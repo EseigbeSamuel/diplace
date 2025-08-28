@@ -1,45 +1,93 @@
-import { Tabs } from 'expo-router';
-import React from 'react';
-import { Platform } from 'react-native';
+import { CustomTabIcon, TabBarLabel } from "@/components/tab";
+import { useTheme } from "@/contexts/themeContext";
+import { Tabs } from "expo-router";
+import React from "react";
+import { heightPercentageToDP as hp } from "react-native-responsive-screen";
 
-import { HapticTab } from '@/components/HapticTab';
-import { IconSymbol } from '@/components/ui/IconSymbol';
-import TabBarBackground from '@/components/ui/TabBarBackground';
-import { Colors } from '@/constants/Colors';
-import { useColorScheme } from '@/hooks/useColorScheme';
-
-export default function TabLayout() {
-  const colorScheme = useColorScheme();
-
+const TabLayout = () => {
+  const { colors } = useTheme();
   return (
     <Tabs
       screenOptions={{
-        tabBarActiveTintColor: Colors[colorScheme ?? 'light'].tint,
         headerShown: false,
-        tabBarButton: HapticTab,
-        tabBarBackground: TabBarBackground,
-        tabBarStyle: Platform.select({
-          ios: {
-            // Use a transparent background on iOS to show the blur effect
-            position: 'absolute',
-          },
-          default: {},
-        }),
-      }}>
+        tabBarStyle: {
+          height: hp("11.57%"),
+          backgroundColor: colors.background,
+          opacity: 40,
+          paddingBottom: hp(0.8),
+          paddingTop: hp(0.5),
+          borderTopLeftRadius: 20,
+          borderTopRightRadius: 20,
+        },
+        tabBarItemStyle: {
+          paddingVertical: hp(0.8),
+        },
+      }}
+      initialRouteName="index"
+    >
       <Tabs.Screen
         name="index"
         options={{
-          title: 'Home',
-          tabBarIcon: ({ color }) => <IconSymbol size={28} name="house.fill" color={color} />,
+          tabBarLabel: (props) => <TabBarLabel {...props}>Home</TabBarLabel>,
+          tabBarLabelPosition: "below-icon",
+          tabBarIcon: ({ focused }) => (
+            <CustomTabIcon
+              focused={focused}
+              activeIcon={require("../../assets/icons/home-active.png")}
+              inactiveIcon={require("../../assets/icons/home.png")}
+            />
+          ),
         }}
       />
       <Tabs.Screen
-        name="explore"
+        name="discover"
         options={{
-          title: 'Explore',
-          tabBarIcon: ({ color }) => <IconSymbol size={28} name="paperplane.fill" color={color} />,
+          tabBarLabel: (props) => (
+            <TabBarLabel {...props}>Discover</TabBarLabel>
+          ),
+          tabBarLabelPosition: "below-icon",
+          tabBarIcon: ({ focused }) => (
+            <CustomTabIcon
+              focused={focused}
+              activeIcon={require("../../assets/icons/discovery-active.png")}
+              inactiveIcon={require("../../assets/icons/discovery.png")}
+            />
+          ),
+        }}
+      />
+      <Tabs.Screen
+        name="chats"
+        options={{
+          tabBarLabel: (props) => <TabBarLabel {...props}>Chats</TabBarLabel>,
+          tabBarLabelPosition: "below-icon",
+          tabBarIcon: ({ focused }) => (
+            <CustomTabIcon
+              focused={focused}
+              activeIcon={require("../../assets/icons/chat-active.png")}
+              inactiveIcon={require("../../assets/icons/chat.png")}
+            />
+          ),
+        }}
+      />
+      <Tabs.Screen
+        name="activity"
+        options={{
+          tabBarLabel: (props) => (
+            <TabBarLabel {...props}>Activity</TabBarLabel>
+          ),
+          tabBarLabelPosition: "below-icon",
+          tabBarIcon: ({ focused }) => (
+            <CustomTabIcon
+              focused={focused}
+              activeIcon={require("../../assets/icons/activity-active.png")}
+              inactiveIcon={require("../../assets/icons/activity.png")}
+              size={28}
+            />
+          ),
         }}
       />
     </Tabs>
   );
-}
+};
+
+export default TabLayout;
