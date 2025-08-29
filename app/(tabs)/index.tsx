@@ -1,11 +1,22 @@
 // Home.tsx
 import Filter from "@/components/filter";
 import { AppHeader } from "@/components/header";
+import HouseCard from "@/components/pagecomponents/home/housecard";
 import SafeAreaViewContainer from "@/components/safeareaview";
+import { FeaturedSpaces, SpacesNearby } from "@/constants/home";
 import { useTheme } from "@/contexts/themeContext";
 import { ColorScheme } from "@/utils";
 import { router } from "expo-router";
-import { Image, Pressable, StyleSheet, Text, View } from "react-native";
+import {
+  FlatList,
+  Image,
+  Pressable,
+  ScrollView,
+  StyleSheet,
+  Text,
+  View,
+} from "react-native";
+
 import { RFValue } from "react-native-responsive-fontsize";
 
 const Home = () => {
@@ -36,6 +47,42 @@ const Home = () => {
         />
         <Filter size="large" />
       </View>
+      <View className="pt-[38px] pb-4 flex flex-row justify-between">
+        <Text style={homeStyles.title} className="font-semibold">
+          Featured Space 🔥
+        </Text>
+
+        <Pressable
+          onPress={() => router.push("/views/location")}
+          className="flex-row items-center gap-2"
+        >
+          <Text>View More</Text>
+          <Image
+            source={require("@/assets/icons/arrow-right-dark.png")}
+            className="w-[20px] h-[20px]"
+          />
+        </Pressable>
+      </View>
+      <ScrollView>
+        <FlatList
+          data={FeaturedSpaces}
+          renderItem={({ item }) => <HouseCard {...item} />}
+          keyExtractor={(item) => item.id}
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          className=""
+        />
+
+        <Text style={homeStyles.title} className="font-semibold pt-8 pb-4">
+          Spaces Nearby 📍
+        </Text>
+        <FlatList
+          data={SpacesNearby}
+          renderItem={({ item }) => <HouseCard {...item} />}
+          scrollEnabled
+          keyExtractor={(item) => item.id}
+        />
+      </ScrollView>
     </SafeAreaViewContainer>
   );
 };
