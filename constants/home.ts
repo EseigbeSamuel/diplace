@@ -87,3 +87,30 @@ export const Tabs = [
     isActive: false,
   },
 ];
+// Constant array based on the provided data
+export const spacesData = [
+  {
+    id: "1",
+    imageSource: require("@/assets/images/SpacesNearbyImage1.png"),
+    name: "Two Cousins Place",
+    location: "13 Tomi Street, Lekki, Lagos",
+    price: "N350,000",
+    duration: "day",
+  },
+  {
+    id: "2",
+    imageSource: require("@/assets/images/SpacesNearbyImage1.png"),
+    name: "Twolooe Event Space",
+    location: "15 Adeniyi Road, Sapele",
+    price: "N280,000",
+    duration: "day",
+  },
+  {
+    id: "3",
+    imageSource: require("@/assets/images/SpacesNearbyImage1.png"),
+    name: "Two unit Self contain apartment",
+    location: "23 Jonah Street, Rumoodara, Port Harcourt",
+    price: "N250,000",
+    duration: "annum",
+  },
+];

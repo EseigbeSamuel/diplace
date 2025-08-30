@@ -1,13 +1,23 @@
 import { cn } from "@/utils";
 import React from "react";
-import { Image, TextInput, View } from "react-native";
+import {
+  Image,
+  NativeSyntheticEvent,
+  TextInput,
+  TextInputFocusEventData,
+  View,
+} from "react-native";
 import { heightPercentageToDP as hp } from "react-native-responsive-screen";
 
 interface FilterProps {
   size?: "small" | "large";
+  onFocus?:
+    | ((e: NativeSyntheticEvent<TextInputFocusEventData>) => void)
+    | undefined;
 }
 
 export default function Filter(props: FilterProps) {
+  const { size, onFocus, ...rest } = props;
   const getSizeStyle = () => {
     if (props.size === "large") {
       return "py-[16px] pr-[8px] pl-[16px]";
@@ -33,6 +43,8 @@ export default function Filter(props: FilterProps) {
       <TextInput
         className="w-full h-full placeholder:text-[#60646C]"
         placeholder="Search"
+        onFocus={onFocus}
+        {...rest}
       />
     </View>
   );
