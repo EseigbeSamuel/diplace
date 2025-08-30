@@ -4,7 +4,7 @@ import Filter from "@/components/filter";
 import { AppHeader } from "@/components/header";
 import HouseCard from "@/components/housecard";
 import SafeAreaViewContainer from "@/components/safeareaview";
-import { FeaturedSpaces, SpacesNearby, Tabs } from "@/constants/home";
+import { featuredSpaces, spacesNearby, Tabs } from "@/constants/home";
 import { useTheme } from "@/contexts/themeContext";
 import { ColorScheme } from "@/utils";
 import { router } from "expo-router";
@@ -12,7 +12,6 @@ import {
   FlatList,
   Image,
   Pressable,
-  ScrollView,
   StyleSheet,
   Text,
   View,
@@ -50,6 +49,7 @@ const Home = () => {
       </View>
       <FlatList
         data={Tabs}
+        contentContainerClassName="gap-2"
         renderItem={({ item }) => (
           <View className="h-[60px] my-4">
             <AppButton
@@ -66,102 +66,48 @@ const Home = () => {
         showsHorizontalScrollIndicator={false}
       />
 
-      <ScrollView showsVerticalScrollIndicator={false}>
-        <View className="pt-[38px] pb-4 flex flex-row justify-between">
-          <Text style={homeStyles.title} className="font-semibold">
-            Featured Space 🔥
-          </Text>
+      <FlatList
+        data={spacesNearby}
+        showsHorizontalScrollIndicator={false}
+        ListHeaderComponent={
+          <>
+            <View className="pt-[38px] pb-4 flex flex-row justify-between">
+              <Text style={homeStyles.title} className="font-semibold">
+                Featured Space 🔥
+              </Text>
+              <Pressable
+                onPress={() => router.push("/views/apartments")}
+                className="flex-row items-center gap-2"
+              >
+                <Text>View More</Text>
+                <Image
+                  source={require("@/assets/icons/arrow-right-dark.png")}
+                  className="w-[20px] h-[20px]"
+                />
+              </Pressable>
+            </View>
 
-          <Pressable
-            onPress={() => router.push("/views/apartments")}
-            className="flex-row items-center gap-2"
-          >
-            <Text>View More</Text>
-            <Image
-              source={require("@/assets/icons/arrow-right-dark.png")}
-              className="w-[20px] h-[20px]"
+            <FlatList
+              data={featuredSpaces}
+              renderItem={({ item }) => <HouseCard {...item} />}
+              keyExtractor={(item) => item.id}
+              horizontal
+              showsHorizontalScrollIndicator={false}
+              contentContainerClassName="gap-4"
             />
-          </Pressable>
-        </View>
-        <View>
-          <FlatList
-            data={FeaturedSpaces}
-            renderItem={({ item }) => (
-              <View className="mr-6">
-                <HouseCard {...item} />
-              </View>
-            )}
-            keyExtractor={(item) => item.id}
-            horizontal
-            showsHorizontalScrollIndicator={false}
-          />
 
-          <Text style={homeStyles.title} className="font-semibold pt-8 pb-4">
-            Spaces Nearby 📍
-          </Text>
-          <FlatList
-            data={SpacesNearby}
-            renderItem={({ item }) => (
-              <View className="pb-8">
-                <HouseCard {...item} />
-              </View>
-            )}
-            showsVerticalScrollIndicator={false}
-            keyExtractor={(item) => item.id}
-          />
-        </View>
-        <AppButton
-          title="View more"
-          onPress={() => router.push("/views/apartments")}
-          afterIcon={require("@/assets/icons/arrow-right-light.png")}
-          size="large"
-        />
-
-        <View className="pt-[38px] pb-4 flex flex-row justify-between">
-          <Text style={homeStyles.title} className="font-semibold">
-            Recently Added🆕
-          </Text>
-
-          <Pressable
-            onPress={() => router.push("/views/apartments")}
-            className="flex-row items-center gap-2"
-          >
-            <Text>View More</Text>
-            <Image
-              source={require("@/assets/icons/arrow-right-dark.png")}
-              className="w-[20px] h-[20px]"
-            />
-          </Pressable>
-        </View>
-
-        <View>
-          <FlatList
-            data={FeaturedSpaces}
-            renderItem={({ item }) => (
-              <View className="mr-6">
-                <HouseCard {...item} />
-              </View>
-            )}
-            keyExtractor={(item) => item.id}
-            horizontal
-            showsHorizontalScrollIndicator={false}
-          />
-
-          <Text style={homeStyles.title} className="font-semibold pt-8 pb-4">
-            Recommended 👍
-          </Text>
-          <FlatList
-            data={SpacesNearby}
-            renderItem={({ item }) => (
-              <View className="pb-8">
-                <HouseCard {...item} />
-              </View>
-            )}
-            showsVerticalScrollIndicator={false}
-            keyExtractor={(item) => item.id}
-          />
-        </View>
-      </ScrollView>
+            <Text style={homeStyles.title} className="pt-8 pb-4 font-semibold">
+              Spaces Nearby 📍
+            </Text>
+          </>
+        }
+        renderItem={({ item }) => (
+          <View className="pb-8">
+            <HouseCard {...item} />
+          </View>
+        )}
+        // data={spacesNearby}
+      />
     </SafeAreaViewContainer>
   );
 };

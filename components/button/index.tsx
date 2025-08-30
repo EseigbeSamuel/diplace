@@ -36,19 +36,19 @@ export default function AppButton(props: ButtonProps) {
 
   const { colors } = useTheme();
 
-  const getVariantContaninerStyles = () => {
-    if (variant === "primary") {
-      return `${
-        disabled ? "bg-[#7E808A]" : "bg-di-dark hover:bg-di-dark-secondary"
-      }`;
-    } else if (variant === "secondary") {
-      return `${
-        disabled
-          ? "bg-[#7E808A] border border-[#E4E4E9]"
-          : "bg-di-gray hover:bg-di-gray-secondary"
-      }`;
-    }
-  };
+  // const getVariantContaninerStyles = () => {
+  //   if (variant === "primary") {
+  //     return `${
+  //       disabled ? "bg-[#7E808A]" : "bg-di-dark hover:bg-di-dark-secondary"
+  //     }`;
+  //   } else if (variant === "secondary") {
+  //     return `${
+  //       disabled
+  //         ? "bg-[#7E808A] border border-[#E4E4E9]"
+  //         : "bg-di-gray hover:bg-di-gray-secondary"
+  //     }`;
+  //   }
+  // };
 
   // const getBtnContainerSize = () => {
   //   if (size === "large") {
@@ -70,7 +70,7 @@ export default function AppButton(props: ButtonProps) {
     }
   };
 
-  const style = styles({ colors, disabled, variant, size, fullwidth });
+  const style = styles({ colors, disabled, variant, size });
 
   return (
     <TouchableOpacity
@@ -79,8 +79,6 @@ export default function AppButton(props: ButtonProps) {
       style={style.container}
       className={cn(
         `flex-row justify-center items-center gap-2 rounded-full`,
-        // getBtnContainerSize(),
-        // getVariantContaninerStyles(),
         fullwidth ? "w-full" : "w-fit",
         className
       )}
@@ -109,11 +107,10 @@ type StylesProps = {
   disabled: boolean;
   variant: "primary" | "secondary" | "tertiary";
   size: "large" | "medium" | "small";
-  fullwidth: boolean;
 };
 
 const styles = (props: StylesProps) => {
-  const { colors, disabled, variant, size, fullwidth } = props;
+  const { colors, disabled, variant, size } = props;
 
   return StyleSheet.create({
     container: {

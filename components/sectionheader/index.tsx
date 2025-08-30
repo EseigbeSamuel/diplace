@@ -25,10 +25,10 @@ const SectionHeader = ({
     navigation.goBack();
   };
   return (
-    <View className="flex flex-row items-center justify-between py-2">
+    <View className="flex flex-row items-center justify-between pb-2">
       <TouchableOpacity
         onPress={handleBackPress}
-        className="p-4 rounded-full bg-gray-100"
+        className="p-4 bg-gray-100 rounded-full"
       >
         <Image
           source={require("@/assets/icons/arrow-left-dark.png")}

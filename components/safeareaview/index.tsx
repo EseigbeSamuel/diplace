@@ -24,6 +24,6 @@ const styles = (colors: ColorScheme) =>
     container: {
       backgroundColor: colors.background,
       flex: 1,
-      padding: 16,
+      paddingHorizontal: 16,
     },
   });

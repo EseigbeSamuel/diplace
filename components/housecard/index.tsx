@@ -40,17 +40,17 @@ const HouseCard = ({
     switch (badgeType) {
       case "hot":
         return (
-          <View className="py-1 px-2 rounded-full border border-red-500 bg-red-400/40 flex flex-row gap-2 items-center">
+          <View className="flex flex-row items-center gap-2 px-2 py-1 border border-red-500 rounded-full bg-red-400/40">
             <Image
               source={require("@/assets/icons/fire-b-fill.png")}
               className="w-4 h-4"
             />
-            <Text className="text-red-600 ">Hot space</Text>
+            <Text className="text-red-600">Hot space</Text>
           </View>
         );
       case "diplace":
         return (
-          <View className="py-1 px-2 rounded-full border border-orange-500 bg-orange-400/40 flex flex-row gap-2 items-center">
+          <View className="flex flex-row items-center gap-2 px-2 py-1 border border-orange-500 rounded-full bg-orange-400/40">
             <Image
               source={require("@/assets/icons/Shield Done.png")}
               className="w-4 h-4"
@@ -60,7 +60,7 @@ const HouseCard = ({
         );
       case "verified":
         return (
-          <View className="py-1 px-2 rounded-full border border-green-500 bg-green-400/40 flex flex-row gap-2 items-center">
+          <View className="flex flex-row items-center gap-2 px-2 py-1 border border-green-500 rounded-full bg-green-400/40">
             <Image
               source={require("@/assets/icons/badge-check-green.png")}
               className="w-4 h-4"
@@ -88,14 +88,14 @@ const HouseCard = ({
             />
           </TouchableOpacity>
         </View>
-        <View className="flex gap-1 flex-row">
+        <View className="flex flex-row gap-1">
           <Image
             source={require("@/assets/icons/Location - Iconly Pro.png")}
             className="w-6 h-6"
           />
           <Text style={homeStyles.subTitlegray}>{location}</Text>
         </View>
-        <View className="flex gap-2 flex-row justify-between items-center">
+        <View className="flex flex-row items-center justify-between gap-2">
           <Text style={homeStyles.title} className="font-semibold">
             {price}
             <Text style={homeStyles.subTitlegray}>/{duration}</Text>

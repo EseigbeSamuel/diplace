@@ -17,8 +17,16 @@ const Placedetails = () => {
         rightIconSource={require("@/assets/icons/more-2-line.png")}
       />
 
-      <View className="-mx-[20px]">
-        <Image source={require("@/assets/images/idViewImage.png")} />
+      <View
+        style={{
+          height: RFValue(380),
+        }}
+        className="w-full rounded-lg"
+      >
+        <Image
+          className="w-full h-full"
+          source={require("@/assets/images/idViewImage.png")}
+        />
       </View>
       <View className="flex flex-row justify-between pt-4">
         <Text style={homeStyles.title} className="w-[70%]">
@@ -39,12 +47,12 @@ const Placedetails = () => {
         <Text style={homeStyles.subTitlegray}>/annum</Text>
       </View>
       <View className="">
-        <Text className="py-2 text-center italic text-gray-400">
+        <Text className="py-2 italic text-center text-gray-400">
           ⚠️ Heads up! The price you see is for the space only. Agent fees and
           other charges may apply.
         </Text>
       </View>
-      <View className="py-2 flex gap-3 flex-col">
+      <View className="flex flex-col gap-3 py-2">
         <AppButton title="Book Now" onPress={() => {}} size="large" />
         <AppButton
           title="Virtual Tour"

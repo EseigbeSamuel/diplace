@@ -1,4 +1,4 @@
-export const FeaturedSpaces = [
+export const featuredSpaces = [
   {
     id: "1",
     imageSource: require("@/assets/images/featuredSpaceImage1.png"),
@@ -27,7 +27,7 @@ export const FeaturedSpaces = [
     duration: "annum",
   },
 ];
-export const SpacesNearby = [
+export const spacesNearby = [
   {
     id: "1",
     imageSource: require("@/assets/images/SpacesNearbyImage1.png"),
