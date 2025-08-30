@@ -1,9 +1,11 @@
 import { useTheme } from "@/contexts/themeContext";
 import { ColorScheme } from "@/utils";
+import { router } from "expo-router";
 import React, { useState } from "react";
 import {
   Image,
   ImageSourcePropType,
+  Pressable,
   StyleSheet,
   Text,
   TouchableOpacity,
@@ -41,9 +43,9 @@ const HouseCard = ({
           <View className="py-1 px-2 rounded-full border border-red-500 bg-red-400/40 flex flex-row gap-2 items-center">
             <Image
               source={require("@/assets/icons/fire-b-fill.png")}
-              className="w-6 h-6"
+              className="w-4 h-4"
             />
-            <Text className="text-red-600">Hot space</Text>
+            <Text className="text-red-600 ">Hot space</Text>
           </View>
         );
       case "diplace":
@@ -51,18 +53,17 @@ const HouseCard = ({
           <View className="py-1 px-2 rounded-full border border-orange-500 bg-orange-400/40 flex flex-row gap-2 items-center">
             <Image
               source={require("@/assets/icons/Shield Done.png")}
-              className="w-6 h-6"
+              className="w-4 h-4"
             />
             <Text className="text-orange-600">DiPlaces</Text>
           </View>
         );
       case "verified":
-      default:
         return (
           <View className="py-1 px-2 rounded-full border border-green-500 bg-green-400/40 flex flex-row gap-2 items-center">
             <Image
               source={require("@/assets/icons/badge-check-green.png")}
-              className="w-6 h-6"
+              className="w-4 h-4"
             />
             <Text className="text-green-600">Verified</Text>
           </View>
@@ -71,36 +72,38 @@ const HouseCard = ({
   };
 
   return (
-    <View className="flex-1 mr-6">
-      <Image source={imageSource} className="rounded-lg" resizeMode="cover" />
-      <View className="flex flex-row justify-between pt-2">
-        <Text style={homeStyles.title}>{title}</Text>
-        <TouchableOpacity onPress={handleBookmarkPress}>
+    <Pressable onPress={() => router.push("/views/placedetails")}>
+      <View className="flex-1">
+        <Image source={imageSource} className="rounded-lg" resizeMode="cover" />
+        <View className="flex flex-row justify-between pt-2">
+          <Text style={homeStyles.title}>{title}</Text>
+          <TouchableOpacity onPress={handleBookmarkPress}>
+            <Image
+              source={
+                isBookmarked
+                  ? require("@/assets/icons/Bookmark - Iconly Pro-1.png")
+                  : require("@/assets/icons/Bookmark - Iconly Pro.png")
+              }
+              className="w-6 h-6"
+            />
+          </TouchableOpacity>
+        </View>
+        <View className="flex gap-1 flex-row">
           <Image
-            source={
-              isBookmarked
-                ? require("@/assets/icons/Bookmark - Iconly Pro-1.png")
-                : require("@/assets/icons/Bookmark - Iconly Pro.png")
-            }
+            source={require("@/assets/icons/Location - Iconly Pro.png")}
             className="w-6 h-6"
           />
-        </TouchableOpacity>
+          <Text style={homeStyles.subTitlegray}>{location}</Text>
+        </View>
+        <View className="flex gap-2 flex-row justify-between items-center">
+          <Text style={homeStyles.title} className="font-semibold">
+            {price}
+            <Text style={homeStyles.subTitlegray}>/{duration}</Text>
+          </Text>
+          {renderBadge()}
+        </View>
       </View>
-      <View className="flex gap-1 flex-row">
-        <Image
-          source={require("@/assets/icons/Location - Iconly Pro.png")}
-          className="w-6 h-6"
-        />
-        <Text style={homeStyles.subTitlegray}>{location}</Text>
-      </View>
-      <View className="flex gap-2 flex-row justify-between">
-        <Text style={homeStyles.title} className="font-semibold">
-          {price}
-          <Text style={homeStyles.subTitlegray}>/{duration}</Text>
-        </Text>
-        {renderBadge()}
-      </View>
-    </View>
+    </Pressable>
   );
 };
 
