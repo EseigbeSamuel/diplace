@@ -29,7 +29,7 @@ const SearchPage = () => {
         {/* Card component */}
         <Pressable
           onPress={() => {
-            router.push("/views/placedetails");
+            router.push("/views/place-details/[id]");
           }}
         >
           <FlatList

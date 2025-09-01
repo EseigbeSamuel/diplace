@@ -47,9 +47,9 @@ const Home = () => {
         />
         <Filter
           size="large"
-          onFocus={() => {
-            router.push("/views/searchPage");
-          }}
+          // onFocus={() => {
+          //   router.push("/views/searchPage");
+          // }}
         />
       </View>
       <FlatList
