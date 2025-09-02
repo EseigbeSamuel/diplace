@@ -72,7 +72,7 @@ const HouseCard = ({
   };
 
   return (
-    <Pressable onPress={() => router.push("/views/placedetails")}>
+    <Pressable onPress={() => router.push("/views/place-details/[id]")}>
       <View className="flex-1">
         <Image source={imageSource} className="rounded-lg" resizeMode="cover" />
         <View className="flex flex-row justify-between pt-2">
