@@ -45,7 +45,12 @@ const Home = () => {
             </View>
           }
         />
-        <Filter size="large" />
+        <Filter
+          size="large"
+          // onFocus={() => {
+          //   router.push("/views/searchPage");
+          // }}
+        />
       </View>
       <FlatList
         data={Tabs}

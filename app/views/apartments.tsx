@@ -2,7 +2,7 @@ import Filter from "@/components/filter";
 import HouseCard from "@/components/housecard";
 import SafeAreaViewContainer from "@/components/safeareaview";
 import SectionHeader from "@/components/sectionheader";
-import { SpacesNearby } from "@/constants/home";
+import { spacesNearby } from "@/constants/home";
 import React from "react";
 import { FlatList, View } from "react-native";
 
@@ -16,7 +16,7 @@ const Apartments = () => {
         </View>
       </View>
       <FlatList
-        data={SpacesNearby}
+        data={spacesNearby}
         renderItem={({ item }) => (
           <View className="pb-8">
             <HouseCard {...item} />
