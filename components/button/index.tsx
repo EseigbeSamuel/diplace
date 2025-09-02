@@ -36,30 +36,6 @@ export default function AppButton(props: ButtonProps) {
 
   const { colors } = useTheme();
 
-  // const getVariantContaninerStyles = () => {
-  //   if (variant === "primary") {
-  //     return `${
-  //       disabled ? "bg-[#7E808A]" : "bg-di-dark hover:bg-di-dark-secondary"
-  //     }`;
-  //   } else if (variant === "secondary") {
-  //     return `${
-  //       disabled
-  //         ? "bg-[#7E808A] border border-[#E4E4E9]"
-  //         : "bg-di-gray hover:bg-di-gray-secondary"
-  //     }`;
-  //   }
-  // };
-
-  // const getBtnContainerSize = () => {
-  //   if (size === "large") {
-  //     return "p-4";
-  //   } else if (size === "medium") {
-  //     return "px-4 py-3";
-  //   } else if (size === "small") {
-  //     return "px-4 py-2.5";
-  //   }
-  // };
-
   const getBtnTextSize = () => {
     if (size === "large") {
       return "text-base";

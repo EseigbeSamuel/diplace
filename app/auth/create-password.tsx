@@ -2,19 +2,18 @@ import AppButton from "@/components/button";
 import SafeAreaViewContainer from "@/components/safeareaview";
 import TextField from "@/components/textfield";
 import { useTheme } from "@/contexts/themeContext";
-import { Link, useRouter } from "expo-router";
+import { useRouter } from "expo-router";
 import React, { useState } from "react";
 import { Text, View } from "react-native";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import { RFValue } from "react-native-responsive-fontsize";
 
-export default function Register() {
+export default function Login() {
   const { colors } = useTheme();
 
   const router = useRouter();
 
   const [formData, setFormData] = useState({
-    email: "",
     password: "",
     confirmPassword: "",
   });
@@ -32,26 +31,17 @@ export default function Register() {
             style={{ fontSize: RFValue(24), color: colors.slate[650] }}
             className="font-bold"
           >
-            Create account
+            Create new password
           </Text>
           <Text
             style={{ fontSize: RFValue(16), color: colors.slate[600] }}
             className="font-normal"
           >
-            Please complete the form to create your account.
+            Follow the steps to create new password.
           </Text>
         </View>
 
-        <View className="gap-2">
-          <TextField
-            label="Email / Phone No."
-            value={formData.email}
-            onChange={(text) =>
-              setFormData({ ...formData, email: text.toString() })
-            }
-            placeholder="Email / Phone No."
-            icon={require("../../assets/icons/mail-outline-light.png")}
-          />
+        <View className="gap-4">
           <TextField
             label="Password"
             value={formData.password}
@@ -61,59 +51,26 @@ export default function Register() {
             placeholder="Password"
             icon={require("../../assets/icons/password-lock.png")}
             type="password"
-            subText="Must be at least 8 characters."
           />
           <TextField
             label="Confirm Password"
-            value={formData.password}
+            value={formData.confirmPassword}
             onChange={(text) =>
               setFormData({ ...formData, confirmPassword: text.toString() })
             }
             placeholder="Password"
             icon={require("../../assets/icons/password-lock.png")}
             type="password"
-            subText="Must be at least 8 characters."
           />
 
           <AppButton
-            onPress={() => router.navigate("/(tabs)")}
-            title="Log in"
+            onPress={() => router.navigate("/auth/login")}
+            title="Proceed to Log in"
             fullwidth
             variant="primary"
             size="large"
-            disabled={!formData.email || !formData.password}
+            disabled={!formData.confirmPassword || !formData.password}
           />
-        </View>
-
-        <View className="flex-row justify-center mt-8">
-          <Text className="text-sm font-medium">Or continue with</Text>
-        </View>
-
-        <View className="justify-center gap-2 mt-2">
-          <AppButton
-            onPress={() => {}}
-            title="Google"
-            fullwidth
-            variant="tertiary"
-            beforeIcon={require("../../assets/icons/google.png")}
-            size="large"
-          />
-          <AppButton
-            onPress={() => {}}
-            title="Apple"
-            fullwidth
-            variant="tertiary"
-            beforeIcon={require("../../assets/icons/apple.png")}
-            size="large"
-          />
-        </View>
-        <View className="flex-row justify-center mt-8">
-          <Text className="text-base font-medium">
-            I already have an account?
-            <Link href="/auth/login" className="text-[#3B82F6]">
-              Log in
-            </Link>
-          </Text>
         </View>
       </KeyboardAwareScrollView>
     </SafeAreaViewContainer>

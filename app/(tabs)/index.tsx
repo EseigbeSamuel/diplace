@@ -68,7 +68,7 @@ const Home = () => {
 
       <FlatList
         data={spacesNearby}
-        showsHorizontalScrollIndicator={false}
+        showsVerticalScrollIndicator={false}
         ListHeaderComponent={
           <>
             <View className="pt-[38px] pb-4 flex flex-row justify-between">

@@ -10,7 +10,6 @@ export default function RootLayout() {
         <StatusBar style="dark" animated />
         <Stack.Screen name="index" />
         <Stack.Screen name="(tabs)" />
-        <Stack.Screen name="views" />
       </Stack>
     </ThemeProvider>
   );

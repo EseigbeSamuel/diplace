@@ -1,6 +1,6 @@
 import AppButton from "@/components/button";
+import OTPInput from "@/components/otp-input";
 import SafeAreaViewContainer from "@/components/safeareaview";
-import TextField from "@/components/textfield";
 import { useTheme } from "@/contexts/themeContext";
 import { useRouter } from "expo-router";
 import React, { useState } from "react";
@@ -14,7 +14,7 @@ export default function ForgotPassowrd() {
   const router = useRouter();
 
   const [formData, setFormData] = useState({
-    email: "",
+    otp: "",
   });
 
   return (
@@ -28,36 +28,31 @@ export default function ForgotPassowrd() {
         <View className="gap-1 mb-6">
           <Text
             style={{ fontSize: RFValue(24), color: colors.slate[650] }}
-            className="font-bold"
+            className="font-bold text-center"
           >
-            Forgot Password
+            Verify OTP
           </Text>
           <Text
             style={{ fontSize: RFValue(16), color: colors.slate[600] }}
-            className="font-normal"
+            className="font-normal text-center"
           >
-            Follow the steps to create new password.
+            Please input the code sent to your email / phone number.
           </Text>
         </View>
 
         <View className="gap-4">
-          <TextField
-            label="Email / Phone No."
-            value={formData.email}
-            onChange={(text) =>
-              setFormData({ ...formData, email: text.toString() })
-            }
-            placeholder="Email / Phone No."
-            icon={require("../../assets/icons/mail-outline-light.png")}
+          <OTPInput
+            length={6}
+            onChange={(otp) => setFormData({ ...formData, otp })}
           />
 
           <AppButton
-            onPress={() => router.navigate("/auth/verify-otp")}
+            onPress={() => router.navigate("/auth/create-password")}
             title="Verify"
             fullwidth
             variant="primary"
             size="large"
-            disabled={!formData.email}
+            disabled={formData.otp.length !== 6}
           />
         </View>
       </KeyboardAwareScrollView>

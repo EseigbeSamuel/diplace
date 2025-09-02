@@ -1,11 +1,13 @@
 import { CustomTabIcon, TabBarLabel } from "@/components/tab";
 import { useTheme } from "@/contexts/themeContext";
+import { tabItems } from "@/utils/permissions";
 import { Tabs } from "expo-router";
 import React from "react";
 import { heightPercentageToDP as hp } from "react-native-responsive-screen";
 
 const TabLayout = () => {
   const { colors } = useTheme();
+  const userRole: "tenant" | "agents" = "tenant";
   return (
     <Tabs
       screenOptions={{
@@ -25,67 +27,36 @@ const TabLayout = () => {
       }}
       initialRouteName="index"
     >
-      <Tabs.Screen
-        name="index"
-        options={{
-          tabBarLabel: (props) => <TabBarLabel {...props}>Home</TabBarLabel>,
-          tabBarLabelPosition: "below-icon",
-          tabBarIcon: ({ focused }) => (
-            <CustomTabIcon
-              focused={focused}
-              activeIcon={require("../../assets/icons/home-active.png")}
-              inactiveIcon={require("../../assets/icons/home.png")}
+      {tabItems.map((item) => {
+        if (!item.grantPermission.includes(userRole)) {
+          return (
+            <Tabs.Screen
+              key={item.name}
+              name={item.name}
+              options={{ href: null }}
             />
-          ),
-        }}
-      />
-      <Tabs.Screen
-        name="discover"
-        options={{
-          tabBarLabel: (props) => (
-            <TabBarLabel {...props}>Discover</TabBarLabel>
-          ),
-          tabBarLabelPosition: "below-icon",
-          tabBarIcon: ({ focused }) => (
-            <CustomTabIcon
-              focused={focused}
-              activeIcon={require("../../assets/icons/discovery-active.png")}
-              inactiveIcon={require("../../assets/icons/discovery.png")}
-            />
-          ),
-        }}
-      />
-      <Tabs.Screen
-        name="chats"
-        options={{
-          tabBarLabel: (props) => <TabBarLabel {...props}>Chats</TabBarLabel>,
-          tabBarLabelPosition: "below-icon",
-          tabBarIcon: ({ focused }) => (
-            <CustomTabIcon
-              focused={focused}
-              activeIcon={require("../../assets/icons/chat-active.png")}
-              inactiveIcon={require("../../assets/icons/chat.png")}
-            />
-          ),
-        }}
-      />
-      <Tabs.Screen
-        name="activity"
-        options={{
-          tabBarLabel: (props) => (
-            <TabBarLabel {...props}>Activity</TabBarLabel>
-          ),
-          tabBarLabelPosition: "below-icon",
-          tabBarIcon: ({ focused }) => (
-            <CustomTabIcon
-              focused={focused}
-              activeIcon={require("../../assets/icons/activity-active.png")}
-              inactiveIcon={require("../../assets/icons/activity.png")}
-              size={28}
-            />
-          ),
-        }}
-      />
+          );
+        }
+        return (
+          <Tabs.Screen
+            key={item.name}
+            name={item.name}
+            options={{
+              tabBarLabel: (props) => (
+                <TabBarLabel {...props}>{item.label}</TabBarLabel>
+              ),
+              tabBarLabelPosition: "below-icon",
+              tabBarIcon: ({ focused }) => (
+                <CustomTabIcon
+                  focused={focused}
+                  activeIcon={item.activeIcon}
+                  inactiveIcon={item.inactiveIcon}
+                />
+              ),
+            }}
+          />
+        );
+      })}
     </Tabs>
   );
 };

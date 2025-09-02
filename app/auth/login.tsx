@@ -58,7 +58,7 @@ export default function Login() {
               setFormData({ ...formData, password: text.toString() })
             }
             placeholder="Password"
-            icon={require("../../assets/icons/mail-outline-light.png")}
+            icon={require("../../assets/icons/password-lock.png")}
             type="password"
           />
           <View className="flex-row justify-end">
@@ -67,7 +67,13 @@ export default function Login() {
             </Link>
           </View>
           <AppButton
-            onPress={() => router.navigate("/(tabs)")}
+            onPress={() => {
+              if (formData.email.toLocaleLowerCase() === "emmanuel") {
+                router.replace("/(onboarding)/welcome");
+              } else {
+                router.replace("/(tabs)");
+              }
+            }}
             title="Log in"
             fullwidth
             variant="primary"
