@@ -36,3 +36,7 @@ export interface Section {
   header?: () => React.ReactElement;
   footer?: () => React.ReactElement;
 }
+export interface HeaderTab {
+  id: string;
+  label: string;
+}
