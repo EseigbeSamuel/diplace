@@ -3,7 +3,7 @@ import { AppHeader } from "@/components/header";
 import HouseCard from "@/components/housecard";
 import ImageSlider from "@/components/imageslider";
 import SafeAreaViewContainer from "@/components/safeareaview";
-import { Categories, FeaturedListers } from "@/constants/discover";
+import { categories, featuredListers } from "@/constants/discover";
 import { featuredSpaces } from "@/constants/home";
 import { useTheme } from "@/contexts/themeContext";
 import { ColorScheme } from "@/utils";
@@ -29,21 +29,21 @@ const Discover = () => {
       <Filter size="large" />
 
       <ScrollView>
-        <View className="my-5 gap-3 flex flex-col">
+        <View className="flex flex-col gap-3 my-5">
           <Text style={homeStyles.title} className="font-semibold">
             Categories
           </Text>
           <FlatList
-            data={Categories}
+            data={categories}
             horizontal
-            contentContainerClassName="gap-4"
+            contentContainerClassName="gap-2"
             showsHorizontalScrollIndicator={false}
             renderItem={({ item }) => (
               <View
                 style={homeStyles.border}
-                className="flex flex-col items-center border rounded-2xl p-4 min-w-[100px]"
+                className="flex flex-col items-center border rounded-2xl p-4 min-w-[108px]"
               >
-                <Image className="size-[30px]" source={item.icon} />
+                <Image className="size-[28px]" source={item.icon} />
                 <Text style={homeStyles.subTitle} className="capitalize">
                   {item.name}{" "}
                 </Text>
@@ -52,11 +52,9 @@ const Discover = () => {
             keyExtractor={(item) => item.id}
           />
         </View>
-        <View>
-          <ImageSlider />
-        </View>
+        <ImageSlider />
 
-        <View className="my-5 gap-3 flex flex-col">
+        <View className="flex flex-col gap-3 my-5">
           <View className="flex flex-row justify-between ">
             <Text style={homeStyles.title} className="font-semibold">
               Featured Listers
@@ -73,11 +71,10 @@ const Discover = () => {
             </Pressable>
           </View>
           <FlatList
-            data={FeaturedListers}
+            data={featuredListers}
             horizontal
             showsHorizontalScrollIndicator={false}
             contentContainerClassName="gap-4"
-            ListHeaderComponent={<></>}
             renderItem={({ item }) => (
               <View
                 style={homeStyles.border}
@@ -87,7 +84,7 @@ const Discover = () => {
                 <View>
                   <Text
                     style={homeStyles.subTitle}
-                    className="capitalize font-medium"
+                    className="font-medium capitalize"
                   >
                     {item.name}{" "}
                   </Text>
@@ -107,8 +104,8 @@ const Discover = () => {
           />
         </View>
 
-        <View className="my-5 gap-3 flex flex-col">
-          <View className=" flex flex-row justify-between">
+        <View className="flex flex-col gap-3 my-5">
+          <View className="flex flex-row justify-between ">
             <Text style={homeStyles.title} className="font-semibold">
               Featured Space 🔥
             </Text>
@@ -133,7 +130,7 @@ const Discover = () => {
           />
         </View>
 
-        <View className="my-5 gap-3 flex flex-col">
+        <View className="flex flex-col gap-3 my-5">
           <View className="flex flex-row justify-between">
             <Text style={homeStyles.title} className="font-semibold">
               Discounted 🏷️
@@ -159,7 +156,7 @@ const Discover = () => {
           />
         </View>
 
-        <View className="my-5 gap-3 flex flex-col">
+        <View className="flex flex-col gap-3 my-5">
           <View className="flex flex-row justify-between">
             <Text style={homeStyles.title} className="font-semibold">
               Top Event Places 🎉
@@ -206,5 +203,6 @@ const styles = (colors: ColorScheme) =>
     subTitle: {
       fontSize: RFValue(14),
       lineHeight: RFValue(20),
+      color: colors.slate[600],
     },
   });

@@ -78,7 +78,7 @@ export default function Login() {
             fullwidth
             variant="primary"
             size="large"
-            disabled={!formData.email || !formData.password}
+            // disabled={!formData.email || !formData.password}
           />
         </View>
 

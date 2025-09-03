@@ -31,7 +31,7 @@ export const Tabs = [
   },
 ];
 
-export const FeaturedListers = [
+export const featuredListers = [
   {
     id: "1",
     imageSource: require("@/assets/images/user.png"),
@@ -58,14 +58,14 @@ export const FeaturedListers = [
   },
 ];
 
-export const Categories = [
+export const categories = [
   {
     id: "1",
-    icon: require("@/assets/icons/Shop.png"),
+    icon: require("@/assets/icons/apartment.png"),
     name: "apartment",
   },
-  { id: "3", icon: require("@/assets/icons/Shop.png"), name: "offices" },
   { id: "2", icon: require("@/assets/icons/Shop.png"), name: "shops" },
+  { id: "3", icon: require("@/assets/icons/office.png"), name: "offices" },
   {
     id: "4",
     icon: require("@/assets/icons/Shop.png"),
@@ -73,7 +73,7 @@ export const Categories = [
   },
 ];
 
-export const Slider = [
+export const slider = [
   {
     id: "1",
     image: require("@/assets/images/featuredSpaceImage1.png"),

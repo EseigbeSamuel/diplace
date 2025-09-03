@@ -60,22 +60,22 @@ const Placedetails = () => {
             other charges may apply.
           </Text>
         </View>
-        <View className="flex flex-row justify-evenly py-4 border-b border-gray-300">
-          <View className="flex justify-center items-center">
+        <View className="flex flex-row py-4 border-b border-gray-300 justify-evenly">
+          <View className="flex items-center justify-center">
             <Image
               source={require("@/assets/icons/bed-outline.png")}
               className="w-6 h-6"
             />
             <Text>2 Bedrooms</Text>
           </View>
-          <View className="flex justify-center items-center">
+          <View className="flex items-center justify-center">
             <Image
               source={require("@/assets/icons/bath.png")}
               className="w-6 h-6"
             />
             <Text>2 Baths</Text>
           </View>
-          <View className="flex justify-center items-center">
+          <View className="flex items-center justify-center">
             <Image
               source={require("@/assets/icons/bath.png")}
               className="w-6 h-6"
@@ -83,24 +83,24 @@ const Placedetails = () => {
             <Text>10 by 12ft</Text>
           </View>
         </View>
-        <View className="flex flex-row justify-between items-center py-3">
+        <View className="flex flex-row items-center justify-between py-3">
           <Text className="font-semibold" style={homeStyles.title}>
             Listed by
           </Text>
           <Text className="">Pushed 2 days ago</Text>
         </View>
 
-        <View className="border-b border-gray-300 py-3 flex gap-2 flex-row">
+        <View className="flex flex-row gap-2 py-3 border-b border-gray-300">
           <View className="h-12 w-12 rounded-[999px] bg-gray-300"></View>
           <View className="w-[50%]">
             <Text>
               Ibe Alex{" "}
               <Image source={require("@/assets/icons/badge-check-green.png")} />
             </Text>
-            <Text className="flex gap-2 flex-row">
+            <Text className="flex flex-row gap-2">
               <Image
-                source={require("@/assets/icons/Star - Iconly Pro-1.png")}
-                className="h-4 w-4"
+                source={require("@/assets/icons/star.png")}
+                className="w-4 h-4"
               />{" "}
               4.5 <Text className="text-blue-500">(15 reviews)</Text>
             </Text>
@@ -169,14 +169,14 @@ const Placedetails = () => {
             <Text className="font-semibold">N600,000.00</Text>
           </View>
         </View>
-        <View className="border-b border-gray-300 py-3 flex flex-row justify-between">
+        <View className="flex flex-row justify-between py-3 border-b border-gray-300">
           <Text className="text-lg">Total Payable</Text>
           <Text style={homeStyles.title} className="font-semibold">
             N716,000.10
           </Text>
         </View>
 
-        <Pressable className="py-4 flex gap-3 items-center flex-row">
+        <Pressable className="flex flex-row items-center gap-3 py-4">
           <Image
             source={require("@/assets/icons/flag.png")}
             className="w-6 h-6"
