@@ -22,8 +22,8 @@ const ActiveActivityCard = ({
         <Image source={image} className="w-6 h-6" />
       </View>
 
-      <View className="flex flex-row justify-between items-center">
-        <View className="">
+      <View className="flex flex-row justify-between items-center flex-1">
+        <View className="flex-1">
           <Text className="text-gray-300">{date}</Text>
           <Text className="text-lg font-semibold">{title}</Text>
           <Text>{location}</Text>
@@ -32,7 +32,7 @@ const ActiveActivityCard = ({
           <AppButton
             title={buttonTitle}
             onPress={() => {
-              router.push("/views/place-details/[id]");
+              router.push("/views/activities/activitySchedule");
             }}
             variant="secondary"
           />
