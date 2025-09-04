@@ -3,6 +3,7 @@ import SafeAreaViewContainer from "@/components/safeareaview";
 import SectionHeader from "@/components/sectionheader";
 import { useTheme } from "@/contexts/themeContext";
 import { ColorScheme } from "@/utils";
+import { router } from "expo-router";
 import React from "react";
 import { Image, ScrollView, StyleSheet, Text, View } from "react-native";
 import { RFValue } from "react-native-responsive-fontsize";
@@ -131,7 +132,12 @@ const ActivitySchedule = () => {
           </Text>
         </View>
         <View>
-          <AppButton title="Book Now" onPress={() => {}} />
+          <AppButton
+            title="Book Now"
+            onPress={() => {
+              router.push("/views/activities/payBalance");
+            }}
+          />
         </View>
       </View>
     </SafeAreaViewContainer>
