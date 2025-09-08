@@ -109,13 +109,13 @@ const Placedetails = () => {
             <View className="w-14 flex items-center justify-center h-14 rounded-[999px] bg-gray-400 ">
               <Image
                 source={require("@/assets/icons/Calling - Iconly Pro.png")}
-                className="w-10 h-10"
+                className="w-6 h-6"
               />
             </View>
             <View className="w-14 flex items-center justify-center h-14 rounded-[999px] bg-gray-400 ">
               <Image
                 source={require("@/assets/icons/Calling - Iconly Pro.png")}
-                className="w-10 h-10"
+                className="w-6 h-6"
               />
             </View>
           </View>

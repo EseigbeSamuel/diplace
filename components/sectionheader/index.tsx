@@ -9,7 +9,7 @@ import {
 } from "react-native";
 
 interface HeaderComponentProps {
-  title: string;
+  title?: string;
   rightIconSource?: ImageSourcePropType;
   onRightIconPress?: () => void;
 }
