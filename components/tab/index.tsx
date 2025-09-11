@@ -1,4 +1,3 @@
-import { LabelPosition } from "@react-navigation/bottom-tabs/src/types";
 import React from "react";
 import {
   Image,
@@ -19,7 +18,6 @@ export const TabBarLabel = ({
 }: {
   focused: boolean;
   color: string;
-  position: LabelPosition;
   children: string;
   title?: string;
 }): React.ReactNode => {

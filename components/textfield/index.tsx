@@ -1,4 +1,5 @@
-import { colors } from "@/utils";
+import { useTheme } from "@/contexts/themeContext";
+import { ColorScheme } from "@/utils";
 import React, { useEffect, useRef, useState } from "react";
 import {
   Animated,
@@ -35,6 +36,8 @@ export default function TextField({
   const [showPassword, setShowPassword] = useState(false);
   const animatedIsFocused = useRef(new Animated.Value(value ? 1 : 0)).current;
 
+  const { colors } = useTheme();
+
   useEffect(() => {
     Animated.timing(animatedIsFocused, {
       toValue: isFocused || value ? 1 : 0,
@@ -55,23 +58,25 @@ export default function TextField({
       inputRange: [0, 1],
       outputRange: [16, 12],
     }),
-    color: isFocused ? colors["slate-900"] : "#888",
+    color: isFocused ? colors.slate[650] : "#888",
   };
+
+  const style = styles(colors);
 
   return (
     <>
       <View
         style={[
-          styles.container,
-          isFocused ? { borderColor: colors["slate-900"], borderWidth: 2 } : {},
+          style.container,
+          isFocused ? { borderColor: colors.slate[650], borderWidth: 2 } : {},
         ]}
       >
-        {icon && <Image source={icon} style={styles.icon} />}
+        {icon && <Image source={icon} style={style.icon} />}
         <Animated.Text style={labelStyle}>{label}</Animated.Text>
 
         <TextInput
           {...rest}
-          style={[styles.input, icon ? { paddingLeft: 35 } : {}]}
+          style={[style.input, icon ? { paddingLeft: 35 } : {}]}
           value={value}
           onChangeText={onChange}
           onFocus={() => setIsFocused(true)}
@@ -81,10 +86,7 @@ export default function TextField({
         />
 
         {type !== "password" && value.length > 0 && (
-          <TouchableOpacity
-            onPress={() => onChange("")}
-            style={styles.clearBtn}
-          >
+          <TouchableOpacity onPress={() => onChange("")} style={style.clearBtn}>
             <Image
               style={{ width: 18, height: 18 }}
               source={require("../../assets/icons/close-contained.png")}
@@ -95,7 +97,7 @@ export default function TextField({
         {type === "password" && (
           <TouchableOpacity
             onPress={() => setShowPassword((prev) => !prev)}
-            style={styles.clearBtn}
+            style={style.clearBtn}
           >
             <Image
               style={{ width: 20, height: 20 }}
@@ -109,48 +111,49 @@ export default function TextField({
         )}
       </View>
 
-      {subText && <Text style={styles.subText}>{subText}</Text>}
+      {subText && <Text style={style.subText}>{subText}</Text>}
     </>
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    height: 56,
-    borderWidth: 1,
-    borderColor: "#ccc",
-    borderRadius: 10,
-    backgroundColor: "#f9f9f9",
-    marginVertical: 6,
-    paddingHorizontal: 10,
-    justifyContent: "center", // ✅ keeps input centered
-  },
-  input: {
-    flex: 1,
-    fontSize: 16,
-    color: "#000",
-    width: "100%",
-    paddingTop: Platform.OS === "android" ? 8 : 0, // ✅ Android tweak
-    paddingBottom: Platform.OS === "android" ? 0 : 6,
-    textAlignVertical: "center", // ✅ keeps text centered on Android
-  },
-  icon: {
-    position: "absolute",
-    left: 10,
-    width: 18,
-    height: 18,
-    tintColor: "#555",
-    resizeMode: "contain",
-  },
-  clearBtn: {
-    position: "absolute",
-    right: 10,
-    height: "100%",
-    justifyContent: "center",
-  },
-  subText: {
-    fontSize: 12,
-    color: "#666",
-    marginLeft: 4,
-  },
-});
+const styles = (colors: ColorScheme) =>
+  StyleSheet.create({
+    container: {
+      height: 56,
+      borderWidth: 1,
+      borderColor: "#ccc",
+      borderRadius: 10,
+      backgroundColor: colors.slate[150],
+      marginVertical: 6,
+      paddingHorizontal: 10,
+      justifyContent: "center",
+    },
+    input: {
+      flex: 1,
+      fontSize: 16,
+      color: colors.slate[650],
+      width: "100%",
+      paddingTop: Platform.OS === "android" ? 8 : 0,
+      paddingBottom: Platform.OS === "android" ? 0 : 6,
+      textAlignVertical: "center",
+    },
+    icon: {
+      position: "absolute",
+      left: 10,
+      width: 18,
+      height: 18,
+      tintColor: "#555",
+      resizeMode: "contain",
+    },
+    clearBtn: {
+      position: "absolute",
+      right: 10,
+      height: "100%",
+      justifyContent: "center",
+    },
+    subText: {
+      fontSize: 12,
+      color: colors.slate[650],
+      marginLeft: 4,
+    },
+  });

@@ -11,7 +11,6 @@ import { heightPercentageToDP as hp } from "react-native-responsive-screen";
 
 const TabLayout = () => {
   const { colors } = useTheme();
-
   const { userType } = useUser();
 
   const addSpaceRef = useRef<BottomSheetModal>(null);

@@ -108,7 +108,7 @@ const styles = (props: StylesProps) => {
     title: {
       color:
         variant === "primary"
-          ? "#fff"
+          ? `${disabled ? colors.slate[150] : colors.slate[100]}`
           : variant === "secondary"
           ? `${disabled ? colors.slate[450] : colors.slate[650]}`
           : colors.slate[650],

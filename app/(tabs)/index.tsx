@@ -25,7 +25,7 @@ const Home = () => {
 
   return (
     <SafeAreaViewContainer>
-      <View className="">
+      <View className="gap-2">
         <AppHeader
           title={
             <View className="gap-2">
@@ -126,9 +126,11 @@ const styles = (colors: ColorScheme) =>
     title: {
       fontSize: RFValue(18),
       lineHeight: RFValue(24),
+      color: colors.slate[650],
     },
     subTitle: {
       fontSize: RFValue(14),
       lineHeight: RFValue(20),
+      color: colors.slate[600],
     },
   });

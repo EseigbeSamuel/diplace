@@ -12,15 +12,24 @@ export default function GetStarted() {
 
   return (
     <SafeAreaViewContainer className="items-center justify-center gap-4">
-      <Text className="font-bold text-center" style={{ fontSize: RFValue(24) }}>
+      <Text
+        className="font-bold text-center"
+        style={{ fontSize: RFValue(24), color: colors.slate[650] }}
+      >
         DiPlace
       </Text>
       <View className="items-center justify-center">
-        <View className="border-4 w-[230px] h-[290px] bg-[#F9F9FB]"></View>
+        <View
+          style={{
+            borderColor: colors.slate[600],
+            backgroundColor: colors.slate[150],
+          }}
+          className="border-4 w-[230px] h-[290px]"
+        ></View>
       </View>
       <View className="w-[90%] gap-2">
         <Text
-          style={{ fontSize: RFValue(24) }}
+          style={{ fontSize: RFValue(24), color: colors.slate[650] }}
           className="font-semibold text-center"
         >
           Find a space without hassle!

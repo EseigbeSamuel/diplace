@@ -15,7 +15,7 @@ interface ThemeProviderProps {
 }
 
 export const ThemeProvider = (props: ThemeProviderProps) => {
-  const [isDarkMode, setIsDarkMode] = React.useState(false);
+  const [isDarkMode, setIsDarkMode] = React.useState(true);
 
   useEffect(() => {
     AsyncStorage.getItem("isDarkMode").then((value) => {
