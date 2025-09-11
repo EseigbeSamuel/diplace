@@ -7,6 +7,8 @@ interface TabsProps {
   initialActiveTab?: string;
   onTabChange?: (tabId: string) => void;
   renderContent?: (activeTab: string) => React.ReactNode;
+  renderHeader?: React.ReactNode;
+  renderAfterIcon?: React.ReactNode;
 }
 
 const HeaderTabs: React.FC<TabsProps> = ({
@@ -14,6 +16,8 @@ const HeaderTabs: React.FC<TabsProps> = ({
   initialActiveTab,
   onTabChange,
   renderContent,
+  renderHeader,
+  renderAfterIcon,
 }) => {
   const [activeTab, setActiveTab] = useState<string>(
     () => initialActiveTab || tabs[0]?.id || ""
@@ -40,24 +44,27 @@ const HeaderTabs: React.FC<TabsProps> = ({
 
   return (
     <View className="flex-1">
-      <View className="flex-row items-center">
-        {tabs.map((tab) => (
-          <TouchableOpacity
-            key={tab.id}
-            onPress={() => handleTabPress(tab.id)}
-            className={`px-4 py-2 ${
-              activeTab === tab.id ? "border-b-2 border-black" : ""
-            }`}
-          >
-            <Text
-              className={`text-base ${
-                activeTab === tab.id ? "font-semibold" : "font-normal"
+      <View className="flex flex-row items-center justify-between">
+        <View className="flex-row items-center gap-4">
+          {tabs.map((tab) => (
+            <TouchableOpacity
+              key={tab.id}
+              onPress={() => handleTabPress(tab.id)}
+              className={`py-2 ${
+                activeTab === tab.id ? "border-b-2 border-black" : ""
               }`}
             >
-              {tab.label}
-            </Text>
-          </TouchableOpacity>
-        ))}
+              <Text
+                className={`text-base ${
+                  activeTab === tab.id ? "font-semibold" : "font-normal"
+                }`}
+              >
+                {tab.label}
+              </Text>
+            </TouchableOpacity>
+          ))}
+        </View>
+        <View>{renderAfterIcon && renderAfterIcon}</View>
       </View>
       {renderContent && renderContent(activeTab)}
     </View>

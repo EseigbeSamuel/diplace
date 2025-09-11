@@ -48,7 +48,8 @@ const tabBarIconBaseStyle = StyleSheet.create({
   iconWrapper: {
     alignItems: "center",
     justifyContent: "center",
-    paddingTop: hp(0.4),
+    // paddingTop: hp(0.4),
+    height: RFValue(62),
   },
 });
 

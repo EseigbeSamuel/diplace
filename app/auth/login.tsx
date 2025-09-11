@@ -2,6 +2,7 @@ import AppButton from "@/components/button";
 import SafeAreaViewContainer from "@/components/safeareaview";
 import TextField from "@/components/textfield";
 import { useTheme } from "@/contexts/themeContext";
+import { useUser } from "@/contexts/user-context";
 import { Link, useRouter } from "expo-router";
 import React, { useState } from "react";
 import { Text, View } from "react-native";
@@ -10,6 +11,7 @@ import { RFValue } from "react-native-responsive-fontsize";
 
 export default function Login() {
   const { colors } = useTheme();
+  const { setUserType, userType } = useUser();
 
   const router = useRouter();
 
@@ -69,8 +71,12 @@ export default function Login() {
           <AppButton
             onPress={() => {
               if (formData.email.toLocaleLowerCase() === "emmanuel") {
-                router.replace("/(onboarding)/welcome");
+                router.replace("/onboarding/welcome");
+              } else if (formData.email.toLocaleLowerCase() === "owner") {
+                setUserType("owner");
+                router.replace("/(tabs)");
               } else {
+                setUserType("tenant");
                 router.replace("/(tabs)");
               }
             }}
@@ -78,7 +84,7 @@ export default function Login() {
             fullwidth
             variant="primary"
             size="large"
-            // disabled={!formData.email || !formData.password}
+            disabled={!formData.email || !formData.password}
           />
         </View>
 
