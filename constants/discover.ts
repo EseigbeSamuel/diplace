@@ -31,30 +31,42 @@ export const Tabs = [
   },
 ];
 
-export const featuredListers = [
+export const featuredLister = [
   {
     id: "1",
     imageSource: require("@/assets/images/user.png"),
     name: "ibe alex",
     rating: 4.5,
+    location: "lekki,lagos",
+    spaces: 4,
+    reviews: 15,
   },
   {
     id: "2",
     imageSource: require("@/assets/images/user.png"),
     name: "altraz palace",
     rating: 4.5,
+    location: "lekki,lagos",
+    spaces: 4,
+    reviews: 15,
   },
   {
     id: "3",
     imageSource: require("@/assets/images/user.png"),
     name: "oluwa olurun",
     rating: 4.5,
+    location: "lekki,lagos",
+    spaces: 4,
+    reviews: 15,
   },
   {
     id: "4",
     imageSource: require("@/assets/images/user.png"),
     name: "john pork",
     rating: 4.5,
+    location: "lekki,lagos",
+    spaces: 4,
+    reviews: 15,
   },
 ];
 
@@ -77,13 +89,16 @@ export const slider = [
   {
     id: "1",
     image: require("@/assets/images/featuredSpaceImage1.png"),
+    location: "port harcourt",
   },
   {
     id: "2",
     image: require("@/assets/images/featuredSpaceImage1.png"),
+    location: "lagos",
   },
   {
     id: "3",
     image: require("@/assets/images/featuredSpaceImage1.png"),
+    location: "benin",
   },
 ];

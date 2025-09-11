@@ -3,7 +3,7 @@ import { AppHeader } from "@/components/header";
 import HouseCard from "@/components/housecard";
 import ImageSlider from "@/components/imageslider";
 import SafeAreaViewContainer from "@/components/safeareaview";
-import { categories, featuredListers } from "@/constants/discover";
+import { categories, featuredLister } from "@/constants/discover";
 import { featuredSpaces } from "@/constants/home";
 import { useTheme } from "@/contexts/themeContext";
 import { ColorScheme } from "@/utils";
@@ -39,7 +39,8 @@ const Discover = () => {
             contentContainerClassName="gap-2"
             showsHorizontalScrollIndicator={false}
             renderItem={({ item }) => (
-              <View
+              <Pressable
+                onPress={() => router.push("/views/apartments")}
                 style={homeStyles.border}
                 className="flex flex-col items-center border rounded-2xl p-4 min-w-[108px]"
               >
@@ -47,12 +48,19 @@ const Discover = () => {
                 <Text style={homeStyles.subTitle} className="capitalize">
                   {item.name}{" "}
                 </Text>
-              </View>
+              </Pressable>
             )}
             keyExtractor={(item) => item.id}
           />
         </View>
-        <ImageSlider />
+
+        <View className="flex flex-col gap-3">
+          <Text style={homeStyles.title} className="font-semibold">
+            Neighborhoods{" "}
+          </Text>
+          <ImageSlider />
+          {/* <ImageSlider data={slider} autoPlay interval={4000} /> */}
+        </View>
 
         <View className="flex flex-col gap-3 my-5">
           <View className="flex flex-row justify-between ">
@@ -60,7 +68,7 @@ const Discover = () => {
               Featured Listers
             </Text>
             <Pressable
-              onPress={() => router.push("/views/apartments")}
+              onPress={() => router.push("/views/featuredListers")}
               className="flex-row items-center gap-2"
             >
               <Text>View more</Text>
@@ -71,7 +79,7 @@ const Discover = () => {
             </Pressable>
           </View>
           <FlatList
-            data={featuredListers}
+            data={featuredLister}
             horizontal
             showsHorizontalScrollIndicator={false}
             contentContainerClassName="gap-4"
@@ -83,17 +91,17 @@ const Discover = () => {
                 <Image source={item.imageSource} />
                 <View>
                   <Text
-                    style={homeStyles.subTitle}
+                    style={homeStyles.text}
                     className="font-medium capitalize"
                   >
-                    {item.name}{" "}
+                    {item.name}
                   </Text>
                   <View className="flex flex-row items-center">
                     <Image
                       source={require("@/assets/icons/Star-Iconly-Pro-1.png")}
                       className="size-[20px]"
                     />
-                    <Text style={homeStyles.subTitle} className="">
+                    <Text style={homeStyles.small} className="">
                       {item.rating}
                     </Text>
                   </View>
@@ -200,9 +208,15 @@ const styles = (colors: ColorScheme) =>
       fontSize: RFValue(18),
       lineHeight: RFValue(24),
     },
+    text: { fontSize: RFValue(14), lineHeight: RFValue(20) },
     subTitle: {
       fontSize: RFValue(14),
       lineHeight: RFValue(20),
+      color: colors.slate[600],
+    },
+    small: {
+      fontSize: RFValue(12),
+      lineHeight: RFValue(16),
       color: colors.slate[600],
     },
   });
