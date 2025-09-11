@@ -7,7 +7,7 @@ import { FlatList, View } from "react-native";
 
 const SpacesDrafts = ({ layout }: { layout: "tiles" | "box" }) => {
   return (
-    <View className="h-full">
+    <View className="flex-1">
       <View className="py-2">
         <Filter size="large" />
       </View>
@@ -15,19 +15,15 @@ const SpacesDrafts = ({ layout }: { layout: "tiles" | "box" }) => {
         data={spacesDrafts}
         renderItem={({ item }) =>
           layout === "box" ? (
-            <>
-              <HouseCard {...item} />
-            </>
+            <HouseCard {...item} />
           ) : (
-            <>
-              <HouseCardTile
-                imageSource={item.imageSource}
-                name={item.title}
-                location={item.location}
-                price={item.price}
-                duration={item.duration}
-              />
-            </>
+            <HouseCardTile
+              imageSource={item.imageSource}
+              name={item.title}
+              location={item.location}
+              price={item.price}
+              duration={item.duration}
+            />
           )
         }
         showsVerticalScrollIndicator={false}

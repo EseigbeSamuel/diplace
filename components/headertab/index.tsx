@@ -43,14 +43,14 @@ const HeaderTabs: React.FC<TabsProps> = ({
   };
 
   return (
-    <View>
-      <View className="flex flex-row justify-between items-center">
-        <View className="flex-row items-center">
+    <View className="flex-1">
+      <View className="flex flex-row items-center justify-between">
+        <View className="flex-row items-center gap-4">
           {tabs.map((tab) => (
             <TouchableOpacity
               key={tab.id}
               onPress={() => handleTabPress(tab.id)}
-              className={`px-4 py-2 ${
+              className={`py-2 ${
                 activeTab === tab.id ? "border-b-2 border-black" : ""
               }`}
             >
@@ -66,7 +66,7 @@ const HeaderTabs: React.FC<TabsProps> = ({
         </View>
         <View>{renderAfterIcon && renderAfterIcon}</View>
       </View>
-      <View>{renderContent && renderContent(activeTab)}</View>
+      {renderContent && renderContent(activeTab)}
     </View>
   );
 };
