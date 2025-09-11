@@ -25,5 +25,6 @@ const styles = (colors: ColorScheme) =>
       backgroundColor: colors.background,
       flex: 1,
       paddingHorizontal: 16,
+      paddingTop: 10,
     },
   });

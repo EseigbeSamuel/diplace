@@ -111,7 +111,6 @@ const Home = () => {
             <HouseCard {...item} />
           </View>
         )}
-        // data={spacesNearby}
       />
     </SafeAreaViewContainer>
   );

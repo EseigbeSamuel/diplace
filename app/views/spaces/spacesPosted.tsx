@@ -7,7 +7,7 @@ import { FlatList, View } from "react-native";
 
 const SpacesPosted = ({ layout }: { layout: "tiles" | "box" }) => {
   return (
-    <View className="h-full">
+    <View className="flex-1">
       <View className="py-2">
         <Filter size="large" />
       </View>

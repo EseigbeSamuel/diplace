@@ -65,7 +65,7 @@ export const categories = [
     name: "apartment",
   },
   { id: "2", icon: require("@/assets/icons/Shop.png"), name: "shops" },
-  { id: "3", icon: require("@/assets/icons/Office.png"), name: "offices" },
+  { id: "3", icon: require("@/assets/icons/office.png"), name: "offices" },
   {
     id: "4",
     icon: require("@/assets/icons/Shop.png"),
