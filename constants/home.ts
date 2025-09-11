@@ -55,6 +55,73 @@ export const spacesNearby = [
   },
 ];
 
+export const spacesDrafts = [
+  {
+    id: "1",
+    imageSource: require("@/assets/images/SpacesNearbyImage1.png"),
+    title: "2 Bedroom Flat",
+    location: "Tony Estate Rumuewhera, Port Harcourt",
+    badgeType: "inDrafts",
+    price: "N600,000",
+    duration: "annum",
+  },
+  {
+    id: "2",
+    imageSource: require("@/assets/images/SpacesNearbyImage1.png"),
+    title: "Atraz Palace Event Hall",
+    location: "GRA Phase II, Port Harcourt",
+    price: "N400,000",
+    badgeType: "pending",
+    duration: "day",
+  },
+  {
+    id: "3",
+    imageSource: require("@/assets/images/SpacesNearbyImage1.png"),
+    title: "Standard Self-contain Room",
+    location: "Paradice Estate Elimbgu, Port Harcourt",
+    price: "N300,000",
+    duration: "annum",
+  },
+];
+
+export const spacesPosted = [
+  {
+    id: "1",
+    imageSource: require("@/assets/images/SpacesNearbyImage1.png"),
+    title: "2 Bedroom Flat",
+    location: "Tony Estate Rumuewhera, Port Harcourt",
+    badgeType: "available",
+    price: "N600,000",
+    duration: "annum",
+  },
+  {
+    id: "2",
+    imageSource: require("@/assets/images/SpacesNearbyImage1.png"),
+    title: "Atraz Palace Event Hall",
+    location: "GRA Phase II, Port Harcourt",
+    price: "N400,000",
+    badgeType: "rented",
+    duration: "day",
+  },
+  {
+    id: "3",
+    imageSource: require("@/assets/images/SpacesNearbyImage1.png"),
+    title: "Standard Self-contain Room",
+    location: "Paradice Estate Elimbgu, Port Harcourt",
+    price: "N300,000",
+    badgeType: "reserved",
+    duration: "annum",
+  },
+  {
+    id: "4",
+    imageSource: require("@/assets/images/SpacesNearbyImage1.png"),
+    title: "Standard Self-contain Room",
+    location: "Paradice Estate Elimbgu, Port Harcourt",
+    price: "N300,000",
+    duration: "annum",
+  },
+];
+
 export const Tabs = [
   {
     id: "1",

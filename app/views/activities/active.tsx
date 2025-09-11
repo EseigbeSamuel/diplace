@@ -1,10 +1,10 @@
 import ActiveActivityCard from "@/components/ActiveActivityCard";
 import React from "react";
-import { Image, Text, View } from "react-native";
+import { Image, ScrollView, Text, View } from "react-native";
 
 const ActiveActivity = () => {
   return (
-    <View>
+    <ScrollView>
       <View className="bg-[#F9F9FB] rounded-lg flex flex-row gap-4 p-4">
         <View>
           <Image
@@ -35,6 +35,62 @@ const ActiveActivity = () => {
           image={require("@/assets/icons/Calendar.png")}
           location="Rumuewhera, Port Harcourt"
         />
+        <ActiveActivityCard
+          buttonTitle="View"
+          date="9th Aug, 2025 | 10AM - 12PM"
+          title="2 Bedroom in-suite apartment"
+          image={require("@/assets/icons/Calendar.png")}
+          location="Rumuewhera, Port Harcourt"
+        />
+        <ActiveActivityCard
+          buttonTitle="View"
+          date="9th Aug, 2025 | 10AM - 12PM"
+          title="2 Bedroom in-suite apartment"
+          image={require("@/assets/icons/Calendar.png")}
+          location="Rumuewhera, Port Harcourt"
+        />
+        <ActiveActivityCard
+          buttonTitle="View"
+          date="9th Aug, 2025 | 10AM - 12PM"
+          title="2 Bedroom in-suite apartment"
+          image={require("@/assets/icons/Calendar.png")}
+          location="Rumuewhera, Port Harcourt"
+        />
+        <ActiveActivityCard
+          buttonTitle="View"
+          date="9th Aug, 2025 | 10AM - 12PM"
+          title="2 Bedroom in-suite apartment"
+          image={require("@/assets/icons/Calendar.png")}
+          location="Rumuewhera, Port Harcourt"
+        />
+        <ActiveActivityCard
+          buttonTitle="View"
+          date="9th Aug, 2025 | 10AM - 12PM"
+          title="2 Bedroom in-suite apartment"
+          image={require("@/assets/icons/Calendar.png")}
+          location="Rumuewhera, Port Harcourt"
+        />
+        <ActiveActivityCard
+          buttonTitle="View"
+          date="9th Aug, 2025 | 10AM - 12PM"
+          title="2 Bedroom in-suite apartment"
+          image={require("@/assets/icons/Calendar.png")}
+          location="Rumuewhera, Port Harcourt"
+        />
+        <ActiveActivityCard
+          buttonTitle="View"
+          date="9th Aug, 2025 | 10AM - 12PM"
+          title="2 Bedroom in-suite apartment"
+          image={require("@/assets/icons/Calendar.png")}
+          location="Rumuewhera, Port Harcourt"
+        />
+        <ActiveActivityCard
+          buttonTitle="View"
+          date="9th Aug, 2025 | 10AM - 12PM"
+          title="2 Bedroom in-suite apartment"
+          image={require("@/assets/icons/Calendar.png")}
+          location="Rumuewhera, Port Harcourt"
+        />
       </View>
       <View className="p-4 border-b border-gray-300">
         <Text className="text-lg font-semibold pb-4">Reserved</Text>
@@ -55,7 +111,7 @@ const ActiveActivity = () => {
           location="GRA Phase II, Port Harcourt"
         />
       </View>
-    </View>
+    </ScrollView>
   );
 };
 

@@ -7,7 +7,7 @@ import { heightPercentageToDP as hp } from "react-native-responsive-screen";
 
 const TabLayout = () => {
   const { colors } = useTheme();
-  const userRole: "tenant" | "agents" = "tenant";
+  const userRole: "tenant" | "agents" = "agents";
   return (
     <Tabs
       screenOptions={{

@@ -2,7 +2,7 @@ import { AppHeader } from "@/components/header";
 import HeaderTabs from "@/components/headertab";
 import SafeAreaViewContainer from "@/components/safeareaview";
 import { useRef, useState } from "react";
-import { StyleSheet } from "react-native";
+import { StyleSheet, View } from "react-native";
 import ActiveActivity from "../views/activities/active";
 import ActivityHistory from "../views/activities/history";
 
@@ -31,15 +31,17 @@ const Activity = () => {
   return (
     <SafeAreaViewContainer>
       <AppHeader title="Activity" />
-      <HeaderTabs
-        tabs={[
-          { id: "active", label: "Active" },
-          { id: "history", label: "History" },
-        ]}
-        initialActiveTab={activeTab}
-        renderContent={renderContent}
-        onTabChange={handleTabChange}
-      />
+      <View className="flex-1">
+        <HeaderTabs
+          tabs={[
+            { id: "active", label: "Active" },
+            { id: "history", label: "History" },
+          ]}
+          initialActiveTab={activeTab}
+          renderContent={renderContent}
+          onTabChange={handleTabChange}
+        />
+      </View>
     </SafeAreaViewContainer>
   );
 };
