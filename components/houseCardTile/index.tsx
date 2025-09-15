@@ -1,13 +1,25 @@
+import { useTheme } from "@/contexts/themeContext";
+import { ColorScheme } from "@/utils";
 import React from "react";
-import { Image, ImageSourcePropType, Text, View } from "react-native";
+import {
+  GestureResponderEvent,
+  Image,
+  ImageSourcePropType,
+  Pressable,
+  StyleSheet,
+  Text,
+  View,
+} from "react-native";
+import { RFValue } from "react-native-responsive-fontsize";
 
 type HouseCardTileProps = {
   imageSource: ImageSourcePropType;
   name: string;
-  location: string;
-  price: string;
-  duration: string;
+  location?: string;
+  price?: string;
+  duration?: string;
   badgeType?: string;
+  onPress?: ((event: GestureResponderEvent) => void) | null | undefined;
 };
 const renderBadge = (badgeType: string) => {
   switch (badgeType) {
@@ -99,35 +111,86 @@ const HouseCardTile = ({
   location,
   price,
   duration,
+  onPress,
   badgeType,
 }: HouseCardTileProps) => {
+  const { colors } = useTheme();
+  const homeStyles = styles(colors);
   return (
-    <View className="py-2 flex flex-row gap-2 justify-between">
-      <View className="flex flex-row gap-2">
-        <View className="">
-          <Image
-            source={imageSource}
-            className="w-[72px] h-[72px] rounded-lg"
-          />
-        </View>
-        <View className="flex gap-1">
-          <Text>{renderBadge(badgeType || "")}</Text>
-          <Text className="text-xl">{name}</Text>
-          <Text className="text-gray-400">{location}</Text>
-          <View className="flex flex-row">
-            <Text className="font-semibold text-lg">{price}</Text>
-            <Text className="text-gray-400">/{duration}</Text>
+    <Pressable>
+      <View className="py-2 flex flex-row gap-2 justify-between">
+        <View className="flex flex-row gap-2">
+          <View className="">
+            <Image
+              source={imageSource}
+              className="w-[72px] h-[72px] rounded-lg"
+            />
+          </View>
+          <View className="flex gap-1">
+            <Text>{renderBadge(badgeType || "")}</Text>
+            <Text className="text-xl" style={homeStyles.subTitleblack}>
+              {name}
+            </Text>
+            <Text className="text-gray-400">{location}</Text>
+            <View className="flex flex-row">
+              <Text
+                className="font-semibold text-lg"
+                style={homeStyles.subTitleblack}
+              >
+                {price}
+              </Text>
+              <Text style={homeStyles.subTitleblack}>
+                {duration ? `/${duration}` : ""}
+              </Text>
+            </View>
           </View>
         </View>
+        <View>
+          <Image
+            source={require("@/assets/icons/arrow-left-up-outline-dark.png")}
+            className="w-6 h-6"
+          />
+        </View>
       </View>
-      <View>
-        <Image
-          source={require("@/assets/icons/arrow-left-up-outline-dark.png")}
-          className="w-6 h-6"
-        />
-      </View>
-    </View>
+    </Pressable>
   );
 };
 
 export default HouseCardTile;
+
+const styles = (colors: ColorScheme) =>
+  StyleSheet.create({
+    container: {
+      backgroundColor: colors.background,
+    },
+    gray: {
+      color: colors.slate[600],
+    },
+    title: {
+      fontSize: RFValue(18),
+      color: colors.slate[650],
+      lineHeight: RFValue(24),
+    },
+    borderBlack: {
+      borderBlockColor: colors.slate[650],
+    },
+    subTitle: {
+      fontSize: RFValue(14),
+      lineHeight: RFValue(20),
+    },
+    titlegray: {
+      fontSize: RFValue(18),
+      lineHeight: RFValue(24),
+      color: colors.slate[600],
+    },
+    subTitlegray: {
+      fontSize: RFValue(14),
+      lineHeight: RFValue(20),
+      color: colors.slate[600],
+    },
+    subTitleblack: {
+      fontSize: RFValue(14),
+      lineHeight: RFValue(20),
+      color: colors.slate[650],
+    },
+  });
