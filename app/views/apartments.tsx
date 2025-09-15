@@ -3,7 +3,7 @@ import HouseCard from "@/components/housecard";
 import SafeAreaViewContainer from "@/components/safeareaview";
 import SectionHeader from "@/components/sectionheader";
 import { spacesNearby } from "@/constants/home";
-import React from "react";
+import { router } from "expo-router";
 import { FlatList, View } from "react-native";
 
 const Apartments = () => {
@@ -19,7 +19,10 @@ const Apartments = () => {
         data={spacesNearby}
         renderItem={({ item }) => (
           <View className="pb-8">
-            <HouseCard {...item} />
+            <HouseCard
+              {...item}
+              onPress={() => router.push("/views/place-details/[id]")}
+            />
           </View>
         )}
         keyExtractor={(item) => item.id}

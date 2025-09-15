@@ -10,18 +10,18 @@ import "../global.css";
 
 export default function RootLayout() {
   return (
-    <GestureHandlerRootView className="flex-1">
-      <BottomSheetModalProvider>
-        <UserProvider>
-          <ThemeProvider>
+    <ThemeProvider>
+      <GestureHandlerRootView className="flex-1">
+        <BottomSheetModalProvider>
+          <UserProvider>
             <Stack screenOptions={{ headerShown: false }}>
               <StatusBar style="dark" animated />
               <Stack.Screen name="index" />
               <Stack.Screen name="(tabs)" />
             </Stack>
-          </ThemeProvider>
-        </UserProvider>
-      </BottomSheetModalProvider>
-    </GestureHandlerRootView>
+          </UserProvider>
+        </BottomSheetModalProvider>
+      </GestureHandlerRootView>
+    </ThemeProvider>
   );
 }

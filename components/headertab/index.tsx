@@ -1,6 +1,9 @@
+import { useTheme } from "@/contexts/themeContext";
 import { HeaderTab } from "@/types";
+import { ColorScheme } from "@/utils";
 import React, { useEffect, useState } from "react";
-import { Text, TouchableOpacity, View } from "react-native";
+import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { RFValue } from "react-native-responsive-fontsize";
 
 interface TabsProps {
   tabs: HeaderTab[];
@@ -19,6 +22,8 @@ const HeaderTabs: React.FC<TabsProps> = ({
   renderHeader,
   renderAfterIcon,
 }) => {
+  const { colors } = useTheme();
+  const homeStyles = styles(colors);
   const [activeTab, setActiveTab] = useState<string>(
     () => initialActiveTab || tabs[0]?.id || ""
   );
@@ -49,12 +54,12 @@ const HeaderTabs: React.FC<TabsProps> = ({
           {tabs.map((tab) => (
             <TouchableOpacity
               key={tab.id}
+              style={homeStyles.borderBlack}
               onPress={() => handleTabPress(tab.id)}
-              className={`py-2 ${
-                activeTab === tab.id ? "border-b-2 border-black" : ""
-              }`}
+              className={`py-2 ${activeTab === tab.id ? "border-b-2 " : ""}`}
             >
               <Text
+                style={homeStyles.subTitleblack}
                 className={`text-base ${
                   activeTab === tab.id ? "font-semibold" : "font-normal"
                 }`}
@@ -72,3 +77,39 @@ const HeaderTabs: React.FC<TabsProps> = ({
 };
 
 export default HeaderTabs;
+const styles = (colors: ColorScheme) =>
+  StyleSheet.create({
+    container: {
+      backgroundColor: colors.background,
+    },
+    gray: {
+      color: colors.slate[600],
+    },
+    title: {
+      fontSize: RFValue(18),
+      color: colors.slate[650],
+      lineHeight: RFValue(24),
+    },
+    borderBlack: {
+      borderBlockColor: colors.slate[650],
+    },
+    subTitle: {
+      fontSize: RFValue(14),
+      lineHeight: RFValue(20),
+    },
+    titlegray: {
+      fontSize: RFValue(18),
+      lineHeight: RFValue(24),
+      color: colors.slate[600],
+    },
+    subTitlegray: {
+      fontSize: RFValue(14),
+      lineHeight: RFValue(20),
+      color: colors.slate[600],
+    },
+    subTitleblack: {
+      fontSize: RFValue(14),
+      lineHeight: RFValue(20),
+      color: colors.slate[650],
+    },
+  });

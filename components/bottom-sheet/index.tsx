@@ -31,6 +31,9 @@ export const CustomBottomSheet = ({ bottomSheetProps, children }: Props) => {
 
 const styles = (colors: ColorScheme) =>
   StyleSheet.create({
+    bottomSheetIndicator: {
+      backgroundColor: colors.background,
+    },
     bottomSheetHandleIndicator: {
       backgroundColor: colors.slate[500],
       width: wp(15),
@@ -40,6 +43,7 @@ const styles = (colors: ColorScheme) =>
     },
     container: {
       flex: 1,
+      backgroundColor: colors.background,
       paddingHorizontal: hp(3),
       paddingVertical: hp(1),
     },

@@ -1,8 +1,8 @@
 import { useTheme } from "@/contexts/themeContext";
 import { ColorScheme } from "@/utils";
-import { router } from "expo-router";
 import React, { useState } from "react";
 import {
+  GestureResponderEvent,
   Image,
   ImageSourcePropType,
   Pressable,
@@ -20,6 +20,7 @@ const HouseCard = ({
   price,
   badgeType,
   duration,
+  onPress,
 }: {
   imageSource: ImageSourcePropType;
   title: string;
@@ -27,6 +28,7 @@ const HouseCard = ({
   price: string;
   badgeType?: string;
   duration: string;
+  onPress?: ((event: GestureResponderEvent) => void) | null | undefined;
 }) => {
   const { colors } = useTheme();
   const homeStyles = styles(colors);
@@ -122,7 +124,7 @@ const HouseCard = ({
   };
 
   return (
-    <Pressable onPress={() => router.push("/views/place-details/[id]")}>
+    <Pressable onPress={onPress}>
       <View className="flex-1">
         <Image source={imageSource} className="rounded-lg" resizeMode="cover" />
         <View className="flex flex-row justify-between pt-2">
@@ -168,6 +170,7 @@ const styles = (colors: ColorScheme) =>
     },
     title: {
       fontSize: RFValue(18),
+      color: colors.slate[650],
       lineHeight: RFValue(24),
     },
     subTitle: {

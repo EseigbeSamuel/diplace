@@ -130,7 +130,12 @@ const Discover = () => {
           </View>
           <FlatList
             data={featuredSpaces}
-            renderItem={({ item }) => <HouseCard {...item} />}
+            renderItem={({ item }) => (
+              <HouseCard
+                {...item}
+                onPress={() => router.push("/views/place-details/[id]")}
+              />
+            )}
             keyExtractor={(item) => item.id}
             horizontal
             showsHorizontalScrollIndicator={false}
@@ -156,7 +161,12 @@ const Discover = () => {
           </View>
           <FlatList
             data={featuredSpaces}
-            renderItem={({ item }) => <HouseCard {...item} />}
+            renderItem={({ item }) => (
+              <HouseCard
+                {...item}
+                onPress={() => router.push("/views/place-details/[id]")}
+              />
+            )}
             keyExtractor={(item) => item.id}
             horizontal
             showsHorizontalScrollIndicator={false}
@@ -182,7 +192,12 @@ const Discover = () => {
           </View>
           <FlatList
             data={featuredSpaces}
-            renderItem={({ item }) => <HouseCard {...item} />}
+            renderItem={({ item }) => (
+              <HouseCard
+                {...item}
+                onPress={() => router.push("/views/place-details/[id]")}
+              />
+            )}
             keyExtractor={(item) => item.id}
             horizontal
             showsHorizontalScrollIndicator={false}
