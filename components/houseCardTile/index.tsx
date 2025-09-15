@@ -117,7 +117,7 @@ const HouseCardTile = ({
   const { colors } = useTheme();
   const homeStyles = styles(colors);
   return (
-    <Pressable>
+    <Pressable onPress={onPress}>
       <View className="py-2 flex flex-row gap-2 justify-between">
         <View className="flex flex-row gap-2">
           <View className="">
