@@ -26,7 +26,9 @@ const Discover = () => {
   return (
     <SafeAreaViewContainer className="flex-1">
       <AppHeader title={"Discover"} />
-      <Filter size="large" />
+      <View className="py-3">
+        <Filter size="large" />
+      </View>
 
       <ScrollView>
         <View className="flex flex-col gap-3 my-5">
@@ -45,7 +47,7 @@ const Discover = () => {
                 className="flex flex-col items-center border rounded-2xl p-4 min-w-[108px]"
               >
                 <Image className="size-[28px]" source={item.icon} />
-                <Text style={homeStyles.subTitle} className="capitalize">
+                <Text style={homeStyles.text} className="capitalize">
                   {item.name}{" "}
                 </Text>
               </Pressable>
@@ -71,7 +73,7 @@ const Discover = () => {
               onPress={() => router.push("/views/featuredListers")}
               className="flex-row items-center gap-2"
             >
-              <Text>View more</Text>
+              <Text style={homeStyles.text}>View more</Text>
               <Image
                 source={require("@/assets/icons/arrow-right-dark.png")}
                 className="w-[20px] h-[20px]"
@@ -121,7 +123,7 @@ const Discover = () => {
               onPress={() => router.push("/views/apartments")}
               className="flex-row items-center gap-2"
             >
-              <Text>View More</Text>
+              <Text style={homeStyles.text}>View More</Text>
               <Image
                 source={require("@/assets/icons/arrow-right-dark.png")}
                 className="w-[20px] h-[20px]"
@@ -152,7 +154,7 @@ const Discover = () => {
               onPress={() => router.push("/views/apartments")}
               className="flex-row items-center gap-2"
             >
-              <Text>View More</Text>
+              <Text style={homeStyles.text}>View More</Text>
               <Image
                 source={require("@/assets/icons/arrow-right-dark.png")}
                 className="w-[20px] h-[20px]"
@@ -183,7 +185,7 @@ const Discover = () => {
               onPress={() => router.push("/views/apartments")}
               className="flex-row items-center gap-2"
             >
-              <Text>View More</Text>
+              <Text style={homeStyles.text}>View More</Text>
               <Image
                 source={require("@/assets/icons/arrow-right-dark.png")}
                 className="w-[20px] h-[20px]"
@@ -222,8 +224,13 @@ const styles = (colors: ColorScheme) =>
     title: {
       fontSize: RFValue(18),
       lineHeight: RFValue(24),
+      color: colors.slate[650],
     },
-    text: { fontSize: RFValue(14), lineHeight: RFValue(20) },
+    text: {
+      fontSize: RFValue(14),
+      lineHeight: RFValue(20),
+      color: colors.slate[650],
+    },
     subTitle: {
       fontSize: RFValue(14),
       lineHeight: RFValue(20),

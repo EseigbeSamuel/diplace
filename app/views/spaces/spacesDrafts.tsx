@@ -74,7 +74,7 @@ const SpacesDrafts = ({ layout }: { layout: "tiles" | "box" }) => {
             />
             <AppButton
               title="Edit Space"
-              afterIcon={require("@/assets/icons/edit-pencil.png")}
+              afterIcon={require("@/assets/icons/Edit-pencil.png")}
               className=""
               variant="tertiary"
               onPress={() => {}}
