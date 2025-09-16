@@ -65,19 +65,19 @@ const SpacesDrafts = ({ layout }: { layout: "tiles" | "box" }) => {
             </Text>
             <Text style={homeStyles.subTitle}>Rewheremuara, Port Harcourt</Text>
           </View>
-          <View className="w-full">
-            <AppButton
-              title="Update Status"
-              className=" w-full"
-              onPress={() => {}}
-              afterIcon={require("@/assets/icons/tag.png")}
-            />
+          <View className="w-full flex-1 gap-3 py-4">
             <AppButton
               title="Edit Space"
               afterIcon={require("@/assets/icons/edit-pencil.png")}
               className=""
-              variant="tertiary"
               onPress={() => {}}
+            />
+            <AppButton
+              title="Remove Space"
+              className=" w-full"
+              onPress={() => {}}
+              variant="tertiary"
+              afterIcon={require("@/assets/icons/delete.png")}
             />
           </View>
         </View>
