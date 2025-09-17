@@ -60,7 +60,9 @@ const Dropdown = ({ options, selected, onSelect }: DropdownProps) => {
                 className="flex-row items-center px-3 py-2"
               >
                 {item.icon && <View className="mr-2">{item.icon}</View>}
-                <Text className="text-gray-800">{item.label}</Text>
+                <Text style={Styles.text} className="text-gray-800">
+                  {item.label}
+                </Text>
               </TouchableOpacity>
             )}
           />
@@ -82,5 +84,6 @@ const styles = (colors: ColorScheme) =>
     text: {
       fontSize: RFValue(14),
       lineHeight: RFValue(20),
+      color: colors.slate[650],
     },
   });
