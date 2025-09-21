@@ -87,7 +87,9 @@ const featuredListers = () => {
                         source={require("@/assets/icons/Star-Iconly-Pro-1.png")}
                         className="size-[20px]"
                       />
-                      <Text className=" font-medium">{item.rating}</Text>
+                      <Text style={Styles.text} className=" font-medium">
+                        {item.rating}
+                      </Text>
                     </View>
                     <View>
                       {/* <Image /> */}
@@ -125,7 +127,9 @@ const featuredListers = () => {
                         source={require("@/assets/icons/Star-Iconly-Pro-1.png")}
                         className="size-[20px]"
                       />
-                      <Text className=" font-medium">{item.rating}</Text>
+                      <Text style={Styles.text} className=" font-medium">
+                        {item.rating}
+                      </Text>
                       <Text style={Styles.small} className="text-blue-500 ">
                         ({item.reviews} Reviews )
                       </Text>
@@ -170,10 +174,16 @@ const styles = (colors: ColorScheme) =>
     head: {
       fontSize: RFValue(24),
       lineHeight: RFValue(32),
+      color: colors.slate[650],
     },
     title: {
       fontSize: RFValue(16),
       lineHeight: RFValue(24),
+      color: colors.slate[650],
+    },
+    text: {
+      fontSize: RFValue(14),
+      lineHeight: RFValue(20),
       color: colors.slate[650],
     },
     subTitle: {
@@ -184,5 +194,6 @@ const styles = (colors: ColorScheme) =>
     small: {
       fontSize: RFValue(12),
       lineHeight: RFValue(16),
+      color: colors.slate[650],
     },
   });
