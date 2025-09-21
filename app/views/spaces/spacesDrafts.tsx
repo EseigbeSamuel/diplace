@@ -68,7 +68,7 @@ const SpacesDrafts = ({ layout }: { layout: "tiles" | "box" }) => {
           <View className="w-full flex-1 gap-3 py-4">
             <AppButton
               title="Edit Space"
-              afterIcon={require("@/assets/icons/Edit-pencil.png")}
+              afterIcon={require("@/assets/icons/edit-pencil.png")}
               className=""
               onPress={() => {}}
             />

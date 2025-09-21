@@ -63,7 +63,7 @@ const TabLayout = () => {
                           }}
                         >
                           <Image
-                            source={require("@/assets/icons/Plus.png")}
+                            source={require("@/assets/icons/plus.png")}
                             style={{ width: 48, height: 48 }}
                             resizeMode="contain"
                           />

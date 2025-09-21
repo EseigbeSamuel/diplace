@@ -1,5 +1,6 @@
 import { CustomBottomSheet } from "@/components/bottom-sheet";
 import AppButton from "@/components/button";
+import ConfirmDialog from "@/components/confirm-dialog";
 import Filter from "@/components/filter";
 import HouseCard from "@/components/housecard";
 import HouseCardTile from "@/components/houseCardTile";
@@ -9,7 +10,7 @@ import { useTheme } from "@/contexts/themeContext";
 import { ColorScheme } from "@/utils";
 import { BottomSheetModal } from "@gorhom/bottom-sheet";
 import { router } from "expo-router";
-import React, { useMemo, useRef } from "react";
+import React, { useMemo, useRef, useState } from "react";
 import { FlatList, Image, StyleSheet, Text, View } from "react-native";
 
 import { RFValue } from "react-native-responsive-fontsize";
@@ -19,12 +20,23 @@ const SpacesPosted = ({ layout }: { layout: "tiles" | "box" }) => {
   const homeStyles = styles(colors);
   const viewSpaceref = useRef<BottomSheetModal>(null);
   const viewUpdateStatus = useRef<BottomSheetModal>(null);
+  const [isDialogVisible, setDialogVisible] = useState(false);
 
   const handleViewSpace = () => {
     viewSpaceref.current?.present();
   };
   const handleViewUpdateStatus = () => {
     viewUpdateStatus.current?.present();
+  };
+
+  const handleConfirm = () => {
+    console.log("Confirmed");
+    setDialogVisible(false);
+  };
+
+  const handleCancel = () => {
+    console.log("Cancelled");
+    setDialogVisible(false);
   };
   const snapPoints = useMemo(() => ["25%", "50%", "75%", "90%"], []);
   return (
@@ -89,7 +101,9 @@ const SpacesPosted = ({ layout }: { layout: "tiles" | "box" }) => {
               afterIcon={require("@/assets/icons/edit-pencil.png")}
               className=""
               variant="tertiary"
-              onPress={() => {}}
+              onPress={() => {
+                router.push("/views/spaces/edit-space");
+              }}
             />
             <AppButton
               title="Preview space"
@@ -108,7 +122,7 @@ const SpacesPosted = ({ layout }: { layout: "tiles" | "box" }) => {
             <AppButton
               title="Remove Space"
               className=" w-full"
-              onPress={() => {}}
+              onPress={() => setDialogVisible(true)}
               variant="tertiary"
               afterIcon={require("@/assets/icons/delete.png")}
             />
@@ -179,10 +193,24 @@ const SpacesPosted = ({ layout }: { layout: "tiles" | "box" }) => {
             />
           </View>
           <View className="flex-1 my-4 w-full">
-            <AppButton onPress={() => {}} title="Update" disabled />
+            <AppButton onPress={() => setDialogVisible(true)} title="Update" />
           </View>
         </View>
       </CustomBottomSheet>
+      <ConfirmDialog
+        visible={isDialogVisible}
+        onConfirm={handleConfirm}
+        onCancel={handleCancel}
+        title="Confirm Status Update"
+        message="You are about to change the status of this property. Do you wish to proceed?"
+      />
+      <ConfirmDialog
+        visible={isDialogVisible}
+        onConfirm={handleConfirm}
+        onCancel={handleCancel}
+        title="Remove Space?"
+        message="You are about to delete this space? Renters will not be able to see this space again when you remove it. Do you wish to proceed?"
+      />
     </View>
   );
 };
