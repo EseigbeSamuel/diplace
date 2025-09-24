@@ -67,7 +67,7 @@ const renderBadge = (badgeType: string) => {
       return (
         <View className="flex flex-row items-center gap-2 px-2 py-1 border border-[#60646C] rounded-full bg-[#F2F2F5]">
           <Image
-            source={require("@/assets/icons/Edit-pencil-fill.png")}
+            source={require("@/assets/icons/edit-pencil-fill.png")}
             className="w-4 h-4"
           />
           <Text className="text-[#1C2024]">In draft</Text>

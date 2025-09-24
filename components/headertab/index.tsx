@@ -1,7 +1,7 @@
 import { useTheme } from "@/contexts/themeContext";
 import { HeaderTab } from "@/types";
 import { ColorScheme } from "@/utils";
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { RFValue } from "react-native-responsive-fontsize";
 
@@ -24,20 +24,15 @@ const HeaderTabs: React.FC<TabsProps> = ({
 }) => {
   const { colors } = useTheme();
   const homeStyles = styles(colors);
-  const [activeTab, setActiveTab] = useState<string>(
-    () => initialActiveTab || tabs[0]?.id || ""
-  );
 
-  useEffect(() => {
-    if (
-      initialActiveTab &&
-      initialActiveTab !== activeTab &&
-      tabs.some((tab) => tab.id === initialActiveTab)
-    ) {
-      setActiveTab(initialActiveTab);
+  const getInitialTab = () => {
+    if (initialActiveTab && tabs.some((tab) => tab.id === initialActiveTab)) {
+      return initialActiveTab;
     }
-  }, [initialActiveTab, activeTab, tabs]);
+    return tabs[0]?.id || "";
+  };
 
+  const [activeTab, setActiveTab] = useState<string>(getInitialTab);
   const handleTabPress = (tabId: string) => {
     if (tabId !== activeTab) {
       setActiveTab(tabId);
@@ -46,7 +41,6 @@ const HeaderTabs: React.FC<TabsProps> = ({
       }
     }
   };
-
   return (
     <View className="flex-1">
       <View className="flex flex-row items-center justify-between">
