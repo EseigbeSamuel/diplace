@@ -17,16 +17,16 @@ const Renter = () => {
   const renderStep = () => {
     switch (current) {
       case 1:
-        return <Info />;
+        return <Info onNext={handleNext} />;
       case 2:
-        return <Selfie />;
+        return <Selfie onNext={handleNext} />;
       case 3:
-        return <Phone />;
+        return <Phone onNext={handleNext} />;
       case 4:
-        return <Identification />;
+        return <Identification onNext={handleNext} />;
 
       default:
-        return <Info />;
+        return <Info onNext={handleNext} />;
     }
   };
   const handleNext = () => {
