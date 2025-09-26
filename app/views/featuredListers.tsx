@@ -15,7 +15,7 @@ import {
 } from "react-native";
 import { RFValue } from "react-native-responsive-fontsize";
 
-const featuredListers = () => {
+const FeaturedListers = () => {
   const { colors } = useTheme();
   const Styles = styles(colors);
   const navigation = useNavigation();
@@ -51,7 +51,7 @@ const featuredListers = () => {
           <Dropdown
             options={options}
             selected={selected}
-            onSelect={setSelected}
+            onSelect={(options) => setSelected(options)}
           />
         </View>
       </View>
@@ -157,7 +157,7 @@ const featuredListers = () => {
   );
 };
 
-export default featuredListers;
+export default FeaturedListers;
 
 const styles = (colors: ColorScheme) =>
   StyleSheet.create({

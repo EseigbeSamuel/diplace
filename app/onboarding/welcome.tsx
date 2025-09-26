@@ -1,14 +1,27 @@
 import AppButton from "@/components/button";
+import RadioCard from "@/components/radio-card/radioCard";
 import SafeAreaViewContainer from "@/components/safeareaview";
 import { useTheme } from "@/contexts/themeContext";
 import { useRouter } from "expo-router";
-import React from "react";
-import { Text, View } from "react-native";
+import React, { useState } from "react";
+import { Alert, Text, View } from "react-native";
 import { RFValue } from "react-native-responsive-fontsize";
 
 export default function GetStarted() {
   const { colors } = useTheme();
+
   const route = useRouter();
+  const [selected, setSelected] = useState("");
+
+  const handleNavigation = () => {
+    if (selected === "renter") {
+      route.push("/onboarding/renter/renter");
+    } else if (selected === "agent") {
+      route.push("/onboarding/agent/agent");
+    } else {
+      Alert.alert("select an option");
+    }
+  };
 
   return (
     <SafeAreaViewContainer className="items-center justify-center gap-4">
@@ -33,11 +46,28 @@ export default function GetStarted() {
           experience to meet your goals.
         </Text>
       </View>
+
+      <View className="w-full p-5">
+        <RadioCard
+          label="I am a Renter looking for a space"
+          value="renter"
+          selected={selected}
+          onSelect={setSelected}
+        />
+        <RadioCard
+          label="I am a space Agent / Manager / Owner"
+          value="agent"
+          selected={selected}
+          onSelect={setSelected}
+        />
+      </View>
       <View className="w-full">
         <AppButton
           title="Get Started"
-          onPress={() => route.push("/auth/login")}
+          // onPress={() => route.push("/auth/login")}
+          onPress={handleNavigation}
           fullwidth
+          disabled={!selected}
         />
       </View>
     </SafeAreaViewContainer>
