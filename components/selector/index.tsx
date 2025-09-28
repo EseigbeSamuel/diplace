@@ -12,6 +12,36 @@ import {
 
 import { RFValue } from "react-native-responsive-fontsize";
 
+export const SimpleSelector = ({ title }: { title: string }) => {
+  const { colors } = useTheme();
+  const Styles = styles(colors);
+  const [isChecked, setIsChecked] = useState(false);
+
+  return (
+    <Pressable onPress={() => setIsChecked(!isChecked)}>
+      <View
+        className="p-4 flex-row w-full items-center gap-4 rounded-xl"
+        style={isChecked ? Styles.borderDarkGray : Styles.borderLightGray}
+      >
+        {isChecked ? (
+          <Image
+            source={require("@/assets/icons/checkbox-circle-fill.png")}
+            className="w-6 h-6"
+          />
+        ) : (
+          <Image
+            source={require("@/assets/icons/checkbox-blank-circle-outline.png")}
+            className="w-6 h-6"
+          />
+        )}
+        <View>
+          <Text style={Styles.subTitle}>{title}</Text>
+        </View>
+      </View>
+    </Pressable>
+  );
+};
+
 const Selector = ({
   image,
   title,
@@ -24,22 +54,31 @@ const Selector = ({
   const [isChecked, setIsChecked] = useState(false);
 
   return (
-    <View
-      className="p-4 flex-1 flex-row w-full items-center gap-4 rounded-xl"
-      style={Styles.borderGray}
+    <Pressable
+      onPress={() => setIsChecked(!isChecked)}
+      style={Styles.checkboxButton}
     >
-      <View className="flex-1 flex-row gap-4">
-        <Image source={image} className="w-6 h-6" />
-        <Text style={Styles.subTitle}>{title}</Text>
-      </View>
-      <Pressable
-        onPress={() => setIsChecked(!isChecked)}
-        className="rounded-full w-6 h-6 items-center justify-center"
-        style={Styles.checkboxButton}
+      <View
+        className="p-4 flex-1 flex-row w-full items-center gap-4 rounded-xl"
+        style={Styles.borderDarkGray}
       >
-        {isChecked && <Text style={Styles.checkbox}>✔</Text>}
-      </Pressable>
-    </View>
+        <View className="flex-1 flex-row gap-4">
+          <Image source={image} className="w-6 h-6" />
+          <Text style={Styles.subTitle}>{title}</Text>
+        </View>
+        {isChecked ? (
+          <Image
+            source={require("@/assets/icons/checkbox-circle-fill.png")}
+            className="w-6 h-6"
+          />
+        ) : (
+          <Image
+            source={require("@/assets/icons/checkbox-blank-circle-outline.png")}
+            className="w-6 h-6"
+          />
+        )}
+      </View>
+    </Pressable>
   );
 };
 
@@ -62,10 +101,15 @@ const styles = (colors: ColorScheme) =>
       borderStyle: "solid",
       borderColor: colors.slate[600],
     },
-    borderGray: {
+    borderDarkGray: {
       borderWidth: 1,
       borderStyle: "solid",
       borderColor: colors.slate[600],
+    },
+    borderLightGray: {
+      borderWidth: 1,
+      borderStyle: "solid",
+      borderColor: colors.slate[300],
     },
     title: {
       fontSize: RFValue(18),
