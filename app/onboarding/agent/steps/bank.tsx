@@ -105,7 +105,7 @@ const Bank = ({ onNext }: props) => {
               >
                 <View className="flex-row justify-between items-center mb-6">
                   <Image
-                    source={require("@/assets/icons/bank.png")} // replace with your bank icon
+                    source={require("@/assets/icons/Bank Card - Iconly Pro.png")} // replace with your bank icon
                     style={{ width: 40, height: 40, tintColor: "white" }}
                   />
                   <Text className="text-white text-sm">Account Number</Text>
