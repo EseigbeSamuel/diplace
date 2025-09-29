@@ -26,7 +26,7 @@ const Renter = () => {
       case 4:
         return <Identification onNext={handleNext} />;
       case 5:
-        return <Info2 onNext={handleNext} />;
+        return <Info2 />;
 
       default:
         return <Info onNext={handleNext} />;

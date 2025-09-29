@@ -1,4 +1,5 @@
 import AppButton from "@/components/button";
+import Filter from "@/components/filter";
 import SafeAreaViewContainer from "@/components/safeareaview";
 import TextField from "@/components/textfield";
 import { useTheme } from "@/contexts/themeContext";
@@ -22,13 +23,18 @@ type props = {
 };
 
 const ID_OPTIONS = [
-  { id: "nin", label: "Nat’l Identification No. (NIN)" },
-  { id: "bvn", label: "Bank Verification No. (BVN)" },
-  { id: "passport", label: "Int’l Passport" },
-  { id: "license", label: "Driver’s License" },
+  { id: "access", label: "Access Bank PLC" },
+  { id: "first", label: "First Bank of Nigeria" },
+  { id: "opay", label: "OPAY  " },
+  { id: "monie", label: "Moniepoint FMB" },
+  { id: "uba", label: "United Bank Of Africa (UBA) " },
+  { id: "gtb", label: "Guarantee Trust Bank (GTB) " },
+  { id: "union", label: "union bank" },
+  { id: "eco", label: "eco bank " },
+  { id: "keystone", label: "keystone bank   " },
 ];
 
-const Identification = ({ onNext }: props) => {
+const Bank = ({ onNext }: props) => {
   const { colors } = useTheme();
   const Styles = styles(colors);
 
@@ -52,10 +58,7 @@ const Identification = ({ onNext }: props) => {
 
     setTimeout(() => {
       setUserData({
-        surname: "KALU",
-        firstName: "SARAHMY",
-        middleName: "UKO",
-        dob: "28-10-1995",
+        accountname: "ibex alex",
       });
       setLoading(false);
     }, 1500);
@@ -71,16 +74,17 @@ const Identification = ({ onNext }: props) => {
     <SafeAreaViewContainer className="flex-col justify-between h-full">
       <View className="gap-5">
         <View>
-          <Image source={require("@/assets/icons/Camera - Iconly Pro.png")} />
+          <Image
+            source={require("@/assets/icons/Bank Card - Iconly Pro-1.png")}
+          />
         </View>
 
         <View>
           <Text style={Styles.headText} className="font-semibold ">
-            Verify your identity
+            Bank Details
           </Text>
           <Text style={Styles.text}>
-            Please select any means of identification to verify your account. We
-            only crosscheck your data to be sure you are real.
+            Please link your bank account you will use to collect payments.
           </Text>
         </View>
       </View>
@@ -90,21 +94,63 @@ const Identification = ({ onNext }: props) => {
         keyboardShouldPersistTaps="handled"
       >
         <View className="flex-1">
-          {/* ID Selector */}
+          {/* ✅ Bank Card */}
+          <View className="mt-6">
+            <View className="mt-6">
+              <View
+                className="rounded-2xl p-5"
+                style={{
+                  backgroundColor: "#1E1E1E", // dark card
+                }}
+              >
+                <View className="flex-row justify-between items-center mb-6">
+                  <Image
+                    source={require("@/assets/icons/bank.png")} // replace with your bank icon
+                    style={{ width: 40, height: 40, tintColor: "white" }}
+                  />
+                  <Text className="text-white text-sm">Account Number</Text>
+                </View>
+
+                <Text className="text-white text-xl font-semibold tracking-wider">
+                  {userData ? userData.accountnumber : "N/A"}
+                </Text>
+
+                <View className="flex-row justify-between mt-6">
+                  <View>
+                    <Text className="text-gray-400 text-xs">Account Name</Text>
+                    <Text className="text-white font-medium mt-1 capitalize">
+                      {userData ? userData.accountname : "UNAVAILABLE"}
+                    </Text>
+                  </View>
+                  <View className="items-end">
+                    <Text className="text-gray-400 text-xs">Bank</Text>
+                    <Text className="text-white font-medium mt-1 capitalize">
+                      {selectedID ? selectedID.label : "UNAVAILABLE"}
+                    </Text>
+                  </View>
+                </View>
+              </View>
+            </View>
+          </View>
+
+          {/* Bank Selector */}
           <TouchableOpacity
-            className="border border-gray-300 p-4 mt-6 rounded-2xl"
+            className="border border-gray-300 p-4 mt-6 rounded-2xl flex-row w-full justify-between"
             onPress={() => setModalVisible(true)}
           >
             <Text style={Styles.text} className="">
-              {selectedID ? selectedID.label : "Select means of ID"}
+              {selectedID ? selectedID.label : "Bank Name"}
             </Text>
+            <View>
+              <Image source={require("@/assets/icons/angle.png")} />
+            </View>
           </TouchableOpacity>
 
           {/* Document Number Input */}
           {selectedID && (
             <TextField
-              label="Document Number"
-              placeholder="Document Number"
+              label="Account Number"
+              placeholder="Account Number"
               value={docNumber}
               onChange={setDocNumber}
               keyboardType="numeric"
@@ -122,47 +168,14 @@ const Identification = ({ onNext }: props) => {
           {/* User Data */}
           {userData && (
             <View className="border border-gray-200 rounded-lg p-4 mt-4">
-              <Text style={Styles.medText} className="font-medium pb-2">
-                Personal Infomation
-              </Text>
               <View className="flex-row flex-wrap justify-between mt-3">
-                <View className="basis-1/2 pr-2 mb-3">
-                  <Text style={Styles.text}>Surname:</Text>
+                <View className="">
+                  <Text style={Styles.text}>Account Name:</Text>
                   <Text
                     style={Styles.medText}
                     className="font-medium capitalize"
                   >
-                    {userData.surname}
-                  </Text>
-                </View>
-
-                <View className="basis-1/2 pl-2 mb-3">
-                  <Text style={Styles.text}>First Name:</Text>
-                  <Text
-                    style={Styles.medText}
-                    className="font-medium capitalize"
-                  >
-                    {userData.firstName}
-                  </Text>
-                </View>
-
-                <View className="basis-1/2 pr-2 mb-3">
-                  <Text style={Styles.text}>Middle Name:</Text>
-                  <Text
-                    style={Styles.medText}
-                    className="font-medium capitalize"
-                  >
-                    {userData.middleName}
-                  </Text>
-                </View>
-
-                <View className="basis-1/2 pl-2 mb-3">
-                  <Text style={Styles.text}>Date of Birth:</Text>
-                  <Text
-                    style={Styles.medText}
-                    className="font-medium capitalize"
-                  >
-                    {userData.dob}
+                    {userData.accountname}
                   </Text>
                 </View>
               </View>
@@ -189,11 +202,11 @@ const Identification = ({ onNext }: props) => {
                 style={Styles.headText}
                 className=" text-center font-semibold "
               >
-                Choose means of identification
+                Select Your Bank
               </Text>
-              <Text style={Styles.text} className="text-center">
-                Select any means of identification to verify your account.
-              </Text>
+            </View>
+            <View className="py-2">
+              <Filter size="small" />
             </View>
 
             <FlatList
@@ -264,7 +277,7 @@ const Identification = ({ onNext }: props) => {
   );
 };
 
-export default Identification;
+export default Bank;
 const styles = (colors: ColorScheme) =>
   StyleSheet.create({
     container: {

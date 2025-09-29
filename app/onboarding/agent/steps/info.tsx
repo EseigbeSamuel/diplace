@@ -2,29 +2,30 @@ import AppButton from "@/components/button";
 import SafeAreaViewContainer from "@/components/safeareaview";
 import { useTheme } from "@/contexts/themeContext";
 import { ColorScheme } from "@/utils";
-import { useRouter } from "expo-router";
 import React from "react";
 import { Image, StyleSheet, Text, View } from "react-native";
 import { RFValue } from "react-native-responsive-fontsize";
 
-const Info2 = () => {
+type InfoProps = {
+  onNext: () => void;
+};
+
+const Info = ({ onNext }: InfoProps) => {
   const { colors } = useTheme();
   const Styles = styles(colors);
-
-  const route = useRouter();
   return (
     <SafeAreaViewContainer className="items-center flex-col justify-between h-full gap-4">
       <View className=" items-center justify-center gap-5 w-full">
         <View>
           <Image source={require("@/assets/images/favicon.png")} />
         </View>
-        <View className="text-center">
-          <Text style={Styles.headText} className="font-semibold text-center">
-            All set! Your account has been verified. 🎉
+        <View>
+          <Text style={Styles.headText} className="font-semibold ">
+            Verify your account
           </Text>
-          <Text style={Styles.text} className="text-center">
-            Your account verification was successful. Enjoy a wonderful
-            experience with DiPlace.
+          <Text style={Styles.text}>
+            To help connect you with verified agents, we have to collect some
+            info to verify your account.
           </Text>
         </View>
         <View
@@ -64,21 +65,35 @@ const Info2 = () => {
               <Text style={Styles.small}>Identification Document</Text>
             </View>
           </View>
+          <View className=" flex-row items-center gap-2 ">
+            <Image
+              source={require("@/assets/icons/ID solid.png")}
+              className="size-[30px]"
+            />
+            <View>
+              <Text style={Styles.small}>Personal Data</Text>
+            </View>
+          </View>
+          <View className=" flex-row items-center gap-2 ">
+            <Image
+              source={require("@/assets/icons/ID solid.png")}
+              className="size-[30px]"
+            />
+            <View>
+              <Text style={Styles.small}>Bank Details</Text>
+            </View>
+          </View>
         </View>
       </View>
 
       <View className="w-full ">
-        <AppButton
-          title="Go to Home"
-          onPress={() => route.navigate("/(tabs)")}
-          fullwidth
-        />
+        <AppButton title="Continue" onPress={onNext} fullwidth />
       </View>
     </SafeAreaViewContainer>
   );
 };
 
-export default Info2;
+export default Info;
 
 const styles = (colors: ColorScheme) =>
   StyleSheet.create({
