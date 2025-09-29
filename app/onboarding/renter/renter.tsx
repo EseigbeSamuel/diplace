@@ -6,6 +6,7 @@ import { Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { RFValue } from "react-native-responsive-fontsize";
 import Identification from "./steps/identification";
 import Info from "./steps/info";
+import Info2 from "./steps/info2";
 import Phone from "./steps/phone";
 import Selfie from "./steps/selfie";
 
@@ -24,13 +25,15 @@ const Renter = () => {
         return <Phone onNext={handleNext} />;
       case 4:
         return <Identification onNext={handleNext} />;
+      case 5:
+        return <Info2 onNext={handleNext} />;
 
       default:
         return <Info onNext={handleNext} />;
     }
   };
   const handleNext = () => {
-    if (current < 4) {
+    if (current < 5) {
       setCurrent(current + 1);
     }
   };

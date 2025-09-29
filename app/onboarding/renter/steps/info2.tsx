@@ -2,17 +2,16 @@ import AppButton from "@/components/button";
 import SafeAreaViewContainer from "@/components/safeareaview";
 import { useTheme } from "@/contexts/themeContext";
 import { ColorScheme } from "@/utils";
+import { useRouter } from "expo-router";
 import React from "react";
 import { Image, StyleSheet, Text, View } from "react-native";
 import { RFValue } from "react-native-responsive-fontsize";
 
-type InfoProps = {
-  onNext: () => void;
-};
-
-const Info = ({ onNext }: InfoProps) => {
+const Info2 = () => {
   const { colors } = useTheme();
   const Styles = styles(colors);
+
+  const route = useRouter();
   return (
     <SafeAreaViewContainer className="items-center flex-col justify-between h-full gap-4">
       <View className=" items-center justify-center gap-5 w-full">
@@ -69,13 +68,17 @@ const Info = ({ onNext }: InfoProps) => {
       </View>
 
       <View className="w-full ">
-        <AppButton title="Continue" onPress={onNext} fullwidth />
+        <AppButton
+          title="Go to Home"
+          onPress={() => route.navigate("/(tabs)")}
+          fullwidth
+        />
       </View>
     </SafeAreaViewContainer>
   );
 };
 
-export default Info;
+export default Info2;
 
 const styles = (colors: ColorScheme) =>
   StyleSheet.create({

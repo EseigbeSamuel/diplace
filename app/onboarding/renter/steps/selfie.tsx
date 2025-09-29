@@ -16,7 +16,6 @@ const Selfie = ({ onNext }: props) => {
   return (
     <SafeAreaViewContainer className="flex-col justify-between h-full">
       <View className="gap-5">
-        {" "}
         <View>
           <Image source={require("@/assets/icons/Camera - Iconly Pro.png")} />
         </View>
