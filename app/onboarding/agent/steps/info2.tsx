@@ -59,7 +59,7 @@ const Info2 = ({ onNext }: InfoProps) => {
               <Text style={Styles.small}>Phone Number</Text>
             </View>
           </View>
-          <View className=" flex-row items-center gap-2 ">
+          <View className="border-b flex-row items-center gap-2 ">
             <Image
               source={require("@/assets/icons/ID solid.png")}
               className="size-[30px]"
@@ -68,7 +68,7 @@ const Info2 = ({ onNext }: InfoProps) => {
               <Text style={Styles.small}>Identification Document</Text>
             </View>
           </View>
-          <View className=" flex-row items-center gap-2 ">
+          <View className="border-b flex-row items-center gap-2 ">
             <Image
               source={require("@/assets/icons/ID solid.png")}
               className="size-[30px]"

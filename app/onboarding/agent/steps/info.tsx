@@ -44,6 +44,7 @@ const Info = ({ onNext }: InfoProps) => {
               <Text style={Styles.small}>Selfie</Text>
             </View>
           </View>
+
           <View
             style={Styles.border}
             className="border-b flex-row items-center gap-2 "
@@ -56,7 +57,11 @@ const Info = ({ onNext }: InfoProps) => {
               <Text style={Styles.small}>Phone Number</Text>
             </View>
           </View>
-          <View className=" flex-row items-center gap-2 ">
+
+          <View
+            style={Styles.border}
+            className="border-b flex-row items-center gap-2 "
+          >
             <Image
               source={require("@/assets/icons/ID solid.png")}
               className="size-[30px]"
@@ -65,9 +70,13 @@ const Info = ({ onNext }: InfoProps) => {
               <Text style={Styles.small}>Identification Document</Text>
             </View>
           </View>
-          <View className=" flex-row items-center gap-2 ">
+
+          <View
+            style={Styles.border}
+            className="border-b flex-row items-center gap-2 "
+          >
             <Image
-              source={require("@/assets/icons/ID solid.png")}
+              source={require("@/assets/icons/Profile - Iconly Pro-1.png")}
               className="size-[30px]"
             />
             <View>
@@ -76,7 +85,7 @@ const Info = ({ onNext }: InfoProps) => {
           </View>
           <View className=" flex-row items-center gap-2 ">
             <Image
-              source={require("@/assets/icons/ID solid.png")}
+              source={require("@/assets/icons/Bank Card - Iconly Pro-1.png")}
               className="size-[30px]"
             />
             <View>

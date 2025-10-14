@@ -25,19 +25,18 @@ type props = {
 const ID_OPTIONS = [
   { id: "access", label: "Access Bank PLC" },
   { id: "first", label: "First Bank of Nigeria" },
-  { id: "opay", label: "OPAY  " },
+  { id: "opay", label: "OPAY" },
   { id: "monie", label: "Moniepoint FMB" },
-  { id: "uba", label: "United Bank Of Africa (UBA) " },
-  { id: "gtb", label: "Guarantee Trust Bank (GTB) " },
-  { id: "union", label: "union bank" },
-  { id: "eco", label: "eco bank " },
-  { id: "keystone", label: "keystone bank   " },
+  { id: "uba", label: "UBA" },
+  { id: "gtb", label: "GTBank" },
+  { id: "union", label: "Union Bank" },
+  { id: "eco", label: "Eco Bank" },
+  { id: "keystone", label: "Keystone Bank" },
 ];
 
 const Bank = ({ onNext }: props) => {
   const { colors } = useTheme();
   const Styles = styles(colors);
-
   const [modalVisible, setModalVisible] = useState(false);
   const [selectedID, setSelectedID] = useState<{
     id: string;
@@ -46,88 +45,74 @@ const Bank = ({ onNext }: props) => {
   const [docNumber, setDocNumber] = useState("");
   const [loading, setLoading] = useState(false);
   const [userData, setUserData] = useState<any>(null);
-  const [active, setActive] = useState(false);
 
-  const isActive = () => {
-    setActive(true);
-  };
-
-  const handleFetchData = async () => {
+  const handleFetchData = () => {
     if (!selectedID || !docNumber) return;
     setLoading(true);
-
     setTimeout(() => {
-      setUserData({
-        accountname: "ibex alex",
-      });
+      setUserData({ accountname: "Ibex Alex", accountnumber: "0972982258" });
       setLoading(false);
     }, 1500);
   };
 
   const handleContinue = () => {
-    if (userData) {
-      onNext();
-    }
+    if (userData) onNext();
   };
 
   return (
-    <SafeAreaViewContainer className="flex-col justify-between h-full">
-      <View className="gap-5">
-        <View>
-          <Image
-            source={require("@/assets/icons/Bank Card - Iconly Pro-1.png")}
-          />
-        </View>
+    <>
+      <SafeAreaViewContainer className=" justify-between">
+        <ScrollView
+          contentContainerStyle={{ flexGrow: 1 }}
+          keyboardShouldPersistTaps="handled"
+        >
+          <View className="gap-5 mt-4">
+            <TouchableOpacity onPress={() => setModalVisible(true)}>
+              <Image
+                source={require("@/assets/icons/Bank Card - Iconly Pro.png")}
+              />
+            </TouchableOpacity>
 
-        <View>
-          <Text style={Styles.headText} className="font-semibold ">
-            Bank Details
-          </Text>
-          <Text style={Styles.text}>
-            Please link your bank account you will use to collect payments.
-          </Text>
-        </View>
-      </View>
+            <View>
+              <Text style={Styles.headText} className="font-semibold">
+                Bank Details
+              </Text>
+              <Text style={Styles.text}>
+                Please link your bank account you will use to collect payments.
+              </Text>
+            </View>
+          </View>
 
-      <ScrollView
-        contentContainerStyle={{ flexGrow: 1 }}
-        keyboardShouldPersistTaps="handled"
-      >
-        <View className="flex-1">
-          {/* ✅ Bank Card */}
+          {/* Account Card */}
           <View className="mt-6">
-            <View className="mt-6">
-              <View
-                className="rounded-2xl p-5"
-                style={{
-                  backgroundColor: "#1E1E1E", // dark card
-                }}
-              >
-                <View className="flex-row justify-between items-center mb-6">
-                  <Image
-                    source={require("@/assets/icons/Bank Card - Iconly Pro.png")} // replace with your bank icon
-                    style={{ width: 40, height: 40, tintColor: "white" }}
-                  />
-                  <Text className="text-white text-sm">Account Number</Text>
+            <View
+              className="rounded-2xl p-5"
+              style={{ backgroundColor: "#1E1E1E" }}
+            >
+              <View className="flex-row justify-between items-center mb-6">
+                <Image
+                  source={require("@/assets/icons/Bank Card - Iconly Pro.png")}
+                  style={{ width: 40, height: 40, tintColor: "white" }}
+                />
+                <Text className="text-white text-sm">Account Number</Text>
+              </View>
+
+              <Text className="text-white text-xl font-semibold tracking-wider">
+                {userData ? userData.accountnumber : "N/A"}
+              </Text>
+
+              <View className="flex-row justify-between mt-6">
+                <View>
+                  <Text className="text-gray-400 text-xs">Account Name</Text>
+                  <Text className="text-white font-medium mt-1 capitalize">
+                    {userData ? userData.accountname : "UNAVAILABLE"}
+                  </Text>
                 </View>
-
-                <Text className="text-white text-xl font-semibold tracking-wider">
-                  {userData ? userData.accountnumber : "N/A"}
-                </Text>
-
-                <View className="flex-row justify-between mt-6">
-                  <View>
-                    <Text className="text-gray-400 text-xs">Account Name</Text>
-                    <Text className="text-white font-medium mt-1 capitalize">
-                      {userData ? userData.accountname : "UNAVAILABLE"}
-                    </Text>
-                  </View>
-                  <View className="items-end">
-                    <Text className="text-gray-400 text-xs">Bank</Text>
-                    <Text className="text-white font-medium mt-1 capitalize">
-                      {selectedID ? selectedID.label : "UNAVAILABLE"}
-                    </Text>
-                  </View>
+                <View className="items-end">
+                  <Text className="text-gray-400 text-xs">Bank</Text>
+                  <Text className="text-white font-medium mt-1 capitalize">
+                    {selectedID ? selectedID.label : "UNAVAILABLE"}
+                  </Text>
                 </View>
               </View>
             </View>
@@ -138,19 +123,17 @@ const Bank = ({ onNext }: props) => {
             className="border border-gray-300 p-4 mt-6 rounded-2xl flex-row w-full justify-between"
             onPress={() => setModalVisible(true)}
           >
-            <Text style={Styles.text} className="">
+            <Text style={Styles.text}>
               {selectedID ? selectedID.label : "Bank Name"}
             </Text>
-            <View>
-              <Image source={require("@/assets/icons/angle.png")} />
-            </View>
+            <Image source={require("@/assets/icons/angle.png")} />
           </TouchableOpacity>
 
-          {/* Document Number Input */}
+          {/* Account Number Field */}
           {selectedID && (
             <TextField
               label="Account Number"
-              placeholder="Account Number"
+              placeholder="Enter your account number"
               value={docNumber}
               onChange={setDocNumber}
               keyboardType="numeric"
@@ -164,120 +147,94 @@ const Bank = ({ onNext }: props) => {
               <Text className="ml-2 text-gray-600">Fetching data...</Text>
             </View>
           )}
+        </ScrollView>
 
-          {/* User Data */}
-          {userData && (
-            <View className="border border-gray-200 rounded-lg p-4 mt-4">
-              <View className="flex-row flex-wrap justify-between mt-3">
-                <View className="">
-                  <Text style={Styles.text}>Account Name:</Text>
-                  <Text
-                    style={Styles.medText}
-                    className="font-medium capitalize"
-                  >
-                    {userData.accountname}
-                  </Text>
-                </View>
+        {/* Bottom Modal */}
+        <Modal visible={modalVisible} animationType="slide" transparent>
+          <View className="flex-1 bg-black/40 justify-end">
+            <View
+              style={[Styles.container]}
+              className="bg-white rounded-t-3xl px-6 pt-3 pb-8 max-h-[60%]"
+            >
+              <View className="w-full h-[30px] items-center mb-2">
+                <View className="bg-gray-300 rounded-full h-2 w-[50px]" />
               </View>
-            </View>
-          )}
-        </View>
-      </ScrollView>
 
-      {/* ID Options Modal */}
-      <Modal visible={modalVisible} animationType="slide" transparent>
-        <View className="flex-1 bg-black/40 justify-end">
-          <View
-            style={Styles.container}
-            className=" rounded-t-2xl p-6 max-h-[450px]"
-          >
-            <View className="w-full h-[30px]  items-center">
-              <View
-                style={{ backgroundColor: colors.slate?.[650] }}
-                className="rounded-full h-2 w-[50px] "
-              ></View>
-            </View>
-            <View>
               <Text
                 style={Styles.headText}
-                className=" text-center font-semibold "
+                className="text-center font-semibold mb-3"
               >
                 Select Your Bank
               </Text>
-            </View>
-            <View className="py-2">
-              <Filter size="small" />
-            </View>
 
-            <FlatList
-              data={ID_OPTIONS}
-              keyExtractor={(item) => item.id}
-              contentContainerClassName="gap-3"
-              renderItem={({ item }) => {
-                const isSelected = selectedID?.id === item.id;
+              <View className="py-2">
+                <Filter size="small" />
+              </View>
 
-                return (
-                  <TouchableOpacity
-                    style={Styles.border}
-                    className="border p-4 rounded-2xl"
-                    onPress={() => {
-                      setSelectedID(item);
-                      setModalVisible(false);
-                      setUserData(null);
-                      setDocNumber("");
-                    }}
-                  >
-                    <View className="flex-row items-center">
-                      {/* Radio circle */}
-                      <View
-                        style={isSelected ? Styles.border2 : Styles.border}
-                        className={`h-5 w-5 rounded-full border-2 items-center justify-center mr-3 
-            `}
-                      >
-                        {isSelected && (
-                          <View
-                            style={{ backgroundColor: colors.slate?.[650] }}
-                            className="h-2.5 w-2.5 rounded-full "
-                          />
-                        )}
+              <FlatList
+                data={ID_OPTIONS}
+                keyExtractor={(item) => item.id}
+                contentContainerClassName="gap-3 pb-4"
+                renderItem={({ item }) => {
+                  const isSelected = selectedID?.id === item.id;
+                  return (
+                    <TouchableOpacity
+                      style={Styles.border}
+                      className="border p-4 rounded-2xl"
+                      onPress={() => {
+                        setSelectedID(item);
+                        setUserData(null);
+                        setDocNumber("");
+                        setModalVisible(false);
+                      }}
+                    >
+                      <View className="flex-row items-center">
+                        <View
+                          style={isSelected ? Styles.border2 : Styles.border}
+                          className="h-5 w-5 rounded-full border-2 items-center justify-center mr-3"
+                        >
+                          {isSelected && (
+                            <View className="bg-gray-800 h-2.5 w-2.5 rounded-full" />
+                          )}
+                        </View>
+                        <Text style={Styles.text2} className="text-base">
+                          {item.label}
+                        </Text>
                       </View>
+                    </TouchableOpacity>
+                  );
+                }}
+              />
 
-                      <Text style={Styles.text2} className="text-base">
-                        {item.label}
-                      </Text>
-                    </View>
-                  </TouchableOpacity>
-                );
-              }}
-            />
-            <View style={Styles.border} className="py-3 border-t-2">
-              <Text style={Styles.small} className="italic text-center">
-                🔐 Your data is 100% safe. We only crosscheck your data to be
-                sure you are real.
-              </Text>
+              <View className="py-3 border-t border-gray-300 mt-2">
+                <Text style={Styles.small} className="italic text-center">
+                  🔐 Your data is 100% safe. We only crosscheck your data to be
+                  sure you are real.
+                </Text>
+              </View>
             </View>
           </View>
-        </View>
-      </Modal>
+        </Modal>
 
-      {!userData ? (
-        <View className="w-full ">
-          <AppButton
-            title={loading ? "Fetching..." : "Fetch Details"}
-            onPress={handleFetchData}
-            fullwidth
-          />
+        {/* Button */}
+        <View className="w-full">
+          {!userData ? (
+            <AppButton
+              title={loading ? "Fetching..." : "Fetch Details"}
+              onPress={handleFetchData}
+              fullwidth
+            />
+          ) : (
+            <AppButton title="Continue" onPress={handleContinue} fullwidth />
+          )}
         </View>
-      ) : (
-        <View className="w-full ">
-          <AppButton title="Continue" onPress={handleContinue} fullwidth />
-        </View>
-      )}
-    </SafeAreaViewContainer>
+      </SafeAreaViewContainer>
+    </>
   );
 };
 
 export default Bank;
+
 const styles = (colors: ColorScheme) =>
   StyleSheet.create({
     container: {

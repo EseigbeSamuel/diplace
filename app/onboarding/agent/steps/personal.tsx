@@ -9,6 +9,7 @@ import {
   Image,
   Modal,
   StyleSheet,
+  Switch,
   Text,
   TouchableOpacity,
   View,
@@ -35,8 +36,13 @@ const Personal = ({ onNext }: props) => {
     label: string;
   } | null>(null);
   const [address, setAddress] = useState("");
-
   const [fullname, setFullname] = useState("");
+  const [business, setBusiness] = useState(false);
+
+  const handleToggle = (value: boolean) => {
+    setBusiness(value);
+  };
+
   return (
     <SafeAreaViewContainer className="flex-col justify-between h-full pb-5">
       <KeyboardAwareScrollView
@@ -61,10 +67,24 @@ const Personal = ({ onNext }: props) => {
           </View>
         </View>
 
-        <View>
-          <View>
-            <Text>use business name</Text>
-            <Text>if you are listing for a business</Text>
+        <View className="flex-row justify-between w-full">
+          <View className="capitalize">
+            <Text className="capitalize " style={Styles.text2}>
+              use business name
+            </Text>
+            <Text style={Styles.small}>if you are listing for a business</Text>
+          </View>
+          <View className="h-1">
+            <Switch
+              trackColor={{
+                false: colors.slate[300],
+                true: colors.success[300],
+              }}
+              thumbColor="#fff"
+              ios_backgroundColor={colors.slate[300]}
+              onValueChange={handleToggle}
+              value={business}
+            />
           </View>
         </View>
 
@@ -76,11 +96,17 @@ const Personal = ({ onNext }: props) => {
             onChange={setFullname}
           />
         </View>
+        {/* <View
+          className="size-1 w-full flex-row"
+          style={{ backgroundColor: colors.slate[400] }}
+        ></View> */}
 
         <View>
-          <View className="flex w-full justify-between">
-            <Text>Location</Text>
-            <Text>Use live location</Text>
+          <View className="flex-row w-full justify-between">
+            <Text className="" style={Styles.text2}>
+              Location
+            </Text>
+            <Text style={Styles.text2}>Use live location</Text>
           </View>
 
           <View>
@@ -90,18 +116,17 @@ const Personal = ({ onNext }: props) => {
               onPress={() => setModalVisible(true)}
             >
               <Text style={Styles.text} className="">
-                {selectedID ? selectedID.label : "Select means of ID"}
+                {selectedID ? selectedID.label : "Select City"}
               </Text>
             </TouchableOpacity>
 
             {/* Document Number Input */}
             {selectedID && (
               <TextField
-                label="Document Number"
-                placeholder="Document Number"
+                label="Address"
+                placeholder="Address"
                 value={address}
                 onChange={setAddress}
-                keyboardType="numeric"
               />
             )}
           </View>
@@ -124,10 +149,7 @@ const Personal = ({ onNext }: props) => {
                   style={Styles.headText}
                   className=" text-center font-semibold "
                 >
-                  Choose means of identification
-                </Text>
-                <Text style={Styles.text} className="text-center">
-                  Select any means of identification to verify your account.
+                  City
                 </Text>
               </View>
 

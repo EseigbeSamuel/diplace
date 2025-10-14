@@ -9,6 +9,7 @@ import Phone from "../renter/steps/phone";
 import Selfie from "../renter/steps/selfie";
 import Bank from "./steps/bank";
 import Info from "./steps/info";
+import Info2 from "./steps/info2";
 import Personal from "./steps/personal";
 
 const Agent = () => {
@@ -30,6 +31,8 @@ const Agent = () => {
         return <Personal onNext={handleNext} />;
       case 6:
         return <Bank onNext={handleNext} />;
+      case 7:
+        return <Info2 onNext={handleNext} />;
 
       default:
         return <Info onNext={handleNext} />;
