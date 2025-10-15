@@ -27,8 +27,8 @@ const Phone = ({ onNext }: Props) => {
   const Styles = styles(colors);
 
   const [step, setStep] = useState<"phone" | "otp">("phone");
-  const [phone, setPhone] = useState("");
-  const [otp, setOtp] = useState(""); // full string, e.g. "12345"
+  const [phone, setPhone] = useState({ num: "" });
+  const [otp, setOtp] = useState("");
   const hiddenInputRef = useRef<TextInput | null>(null);
 
   // resend timer
@@ -78,7 +78,7 @@ const Phone = ({ onNext }: Props) => {
   };
 
   const handleVerifyPhone = () => {
-    if (phone.trim().length < 8) return;
+    if (phone.num.trim().length < 1) return;
     // TODO: call send OTP API here
     setStep("otp");
   };
@@ -147,9 +147,11 @@ const Phone = ({ onNext }: Props) => {
               </View>
 
               <TextField
-                value={phone}
+                value={phone.num}
                 label="Phone No."
-                onChange={(text) => setPhone(text)}
+                onChange={(text) =>
+                  setPhone({ ...phone, num: text.toString() })
+                }
                 keyboardType="numeric"
                 placeholder="Phone No."
                 icon={require("@/assets/icons/Call - Iconly Pro-1.png")}
@@ -161,7 +163,7 @@ const Phone = ({ onNext }: Props) => {
                 title="Continue"
                 onPress={handleVerifyPhone}
                 fullwidth
-                disabled={phone.length < 10}
+                disabled={phone.num.length < 10}
               />
             </View>
           </View>

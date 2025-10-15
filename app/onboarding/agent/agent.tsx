@@ -40,7 +40,7 @@ const Agent = () => {
   };
 
   const handleNext = () => {
-    if (current < 6) {
+    if (current < 7) {
       setCurrent(current + 1);
     }
   };

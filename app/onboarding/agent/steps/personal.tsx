@@ -35,8 +35,13 @@ const Personal = ({ onNext }: props) => {
     id: string;
     label: string;
   } | null>(null);
-  const [address, setAddress] = useState("");
-  const [fullname, setFullname] = useState("");
+
+  const [input, setInput] = useState({
+    address: "",
+    fullname: "",
+  });
+  // const [address, setAddress] = useState("");
+  // const [fullname, setFullname] = useState("");
   const [business, setBusiness] = useState(false);
 
   const handleToggle = (value: boolean) => {
@@ -92,8 +97,10 @@ const Personal = ({ onNext }: props) => {
           <TextField
             label="Full Name"
             placeholder="fullname"
-            value={fullname}
-            onChange={setFullname}
+            value={input.fullname}
+            onChange={(text) =>
+              setInput({ ...input, fullname: text.toString() })
+            }
           />
         </View>
         {/* <View
@@ -125,8 +132,10 @@ const Personal = ({ onNext }: props) => {
               <TextField
                 label="Address"
                 placeholder="Address"
-                value={address}
-                onChange={setAddress}
+                value={input.address}
+                onChange={(text) =>
+                  setInput({ ...input, address: text.toString() })
+                }
               />
             )}
           </View>
@@ -167,7 +176,7 @@ const Personal = ({ onNext }: props) => {
                       onPress={() => {
                         setSelectedID(item);
                         setModalVisible(false);
-                        setAddress("");
+                        setInput({ ...input, address: "" });
                       }}
                     >
                       <View className="flex-row items-center">

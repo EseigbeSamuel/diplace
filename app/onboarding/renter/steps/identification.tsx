@@ -37,7 +37,7 @@ const Identification = ({ onNext }: props) => {
     id: string;
     label: string;
   } | null>(null);
-  const [docNumber, setDocNumber] = useState("");
+  const [docNumber, setDocNumber] = useState({ num: "" });
   const [loading, setLoading] = useState(false);
   const [userData, setUserData] = useState<any>(null);
   const [active, setActive] = useState(false);
@@ -105,8 +105,10 @@ const Identification = ({ onNext }: props) => {
             <TextField
               label="Document Number"
               placeholder="Document Number"
-              value={docNumber}
-              onChange={setDocNumber}
+              value={docNumber.num}
+              onChange={(text) =>
+                setDocNumber({ ...docNumber, num: text.toString() })
+              }
               keyboardType="numeric"
             />
           )}
@@ -211,7 +213,7 @@ const Identification = ({ onNext }: props) => {
                       setSelectedID(item);
                       setModalVisible(false);
                       setUserData(null);
-                      setDocNumber("");
+                      setDocNumber({ ...docNumber, num: "" });
                     }}
                   >
                     <View className="flex-row items-center">
