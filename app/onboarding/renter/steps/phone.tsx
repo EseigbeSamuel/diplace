@@ -31,6 +31,11 @@ const Phone = ({ onNext }: Props) => {
   const [otp, setOtp] = useState("");
   const hiddenInputRef = useRef<TextInput | null>(null);
 
+  const [selectedCountry, setSelectedCountry] = useState({
+    callingCode: "234",
+    cca2: "NG",
+  });
+
   // resend timer
   const [secondsLeft, setSecondsLeft] = useState(60);
   const [isResendingAllowed, setIsResendingAllowed] = useState(false);
@@ -163,7 +168,7 @@ const Phone = ({ onNext }: Props) => {
                 title="Continue"
                 onPress={handleVerifyPhone}
                 fullwidth
-                disabled={phone.num.length < 10}
+                disabled={phone.num.length < 1}
               />
             </View>
           </View>
@@ -221,15 +226,6 @@ const Phone = ({ onNext }: Props) => {
                   onPress={handleResend}
                   disabled={!isResendingAllowed}
                 >
-                  {/* <Text
-                    className={`text-sm font-semibold ${
-                      isResendingAllowed ? "text-blue-600" : `${styles={Styles.text}}`
-                    }`}
-                  >
-                    {isResendingAllowed
-                      ? "Resend"
-                      : `Resend in ${secondsLeft}s`}
-                  </Text>  */}
                   <Text
                     className={`text-sm font-semibold ${
                       isResendingAllowed ? "text-blue-600" : ""

@@ -178,46 +178,48 @@ const Bank = ({ onNext }: props) => {
             <Filter size="small" />
           </View>
 
-          <FlatList
-            data={ID_OPTIONS}
-            keyExtractor={(item) => item.id}
-            scrollEnabled
-            style={{ maxHeight: 400 }}
-            contentContainerStyle={{ gap: 12 }}
-            renderItem={({ item }) => {
-              const isSelected = selectedID?.id === item.id;
-              return (
-                <TouchableOpacity
-                  style={Styles.border}
-                  className="border p-4 rounded-2xl"
-                  onPress={() => {
-                    setSelectedID(item);
-                    setUserData(null);
-                    setDocNumber({ ...docNumber, num: "" });
-                    openModal.current?.dismiss();
-                    setIsModalOpen(false);
-                  }}
-                >
-                  <View className="flex-row items-center">
-                    <View
-                      style={isSelected ? Styles.border2 : Styles.border}
-                      className="h-5 w-5 rounded-full border-2 items-center justify-center mr-3"
-                    >
-                      {isSelected && (
-                        <View
-                          style={{ backgroundColor: colors.slate?.[650] }}
-                          className=" h-2.5 w-2.5 rounded-full"
-                        />
-                      )}
+          <View>
+            <FlatList
+              data={ID_OPTIONS}
+              keyExtractor={(item) => item.id}
+              scrollEnabled
+              style={{ maxHeight: 400 }}
+              contentContainerStyle={{ gap: 12 }}
+              renderItem={({ item }) => {
+                const isSelected = selectedID?.id === item.id;
+                return (
+                  <TouchableOpacity
+                    style={Styles.border}
+                    className="border p-4 rounded-2xl"
+                    onPress={() => {
+                      setSelectedID(item);
+                      setUserData(null);
+                      setDocNumber({ ...docNumber, num: "" });
+                      openModal.current?.dismiss();
+                      setIsModalOpen(false);
+                    }}
+                  >
+                    <View className="flex-row items-center">
+                      <View
+                        style={isSelected ? Styles.border2 : Styles.border}
+                        className="h-5 w-5 rounded-full border-2 items-center justify-center mr-3"
+                      >
+                        {isSelected && (
+                          <View
+                            style={{ backgroundColor: colors.slate?.[650] }}
+                            className=" h-2.5 w-2.5 rounded-full"
+                          />
+                        )}
+                      </View>
+                      <Text style={Styles.text2} className="text-base">
+                        {item.label}
+                      </Text>
                     </View>
-                    <Text style={Styles.text2} className="text-base">
-                      {item.label}
-                    </Text>
-                  </View>
-                </TouchableOpacity>
-              );
-            }}
-          />
+                  </TouchableOpacity>
+                );
+              }}
+            />
+          </View>
 
           <View className="py-3 border-t border-gray-300 mt-2">
             <Text style={Styles.small} className="italic text-center">
