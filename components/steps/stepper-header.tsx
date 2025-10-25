@@ -10,6 +10,7 @@ import SectionHeader from "../sectionheader";
 interface SubstepComponentProps {
   onNext: () => void;
   onPrev: () => void;
+  // searchData?: any;
 }
 
 interface Step {
@@ -31,6 +32,18 @@ const StepperWithHeader: React.FC<StepperWithHeaderProps> = ({
   const navigation = useNavigation();
   const { colors } = useTheme();
 
+  // type StepperRouteParams = { searchData?: any };
+  // const route =
+  //   useRoute<RouteProp<Record<string, StepperRouteParams>, string>>();
+  // const [searchData, setSearchData] = useState<any>(null);
+
+  // useEffect(() => {
+  //   if (route.params?.searchData) {
+  //     setSearchData(route.params.searchData);
+  //     // Optionally, reset params to avoid re-triggering
+  //     navigation.setParams({ searchData: undefined } as any);
+  //   }
+  // }, [route.params]);
   const handlePrev = () => {
     if (currentSubstepIndex > 0) {
       setCurrentSubstepIndex(currentSubstepIndex - 1);
