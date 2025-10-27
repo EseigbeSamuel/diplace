@@ -16,7 +16,7 @@ const Info2 = () => {
     <SafeAreaViewContainer className="items-center flex-col justify-between h-full gap-4">
       <View className=" items-center justify-center gap-5 w-full">
         <View>
-          <Image source={require("@/assets/images/favicon.png")} />
+          <Image source={require("@/assets/icons/verify-file-3d.png")} />
         </View>
         <View className="text-center">
           <Text style={Styles.headText} className="font-semibold text-center">

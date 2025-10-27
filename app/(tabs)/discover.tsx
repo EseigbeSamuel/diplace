@@ -3,7 +3,7 @@ import { AppHeader } from "@/components/header";
 import HouseCard from "@/components/housecard";
 import ImageSlider from "@/components/imageslider";
 import SafeAreaViewContainer from "@/components/safeareaview";
-import { categories, featuredLister } from "@/constants/discover";
+import { categories, featuredLister, slider } from "@/constants/discover";
 import { featuredSpaces } from "@/constants/home";
 import { useTheme } from "@/contexts/themeContext";
 import { ColorScheme } from "@/utils";
@@ -30,8 +30,8 @@ const Discover = () => {
         <Filter size="large" />
       </View>
 
-      <ScrollView>
-        <View className="flex flex-col gap-3 my-5">
+      <ScrollView nestedScrollEnabled>
+        <View className="flex flex-col gap-3 mt-5 mb-7">
           <Text style={homeStyles.title} className="font-semibold">
             Categories
           </Text>
@@ -41,27 +41,44 @@ const Discover = () => {
             contentContainerClassName="gap-2"
             showsHorizontalScrollIndicator={false}
             renderItem={({ item }) => (
+              // <Pressable
+              //   onPress={() => router.push("/views/apartments")}
+              //   style={homeStyles.border}
+              //   className="flex flex-col items-center border rounded-2xl p-4 min-w-[108px]"
+              // >
+              //   <Image className="size-[28px]" source={item.icon} />
+              //   <Text style={homeStyles.text} className="capitalize">
+              //     {item.name}{" "}
+              //   </Text>
+              // </Pressable>
               <Pressable
                 onPress={() => router.push("/views/apartments")}
-                style={homeStyles.border}
-                className="flex flex-col items-center border rounded-2xl p-4 min-w-[108px]"
+                className={`flex flex-col items-center border rounded-2xl p-4 min-w-[108px] ${
+                  item.name === "apartment"
+                    ? "bg-blue-50 border-blue-500"
+                    : item.name === "shops"
+                    ? "bg-amber-50 border-amber-500"
+                    : item.name === "offices"
+                    ? "bg-green-50 border-green-500"
+                    : item.name === "event center"
+                    ? "bg-pink-50 border-pink-500"
+                    : "bg-gray-50 border-gray-300"
+                }`}
               >
                 <Image className="size-[28px]" source={item.icon} />
-                <Text style={homeStyles.text} className="capitalize">
-                  {item.name}{" "}
-                </Text>
+                <Text className="capitalize text-black">{item.name}</Text>
               </Pressable>
             )}
             keyExtractor={(item) => item.id}
           />
         </View>
 
-        <View className="flex flex-col gap-3">
+        <View className="flex flex-col gap-3 w-full">
           <Text style={homeStyles.title} className="font-semibold">
-            Neighborhoods{" "}
+            Neighborhoods
           </Text>
-          <ImageSlider />
-          {/* <ImageSlider data={slider} autoPlay interval={4000} /> */}
+          {/* <ImageSlider /> */}
+          <ImageSlider data={slider} />
         </View>
 
         <View className="flex flex-col gap-3 my-5">
@@ -100,7 +117,7 @@ const Discover = () => {
                   </Text>
                   <View className="flex flex-row items-center">
                     <Image
-                      source={require("@/assets/icons/Star-Iconly-Pro-1.png")}
+                      source={require("@/assets/icons/star.png")}
                       className="size-[20px]"
                     />
                     <Text style={homeStyles.small} className="">
