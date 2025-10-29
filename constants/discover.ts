@@ -73,14 +73,14 @@ export const featuredLister = [
 export const categories = [
   {
     id: "1",
-    icon: require("@/assets/icons/apartment.png"),
+    icon: require("@/assets/icons/Apartments.png"),
     name: "apartment",
   },
-  { id: "2", icon: require("@/assets/icons/Shop.png"), name: "shops" },
-  { id: "3", icon: require("@/assets/icons/office.png"), name: "offices" },
+  { id: "2", icon: require("@/assets/icons/Shops.png"), name: "shops" },
+  { id: "3", icon: require("@/assets/icons/Offices.png"), name: "offices" },
   {
     id: "4",
-    icon: require("@/assets/icons/Shop.png"),
+    icon: require("@/assets/icons/Event-center.png"),
     name: "event center",
   },
 ];

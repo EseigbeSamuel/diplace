@@ -76,7 +76,8 @@ export default function Register() {
           />
 
           <AppButton
-            onPress={() => router.navigate("/(tabs)")}
+            // onPress={() => router.navigate("/(tabs)")}
+            onPress={() => router.navigate("/onboarding/welcome")}
             title="Log in"
             fullwidth
             variant="primary"
