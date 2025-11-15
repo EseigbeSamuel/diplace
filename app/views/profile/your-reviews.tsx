@@ -228,7 +228,7 @@ const styles = (colors: ColorScheme) =>
       lineHeight: RFValue(14),
     },
     section: {
-      paddingHorizontal: RFValue(16),
+      paddingHorizontal: RFValue(3),
       paddingVertical: RFValue(20),
       borderTopWidth: 1,
       borderTopColor: colors.slate[300],

@@ -298,7 +298,6 @@ const styles = (colors: ColorScheme) =>
   StyleSheet.create({
     container: {
       flex: 1,
-      paddingHorizontal: RFValue(16),
     },
     headerSection: {
       paddingTop: RFValue(20),
