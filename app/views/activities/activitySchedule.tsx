@@ -97,7 +97,7 @@ const ActivitySchedule = () => {
                 style={homeStyles.gray300}
               >
                 <Image
-                  source={require("@/assets/icons/Calling - Iconly Pro.png")}
+                  source={require("@/assets/icons/calling.png")}
                   className="w-6 h-6"
                 />
               </View>

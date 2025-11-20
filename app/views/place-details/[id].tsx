@@ -108,13 +108,13 @@ const Placedetails = () => {
           <View className="flex flex-row gap-3">
             <View className="w-14 flex items-center justify-center h-14 rounded-[999px] bg-gray-400 ">
               <Image
-                source={require("@/assets/icons/Calling - Iconly Pro.png")}
+                source={require("@/assets/icons/calling.png")}
                 className="w-6 h-6"
               />
             </View>
             <View className="w-14 flex items-center justify-center h-14 rounded-[999px] bg-gray-400 ">
               <Image
-                source={require("@/assets/icons/Calling - Iconly Pro.png")}
+                source={require("@/assets/icons/calling.png")}
                 className="w-6 h-6"
               />
             </View>
