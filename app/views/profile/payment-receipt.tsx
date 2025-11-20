@@ -241,7 +241,7 @@ const styles = (colors: ColorScheme) =>
     container: {
       flex: 1,
       paddingTop: RFValue(24),
-      paddingHorizontal: RFValue(16),
+      paddingHorizontal: RFValue(3),
       paddingBottom: RFValue(40),
     },
     receiptCard: {

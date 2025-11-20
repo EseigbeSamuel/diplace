@@ -212,7 +212,7 @@ const Profile = () => {
         {/* <View style={profileStyles.switchButtonContainer}>
           <AppButton
             title="Switch to Renter Mode"
-            onPress={() => {}}
+            onPress={() => router.push("/(tabs)/spaces")}
             size="large"
             variant="secondary"
             beforeIcon={require("@/assets/icons/resize-bottom-right.png")}
@@ -324,7 +324,7 @@ const styles = (colors: ColorScheme) =>
       tintColor: colors.slate[650],
     },
     menuContainer: {
-      paddingHorizontal: RFValue(16),
+      paddingHorizontal: RFValue(4),
     },
     menuItem: {
       flexDirection: "row",

@@ -98,7 +98,7 @@ export default MyAccount;
 const styles = (colors: ColorScheme) =>
   StyleSheet.create({
     container: {
-      paddingHorizontal: RFValue(16),
+      paddingHorizontal: RFValue(3),
       paddingTop: RFValue(20),
     },
     menuItem: {

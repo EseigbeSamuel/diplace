@@ -228,7 +228,7 @@ const styles = (colors: ColorScheme) =>
       tintColor: colors.slate[650],
     },
     container: {
-      paddingHorizontal: RFValue(16),
+      paddingHorizontal: RFValue(3),
     },
     monthGroup: {
       marginBottom: RFValue(24),

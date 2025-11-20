@@ -378,7 +378,6 @@ const styles = (colors: ColorScheme) =>
       fontWeight: "500",
     },
     section: {
-      paddingHorizontal: RFValue(16),
       paddingTop: RFValue(24),
     },
     sectionTitle: {

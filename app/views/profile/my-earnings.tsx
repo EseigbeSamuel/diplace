@@ -168,7 +168,7 @@ export default MyEarnings;
 const styles = (colors: ColorScheme) =>
   StyleSheet.create({
     earningsCard: {
-      marginHorizontal: RFValue(16),
+      marginHorizontal: RFValue(3),
       marginTop: RFValue(20),
       marginBottom: RFValue(24),
       backgroundColor: colors.slate[650],
@@ -226,7 +226,7 @@ const styles = (colors: ColorScheme) =>
       tintColor: "rgba(255, 255, 255, 0.7)",
     },
     section: {
-      paddingHorizontal: RFValue(16),
+      paddingHorizontal: RFValue(3),
     },
     sectionHeader: {
       flexDirection: "row",

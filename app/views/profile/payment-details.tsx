@@ -131,7 +131,7 @@ const styles = (colors: ColorScheme) =>
   StyleSheet.create({
     container: {
       flex: 1,
-      paddingHorizontal: RFValue(16),
+      paddingHorizontal: RFValue(3),
       paddingTop: RFValue(20),
     },
     cardsContainer: {
