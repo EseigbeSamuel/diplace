@@ -67,7 +67,7 @@ const renderBadge = (badgeType: string) => {
       return (
         <View className="flex flex-row items-center gap-2 px-2 py-1 border border-[#60646C] rounded-full bg-[#F2F2F5]">
           <Image
-            source={require("@/assets/icons/Edit-pencil-fill.png")}
+            source={require("@/assets/icons/edit-pencil-fill.png")}
             className="w-4 h-4"
           />
           <Text className="text-[#1C2024]">In draft</Text>
@@ -118,7 +118,7 @@ const HouseCardTile = ({
   const homeStyles = styles(colors);
   return (
     <Pressable onPress={onPress}>
-      <View className="py-2 flex flex-row gap-2 justify-between">
+      <View className="flex flex-row justify-between gap-2 py-2">
         <View className="flex flex-row gap-2">
           <View className="">
             <Image
@@ -134,7 +134,7 @@ const HouseCardTile = ({
             <Text className="text-gray-400">{location}</Text>
             <View className="flex flex-row">
               <Text
-                className="font-semibold text-lg"
+                className="text-lg font-semibold"
                 style={homeStyles.subTitleblack}
               >
                 {price}

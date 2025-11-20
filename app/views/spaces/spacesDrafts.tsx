@@ -52,14 +52,14 @@ const SpacesDrafts = ({ layout }: { layout: "tiles" | "box" }) => {
           index: 2,
         }}
       >
-        <View className="flex-1 py-4 justify-center items-center">
+        <View className="items-center justify-center flex-1 py-4">
           <View>
             <Image
               source={require("@/assets/images/featuredSpaceImage1.png")}
               className="h-[100px] w-[100px] rounded-xl"
             />
           </View>
-          <View className="flex-1 gap-1 items-center justify-center py-2">
+          <View className="items-center justify-center flex-1 gap-1 py-2">
             <Text style={homeStyles.textBlack}>
               2 Bedroom in-suite apartment
             </Text>
@@ -68,13 +68,13 @@ const SpacesDrafts = ({ layout }: { layout: "tiles" | "box" }) => {
           <View className="w-full">
             <AppButton
               title="Update Status"
-              className=" w-full"
+              className="w-full "
               onPress={() => {}}
               afterIcon={require("@/assets/icons/tag.png")}
             />
             <AppButton
               title="Edit Space"
-              afterIcon={require("@/assets/icons/Edit-pencil.png")}
+              afterIcon={require("@/assets/icons/edit-pencil.png")}
               className=""
               variant="tertiary"
               onPress={() => {}}
