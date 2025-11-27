@@ -327,6 +327,7 @@
 
 // // export default ImageSlider;
 
+import { BlurView } from "expo-blur";
 import React, { useEffect, useRef, useState } from "react";
 import {
   Dimensions,
@@ -356,7 +357,6 @@ const ImageSlider = ({ data, autoPlay = true, interval = 3000 }: Props) => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const itemWidth = width * 0.9;
 
-  // ✅ Stable autoplay logic
   useEffect(() => {
     if (!autoPlay || data.length <= 1) return;
 
@@ -374,7 +374,6 @@ const ImageSlider = ({ data, autoPlay = true, interval = 3000 }: Props) => {
     return () => clearInterval(timer);
   }, [autoPlay, interval, data.length]);
 
-  // ✅ Manual scroll sync
   const handleScroll = (event: any) => {
     const offsetX = event.nativeEvent.contentOffset.x;
     const newIndex = Math.round(offsetX / itemWidth);
@@ -383,7 +382,7 @@ const ImageSlider = ({ data, autoPlay = true, interval = 3000 }: Props) => {
 
   return (
     <View className="w-full items-center">
-      {/* ✅ Horizontal Scroll */}
+      {/*Horizontal Scroll */}
       <ScrollView
         ref={scrollRef}
         horizontal
@@ -400,7 +399,7 @@ const ImageSlider = ({ data, autoPlay = true, interval = 3000 }: Props) => {
           <View
             key={item.id}
             className="overflow-hidden rounded-2xl mx-2"
-            style={{ width: itemWidth, height: 220 }}
+            style={{ width: itemWidth, height: 170 }}
           >
             <Image
               source={item.image}
@@ -409,21 +408,26 @@ const ImageSlider = ({ data, autoPlay = true, interval = 3000 }: Props) => {
             />
 
             {item.location && (
-              <View className="absolute bottom-3 left-3 flex-row items-center bg-black/40 px-3 py-1.5 rounded-full">
+              <BlurView
+                intensity={70}
+                tint="dark"
+                className="absolute -bottom-1 w-full flex-row items-center p-4 rounded-xl"
+              >
                 <Image
                   source={require("@/assets/icons/location.png")}
                   className="w-3.5 h-3.5 mr-2"
                 />
-                <Text className="text-white font-semibold text-sm">
+
+                <Text className="text-white font-semibold capitalize">
                   {item.location}
                 </Text>
-              </View>
+              </BlurView>
             )}
           </View>
         ))}
       </ScrollView>
 
-      {/* ✅ Dots */}
+      {/*  Dots */}
       <View className="flex-row items-center justify-center bg-[#18181A]/10 px-2.5 py-1.5 rounded-full mt-3">
         {data.map((_, i) => (
           <TouchableOpacity

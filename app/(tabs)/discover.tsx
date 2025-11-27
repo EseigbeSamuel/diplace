@@ -79,6 +79,7 @@ const Discover = () => {
           </Text>
           {/* <ImageSlider /> */}
           <ImageSlider data={slider} />
+          {/* <CarouselSlider /> */}
         </View>
 
         <View className="flex flex-col gap-3 my-5">
