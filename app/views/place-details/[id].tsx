@@ -40,12 +40,12 @@ const Placedetails = () => {
           <Text style={homeStyles.title} className="w-[70%]">
             2 Bedroom in-suite apartment
           </Text>
-          <Text style={homeStyles.title}>₦600,000</Text>
+          <Text style={[homeStyles.title, { fontWeight: 600 }]}>₦600,000</Text>
         </View>
         <View className="flex flex-row justify-between py-4">
           <View className="flex gap-1 flex-row items-center w-[70%]">
             <Image
-              source={require("@/assets/icons/Location - Iconly Pro.png")}
+              source={require("@/assets/icons/location-black.png")}
               className="w-6 h-6"
             />
             <Text style={homeStyles.subTitlegray}>
@@ -54,8 +54,11 @@ const Placedetails = () => {
           </View>
           <Text style={homeStyles.subTitlegray}>/annum</Text>
         </View>
-        <View className="border-t border-b border-gray-300">
-          <Text className="py-2 italic text-center text-gray-400">
+        <View className="px-3 py-2 border-t border-b border-gray-300">
+          <Text
+            style={{ color: colors.slate[600] }}
+            className="py-2 italic text-center"
+          >
             ⚠️ Heads up! The price you see is for the space only. Agent fees and
             other charges may apply.
           </Text>
@@ -66,38 +69,49 @@ const Placedetails = () => {
               source={require("@/assets/icons/bed-outline.png")}
               className="w-6 h-6"
             />
-            <Text>2 Bedrooms</Text>
+            <Text style={{ color: colors.slate[650] }}>2 Bedrooms</Text>
           </View>
           <View className="flex items-center justify-center">
             <Image
               source={require("@/assets/icons/bath.png")}
               className="w-6 h-6"
             />
-            <Text>2 Baths</Text>
+            <Text style={{ color: colors.slate[650] }}>2 Baths</Text>
           </View>
           <View className="flex items-center justify-center">
             <Image
               source={require("@/assets/icons/bath.png")}
               className="w-6 h-6"
             />
-            <Text>10 by 12ft</Text>
+            <Text style={{ color: colors.slate[650] }}>10 by 12ft</Text>
           </View>
         </View>
         <View className="flex flex-row items-center justify-between py-3">
           <Text className="font-semibold" style={homeStyles.title}>
             Listed by
           </Text>
-          <Text className="">Pushed 2 days ago</Text>
+          <Text style={{ color: colors.slate[650] }} className="">
+            Pushed 2 days ago
+          </Text>
         </View>
 
         <View className="flex flex-row gap-2 py-3 border-b border-gray-300">
-          <View className="h-12 w-12 rounded-[999px] bg-gray-300"></View>
+          <View
+            style={{ height: RFValue(48), width: RFValue(48) }}
+            className="bg-gray-300 rounded-full"
+          ></View>
           <View className="w-[50%]">
-            <Text>
+            <Text
+              style={{ color: colors.slate[650], fontSize: RFValue(16) }}
+              className="font-medium"
+            >
               Ibe Alex{" "}
               <Image source={require("@/assets/icons/badge-check-green.png")} />
             </Text>
-            <Text className="flex flex-row gap-2">
+            <Text
+              style={{ color: colors.slate[650] }}
+              className="flex flex-row gap-2"
+            >
               <Image
                 source={require("@/assets/icons/star.png")}
                 className="w-4 h-4"
@@ -124,7 +138,7 @@ const Placedetails = () => {
           <Text style={homeStyles.title} className="pb-2">
             About this space
           </Text>
-          <Text>
+          <Text style={{ color: colors.slate[650] }}>
             Lorem ipsum dolor sit amet consectetur adipisicing elit.
             Voluptatibus, ipsa consequatur excepturi in ab nemo est porro hic,
             ad, maxime at. Odio, sunt. Necessitatibus similique eos quod
@@ -134,14 +148,19 @@ const Placedetails = () => {
             Amentities
           </Text>
           {listItems.map((item, index) => (
-            <Text key={index}>{`\u2022 ${item}`}</Text>
+            <Text
+              key={index}
+              style={{ color: colors.slate[650] }}
+            >{`\u2022 ${item}`}</Text>
           ))}
         </View>
         <View className="py-3 border-b border-gray-300">
           <Text style={homeStyles.title} className="pb-2">
             Location
           </Text>
-          <Text>Road 2, Tony Estate, Port Harcourt</Text>
+          <Text style={{ color: colors.slate[650] }}>
+            Road 2, Tony Estate, Port Harcourt
+          </Text>
         </View>
 
         <View className="py-3 border-b border-gray-300">
@@ -150,27 +169,48 @@ const Placedetails = () => {
           </Text>
           <View className="flex flex-row justify-between py-2">
             <Text style={homeStyles.gray}>Space rent</Text>
-            <Text className="font-semibold">N600,000.00</Text>
+            <Text
+              style={{ color: colors.slate[650] }}
+              className="font-semibold"
+            >
+              N600,000.00
+            </Text>
           </View>
           <View className="flex flex-row justify-between py-2">
-            <Text style={homeStyles.gray}>Space rent</Text>
-            <Text className="font-semibold">N600,000.00</Text>
+            <Text style={homeStyles.gray}>Caution fee</Text>
+            <Text
+              style={{ color: colors.slate[650] }}
+              className="font-semibold"
+            >
+              ₦50,000.00
+            </Text>
           </View>
           <View className="flex flex-row justify-between py-2">
-            <Text style={homeStyles.gray}>Space rent</Text>
-            <Text className="font-semibold">N600,000.00</Text>
+            <Text style={homeStyles.gray}>Agent fee (10%)</Text>
+            <Text
+              style={{ color: colors.slate[650] }}
+              className="font-semibold"
+            >
+              ₦60,000.00
+            </Text>
           </View>
           <View className="flex flex-row justify-between py-2">
-            <Text style={homeStyles.gray}>Space rent</Text>
-            <Text className="font-semibold">N600,000.00</Text>
-          </View>
-          <View className="flex flex-row justify-between py-2">
-            <Text style={homeStyles.gray}>Space rent</Text>
-            <Text className="font-semibold">N600,000.00</Text>
+            <Text style={homeStyles.gray}>Platform fee (1%)</Text>
+            <Text
+              style={{ color: colors.slate[650] }}
+              className="font-semibold"
+            >
+              ₦6,000.00
+            </Text>
           </View>
         </View>
         <View className="flex flex-row justify-between py-3 border-b border-gray-300">
-          <Text className="text-lg">Total Payable</Text>
+          <Text
+            style={{ color: colors.slate[650], fontSize: RFValue(16) }}
+            className="font-medium"
+          >
+            Total Payable
+          </Text>
           <Text style={homeStyles.title} className="font-semibold">
             N716,000.10
           </Text>
@@ -178,10 +218,10 @@ const Placedetails = () => {
 
         <Pressable className="flex flex-row items-center gap-3 py-4">
           <Image
-            source={require("@/assets/icons/flag.png")}
+            source={require("@/assets/icons/flag-red.png")}
             className="w-6 h-6"
           />
-          <Text>Report listing</Text>
+          <Text style={{ color: colors.error[200] }}>Report listing</Text>
         </Pressable>
       </ScrollView>
       <View className="flex flex-col gap-3 py-4">
@@ -211,6 +251,7 @@ const styles = (colors: ColorScheme) =>
     title: {
       fontSize: RFValue(18),
       lineHeight: RFValue(24),
+      color: colors.slate[650],
     },
     subTitle: {
       fontSize: RFValue(14),

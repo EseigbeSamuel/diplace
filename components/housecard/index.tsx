@@ -30,7 +30,7 @@ const HouseCard = ({
   duration: string;
   onPress?: ((event: GestureResponderEvent) => void) | null | undefined;
 }) => {
-  const { colors } = useTheme();
+  const { colors, isDarkMode } = useTheme();
   const homeStyles = styles(colors);
   const [isBookmarked, setIsBookmarked] = useState(false);
 
@@ -140,10 +140,14 @@ const HouseCard = ({
             />
           </TouchableOpacity>
         </View>
-        <View className="flex flex-row gap-1">
+        <View className="flex flex-row items-center gap-0.5">
           <Image
-            source={require("@/assets/icons/Location - Iconly Pro.png")}
-            className="w-6 h-6"
+            source={
+              isDarkMode
+                ? require("@/assets/icons/location-white.png")
+                : require("@/assets/icons/location-black.png")
+            }
+            className="w-4 h-4"
           />
           <Text style={homeStyles.subTitlegray}>{location}</Text>
         </View>

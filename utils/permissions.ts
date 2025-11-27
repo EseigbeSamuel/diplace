@@ -1,23 +1,35 @@
-export const tabItems = [
+export const tabItems = (isDarkMode: boolean) => [
   {
     name: "index",
     label: "Home",
-    activeIcon: require("../assets/icons/home-active.png"),
-    inactiveIcon: require("../assets/icons/home.png"),
+    activeIcon: isDarkMode
+      ? require("../assets/icons/home-white-active.png")
+      : require("../assets/icons/home-active.png"),
+    inactiveIcon: isDarkMode
+      ? require("../assets/icons/home-white.png")
+      : require("../assets/icons/home.png"),
     grantPermission: ["tenant", "owner"],
   },
   {
     name: "discover",
     label: "Discover",
-    activeIcon: require("../assets/icons/discovery-active.png"),
-    inactiveIcon: require("../assets/icons/discovery.png"),
+    activeIcon: isDarkMode
+      ? require("../assets/icons/discovery-white-active.png")
+      : require("../assets/icons/discovery-active.png"),
+    inactiveIcon: isDarkMode
+      ? require("../assets/icons/discovery-white-inactive.png")
+      : require("../assets/icons/discovery.png"),
     grantPermission: ["tenant"],
   },
   {
     name: "spaces",
     label: "Spaces",
-    activeIcon: require("../assets/icons/spaces-active.png"),
-    inactiveIcon: require("../assets/icons/spaces.png"),
+    activeIcon: isDarkMode
+      ? require("../assets/icons/spaces-white-active.png")
+      : require("../assets/icons/spaces-active.png"),
+    inactiveIcon: isDarkMode
+      ? require("../assets/icons/spaces-white-inactive.png")
+      : require("../assets/icons/spaces.png"),
     grantPermission: ["owner"],
   },
   {
@@ -30,15 +42,23 @@ export const tabItems = [
   {
     name: "chats",
     label: "Chats",
-    activeIcon: require("../assets/icons/chat-active.png"),
-    inactiveIcon: require("../assets/icons/chat.png"),
+    activeIcon: isDarkMode
+      ? require("../assets/icons/chat-white-active.png")
+      : require("../assets/icons/chat-active.png"),
+    inactiveIcon: isDarkMode
+      ? require("../assets/icons/chat-white-inactive.png")
+      : require("../assets/icons/chat.png"),
     grantPermission: ["tenant", "owner"],
   },
   {
     name: "activity",
     label: "Activity",
-    activeIcon: require("../assets/icons/activity-active.png"),
-    inactiveIcon: require("../assets/icons/activity.png"),
+    activeIcon: isDarkMode
+      ? require("../assets/icons/activity-inactive-light.png")
+      : require("../assets/icons/activity-active.png"),
+    inactiveIcon: isDarkMode
+      ? require("../assets/icons/activity-light-inactive.png")
+      : require("../assets/icons/activity.png"),
     grantPermission: ["tenant", "owner"],
   },
 ];

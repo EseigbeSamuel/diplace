@@ -57,7 +57,7 @@ const PreviewSpaces = () => {
         <View className=" py-4">
           <View className="flex gap-1 flex-row items-center">
             <Image
-              source={require("@/assets/icons/Location - Iconly Pro.png")}
+              source={require("@/assets/icons/location-black.png")}
               className="w-6 h-6"
             />
             <Text style={homeStyles.subTitlegray}>

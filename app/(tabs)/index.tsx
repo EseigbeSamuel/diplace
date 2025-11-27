@@ -46,7 +46,7 @@ const Home = () => {
           }
         />
         <Filter
-          size="large"
+          size="small"
           // onFocus={() => {
           //   router.push("/views/searchPage");
           // }}

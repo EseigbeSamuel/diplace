@@ -42,7 +42,7 @@ const HeaderTabs: React.FC<TabsProps> = ({
     }
   };
   return (
-    <View className="flex-1">
+    <View className="flex-1 gap-4">
       <View className="flex flex-row items-center justify-between">
         <View className="flex-row items-center gap-4">
           {tabs.map((tab) => (
@@ -53,10 +53,14 @@ const HeaderTabs: React.FC<TabsProps> = ({
               className={`py-2 ${activeTab === tab.id ? "border-b-2 " : ""}`}
             >
               <Text
-                style={homeStyles.subTitleblack}
-                className={`text-base ${
-                  activeTab === tab.id ? "font-semibold" : "font-normal"
-                }`}
+                style={{
+                  color:
+                    activeTab === tab.id
+                      ? colors.slate[650]
+                      : colors.slate[600],
+                  fontSize: RFValue(16),
+                  lineHeight: RFValue(20),
+                }}
               >
                 {tab.label}
               </Text>
@@ -102,7 +106,7 @@ const styles = (colors: ColorScheme) =>
       color: colors.slate[600],
     },
     subTitleblack: {
-      fontSize: RFValue(14),
+      fontSize: RFValue(16),
       lineHeight: RFValue(20),
       color: colors.slate[650],
     },
