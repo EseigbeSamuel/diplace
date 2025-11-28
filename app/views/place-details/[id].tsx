@@ -1,23 +1,57 @@
+import { CustomBottomSheet } from "@/components/bottom-sheet";
 import AppButton from "@/components/button";
 import SafeAreaViewContainer from "@/components/safeareaview";
 import SectionHeader from "@/components/sectionheader";
 import { useTheme } from "@/contexts/themeContext";
 import { ColorScheme } from "@/utils";
-import React from "react";
+import { BottomSheetModal } from "@gorhom/bottom-sheet";
+import React, { useMemo, useRef, useState } from "react";
 import {
+  FlatList,
   Image,
   Pressable,
   ScrollView,
   StyleSheet,
   Text,
+  TouchableOpacity,
   View,
 } from "react-native";
+import { Calendar } from "react-native-calendars";
 import { RFValue } from "react-native-responsive-fontsize";
 
+type timeslot = {
+  id: string;
+  label: string;
+};
+const timeslotDB: timeslot[] = [
+  { id: "morning", label: "10AM - 12PM (Morning slot)" },
+  { id: "afternoon", label: "1PM - 3PM (Afternoon slot)" },
+  { id: "evening", label: "4PM - 6PM (Evening slot)" },
+];
+
 const Placedetails = () => {
-  const { colors } = useTheme();
+  const { colors, isDarkMode } = useTheme();
   const homeStyles = styles(colors);
   const listItems = ["Wardrobe", "2 Bethroom"];
+  const [selectedTime, setSelectedTime] = useState<{
+    id: string;
+    label: string;
+  } | null>(null);
+  const [selectedDate, setSelectedDate] = useState<Date | null>(null);
+  const openDatePicker = useRef<BottomSheetModal>(null);
+
+  const openInspection = useRef<BottomSheetModal>(null);
+  const openTimeSlot = useRef<BottomSheetModal>(null);
+
+  const handleOpenInspection = () => {
+    openInspection.current?.present();
+  };
+  const handleOpenTimeSlot = () => {
+    openTimeSlot.current?.present();
+  };
+
+  const snapPoints = useMemo(() => ["75%", "90%"], []);
+
   return (
     <SafeAreaViewContainer>
       <SectionHeader
@@ -225,7 +259,11 @@ const Placedetails = () => {
         </Pressable>
       </ScrollView>
       <View className="flex flex-col gap-3 py-4">
-        <AppButton title="Book Now" onPress={() => {}} size="large" />
+        <AppButton
+          title="Book Now"
+          onPress={handleOpenInspection}
+          size="large"
+        />
         <AppButton
           title="Virtual Tour"
           onPress={() => {}}
@@ -234,6 +272,207 @@ const Placedetails = () => {
           beforeIcon={require("@/assets/icons/Video - Iconly Pro.png")}
         />
       </View>
+
+      {/* inspection */}
+      <CustomBottomSheet
+        bottomSheetProps={{
+          ref: openInspection,
+          snapPoints,
+        }}
+      >
+        <View className="flex flex-col gap-10 ">
+          <View>
+            <Text
+              className="font-semibold text-center "
+              style={homeStyles.title2}
+            >
+              Schedule an Inspection
+            </Text>
+            <Text className=" text-center " style={homeStyles.subTitlegray}>
+              Pick a convenient time to inspect this space in person. A small
+              inspection fee may apply, payable before confirmation.
+            </Text>
+          </View>
+
+          <View>
+            <TouchableOpacity
+              className="border border-gray-300 p-4 mt-6 rounded-2xl flex-row w-full justify-between"
+              onPress={() => openDatePicker.current?.present()}
+            >
+              <Text style={homeStyles.text}>{"Select Inspection Date"}</Text>
+              {isDarkMode ? (
+                <Image source={require("@/assets/icons/calender-white.png")} />
+              ) : (
+                <Image source={require("@/assets/icons/calender-dark.png")} />
+              )}
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              className="border border-gray-300 p-4 mt-6 rounded-2xl flex-row w-full justify-between"
+              onPress={handleOpenTimeSlot}
+            >
+              <Text style={homeStyles.text}>
+                {selectedTime ? selectedTime.label : "Choose Time Slot"}
+              </Text>
+              <Image source={require("@/assets/icons/angle.png")} />
+            </TouchableOpacity>
+          </View>
+
+          <View className="flex flex-row w-full justify-between ">
+            <Text style={homeStyles.text}>inspection fee: </Text>
+            <Text style={homeStyles.title2} className="font-semibold ">
+              $1000
+            </Text>
+          </View>
+          <View className="py-3 border-t border-gray-300 mt-2 flex-col flex gap-5">
+            <Text style={homeStyles.small} className="italic text-center">
+              🔐 Fee is held by DiPlace and only released after a successful
+              inspection. Refunded if canceled or not completed.
+            </Text>
+
+            <View className="flex flex-col gap-5">
+              <AppButton
+                title="Schedule Inspection"
+                onPress={() => {}}
+                size="large"
+                disabled={!selectedTime}
+              />
+              <Text style={homeStyles.text} className="font-medium text-center">
+                Skip & Proceed to Book Now
+              </Text>
+            </View>
+          </View>
+        </View>
+      </CustomBottomSheet>
+
+      {/* DATE PICKER SHEET */}
+      <CustomBottomSheet
+        bottomSheetProps={{
+          ref: openDatePicker,
+          snapPoints,
+        }}
+      >
+        <View className="flex flex-col gap-8">
+          <View className="flex items-center">
+            <Text style={homeStyles.title2} className="text-center">
+              Select date
+            </Text>
+
+            <Text style={homeStyles.title} className="font-semibold mt-2">
+              {selectedDate ? selectedDate.toDateString() : "Pick a date"}
+            </Text>
+          </View>
+
+          <View>
+            <Calendar
+              onDayPress={(day) => {
+                setSelectedDate(new Date(day.dateString));
+              }}
+              markedDates={
+                selectedDate
+                  ? {
+                      [selectedDate.toISOString().split("T")[0]]: {
+                        selected: true,
+                        selectedColor: colors.slate[650],
+                      },
+                    }
+                  : {}
+              }
+              theme={{
+                todayTextColor: colors.slate[650],
+                arrowColor: colors.slate[650],
+                monthTextColor: colors.slate[650],
+                textDayFontFamily: "InterRegular",
+                textMonthFontFamily: "InterMedium",
+                textDayHeaderFontFamily: "InterMedium",
+              }}
+            />
+          </View>
+
+          <View className="flex-row justify-between px-5">
+            <TouchableOpacity onPress={() => openDatePicker.current?.dismiss()}>
+              <Text style={homeStyles.text}>Cancel</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              onPress={() => {
+                openDatePicker.current?.dismiss();
+              }}
+            >
+              <Text style={[homeStyles.title2, { fontWeight: "600" }]}>OK</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </CustomBottomSheet>
+
+      {/* Time slot */}
+      <CustomBottomSheet
+        bottomSheetProps={{
+          ref: openTimeSlot,
+          snapPoints,
+        }}
+      >
+        <View className="flex flex-col gap-10">
+          <View>
+            <Text style={homeStyles.title2} className="text-center">
+              Choose Time Slot
+            </Text>
+            <Text style={homeStyles.subTitlegray} className="text-center">
+              Pick a convenient time for you from the agent’s available time
+              slot.
+            </Text>
+          </View>
+          <View>
+            <FlatList
+              data={timeslotDB}
+              keyExtractor={(item) => item.id}
+              contentContainerClassName="gap-3"
+              renderItem={({ item }) => {
+                const isSelected = selectedTime?.id === item.id;
+
+                return (
+                  <TouchableOpacity
+                    style={homeStyles.border}
+                    className="border p-4 rounded-2xl"
+                    onPress={() => {
+                      setSelectedTime(item);
+                      openTimeSlot.current?.dismiss();
+                      // setModalVisible(false);
+                      // setUserData(null);
+                      // setDocNumber({ ...docNumber, num: "" });
+                    }}
+                  >
+                    <View className="flex-row items-center">
+                      {/* Radio circle */}
+                      <View
+                        style={
+                          isSelected ? homeStyles.border2 : homeStyles.border
+                        }
+                        className={`h-5 w-5 rounded-full border-2 items-center justify-center mr-3 
+                            `}
+                      >
+                        {isSelected && (
+                          <View
+                            style={{ backgroundColor: colors.slate?.[650] }}
+                            className="h-2.5 w-2.5 rounded-full "
+                          />
+                        )}
+                      </View>
+
+                      <Text
+                        style={homeStyles.subTitlegray}
+                        className="text-base"
+                      >
+                        {item.label}
+                      </Text>
+                    </View>
+                  </TouchableOpacity>
+                );
+              }}
+            />
+          </View>
+        </View>
+      </CustomBottomSheet>
     </SafeAreaViewContainer>
   );
 };
@@ -266,5 +505,27 @@ const styles = (colors: ColorScheme) =>
       fontSize: RFValue(14),
       lineHeight: RFValue(20),
       color: colors.slate[600],
+    },
+    title2: {
+      fontSize: RFValue(20),
+      lineHeight: RFValue(28),
+      color: colors.slate[650],
+    },
+    text: {
+      fontSize: RFValue(16),
+      lineHeight: RFValue(24),
+      color: colors.slate[650],
+    },
+    small: {
+      fontSize: RFValue(12),
+      lineHeight: RFValue(16),
+      color: colors.slate[600],
+    },
+    border: {
+      borderColor: colors.slate[300],
+      backgroundAttachment: colors.slate[150],
+    },
+    border2: {
+      borderColor: colors.slate[650],
     },
   });
