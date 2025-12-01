@@ -338,7 +338,7 @@ const Placedetails = () => {
               <AppButton
                 title="Schedule Inspection"
                 onPress={() => {
-                  router.push("/views/inspection/inspectionPayment" as any);
+                  router.push("/views/inspection/inspectionPayment");
                 }}
                 size="large"
                 disabled={!selectedTime}
@@ -364,9 +364,6 @@ const Placedetails = () => {
               Select date
             </Text>
 
-            {/* <Text style={homeStyles.title} className="font-semibold mt-2">
-              {selectedDate ? selectedDate.toDateString() : "Pick a date"}
-            </Text> */}
             <Text style={homeStyles.title} className="font-semibold mt-2">
               {selectedDate || "Pick a date"}
             </Text>

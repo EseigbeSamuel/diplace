@@ -6,7 +6,7 @@ import React from "react";
 import { Image, StyleSheet, Text, View } from "react-native";
 import { RFValue } from "react-native-responsive-fontsize";
 
-const PaymentReciept = () => {
+const PaymentReceipt = () => {
   const { colors } = useTheme();
   const custom = styles(colors);
 
@@ -89,7 +89,7 @@ const PaymentReciept = () => {
   );
 };
 
-export default PaymentReciept;
+export default PaymentReceipt;
 
 const styles = (colors: ColorScheme) =>
   StyleSheet.create({

@@ -8,7 +8,6 @@ import { ColorScheme } from "@/utils";
 import { BottomSheetModal, TouchableOpacity } from "@gorhom/bottom-sheet";
 import { useNavigation, useRouter } from "expo-router";
 import { useMemo, useRef, useState } from "react";
-const { minutes, seconds, isExpired } = useCountdown(9);
 
 import {
   FlatList,
@@ -46,7 +45,7 @@ const payviaDB: payvia[] = [
   },
 ];
 
-const InspectonPayment = () => {
+const InspectionPayment = () => {
   const { colors } = useTheme();
   const custom = styles(colors);
   const navigation = useNavigation();
@@ -56,6 +55,7 @@ const InspectonPayment = () => {
   const snapPoints = useMemo(() => ["75%", "90%"], []);
   const [business, setBusiness] = useState(false);
   const [selectedPayVia, setSelectedPayVia] = useState<string | null>(null);
+  const { minutes, seconds, isExpired } = useCountdown(9);
 
   const [formData, setFormData] = useState({
     cardNum: "",
@@ -255,65 +255,6 @@ const InspectonPayment = () => {
           </View>
         </CustomBottomSheet>
 
-        {/* bank */}
-        {/* <CustomBottomSheet
-          bottomSheetProps={{
-            ref: openBank,
-            snapPoints,
-          }}
-        >
-          <View style={custom.back} className="p-5 rounded gap-5">
-            <View>
-              <Text style={custom.title} className="font-semibold  ">
-                Pay via bank transfer
-              </Text>
-              <Text style={custom.small}>
-                Transfer to the bank details below to complete transaction.
-              </Text>
-            </View>
-
-            <View style={custom.back} className="flex-col gap-3 p-5 rounded">
-              <View>
-                <Text style={custom.small}>Account Name</Text>
-                <Text style={custom.text} className="font-medium ">
-                  Paystack/DiPlace Technologies
-                </Text>
-              </View>
-              <View>
-                <Text style={custom.small}>Account Number </Text>
-                <Text style={custom.text} className="font-medium ">
-                  8102934980
-                </Text>
-              </View>
-              <View>
-                <Text style={custom.small}>Bank Name</Text>
-                <Text style={custom.text} className="font-medium ">
-                  Wema Bank Plc
-                </Text>
-              </View>
-            </View>
-            <View>
-              <Text style={custom.tiny} className="italic text-center">
-                You have minutes to complete your transfer. This slot will
-                expire if payment isn’t confirmed in time.
-              </Text>
-            </View>
-
-            <View>
-              <AppButton
-                title="Confirm & Pay"
-                onPress={() => {
-                  router.push("/views/inspection/paymentReciept" as any);
-                }}
-                size="large"
-              />
-              <Text style={custom.tiny} className="italic text-center">
-                🔐 Your payment is 100% secure. Funds are held safely until
-                inspection is confirmed.
-              </Text>
-            </View>
-          </View>
-        </CustomBottomSheet> */}
         {/* bank bottom sheet */}
         <CustomBottomSheet
           bottomSheetProps={{
@@ -359,11 +300,11 @@ const InspectonPayment = () => {
 
             {/* Countdown text */}
             <Text style={[custom.small, { marginTop: 10 }]}>
-              You have{" "}
+              You have
               <Text style={{ color: "red", fontWeight: "600" }}>
                 {String(minutes).padStart(2, "0")}:
                 {String(seconds).padStart(2, "0")}
-              </Text>{" "}
+              </Text>
               minutes to complete your transfer. This slot will expire if
               payment isn’t confirmed in time.
             </Text>
@@ -372,7 +313,7 @@ const InspectonPayment = () => {
               <AppButton
                 title="I’ve sent the money (₦1000)"
                 onPress={() => {
-                  router.push("/views/inspection/paymentReciept" as any);
+                  router.push("/views/inspection/paymentReceipt");
                 }}
                 size="large"
               />
@@ -388,7 +329,7 @@ const InspectonPayment = () => {
   );
 };
 
-export default InspectonPayment;
+export default InspectionPayment;
 
 const styles = (colors: ColorScheme) =>
   StyleSheet.create({
