@@ -5,6 +5,7 @@ import SectionHeader from "@/components/sectionheader";
 import { useTheme } from "@/contexts/themeContext";
 import { ColorScheme } from "@/utils";
 import { BottomSheetModal } from "@gorhom/bottom-sheet";
+import { useRouter } from "expo-router";
 import React, { useMemo, useRef, useState } from "react";
 import {
   FlatList,
@@ -37,11 +38,14 @@ const Placedetails = () => {
     id: string;
     label: string;
   } | null>(null);
-  const [selectedDate, setSelectedDate] = useState<Date | null>(null);
+  const [selectedDate, setSelectedDate] = useState<string | null>(null);
+
+  // const [selectedDate, setSelectedDate] = useState<Date | null>(null);
   const openDatePicker = useRef<BottomSheetModal>(null);
 
   const openInspection = useRef<BottomSheetModal>(null);
   const openTimeSlot = useRef<BottomSheetModal>(null);
+  const router = useRouter();
 
   const handleOpenInspection = () => {
     openInspection.current?.present();
@@ -333,7 +337,9 @@ const Placedetails = () => {
             <View className="flex flex-col gap-5">
               <AppButton
                 title="Schedule Inspection"
-                onPress={() => {}}
+                onPress={() => {
+                  router.push("/views/inspection/inspectionPayment" as any);
+                }}
                 size="large"
                 disabled={!selectedTime}
               />
@@ -358,22 +364,26 @@ const Placedetails = () => {
               Select date
             </Text>
 
-            <Text style={homeStyles.title} className="font-semibold mt-2">
+            {/* <Text style={homeStyles.title} className="font-semibold mt-2">
               {selectedDate ? selectedDate.toDateString() : "Pick a date"}
+            </Text> */}
+            <Text style={homeStyles.title} className="font-semibold mt-2">
+              {selectedDate || "Pick a date"}
             </Text>
           </View>
 
           <View>
             <Calendar
               onDayPress={(day) => {
-                setSelectedDate(new Date(day.dateString));
+                setSelectedDate(day.dateString);
               }}
               markedDates={
                 selectedDate
                   ? {
-                      [selectedDate.toISOString().split("T")[0]]: {
+                      [selectedDate]: {
                         selected: true,
                         selectedColor: colors.slate[650],
+                        selectedTextColor: "white",
                       },
                     }
                   : {}
@@ -437,9 +447,6 @@ const Placedetails = () => {
                     onPress={() => {
                       setSelectedTime(item);
                       openTimeSlot.current?.dismiss();
-                      // setModalVisible(false);
-                      // setUserData(null);
-                      // setDocNumber({ ...docNumber, num: "" });
                     }}
                   >
                     <View className="flex-row items-center">
