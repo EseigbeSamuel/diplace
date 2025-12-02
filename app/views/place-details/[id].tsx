@@ -284,7 +284,7 @@ const Placedetails = () => {
           snapPoints,
         }}
       >
-        <View className="flex flex-col gap-10 ">
+        <View className="flex flex-col gap-5 ">
           <View>
             <Text
               className="font-semibold text-center "
@@ -339,6 +339,7 @@ const Placedetails = () => {
                 title="Schedule Inspection"
                 onPress={() => {
                   router.push("/views/inspection/inspectionPayment");
+                  openInspection.current?.dismiss();
                 }}
                 size="large"
                 disabled={!selectedTime}

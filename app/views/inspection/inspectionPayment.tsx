@@ -49,9 +49,10 @@ const InspectionPayment = () => {
   const { colors } = useTheme();
   const custom = styles(colors);
   const navigation = useNavigation();
+  const router = useRouter();
+
   const openBank = useRef<BottomSheetModal>(null);
   const openCard = useRef<BottomSheetModal>(null);
-  const router = useRouter();
   const snapPoints = useMemo(() => ["75%", "90%"], []);
   const [business, setBusiness] = useState(false);
   const [selectedPayVia, setSelectedPayVia] = useState<string | null>(null);
@@ -90,79 +91,92 @@ const InspectionPayment = () => {
         extraScrollHeight={20}
         enableAutomaticScroll={true}
       >
-        <View>
-          <TouchableOpacity
-            onPress={handleBackPress}
-            className="p-4 bg-gray-100 rounded-full w-[50px] "
-          >
-            <Image
-              source={require("@/assets/icons/arrow-left-dark.png")}
-              className="w-6 h-6"
-            />
-          </TouchableOpacity>
-          <Text
-            style={custom.subTitle}
-            className="text-center font-medium w-full "
-          >
-            Pay for inspection
-          </Text>
-        </View>
-
-        <View
-          style={custom.back}
-          className="flex-row items-center justify-between w-full p-5 rounded"
-        >
-          <View>
-            <Text style={custom.small}>Amount Payable:</Text>
-            <Text style={custom.title} className="font-semibold ">
-              $1000
+        <View className="flex-col gap-10 h-full">
+          <View className="flex-row items-center">
+            <TouchableOpacity
+              onPress={handleBackPress}
+              className="p-4 bg-gray-100 rounded-full w-[50px] "
+            >
+              <Image
+                source={require("@/assets/icons/arrow-left-dark.png")}
+                className="w-6 h-6"
+              />
+            </TouchableOpacity>
+            <Text
+              style={custom.subTitle}
+              className=" text-center font-medium w-full "
+            >
+              Pay for inspection
             </Text>
           </View>
-          <View>
-            <Image source={require("@/assets/icons/money-bag.png")} />
+
+          <View
+            style={custom.back}
+            className="flex-row items-center justify-between w-full p-5 rounded-3xl"
+          >
+            <View>
+              <Text style={custom.small}>Amount Payable:</Text>
+              <Text style={custom.title} className="font-semibold ">
+                $1000
+              </Text>
+            </View>
+            <View>
+              <Image
+                source={require("@/assets/icons/money-bag.png")}
+                className="h-10 w-10"
+              />
+            </View>
+          </View>
+
+          <View
+            style={custom.tborder}
+            className="py-3 border-t mt-2 flex-col flex gap-5"
+          >
+            <FlatList
+              data={payviaDB}
+              keyExtractor={(item) => item.id}
+              ListHeaderComponent={
+                <>
+                  <Text style={custom.subTitle} className=" font-medium ">
+                    Pay Via
+                  </Text>
+                </>
+              }
+              contentContainerClassName="gap-5 p-5"
+              renderItem={({ item }) => {
+                const isSelected = selectedPayVia === item.id;
+
+                return (
+                  <TouchableOpacity
+                    onPress={() => setSelectedPayVia(item.id)}
+                    className="w-full justify-between items-center flex-row"
+                  >
+                    <View className="flex-row items-center gap-3">
+                      <Image source={item.icon} className="h-10 w-10" />
+
+                      <Text style={custom.text} className="capitalize">
+                        {item.label}
+                      </Text>
+                    </View>
+
+                    <View
+                      style={isSelected ? custom.border2 : custom.border}
+                      className="h-5 w-5 rounded-full border-2 items-center justify-center mr-3"
+                    >
+                      {isSelected && (
+                        <View
+                          style={{ backgroundColor: colors.slate?.[650] }}
+                          className="h-2.5 w-2.5 rounded-full"
+                        />
+                      )}
+                    </View>
+                  </TouchableOpacity>
+                );
+              }}
+            />
           </View>
         </View>
-
-        <View className="py-3 border-t border-gray-300 mt-2 flex-col flex gap-5">
-          <Text style={custom.subTitle} className=" font-medium ">
-            Pay Via
-          </Text>
-          <FlatList
-            data={payviaDB}
-            keyExtractor={(item) => item.id}
-            renderItem={({ item }) => {
-              const isSelected = selectedPayVia === item.id;
-
-              return (
-                <TouchableOpacity
-                  onPress={() => setSelectedPayVia(item.id)}
-                  className="w-full justify-between items-center flex-row"
-                >
-                  <View className="flex-row items-center gap-3">
-                    <Image source={item.icon} />
-                    <Text style={custom.text} className="capitalize">
-                      {item.label}
-                    </Text>
-                  </View>
-
-                  <View
-                    style={isSelected ? custom.border2 : custom.border}
-                    className="h-5 w-5 rounded-full border-2 items-center justify-center mr-3"
-                  >
-                    {isSelected && (
-                      <View
-                        style={{ backgroundColor: colors.slate?.[650] }}
-                        className="h-2.5 w-2.5 rounded-full"
-                      />
-                    )}
-                  </View>
-                </TouchableOpacity>
-              );
-            }}
-          />
-        </View>
-
-        <View>
+        <View className="flex-col gap-5 ">
           <AppButton
             title="Make Payment"
             onPress={handleMakePayment}
@@ -175,57 +189,67 @@ const InspectionPayment = () => {
           </Text>
         </View>
 
-        {/* card */}
+        {/* card transfer bottom sheets */}
         <CustomBottomSheet
           bottomSheetProps={{
             ref: openCard,
             snapPoints,
           }}
         >
-          <View>
+          <View className="w-full flex-col gap-5">
             <View>
-              <Text style={custom.title} className="font-semibold  ">
+              <Text
+                style={custom.title}
+                className="font-semibold text-center  "
+              >
                 Pay with card
               </Text>
-              <Text style={custom.small}>
+              <Text style={custom.small} className="text-center">
                 Fill card details to complete transaction.
               </Text>
             </View>
-            <View className="flex-row w-full">
+
+            <View className="w-full">
               <TextField
-                label="Account Number"
-                placeholder="Enter your account number"
+                label="Card Number"
+                placeholder="Enter your card number"
                 value={formData.cardNum}
                 onChange={(text) =>
                   setFormData({ ...formData, cardNum: text.toString() })
                 }
                 keyboardType="numeric"
               />
-              <View className="flex-row items-center w-full justify-between">
-                <TextField
-                  label="Account Number"
-                  placeholder="Enter your account number"
-                  value={formData.expDate}
-                  onChange={(text) =>
-                    setFormData({ ...formData, expDate: text.toString() })
-                  }
-                  keyboardType="numeric"
-                />
-                <TextField
-                  label="Account Number"
-                  placeholder="Enter your account number"
-                  value={formData.cvv}
-                  onChange={(text) =>
-                    setFormData({ ...formData, cvv: text.toString() })
-                  }
-                  keyboardType="numeric"
-                />
+              <View className="flex-row items-center gap-3">
+                <View className="flex-1">
+                  <TextField
+                    label="Expiry Date"
+                    placeholder="MM/YY"
+                    value={formData.expDate}
+                    onChange={(text) =>
+                      setFormData({ ...formData, expDate: text.toString() })
+                    }
+                    keyboardType="numeric"
+                  />
+                </View>
+                <View className="flex-1">
+                  <TextField
+                    label="CVV"
+                    placeholder="123"
+                    value={formData.cvv}
+                    onChange={(text) =>
+                      setFormData({ ...formData, cvv: text.toString() })
+                    }
+                    keyboardType="numeric"
+                  />
+                </View>
               </View>
             </View>
 
             <View className="flex-row items-center w-full justify-between">
-              <Text style={custom.text}>Save card details</Text>
-              <View className="h-1">
+              <Text style={custom.text} className="">
+                Save card details
+              </Text>
+              <View className="">
                 <Switch
                   trackColor={{
                     false: colors.slate[300],
@@ -239,11 +263,12 @@ const InspectionPayment = () => {
               </View>
             </View>
 
-            <View>
+            <View className="flex-col gap-5">
               <AppButton
                 title="Confirm & Pay"
                 onPress={() => {
-                  router.push("/views/inspection/paymentReciept" as any);
+                  router.push("/views/inspection/paymentReceipt");
+                  openCard.current?.dismiss();
                 }}
                 size="large"
               />
@@ -262,19 +287,19 @@ const InspectionPayment = () => {
             snapPoints,
           }}
         >
-          <View>
+          <View className="flex-col gap-5">
             <View>
-              <Text style={custom.title} className="font-semibold">
+              <Text style={custom.title} className="font-semibold text-center">
                 Pay via bank transfer
               </Text>
-              <Text style={custom.small}>
+              <Text style={custom.small} className="text-center">
                 Transfer to the bank details below to complete transaction.
               </Text>
             </View>
 
             <View
               style={custom.back}
-              className="flex-col gap-3 p-5 rounded mt-3"
+              className="flex-col gap-3 p-5 rounded-3xl mt-3"
             >
               <View>
                 <Text style={custom.small}>Account Name</Text>
@@ -298,7 +323,6 @@ const InspectionPayment = () => {
               </View>
             </View>
 
-            {/* Countdown text */}
             <Text style={[custom.small, { marginTop: 10 }]}>
               You have
               <Text style={{ color: "red", fontWeight: "600" }}>
@@ -314,6 +338,7 @@ const InspectionPayment = () => {
                 title="I’ve sent the money (₦1000)"
                 onPress={() => {
                   router.push("/views/inspection/paymentReceipt");
+                  openBank.current?.dismiss();
                 }}
                 size="large"
               />
@@ -344,6 +369,7 @@ const styles = (colors: ColorScheme) =>
     border2: {
       borderColor: colors.slate[650],
     },
+    tborder: { borderColor: colors.slate[400] },
     title: {
       fontSize: RFValue(20),
       lineHeight: RFValue(28),
