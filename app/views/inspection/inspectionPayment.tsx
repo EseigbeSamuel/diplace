@@ -267,7 +267,7 @@ const InspectionPayment = () => {
               <AppButton
                 title="Confirm & Pay"
                 onPress={() => {
-                  router.push("/views/inspection/paymentReceipt");
+                  router.replace("/views/inspection/paymentReceipt");
                   openCard.current?.dismiss();
                 }}
                 size="large"
@@ -337,7 +337,7 @@ const InspectionPayment = () => {
               <AppButton
                 title="I’ve sent the money (₦1000)"
                 onPress={() => {
-                  router.push("/views/inspection/paymentReceipt");
+                  router.replace("/views/inspection/paymentReceipt");
                   openBank.current?.dismiss();
                 }}
                 size="large"
