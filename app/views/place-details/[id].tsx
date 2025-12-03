@@ -10,6 +10,7 @@ import React, { useMemo, useRef, useState } from "react";
 import {
   FlatList,
   Image,
+  Modal,
   Pressable,
   ScrollView,
   StyleSheet,
@@ -39,8 +40,8 @@ const Placedetails = () => {
     label: string;
   } | null>(null);
   const [selectedDate, setSelectedDate] = useState<string | null>(null);
+  const [showDatePicker, setShowDatePicker] = useState(false);
 
-  // const [selectedDate, setSelectedDate] = useState<Date | null>(null);
   const openDatePicker = useRef<BottomSheetModal>(null);
 
   const openInspection = useRef<BottomSheetModal>(null);
@@ -55,6 +56,18 @@ const Placedetails = () => {
   };
 
   const snapPoints = useMemo(() => ["75%", "90%"], []);
+
+  const formatReadableDate = (
+    dateString: string | null | undefined
+  ): string => {
+    if (!dateString) return "";
+    const date = new Date(dateString);
+    return date.toLocaleDateString("en-US", {
+      weekday: "short",
+      month: "short",
+      day: "numeric",
+    });
+  };
 
   return (
     <SafeAreaViewContainer>
@@ -299,11 +312,31 @@ const Placedetails = () => {
           </View>
 
           <View>
-            <TouchableOpacity
+            {/* <TouchableOpacity
               className="border border-gray-300 p-4 mt-6 rounded-2xl flex-row w-full justify-between"
-              onPress={() => openDatePicker.current?.present()}
+              // onPress={() => openDatePicker.current?.present()}
+              onPress={() => setShowDatePicker(true)}
             >
               <Text style={homeStyles.text}>{"Select Inspection Date"}</Text>
+              {isDarkMode ? (
+                <Image source={require("@/assets/icons/calender-white.png")} />
+              ) : (
+                <Image source={require("@/assets/icons/calender-dark.png")} />
+              )}
+            </TouchableOpacity> */}
+            <TouchableOpacity
+              className="border border-gray-300 dark:border-gray-600 p-4 mt-6 rounded-2xl flex-row w-full justify-between"
+              onPress={() => setShowDatePicker(true)}
+            >
+              <Text
+                className="text-base dark:text-white"
+                style={homeStyles.text}
+              >
+                {selectedDate
+                  ? formatReadableDate(selectedDate)
+                  : "Select Inspection Date"}
+              </Text>
+
               {isDarkMode ? (
                 <Image source={require("@/assets/icons/calender-white.png")} />
               ) : (
@@ -312,10 +345,10 @@ const Placedetails = () => {
             </TouchableOpacity>
 
             <TouchableOpacity
-              className="border border-gray-300 p-4 mt-6 rounded-2xl flex-row w-full justify-between"
+              className="border border-gray-300 dark:border-gray-600 p-4 mt-6 rounded-2xl flex-row w-full justify-between"
               onPress={handleOpenTimeSlot}
             >
-              <Text style={homeStyles.text}>
+              <Text className="text-base dark:text-white">
                 {selectedTime ? selectedTime.label : "Choose Time Slot"}
               </Text>
               <Image source={require("@/assets/icons/angle.png")} />
@@ -352,66 +385,132 @@ const Placedetails = () => {
         </View>
       </CustomBottomSheet>
 
-      {/* DATE PICKER SHEET */}
-      <CustomBottomSheet
-        bottomSheetProps={{
-          ref: openDatePicker,
-          snapPoints,
-        }}
-      >
-        <View className="flex flex-col gap-8">
-          <View className="flex items-center">
-            <Text style={homeStyles.title2} className="text-center">
-              Select date
+      {/* DATE PICKER MODAL */}
+      {/* <Modal visible={showDatePicker} transparent animationType="fade">
+        <View className="flex-1 justify-center items-center bg-black/40">
+          <View className="bg-white dark:bg-gray-900 rounded-2xl p-5 w-[90%]">
+            <Text className="text-center text-lg font-semibold dark:text-white mb-3">
+              Select a Date
             </Text>
 
-            <Text style={homeStyles.title} className="font-semibold mt-2">
-              {selectedDate || "Pick a date"}
-            </Text>
-          </View>
-
-          <View>
             <Calendar
               onDayPress={(day) => {
                 setSelectedDate(day.dateString);
+                setShowDatePicker(false);
+              }}
+              theme={{
+                backgroundColor: isDarkMode ? "#111827" : "#ffffff",
+                calendarBackground: isDarkMode ? "#111827" : "#ffffff",
+                dayTextColor: isDarkMode ? "#e5e7eb" : "#111827",
+                monthTextColor: isDarkMode ? "#ffffff" : "#111827",
+                textSectionTitleColor: isDarkMode ? "#9ca3af" : "#6b7280",
+                selectedDayBackgroundColor: "#2563eb",
+                selectedDayTextColor: "#ffffff",
+                todayTextColor: "#2563eb",
+                arrowColor: isDarkMode ? "#ffffff" : "#000000",
               }}
               markedDates={
                 selectedDate
                   ? {
                       [selectedDate]: {
                         selected: true,
-                        selectedColor: colors.slate[650],
-                        selectedTextColor: "white",
+                        selectedColor: "#2563eb",
+                        selectedTextColor: "#fff",
+                      },
+                    }
+                  : {}
+              }
+            />
+
+            <TouchableOpacity
+              onPress={() => setShowDatePicker(false)}
+              className="mt-5 bg-gray-200 dark:bg-gray-700 p-3 rounded-xl"
+            >
+              <Text className="text-center text-gray-800 dark:text-gray-200">
+                Close
+              </Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal> */}
+      <Modal visible={showDatePicker} transparent animationType="fade">
+        <View className="flex-1 justify-center items-center bg-black/30">
+          <View className="w-[88%] rounded-3xl bg-white dark:bg-gray-900 p-5">
+            {/* TOP LABEL */}
+            <Text className="text-gray-500 dark:text-gray-400 text-sm mb-2">
+              Select date
+            </Text>
+
+            {/* LARGE FORMATTED DATE */}
+            <Text className="text-2xl font-semibold text-gray-900 dark:text-white mb-4">
+              {selectedDate ? formatReadableDate(selectedDate) : "—"}
+            </Text>
+
+            {/* DIVIDER */}
+            <View className="h-[1px] bg-gray-200 dark:bg-gray-700 mb-4" />
+
+            {/* CALENDAR */}
+            <Calendar
+              onDayPress={(day) => setSelectedDate(day.dateString)}
+              markingType={"custom"}
+              markedDates={
+                selectedDate
+                  ? {
+                      [selectedDate]: {
+                        customStyles: {
+                          container: {
+                            borderWidth: 2,
+                            borderColor: "#000",
+                            borderRadius: 999,
+                          },
+                          text: {
+                            color: "#000",
+                            fontWeight: "600",
+                          },
+                        },
                       },
                     }
                   : {}
               }
               theme={{
-                todayTextColor: colors.slate[650],
-                arrowColor: colors.slate[650],
-                monthTextColor: colors.slate[650],
-                textDayFontFamily: "InterRegular",
-                textMonthFontFamily: "InterMedium",
-                textDayHeaderFontFamily: "InterMedium",
+                backgroundColor: isDarkMode ? "#111827" : "#ffffff",
+                calendarBackground: isDarkMode ? "#111827" : "#ffffff",
+
+                textSectionTitleColor: "#9ca3af",
+                monthTextColor: isDarkMode ? "#ffffff" : "#000000",
+                textMonthFontWeight: "600",
+                textMonthFontSize: 16,
+
+                dayTextColor: isDarkMode ? "#e5e7eb" : "#000000",
+                textDayFontSize: 15,
+
+                arrowColor: "#000",
+                todayTextColor: "#000",
               }}
+              style={{ borderRadius: 20, paddingBottom: 10 }}
             />
-          </View>
 
-          <View className="flex-row justify-between px-5">
-            <TouchableOpacity onPress={() => openDatePicker.current?.dismiss()}>
-              <Text style={homeStyles.text}>Cancel</Text>
-            </TouchableOpacity>
+            {/* BOTTOM BUTTONS */}
+            <View className="flex-row justify-end mt-3">
+              <TouchableOpacity onPress={() => setShowDatePicker(false)}>
+                <Text className="text-gray-600 dark:text-gray-300 text-base mr-6">
+                  Cancel
+                </Text>
+              </TouchableOpacity>
 
-            <TouchableOpacity
-              onPress={() => {
-                openDatePicker.current?.dismiss();
-              }}
-            >
-              <Text style={[homeStyles.title2, { fontWeight: "600" }]}>OK</Text>
-            </TouchableOpacity>
+              <TouchableOpacity
+                onPress={() => {
+                  setShowDatePicker(false);
+                }}
+              >
+                <Text className="text-blue-600 dark:text-blue-400 text-base font-semibold">
+                  OK
+                </Text>
+              </TouchableOpacity>
+            </View>
           </View>
         </View>
-      </CustomBottomSheet>
+      </Modal>
 
       {/* Time slot */}
       <CustomBottomSheet
