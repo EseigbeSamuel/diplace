@@ -8,6 +8,7 @@ import { Tabs } from "expo-router";
 import React, { useMemo, useRef } from "react";
 import { Image, Pressable, Text, View } from "react-native";
 import { heightPercentageToDP as hp } from "react-native-responsive-screen";
+import AddSpaceBottomSheet from "../views/spaces/components/AddSpacesBottomContainer";
 
 const TabLayout = () => {
   const { colors } = useTheme();
@@ -93,11 +94,15 @@ const TabLayout = () => {
           ref: addSpaceRef,
           snapPoints,
           index: 2,
+          enableContentPanningGesture: true,
+          enableHandlePanningGesture: true,
+          enablePanDownToClose: true,
         }}
       >
-        <View style={{ padding: 20 }}>
-          <Text>Add Space</Text>
-        </View>
+        <AddSpaceBottomSheet
+          colors={colors}
+          closeSheet={() => addSpaceRef.current?.close()}
+        />
       </CustomBottomSheet>
     </>
   );
