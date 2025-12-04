@@ -41,16 +41,6 @@ const Discover = () => {
             contentContainerClassName="gap-2"
             showsHorizontalScrollIndicator={false}
             renderItem={({ item }) => (
-              // <Pressable
-              //   onPress={() => router.push("/views/apartments")}
-              //   style={homeStyles.border}
-              //   className="flex flex-col items-center border rounded-2xl p-4 min-w-[108px]"
-              // >
-              //   <Image className="size-[28px]" source={item.icon} />
-              //   <Text style={homeStyles.text} className="capitalize">
-              //     {item.name}{" "}
-              //   </Text>
-              // </Pressable>
               <Pressable
                 onPress={() => router.push("/views/apartments")}
                 className={`flex flex-col items-center border rounded-2xl p-4 min-w-[108px] ${
@@ -77,7 +67,6 @@ const Discover = () => {
           <Text style={homeStyles.title} className="font-semibold">
             Neighborhoods
           </Text>
-          {/* <ImageSlider /> */}
           <ImageSlider data={slider} />
         </View>
 

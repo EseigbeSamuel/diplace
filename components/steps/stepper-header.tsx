@@ -10,6 +10,7 @@ import SectionHeader from "../sectionheader";
 interface SubstepComponentProps {
   onNext: () => void;
   onPrev: () => void;
+  onSkip: () => void;
   // searchData?: any;
 }
 
@@ -67,6 +68,17 @@ const StepperWithHeader: React.FC<StepperWithHeaderProps> = ({
     }
   };
 
+  const handleSkip = () => {
+    // If current step still has substeps left — SKIP all of them
+    if (currentStepIndex < steps.length - 1) {
+      setCurrentStepIndex(currentStepIndex + 1);
+      setCurrentSubstepIndex(0);
+    } else {
+      // last step — just complete the thing
+      if (onComplete) onComplete();
+    }
+  };
+
   const handleSaveAndEditLater = () => {
     // navigation.navigate(screen: "/"); // Adjust 'Home' to your actual home screen route name
   };
@@ -94,7 +106,11 @@ const StepperWithHeader: React.FC<StepperWithHeaderProps> = ({
         currentSubstepIndex={currentSubstepIndex + 1}
       />
       <View className="flex-1">
-        <CurrentSubstep onNext={handleNext} onPrev={handlePrev} />
+        <CurrentSubstep
+          onNext={handleNext}
+          onPrev={handlePrev}
+          onSkip={handleSkip}
+        />
       </View>
     </SafeAreaViewContainer>
   );
