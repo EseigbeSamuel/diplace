@@ -140,6 +140,9 @@ importers:
       react-native-reanimated:
         specifier: ~4.1.0
         version: 4.1.0(@babel/core@7.28.0)(react-native-worklets@0.5.1(@babel/core@7.28.0)(react-native@0.81.4(@babel/core@7.28.0)(@types/react@19.1.13)(react@19.1.0))(react@19.1.0))(react-native@0.81.4(@babel/core@7.28.0)(@types/react@19.1.13)(react@19.1.0))(react@19.1.0)
+      react-native-reanimated-carousel:
+        specifier: ^4.0.3
+        version: 4.0.3(react-native-gesture-handler@2.28.0(react-native@0.81.4(@babel/core@7.28.0)(@types/react@19.1.13)(react@19.1.0))(react@19.1.0))(react-native-reanimated@4.1.0(@babel/core@7.28.0)(react-native-worklets@0.5.1(@babel/core@7.28.0)(react-native@0.81.4(@babel/core@7.28.0)(@types/react@19.1.13)(react@19.1.0))(react@19.1.0))(react-native@0.81.4(@babel/core@7.28.0)(@types/react@19.1.13)(react@19.1.0))(react@19.1.0))(react-native@0.81.4(@babel/core@7.28.0)(@types/react@19.1.13)(react@19.1.0))(react@19.1.0)
       react-native-responsive-fontsize:
         specifier: ^0.5.1
         version: 0.5.1(react-native@0.81.4(@babel/core@7.28.0)(@types/react@19.1.13)(react@19.1.0))
@@ -152,6 +155,9 @@ importers:
       react-native-screens:
         specifier: ~4.16.0
         version: 4.16.0(react-native@0.81.4(@babel/core@7.28.0)(@types/react@19.1.13)(react@19.1.0))(react@19.1.0)
+      react-native-swiper-flatlist:
+        specifier: ^3.2.5
+        version: 3.2.5(react-native@0.81.4(@babel/core@7.28.0)(@types/react@19.1.13)(react@19.1.0))
       react-native-web:
         specifier: ~0.21.1
         version: 0.21.1(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
@@ -3845,6 +3851,14 @@ packages:
       react: '*'
       react-native: '>=0.70.0'
 
+  react-native-reanimated-carousel@4.0.3:
+    resolution: {integrity: sha512-YZXlvZNghR5shFcI9hTA7h7bEhh97pfUSLZvLBAshpbkuYwJDKmQXejO/199T6hqGq0wCRwR0CWf2P4Vs6A4Fw==}
+    peerDependencies:
+      react: '>=18.0.0'
+      react-native: '>=0.70.3'
+      react-native-gesture-handler: '>=2.9.0'
+      react-native-reanimated: '>=3.0.0'
+
   react-native-reanimated@4.1.0:
     resolution: {integrity: sha512-L8FqZn8VjZyBaCUMYFyx1Y+T+ZTbblaudpxReOXJ66RnOf52g6UM4Pa/IjwLD1XAw1FUxLRQrtpdjbkEc74FiQ==}
     peerDependencies:
@@ -3883,6 +3897,11 @@ packages:
 
   react-native-swipe-gestures@1.0.5:
     resolution: {integrity: sha512-Ns7Bn9H/Tyw278+5SQx9oAblDZ7JixyzeOczcBK8dipQk2pD7Djkcfnf1nB/8RErAmMLL9iXgW0QHqiII8AhKw==}
+
+  react-native-swiper-flatlist@3.2.5:
+    resolution: {integrity: sha512-pP6Yioo//PgxBf1Ac/utPaAMaCTXF0QW/Q55hQofGtE7B5/hL0nb9u4cXEdgGJslx0oBCkir4AJAbbD5FpWnaA==}
+    peerDependencies:
+      react-native: '>=0.59.0'
 
   react-native-web@0.21.1:
     resolution: {integrity: sha512-BeNsgwwe4AXUFPAoFU+DKjJ+CVQa3h54zYX77p7GVZrXiiNo3vl03WYDYVEy5R2J2HOPInXtQZB5gmj3vuzrKg==}
@@ -9088,6 +9107,13 @@ snapshots:
       react-native: 0.81.4(@babel/core@7.28.0)(@types/react@19.1.13)(react@19.1.0)
       react-native-animatable: 1.4.0
 
+  react-native-reanimated-carousel@4.0.3(react-native-gesture-handler@2.28.0(react-native@0.81.4(@babel/core@7.28.0)(@types/react@19.1.13)(react@19.1.0))(react@19.1.0))(react-native-reanimated@4.1.0(@babel/core@7.28.0)(react-native-worklets@0.5.1(@babel/core@7.28.0)(react-native@0.81.4(@babel/core@7.28.0)(@types/react@19.1.13)(react@19.1.0))(react@19.1.0))(react-native@0.81.4(@babel/core@7.28.0)(@types/react@19.1.13)(react@19.1.0))(react@19.1.0))(react-native@0.81.4(@babel/core@7.28.0)(@types/react@19.1.13)(react@19.1.0))(react@19.1.0):
+    dependencies:
+      react: 19.1.0
+      react-native: 0.81.4(@babel/core@7.28.0)(@types/react@19.1.13)(react@19.1.0)
+      react-native-gesture-handler: 2.28.0(react-native@0.81.4(@babel/core@7.28.0)(@types/react@19.1.13)(react@19.1.0))(react@19.1.0)
+      react-native-reanimated: 4.1.0(@babel/core@7.28.0)(react-native-worklets@0.5.1(@babel/core@7.28.0)(react-native@0.81.4(@babel/core@7.28.0)(@types/react@19.1.13)(react@19.1.0))(react@19.1.0))(react-native@0.81.4(@babel/core@7.28.0)(@types/react@19.1.13)(react@19.1.0))(react@19.1.0)
+
   react-native-reanimated@4.1.0(@babel/core@7.28.0)(react-native-worklets@0.5.1(@babel/core@7.28.0)(react-native@0.81.4(@babel/core@7.28.0)(@types/react@19.1.13)(react@19.1.0))(react@19.1.0))(react-native@0.81.4(@babel/core@7.28.0)(@types/react@19.1.13)(react@19.1.0))(react@19.1.0):
     dependencies:
       '@babel/core': 7.28.0
@@ -9125,6 +9151,10 @@ snapshots:
       warn-once: 0.1.1
 
   react-native-swipe-gestures@1.0.5: {}
+
+  react-native-swiper-flatlist@3.2.5(react-native@0.81.4(@babel/core@7.28.0)(@types/react@19.1.13)(react@19.1.0)):
+    dependencies:
+      react-native: 0.81.4(@babel/core@7.28.0)(@types/react@19.1.13)(react@19.1.0)
 
   react-native-web@0.21.1(react-dom@19.1.0(react@19.1.0))(react@19.1.0):
     dependencies:

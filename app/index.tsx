@@ -1,10 +1,11 @@
 import AppButton from "@/components/button";
+import CarouselCard from "@/components/carousel-card";
 import SafeAreaViewContainer from "@/components/safeareaview";
 import { useTheme } from "@/contexts/themeContext";
 import { useRouter } from "expo-router";
 import React, { useRef, useState } from "react";
 import { ImageSourcePropType, Text, View } from "react-native";
-// import Carousel from "react-native-reanimated-carousel";
+import Carousel from "react-native-reanimated-carousel";
 import { RFValue } from "react-native-responsive-fontsize";
 
 export interface IOnboardingSplash {
@@ -50,7 +51,7 @@ export default function GetStarted() {
         DiPlace
       </Text>
 
-      {/* <Carousel
+      <Carousel
         ref={carouselRef}
         width={RFValue(250)}
         height={RFValue(300)}
@@ -60,10 +61,7 @@ export default function GetStarted() {
         autoPlayInterval={5000}
         scrollAnimationDuration={900}
         modeConfig={{ parallaxAdjacentItemScale: 0.85 }}
-        onSnapToItem={(index) => setCurrentIndex(index)}
-        onProgressChange={(_, absoluteProgress) => {
-          setCurrentIndex(Math.round(absoluteProgress));
-        }}
+        onSnapToItem={(index: number) => setCurrentIndex(index)}
         renderItem={({ item, animationValue, index }) => {
           return (
             <CarouselCard
@@ -73,7 +71,7 @@ export default function GetStarted() {
             />
           );
         }}
-      /> */}
+      />
 
       <View className="flex-row justify-center mt-3">
         {OnboardingSplash.map((_, i) => (
@@ -110,7 +108,7 @@ export default function GetStarted() {
       <View className="w-[90%] mt-3">
         <AppButton
           title="Get Started"
-          onPress={() => router.push("/auth/login")}
+          onPress={() => router.replace("/auth/login")}
           fullwidth
           afterIcon={require("../assets/icons/arrow-right-light.png")}
         />
