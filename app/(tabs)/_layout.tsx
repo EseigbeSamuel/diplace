@@ -11,7 +11,7 @@ import { heightPercentageToDP as hp } from "react-native-responsive-screen";
 import AddSpaceBottomSheet from "../views/spaces/components/AddSpacesBottomContainer";
 
 const TabLayout = () => {
-  const { colors } = useTheme();
+  const { colors, isDarkMode } = useTheme();
   const { userType } = useUser();
 
   const addSpaceRef = useRef<BottomSheetModal>(null);
@@ -38,11 +38,12 @@ const TabLayout = () => {
           },
           tabBarItemStyle: {
             paddingVertical: hp(0.8),
+            backgroundColor: colors.background,
           },
         }}
         initialRouteName="index"
       >
-        {tabItems.map((item) => (
+        {tabItems(isDarkMode).map((item) => (
           <Tabs.Screen
             key={item.name}
             name={item.name}
@@ -64,7 +65,11 @@ const TabLayout = () => {
                           }}
                         >
                           <Image
-                            source={require("@/assets/icons/plus.png")}
+                            source={
+                              isDarkMode
+                                ? require("@/assets/icons/plus-white.png")
+                                : require("@/assets/icons/plus.png")
+                            }
                             style={{ width: 48, height: 48 }}
                             resizeMode="contain"
                           />

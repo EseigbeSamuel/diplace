@@ -1,20 +1,19 @@
+import SafeAreaViewContainer from "@/components/safeareaview";
+import SectionHeader from "@/components/sectionheader";
+import { useTheme } from "@/contexts/themeContext";
+import { ColorScheme } from "@/utils";
+import { useRouter } from "expo-router";
 import React from "react";
 import {
   Image,
   Pressable,
   ScrollView,
   StyleSheet,
+  Switch,
   Text,
   View,
-  Switch,
 } from "react-native";
 import { RFValue } from "react-native-responsive-fontsize";
-import SafeAreaViewContainer from "@/components/safeareaview";
-import SectionHeader from "@/components/sectionheader";
-import AppButton from "@/components/button";
-import { useTheme } from "@/contexts/themeContext";
-import { ColorScheme } from "@/utils";
-import { useRouter } from "expo-router";
 
 const Profile = () => {
   const router = useRouter();

@@ -7,7 +7,8 @@ import {
   View,
 } from "react-native";
 
-import { cn, colors } from "@/utils";
+import { useTheme } from "@/contexts/themeContext";
+import { cn } from "@/utils";
 import { RFValue } from "react-native-responsive-fontsize";
 import { heightPercentageToDP as hp } from "react-native-responsive-screen";
 
@@ -21,13 +22,14 @@ export const TabBarLabel = ({
   children: string;
   title?: string;
 }): React.ReactNode => {
+  const { colors } = useTheme();
   return (
     <Text
       className={cn("uppercase")}
       style={{
         fontSize: RFValue(14),
         marginTop: hp(1.2),
-        color: focused ? colors.black : colors["slate-900"],
+        color: colors.slate[650],
       }}
     >
       {title ?? children}

@@ -1,23 +1,37 @@
 import ActiveActivityCard from "@/components/ActiveActivityCard";
+import { useTheme } from "@/contexts/themeContext";
 import React from "react";
 import { Image, ScrollView, Text, View } from "react-native";
 
 const ActiveActivity = () => {
+  const { colors, isDarkMode } = useTheme();
   return (
     <ScrollView>
-      <View className="bg-[#F9F9FB] rounded-lg flex flex-row gap-4 p-4">
+      <View
+        style={{
+          borderColor: colors.slate[300],
+          backgroundColor: colors.slate[150],
+        }}
+        className="flex flex-row gap-4 p-4 border rounded-lg"
+      >
+        <Image
+          source={require("@/assets/icons/calender-dark.png")}
+          className="w-9 h-9"
+        />
         <View>
-          <Image
-            source={require("@/assets/icons/Calendar-fill.png")}
-            className="w-9 h-9"
-          />
-        </View>
-        <View>
-          <Text className="font-semibold text-lg">Today’s Activity</Text>
-          <Text className="break-words w-[80%] text-[#60646C]">
+          <Text
+            style={{ color: colors.slate[650] }}
+            className="text-lg font-semibold"
+          >
+            Today’s Activity
+          </Text>
+          <Text
+            style={{ color: colors.slate[650] }}
+            className="break-words w-[80%] font-medium"
+          >
             You have an inspection scheduled between 10AM - 12PM.
           </Text>
-          <View className="flex flex-row gap-2 items-center">
+          <View className="flex flex-row items-center gap-2">
             <Text className="pt-7">View schedule</Text>
             {/* <Image
               source={require("@/assets/icons/arrow-right-up-outline-dark.png")}
@@ -27,73 +41,55 @@ const ActiveActivity = () => {
         </View>
       </View>
       <View className="p-4 border-b border-gray-300">
-        <Text className="text-lg font-semibold pb-4">Scheduled</Text>
-        <ActiveActivityCard
-          buttonTitle="View"
-          date="9th Aug, 2025 | 10AM - 12PM"
-          title="2 Bedroom in-suite apartment"
-          image={require("@/assets/icons/Calendar.png")}
-          location="Rumuewhera, Port Harcourt"
-        />
-        <ActiveActivityCard
-          buttonTitle="View"
-          date="9th Aug, 2025 | 10AM - 12PM"
-          title="2 Bedroom in-suite apartment"
-          image={require("@/assets/icons/Calendar.png")}
-          location="Rumuewhera, Port Harcourt"
-        />
-        <ActiveActivityCard
-          buttonTitle="View"
-          date="9th Aug, 2025 | 10AM - 12PM"
-          title="2 Bedroom in-suite apartment"
-          image={require("@/assets/icons/Calendar.png")}
-          location="Rumuewhera, Port Harcourt"
-        />
-        <ActiveActivityCard
-          buttonTitle="View"
-          date="9th Aug, 2025 | 10AM - 12PM"
-          title="2 Bedroom in-suite apartment"
-          image={require("@/assets/icons/Calendar.png")}
-          location="Rumuewhera, Port Harcourt"
-        />
-        <ActiveActivityCard
-          buttonTitle="View"
-          date="9th Aug, 2025 | 10AM - 12PM"
-          title="2 Bedroom in-suite apartment"
-          image={require("@/assets/icons/Calendar.png")}
-          location="Rumuewhera, Port Harcourt"
-        />
-        <ActiveActivityCard
-          buttonTitle="View"
-          date="9th Aug, 2025 | 10AM - 12PM"
-          title="2 Bedroom in-suite apartment"
-          image={require("@/assets/icons/Calendar.png")}
-          location="Rumuewhera, Port Harcourt"
-        />
-        <ActiveActivityCard
-          buttonTitle="View"
-          date="9th Aug, 2025 | 10AM - 12PM"
-          title="2 Bedroom in-suite apartment"
-          image={require("@/assets/icons/Calendar.png")}
-          location="Rumuewhera, Port Harcourt"
-        />
-        <ActiveActivityCard
-          buttonTitle="View"
-          date="9th Aug, 2025 | 10AM - 12PM"
-          title="2 Bedroom in-suite apartment"
-          image={require("@/assets/icons/Calendar.png")}
-          location="Rumuewhera, Port Harcourt"
-        />
-        <ActiveActivityCard
-          buttonTitle="View"
-          date="9th Aug, 2025 | 10AM - 12PM"
-          title="2 Bedroom in-suite apartment"
-          image={require("@/assets/icons/Calendar.png")}
-          location="Rumuewhera, Port Harcourt"
-        />
+        <Text
+          style={{ color: colors.slate[650] }}
+          className="pb-4 text-lg font-semibold"
+        >
+          Scheduled
+        </Text>
+        <View className="gap-4">
+          <ActiveActivityCard
+            buttonTitle="View"
+            date="9th Aug, 2025 | 10AM - 12PM"
+            title="2 Bedroom in-suite apartment"
+            image={
+              isDarkMode
+                ? require("@/assets/icons/calender-white.png")
+                : require("@/assets/icons/Calendar.png")
+            }
+            location="Rumuewhera, Port Harcourt"
+          />
+          <ActiveActivityCard
+            buttonTitle="View"
+            date="9th Aug, 2025 | 10AM - 12PM"
+            title="2 Bedroom in-suite apartment"
+            image={
+              isDarkMode
+                ? require("@/assets/icons/calender-white.png")
+                : require("@/assets/icons/Calendar.png")
+            }
+            location="Rumuewhera, Port Harcourt"
+          />
+          <ActiveActivityCard
+            buttonTitle="View"
+            date="9th Aug, 2025 | 10AM - 12PM"
+            title="2 Bedroom in-suite apartment"
+            image={
+              isDarkMode
+                ? require("@/assets/icons/calender-white.png")
+                : require("@/assets/icons/Calendar.png")
+            }
+            location="Rumuewhera, Port Harcourt"
+          />
+        </View>
       </View>
       <View className="p-4 border-b border-gray-300">
-        <Text className="text-lg font-semibold pb-4">Reserved</Text>
+        <Text
+          style={{ color: colors.slate[650] }}
+          className="pb-4 text-lg font-semibold"
+        >
+          Reserved
+        </Text>
         <ActiveActivityCard
           buttonTitle="View"
           date="Due: 10th Aug, 2025"
@@ -103,7 +99,12 @@ const ActiveActivity = () => {
         />
       </View>
       <View className="p-4 border-b border-gray-300">
-        <Text className="text-lg font-semibold pb-4">Inspected</Text>
+        <Text
+          style={{ color: colors.slate[650] }}
+          className="pb-4 text-lg font-semibold"
+        >
+          Inspected
+        </Text>
         <ActiveActivityCard
           buttonTitle="Book"
           title="2 Bedroom in-suite apartment"
