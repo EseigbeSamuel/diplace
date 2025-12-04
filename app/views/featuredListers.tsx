@@ -3,8 +3,9 @@ import SafeAreaViewContainer from "@/components/safeareaview";
 import { featuredLister } from "@/constants/discover";
 import { useTheme } from "@/contexts/themeContext";
 import { ColorScheme } from "@/utils";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useNavigation } from "expo-router";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   FlatList,
   Image,
@@ -14,6 +15,11 @@ import {
   View,
 } from "react-native";
 import { RFValue } from "react-native-responsive-fontsize";
+type DropdownOption = {
+  id: string;
+  label: string;
+  icon?: React.ReactNode;
+};
 
 const FeaturedListers = () => {
   const { colors } = useTheme();
@@ -23,12 +29,32 @@ const FeaturedListers = () => {
   const handleBackPress = () => {
     navigation.goBack();
   };
-  const options = [
-    { id: "grid", label: "Grid", icon: "" },
-    { id: "list", label: "List", icon: "" },
+
+  const options: DropdownOption[] = [
+    { id: "grid", label: "Grid" },
+    { id: "list", label: "List" },
   ];
 
-  const [selected, setSelected] = useState(options[0]);
+  const [selected, setSelected] = useState<DropdownOption>(options[0]);
+
+  // Load saved layout on mount
+  useEffect(() => {
+    const loadLayout = async () => {
+      const saved = await AsyncStorage.getItem("layout_type");
+      if (saved) {
+        const found = options.find((o) => o.id === saved);
+        if (found) setSelected(found);
+      }
+    };
+
+    loadLayout();
+  }, []);
+
+  // Save layout whenever the user changes it
+  const handleSelect = async (option: DropdownOption) => {
+    setSelected(option);
+    await AsyncStorage.setItem("layout_type", option.id);
+  };
 
   return (
     <SafeAreaViewContainer>
@@ -51,12 +77,12 @@ const FeaturedListers = () => {
           <Dropdown
             options={options}
             selected={selected}
-            onSelect={(options) => setSelected(options)}
+            onSelect={handleSelect}
           />
         </View>
       </View>
 
-      <View style={Styles.container} className="h-full p-3">
+      <View className="h-full px-3">
         {selected.id === "grid" ? (
           <FlatList
             data={featuredLister}
@@ -67,8 +93,8 @@ const FeaturedListers = () => {
             contentContainerClassName="gap-4 "
             renderItem={({ item }) => (
               <View
-                style={Styles.back}
-                className="w-[180px] rounded-xl shadow-lg p-3"
+                style={[Styles.back, Styles.border]}
+                className="flex-1 max-w-[48%] border rounded-xl shadow-lg p-3"
               >
                 <Image source={item.imageSource} />
                 <View className="grid gap-1">
@@ -84,7 +110,7 @@ const FeaturedListers = () => {
                   <View className="flex flex-row items-center w-full justify-between ">
                     <View className="flex flex-row items-center gap-1">
                       <Image
-                        source={require("@/assets/icons/Star-Iconly-Pro-1.png")}
+                        source={require("@/assets/icons/star.png")}
                         className="size-[20px]"
                       />
                       <Text style={Styles.text} className=" font-medium">
@@ -109,8 +135,8 @@ const FeaturedListers = () => {
             contentContainerClassName="gap-4"
             renderItem={({ item }) => (
               <View
-                style={Styles.back}
-                className="flex flex-row gap-3 items-center shadow-lg rounded-2xl p-3 w-full "
+                style={[Styles.back, Styles.border]}
+                className="flex flex-row border gap-3 items-center shadow-lg rounded-2xl p-3 w-full "
               >
                 <Image source={item.imageSource} />
                 <View className="flex-1">
@@ -124,7 +150,7 @@ const FeaturedListers = () => {
                   <View className="flex flex-row items-center w-full justify-between ">
                     <View className="flex flex-row gap-1 items-center flex-shrink">
                       <Image
-                        source={require("@/assets/icons/Star-Iconly-Pro-1.png")}
+                        source={require("@/assets/icons/star.png")}
                         className="size-[20px]"
                       />
                       <Text style={Styles.text} className=" font-medium">
@@ -170,6 +196,13 @@ const styles = (colors: ColorScheme) =>
 
     border: {
       borderColor: colors.slate[300],
+    },
+    borderShadow: {
+      shadowColor: colors.slate[650],
+      shadowOffset: { width: 0, height: 2 },
+      shadowOpacity: 0.1,
+      shadowRadius: 4,
+      elevation: 3,
     },
     head: {
       fontSize: RFValue(24),
