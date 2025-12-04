@@ -410,7 +410,7 @@ const LocationPickerSubstep: React.FC<LocationPickerSubstepProps> = ({
           <View style={styles.modalSearchContainer}>
             <View style={styles.modalSearchInput}>
               <Image
-                source={require("@/assets/icons/Location - Iconly Pro-1.png")}
+                source={require("@/assets/icons/location-1.png")}
                 style={styles.searchIconSmall}
               />
               <TextInput

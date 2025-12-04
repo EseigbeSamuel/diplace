@@ -146,7 +146,7 @@ const SpacePreviewScreen: React.FC<SpacePreviewScreenProps> = ({ onNext }) => {
 
           <View style={styles.locationRow}>
             <Image
-              source={require("@/assets/icons/Location - Iconly Pro.png")}
+              source={require("@/assets/icons/location-1.png")}
               style={styles.locationIcon}
               resizeMode="contain"
             />
