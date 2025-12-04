@@ -1,20 +1,20 @@
-import React, { useState } from "react";
-import {
-  View,
-  Text,
-  FlatList,
-  TouchableOpacity,
-  TextInput,
-  StyleSheet,
-  SafeAreaView,
-  StatusBar,
-  Image,
-} from "react-native";
+import { mockChats } from "@/constants/mockChats";
 import { useTheme } from "@/contexts/themeContext";
 import { ColorScheme } from "@/utils";
-import { RFValue } from "react-native-responsive-fontsize";
-import { mockChats } from "@/constants/mockChats";
 import { useRouter } from "expo-router";
+import React, { useState } from "react";
+import {
+  FlatList,
+  Image,
+  SafeAreaView,
+  StatusBar,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
+} from "react-native";
+import { RFValue } from "react-native-responsive-fontsize";
 
 const filterTabs = ["All", "Unread", "Read", "Dates"];
 
@@ -141,14 +141,6 @@ const ChatsPage: React.FC = () => {
       ]}
       onPress={() => setActiveFilter(tab)}
     >
-      {/* {tab === "Dates" && (
-        <View style={[]}>
-          <Image
-            source={require("@/assets/icons/Calendar.png")}
-            style={{ width: 13, height: 13 }}
-          />
-        </View>
-      )} */}
       <Text
         style={[
           styles.filterText,

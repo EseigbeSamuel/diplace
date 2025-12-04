@@ -8,16 +8,16 @@ import { Image, ScrollView, StyleSheet, Text, View } from "react-native";
 import { RFValue } from "react-native-responsive-fontsize";
 
 const PayBalance = () => {
-  const { colors } = useTheme();
+  const { colors, isDarkMode } = useTheme();
   const homeStyles = styles(colors);
   return (
     <SafeAreaViewContainer>
       <SectionHeader title="Pay Balance" />
-      <View className="py-4 flex-1">
-        <View className="my-4 p-4 bg-black rounded-xl flex flex-row justify-between items-center">
+      <View className="flex-1 py-4">
+        <View className="flex flex-row items-center justify-between p-4 my-4 bg-black rounded-xl">
           <View>
             <Text className="text-white">Total Amount Payable:</Text>
-            <Text className="font-semibold text-white text-xl">
+            <Text className="text-xl font-semibold text-white">
               ₦1,004,800.00
             </Text>
           </View>
@@ -34,7 +34,7 @@ const PayBalance = () => {
             <Text className="py-4" style={homeStyles.title}>
               Property Info
             </Text>
-            <View className="flex gap-4 flex-row items-center">
+            <View className="flex flex-row items-center gap-4">
               <View>
                 <Image
                   source={require("@/assets/images/featuredSpaceImage1.png")}
@@ -51,26 +51,26 @@ const PayBalance = () => {
               </View>
             </View>
           </View>
-          <View className="border-b border-t border-gray-300 py-4 my-4">
+          <View className="py-4 my-4 border-t border-b border-gray-300">
             <Text style={homeStyles.title} className="pb-4">
               Cost Breakdown
             </Text>
             <View>
               <View className="flex flex-row justify-between py-2">
                 <Text style={homeStyles.titleGray}>Rent (3 days)</Text>
-                <Text className="font-semibold text-lg">₦1,200,000.00</Text>
+                <Text className="text-lg font-semibold">₦1,200,000.00</Text>
               </View>
               <View className="flex flex-row justify-between py-2">
                 <Text style={homeStyles.titleGray}>
                   Caution fee (refundable)
                 </Text>
-                <Text className="font-semibold text-lg">₦50,000.00</Text>
+                <Text className="text-lg font-semibold">₦50,000.00</Text>
               </View>
               <View className="flex flex-row justify-between py-2">
                 <Text style={homeStyles.titleGray}>
                   DiPlace Platform fee (0.5%)
                 </Text>
-                <Text className="font-semibold text-lg">₦6,000.00</Text>
+                <Text className="text-lg font-semibold">₦6,000.00</Text>
               </View>
             </View>
           </View>
@@ -92,7 +92,7 @@ const PayBalance = () => {
               </Text>
             </View>
           </View>
-          <View className="flex flex-row justify-between border-b py-4 border-gray-300">
+          <View className="flex flex-row justify-between py-4 border-b border-gray-300">
             <Text className="" style={homeStyles.subTitle}>
               Balance Due
             </Text>
@@ -100,7 +100,7 @@ const PayBalance = () => {
               ₦1,004,800.00
             </Text>
           </View>
-          <View className="border-b border-gray-300 py-4 ">
+          <View className="py-4 border-b border-gray-300 ">
             <Text style={homeStyles.title}>Renter’s Information</Text>
             <View className="bg-[#F9F9FB] rounded-xl p-4 mt-4">
               <Text style={homeStyles.title}>Rhema Generation Inc.</Text>
@@ -110,7 +110,7 @@ const PayBalance = () => {
               </Text>
             </View>
           </View>
-          <View className="border-b border-gray-300 py-4 ">
+          <View className="py-4 border-b border-gray-300 ">
             <Text style={homeStyles.title}>Event Details</Text>
             <View className="bg-[#F9F9FB] rounded-xl p-4 mt-4 flex flex-col gap-1">
               <View>
@@ -118,7 +118,11 @@ const PayBalance = () => {
               </View>
               <View className="flex flex-row gap-1">
                 <Image
-                  source={require("@/assets/icons/Calendar.png")}
+                  source={
+                    isDarkMode
+                      ? require("@/assets/icons/calender-white.png")
+                      : require("@/assets/icons/calendar.png")
+                  }
                   className="w-5 h-5"
                 />
                 <Text style={homeStyles.subTitlegray}>Event Date:</Text>
