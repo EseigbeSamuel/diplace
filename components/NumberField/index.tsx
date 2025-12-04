@@ -1,7 +1,8 @@
 import { useTheme } from "@/contexts/themeContext";
 import { ColorScheme } from "@/utils";
-import React, { useState } from "react";
+import React from "react";
 import {
+  Platform,
   Pressable,
   StyleSheet,
   Text,
@@ -10,55 +11,54 @@ import {
 } from "react-native";
 
 interface NumericFieldProps {
-  onChange?: (value: number) => void;
-  initialValue?: number;
+  value: number;
+  onChange: (value: number) => void;
   minValue?: number;
   maxValue?: number;
+  shadowed?: boolean;
 }
 
 const NumericField: React.FC<NumericFieldProps> = ({
+  value,
   onChange,
-  initialValue = 0,
   minValue = 0,
   maxValue = 100,
+  shadowed = false,
 }) => {
   const { colors } = useTheme();
   const Styles = styles(colors);
-  const [value, setValue] = useState<number>(initialValue);
 
   const handleIncrement = () => {
     if (value < maxValue) {
-      const newValue = value + 1;
-      setValue(newValue);
-      if (onChange) onChange(newValue);
+      onChange(value + 1);
     }
   };
 
   const handleDecrement = () => {
     if (value > minValue) {
-      const newValue = value - 1;
-      setValue(newValue);
-      if (onChange) onChange(newValue);
+      onChange(value - 1);
     }
   };
 
   return (
     <View
-      className="flex-row items-center justify-between p-2 rounded-lg w-[100px]"
-      style={Styles.borderDarkGray}
+      className="flex-row items-center justify-between p-2 rounded-xl w-[100px]"
+      style={[!shadowed ? Styles.borderDarkGray : Styles.shadowed]}
     >
       <Text className="text-xl font-bold" style={Styles.textBlack}>
         {value}
       </Text>
+
       <View className="flex-col">
-        <Pressable onPress={handleIncrement} className="mb-1">
+        <Pressable onPress={handleIncrement} className=" mb-1">
           <Text className="text-xl font-bold" style={Styles.textBlack}>
-            ⬆
+            ˄
           </Text>
         </Pressable>
+
         <TouchableOpacity onPress={handleDecrement}>
-          <Text className="text-xl font-bold " style={Styles.textBlack}>
-            ⬇
+          <Text className="text-xl font-bold" style={Styles.textBlack}>
+            ˅
           </Text>
         </TouchableOpacity>
       </View>
@@ -70,15 +70,30 @@ export default NumericField;
 
 const styles = (colors: ColorScheme) =>
   StyleSheet.create({
-    container: {
-      backgroundColor: colors.background,
-    },
     textBlack: {
       color: colors.slate[650],
     },
     borderDarkGray: {
       borderWidth: 1,
       borderStyle: "solid",
-      borderColor: colors.slate[600],
+      borderColor: colors.slate[450],
+      backgroundColor: colors.slate[150],
+    },
+    shadowed: {
+      paddingHorizontal: 12,
+      backgroundColor: colors.background,
+
+      ...Platform.select({
+        ios: {
+          shadowColor: colors.slate[650],
+          shadowOffset: { width: 0, height: 6 },
+          shadowOpacity: 0.12,
+          shadowRadius: 8,
+        },
+        android: {
+          borderBottomWidth: 1,
+          borderBottomColor: "rgba(0,0,0,0.15)",
+        },
+      }),
     },
   });

@@ -6,6 +6,7 @@ import { StyleSheet, View } from "react-native";
 interface SubstepComponentProps {
   onNext: () => void;
   onPrev: () => void;
+  onSkip: () => void;
 }
 
 interface Step {
@@ -31,7 +32,7 @@ export const ProgressIndicator: React.FC<ProgressIndicatorProps> = ({
       {steps.map((step, index) => {
         let progress = 0;
         if (index < currentStepIndex) {
-          progress = 1;
+          progress = 0;
         } else if (index === currentStepIndex) {
           progress = currentSubstepIndex / step.substeps.length;
         }
@@ -82,6 +83,17 @@ const Stepper: React.FC<StepperProps> = ({ steps, onComplete }) => {
     }
   };
 
+  const handleSkip = () => {
+    // If NOT on the last step, jump to the next step
+    if (currentStepIndex < steps.length - 1) {
+      setCurrentStepIndex(currentStepIndex + 1);
+      setCurrentSubstepIndex(0);
+    } else {
+      // If last step → just finish the whole form
+      if (onComplete) onComplete();
+    }
+  };
+
   const CurrentSubstep = steps[currentStepIndex].substeps[currentSubstepIndex];
 
   return (
@@ -95,7 +107,11 @@ const Stepper: React.FC<StepperProps> = ({ steps, onComplete }) => {
         {/* <Text className="text-lg font-bold mb-4">
           {steps[currentStepIndex].name} - Substep {currentSubstepIndex + 1}
         </Text> */}
-        <CurrentSubstep onNext={handleNext} onPrev={handlePrev} />
+        <CurrentSubstep
+          onNext={handleNext}
+          onPrev={handlePrev}
+          onSkip={handleSkip}
+        />
       </View>
     </View>
   );
