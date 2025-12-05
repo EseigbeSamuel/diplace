@@ -31,7 +31,7 @@ const CarouselCard = ({ item, animationValue }: CarouselCardProps) => {
       style={[
         {
           width: RFValue(250),
-          height: RFValue(350),
+          height: RFValue(320),
           borderRadius: 25,
           backgroundColor: "#fff",
           elevation: 10,

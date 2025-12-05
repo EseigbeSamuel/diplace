@@ -11,7 +11,7 @@ import { RFValue } from "react-native-responsive-fontsize";
 
 export default function Login() {
   const { colors } = useTheme();
-  const { setUserType, userType } = useUser();
+  const { setUserType } = useUser();
 
   const router = useRouter();
 
@@ -30,14 +30,20 @@ export default function Login() {
       >
         <View className="gap-1 mb-6">
           <Text
-            style={{ fontSize: RFValue(24), color: colors.slate[650] }}
-            className="font-bold"
+            style={{
+              fontSize: RFValue(24),
+              color: colors.slate[650],
+              fontFamily: "InstrumentSansBold",
+            }}
           >
             Log in
           </Text>
           <Text
-            style={{ fontSize: RFValue(16), color: colors.slate[600] }}
-            className="font-normal"
+            style={{
+              fontSize: RFValue(16),
+              color: colors.slate[600],
+              fontFamily: "InstrumentSansRegular",
+            }}
           >
             Welcome back. Log in to get started.
           </Text>

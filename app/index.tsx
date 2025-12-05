@@ -45,7 +45,11 @@ export default function GetStarted() {
   return (
     <SafeAreaViewContainer className="items-center justify-center gap-4">
       <Text
-        style={{ fontSize: RFValue(24), color: colors.slate[650] }}
+        style={{
+          fontSize: RFValue(24),
+          color: colors.slate[650],
+          fontFamily: "InstrumentSansBold",
+        }}
         className="font-bold"
       >
         DiPlace
@@ -54,7 +58,7 @@ export default function GetStarted() {
       <Carousel
         ref={carouselRef}
         width={RFValue(250)}
-        height={RFValue(300)}
+        height={RFValue(330)}
         data={OnboardingSplash}
         mode="parallax"
         autoPlay
@@ -91,15 +95,23 @@ export default function GetStarted() {
       </View>
       <View className="w-[90%] gap-2 mt-2">
         <Text
-          style={{ fontSize: RFValue(22), color: colors.slate[650] }}
+          style={{
+            fontSize: RFValue(22),
+            color: colors.slate[650],
+            fontFamily: "InstrumentSansSemiBold",
+          }}
           className="font-semibold text-center"
         >
           {OnboardingSplash[currentIndex].title}
         </Text>
 
         <Text
-          style={{ color: colors.slate[600] }}
-          className="text-base text-center"
+          style={{
+            color: colors.slate[600],
+            fontFamily: "InstrumentSansRegular",
+            fontSize: RFValue(16),
+          }}
+          className="text-center"
         >
           {OnboardingSplash[currentIndex].description}
         </Text>

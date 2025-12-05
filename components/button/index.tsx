@@ -8,6 +8,7 @@ import {
   Text,
   TouchableOpacity,
 } from "react-native";
+import { RFValue } from "react-native-responsive-fontsize";
 
 type ButtonProps = {
   title: string;
@@ -112,7 +113,8 @@ const styles = (props: StylesProps) => {
           : variant === "secondary"
           ? `${disabled ? colors.slate[450] : colors.slate[650]}`
           : colors.slate[650],
-      fontSize: size === "small" ? 14 : 16,
+      fontSize: size === "small" ? RFValue(14) : RFValue(16),
+      fontFamily: "InstrumentSansMedium",
     },
   });
 };

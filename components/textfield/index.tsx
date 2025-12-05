@@ -13,6 +13,7 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+import { RFValue } from "react-native-responsive-fontsize";
 
 type Props = TextInputProps & {
   label: string;
@@ -119,7 +120,7 @@ export default function TextField({
 const styles = (colors: ColorScheme) =>
   StyleSheet.create({
     container: {
-      height: 56,
+      height: RFValue(56),
       borderWidth: 1,
       borderColor: "#ccc",
       borderRadius: 10,
@@ -136,6 +137,7 @@ const styles = (colors: ColorScheme) =>
       paddingTop: Platform.OS === "android" ? 8 : 0,
       paddingBottom: Platform.OS === "android" ? 0 : 6,
       textAlignVertical: "center",
+      fontFamily: "InstrumentSansRegular",
     },
     icon: {
       position: "absolute",

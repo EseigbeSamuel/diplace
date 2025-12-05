@@ -1,12 +1,12 @@
-import React from "react";
-import { Image, ScrollView, StyleSheet, Text, View } from "react-native";
-import { RFValue } from "react-native-responsive-fontsize";
+import AppButton from "@/components/button";
 import SafeAreaViewContainer from "@/components/safeareaview";
 import SectionHeader from "@/components/sectionheader";
-import AppButton from "@/components/button";
 import { useTheme } from "@/contexts/themeContext";
 import { ColorScheme } from "@/utils";
 import { useRouter } from "expo-router";
+import React from "react";
+import { Image, ScrollView, StyleSheet, Text, View } from "react-native";
+import { RFValue } from "react-native-responsive-fontsize";
 
 const AddSpace = () => {
   const { colors } = useTheme();
@@ -55,7 +55,11 @@ const AddSpace = () => {
       <ScrollView showsVerticalScrollIndicator={false}>
         <View style={addSpaceStyles.container}>
           {/* Main Title */}
-
+          <View style={{}}>
+            <Text style={addSpaceStyles.mainTitle}>
+              Get your space on DiPlace with these easy steps.
+            </Text>
+          </View>
           {/* Steps List */}
           <View style={addSpaceStyles.stepsList}>
             {steps.map((step, index) => (
@@ -104,12 +108,13 @@ const styles = (colors: ColorScheme) =>
       paddingTop: RFValue(20),
     },
     mainTitle: {
-      fontSize: RFValue(22),
-      fontWeight: "700",
+      fontSize: RFValue(24),
+      fontWeight: "600",
       color: colors.slate[650],
       lineHeight: RFValue(30),
       marginBottom: RFValue(32),
       paddingHorizontal: RFValue(2),
+      fontFamily: "InstrumentSansBold",
     },
     stepsList: {
       marginBottom: RFValue(20),
