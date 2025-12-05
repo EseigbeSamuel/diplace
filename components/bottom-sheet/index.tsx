@@ -1,7 +1,11 @@
 import { useTheme } from "@/contexts/themeContext";
 import { BottomSheetModalProps } from "@/types";
 import { ColorScheme } from "@/utils";
-import { BottomSheetModal, BottomSheetScrollView } from "@gorhom/bottom-sheet";
+import {
+  BottomSheetBackdrop,
+  BottomSheetModal,
+  BottomSheetScrollView,
+} from "@gorhom/bottom-sheet";
 import { StyleSheet } from "react-native";
 import {
   heightPercentageToDP as hp,
@@ -21,6 +25,14 @@ export const CustomBottomSheet = ({ bottomSheetProps, children }: Props) => {
     <BottomSheetModal
       {...bottomSheetProps}
       handleIndicatorStyle={style.bottomSheetHandleIndicator}
+      backdropComponent={(props) => (
+        <BottomSheetBackdrop
+          {...props}
+          disappearsOnIndex={-1}
+          appearsOnIndex={0}
+          pressBehavior="close"
+        />
+      )}
     >
       <BottomSheetScrollView style={style.container}>
         {children}

@@ -1,3 +1,8 @@
+import SafeAreaViewContainer from "@/components/safeareaview";
+import SectionHeader from "@/components/sectionheader";
+import { useTheme } from "@/contexts/themeContext";
+import { ColorScheme } from "@/utils";
+import { useRouter } from "expo-router";
 import React, { useState } from "react";
 import {
   Image,
@@ -9,11 +14,6 @@ import {
   View,
 } from "react-native";
 import { RFValue } from "react-native-responsive-fontsize";
-import SafeAreaViewContainer from "@/components/safeareaview";
-import SectionHeader from "@/components/sectionheader";
-import { useTheme } from "@/contexts/themeContext";
-import { ColorScheme } from "@/utils";
-import { useRouter } from "expo-router";
 
 interface Transaction {
   id: number;
@@ -25,7 +25,7 @@ interface Transaction {
 }
 
 const RecentEarnings = () => {
-  const { colors } = useTheme();
+  const { colors, isDarkMode } = useTheme();
   const router = useRouter();
   const recentEarningsStyles = styles(colors);
   const [selectedFilter, setSelectedFilter] = useState("All time");
@@ -102,7 +102,9 @@ const RecentEarnings = () => {
       case "reservation":
         return require("@/assets/icons/Lock.png");
       case "inspection":
-        return require("@/assets/icons/Calendar.png");
+        return isDarkMode
+          ? require("@/assets/icons/calender-white.png")
+          : require("@/assets/icons/calendar.png");
       case "booking":
         return require("@/assets/icons/success.png");
       default:

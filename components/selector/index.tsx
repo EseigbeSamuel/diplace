@@ -12,31 +12,33 @@ import {
 
 import { RFValue } from "react-native-responsive-fontsize";
 
-export const SimpleSelector = ({ title }: { title: string }) => {
+export const SimpleSelector = ({
+  title,
+  isChecked,
+  onChange,
+}: {
+  title: string;
+  isChecked: boolean;
+  onChange: () => void;
+}) => {
   const { colors } = useTheme();
   const Styles = styles(colors);
-  const [isChecked, setIsChecked] = useState(false);
 
   return (
-    <Pressable onPress={() => setIsChecked(!isChecked)}>
+    <Pressable onPress={onChange}>
       <View
         className="p-4 flex-row w-full items-center gap-4 rounded-xl"
         style={isChecked ? Styles.borderDarkGray : Styles.borderLightGray}
       >
-        {isChecked ? (
-          <Image
-            source={require("@/assets/icons/checkbox-circle-fill.png")}
-            className="w-6 h-6"
-          />
-        ) : (
-          <Image
-            source={require("@/assets/icons/checkbox-blank-circle-outline.png")}
-            className="w-6 h-6"
-          />
-        )}
-        <View>
-          <Text style={Styles.subTitle}>{title}</Text>
-        </View>
+        <Image
+          source={
+            isChecked
+              ? require("@/assets/icons/checkbox-circle-fill.png")
+              : require("@/assets/icons/checkbox-blank-circle-outline.png")
+          }
+          className="w-6 h-6"
+        />
+        <Text style={Styles.subTitle}>{title}</Text>
       </View>
     </Pressable>
   );
@@ -92,7 +94,7 @@ const styles = (colors: ColorScheme) =>
       color: colors.slate[650],
     },
     checkbox: {
-      //   backgroundColor: colors.slate[650],
+      backgroundColor: colors.slate[650],
       color: colors.slate[650],
     },
     checkboxButton: {

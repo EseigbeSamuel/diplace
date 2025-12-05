@@ -25,7 +25,7 @@
 //             className="w-32 h-32 rounded-full"
 //           />
 //         </View>
-//         <View className="bg-white rounded-t-3xl -mt-16 flex flex-col items-center">
+//         <View className="flex flex-col items-center -mt-16 bg-white rounded-t-3xl">
 //           <Text style={profileStyles.title} className="pt-4">
 //             Ibe Alex
 //           </Text>
@@ -40,7 +40,7 @@
 //               onPress={() => router.push("/upgrade")}
 //               variant="secondary"
 //             />
-//             <Text className="text-center text-gray-400 text-sm pt-2">
+//             <Text className="pt-2 text-sm text-center text-gray-400">
 //               Boost your profile with priority listings.
 //             </Text>
 //           </View>
@@ -68,7 +68,7 @@
 //             <Text style={profileStyles.mediumTitle}>Security</Text>
 //             {/* Security UI */}
 //           </View>
-//           <View className="w-full px-4 py-4 border-t border-gray-300 flex-row justify-between">
+//           <View className="flex-row justify-between w-full px-4 py-4 border-t border-gray-300">
 //             <Text style={profileStyles.mediumTitle}>Dark mode</Text>
 //             <AppButton title="Toggle" onPress={() => {}} variant="secondary" />
 //           </View>
@@ -118,3 +118,7 @@
 //       color: colors.slate[600],
 //     },
 //   });
+
+export default function ProfilePage() {
+  return <></>;
+}

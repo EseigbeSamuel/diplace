@@ -9,7 +9,7 @@ import { Image, ScrollView, StyleSheet, Text, View } from "react-native";
 import { RFValue } from "react-native-responsive-fontsize";
 
 const ActivitySchedule = () => {
-  const { colors } = useTheme();
+  const { colors, isDarkMode } = useTheme();
   const homeStyles = styles(colors);
   const handleRightIconPress = () => {
     console.log("Right icon pressed");
@@ -23,8 +23,8 @@ const ActivitySchedule = () => {
       />
       <ScrollView showsVerticalScrollIndicator={false}>
         <View className="h-[300px] bg-gray-500"></View>
-        <View className=" bg-white rounded-t-3xl -mt-8 flex flex-col">
-          <View className="pb-6 flex flex-row px-4 py-6 gap-4 ">
+        <View className="flex flex-col -mt-8 bg-white rounded-t-3xl">
+          <View className="flex flex-row gap-4 px-4 py-6 pb-6 ">
             <View className="w-[70%] ">
               <Text style={homeStyles.title}>2 Bedroom in-suite apartment</Text>
               <Text className="pt-2" style={homeStyles.subTitle}>
@@ -36,22 +36,26 @@ const ActivitySchedule = () => {
             </View>
           </View>
           <View className="border-b border-t mx-4 flex justify-center border-gray-300 h-[100px]">
-            <View className=" flex flex-row justify-between items-center">
+            <View className="flex flex-row items-center justify-between ">
               <View>
                 <Text style={homeStyles.mediumTitle} className="pb-2">
                   Wedding & Engagement
                 </Text>
                 <View>
-                  <View className="flex gap-2 flex-row items-center">
+                  <View className="flex flex-row items-center gap-2">
                     <Image
-                      source={require("@/assets/icons/Calendar.png")}
+                      source={
+                        isDarkMode
+                          ? require("@/assets/icons/calender-white.png")
+                          : require("@/assets/icons/calendar.png")
+                      }
                       className="w-[20px] h-[20px]"
                     />
                     <Text>Wed, 9th August, 2025</Text>
                   </View>
                 </View>
                 <View>
-                  <View className="flex gap-2 flex-row items-center">
+                  <View className="flex flex-row items-center gap-2">
                     <Image
                       source={require("@/assets/icons/Time.png")}
                       className="w-[20px] h-[20px]"
@@ -69,7 +73,7 @@ const ActivitySchedule = () => {
               </View>
             </View>
           </View>
-          <View className="flex flex-row gap-2 py-6 mx-4 justify-between ">
+          <View className="flex flex-row justify-between gap-2 py-6 mx-4 ">
             <View className="flex flex-row gap-2">
               <View className="h-12 w-12 rounded-[999px] bg-gray-300"></View>
               <View className="">
