@@ -312,18 +312,6 @@ const Placedetails = () => {
           </View>
 
           <View>
-            {/* <TouchableOpacity
-              className="border border-gray-300 p-4 mt-6 rounded-2xl flex-row w-full justify-between"
-              // onPress={() => openDatePicker.current?.present()}
-              onPress={() => setShowDatePicker(true)}
-            >
-              <Text style={homeStyles.text}>{"Select Inspection Date"}</Text>
-              {isDarkMode ? (
-                <Image source={require("@/assets/icons/calender-white.png")} />
-              ) : (
-                <Image source={require("@/assets/icons/calender-dark.png")} />
-              )}
-            </TouchableOpacity> */}
             <TouchableOpacity
               className="border border-gray-300 dark:border-gray-600 p-4 mt-6 rounded-2xl flex-row w-full justify-between"
               onPress={() => setShowDatePicker(true)}
