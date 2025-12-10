@@ -5,10 +5,10 @@ import { promoData, RecentEarningsDB } from "@/constants/ownerHome";
 import { useTheme } from "@/contexts/themeContext";
 import { ColorScheme } from "@/utils";
 import { BottomSheetModal } from "@gorhom/bottom-sheet";
+import { LinearGradient } from "expo-linear-gradient";
 import { router } from "expo-router";
-import { ChevronDown, Eye, EyeOff } from "lucide-react-native";
+import { ArrowUpRight, ChevronDown, MapPin } from "lucide-react-native";
 import { useMemo, useRef, useState } from "react";
-
 import {
   FlatList,
   Image,
@@ -73,14 +73,47 @@ export default function OwnersHome() {
             <Text style={custom.text} className=" font-medium">
               Confirm space availability
             </Text>
-            <View className="rounded-3xl flex-wrap flex-row p-5">
-              <Image
-                source={require("@/assets/images/landlord-right.jpg")}
-                className="object-cover h-[200px] w-full rounded-3xl"
-              />
+            <View className="w-full px-4 mt-4">
+              <View className="rounded-3xl overflow-hidden bg-white shadow-lg shadow-black/20">
+                <View className="w-full h-48 overflow-hidden rounded-3xl">
+                  <Image
+                    source={require("@/assets/images/landlord-right.jpg")}
+                    className="w-full h-full rounded-3xl"
+                  />
+                  <LinearGradient
+                    colors={["transparent", "rgba(0,0,0,0.85)"]}
+                    style={{
+                      position: "absolute",
+                      bottom: 0,
+                      left: 0,
+                      right: 0,
+                      height: "60%",
+                      borderBottomLeftRadius: 24,
+                      borderBottomRightRadius: 24,
+                    }}
+                  />
+                  <View className="absolute bottom-4 left-4 right-4">
+                    <Text className="text-white text-lg font-semibold">
+                      Atraz Palace Hall
+                    </Text>
+
+                    <View className="flex-row items-center mt-1">
+                      <MapPin size={16} color="#fff" />
+                      <Text className="text-white ml-1 text-sm">
+                        10 Onukem Street, Eneka, Port Harcourt
+                      </Text>
+                    </View>
+                  </View>
+                  <TouchableOpacity className="absolute bottom-4 right-4 bg-black/80 rounded-full w-10 h-10 flex items-center justify-center">
+                    <ArrowUpRight size={20} color="#ffffff" />
+                  </TouchableOpacity>
+                </View>
+              </View>
+              <View className="h-4 w-[85%] mx-auto bg-black/10 rounded-full mt-[-6px] blur-lg opacity-20" />
             </View>
           </View>
-          {/*  */}
+
+          {/*overview  */}
           <View>
             <View className="flex-row items-center w-full justify-between mb-3">
               <Text style={custom.subTitle} className="font-medium ">
@@ -100,11 +133,21 @@ export default function OwnersHome() {
               >
                 <View className="flex-row flex-wrap items-center justify-between w-full">
                   <Text style={custom.small}>Total Space</Text>
-                  <View>
-                    <Image
-                      source={require("@/assets/icons/arrow-right-up-outline-dark.png")}
-                      className="size-10"
-                    />
+                  <View
+                    style={{ backgroundColor: colors.slate[650] }}
+                    className="rounded-full p-2 justify-center items-center flex-row"
+                  >
+                    {isDarkMode ? (
+                      <Image
+                        source={require("@/assets/icons/arrow-right-up-dark.png")}
+                        className="size-7"
+                      />
+                    ) : (
+                      <Image
+                        source={require("@/assets/icons/arrow-right-up-light.png")}
+                        className="size-7"
+                      />
+                    )}
                   </View>
                 </View>
                 <View className="flex-row flex-wrap items-center justify-between w-full">
@@ -125,7 +168,7 @@ export default function OwnersHome() {
                 <View>
                   <View className="flex-row items-center gap-1">
                     <Image
-                      source={require("@/assets/icons/Lock-fill.png")}
+                      source={require("@/assets/icons/blue-unlock.png")}
                       className="size-7"
                     />
                     <Text style={custom.small}>6 Available spaces</Text>
@@ -162,9 +205,7 @@ export default function OwnersHome() {
                   style={custom.container2}
                   className="flex-row items-center gap-3 rounded-3xl p-4"
                 >
-                  <Image
-                    source={require("@/assets/icons/badge-check-green.png")}
-                  />
+                  <Image source={require("@/assets/icons/yellow-lock.png")} />
                   <View>
                     <Text style={custom.small}>Reserved Space</Text>
                     <Text style={custom.subTitle} className=" font-semibold">
@@ -218,9 +259,15 @@ export default function OwnersHome() {
 
                 <TouchableOpacity onPress={() => setHidden(!hidden)}>
                   {hidden ? (
-                    <Eye size={22} color="white" />
+                    // <Eye size={22} color="white" />
+                    <Image
+                      source={require("@/assets/icons/eye-open-light.png")}
+                    />
                   ) : (
-                    <EyeOff size={22} color="white" />
+                    // <EyeOff size={22} color="white" />
+                    <Image
+                      source={require("@/assets/icons/eye-closed-light.png")}
+                    />
                   )}
                 </TouchableOpacity>
               </View>
@@ -247,7 +294,7 @@ export default function OwnersHome() {
                     <Text style={custom.smallDrak}>see more</Text>
                     {isDarkMode ? (
                       <Image
-                        source={require("@/assets/icons/arrow-left-light.png")}
+                        source={require("@/assets/icons/arrow-right-light.png")}
                         className="w-[20px] h-[20px]"
                       />
                     ) : (
