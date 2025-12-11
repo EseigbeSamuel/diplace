@@ -1,280 +1,403 @@
-import AppButton from "@/components/button";
-import SafeAreaViewContainer from "@/components/safeareaview";
-import TextField from "@/components/textfield";
-import { useTheme } from "@/contexts/themeContext";
-import { ColorScheme } from "@/utils";
-import React, { useEffect, useRef, useState } from "react";
+import React, { useState, useRef, useMemo } from "react";
 import {
-  Image,
-  Keyboard,
-  StyleSheet,
+  View,
   Text,
+  StyleSheet,
   TextInput,
   TouchableOpacity,
-  View,
+  Image,
+  Alert,
+  Modal,
 } from "react-native";
-import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import { RFValue } from "react-native-responsive-fontsize";
+import AppButton from "@/components/button";
+import SafeAreaViewContainer from "@/components/safeareaview";
+import { useTheme } from "@/contexts/themeContext";
+import { ColorScheme } from "@/utils";
+import { CustomBottomSheet } from "@/components/bottom-sheet";
+import { BottomSheetModal } from "@gorhom/bottom-sheet";
 
-type Props = {
+type PhoneVerificationProps = {
   onNext: () => void;
 };
 
-const OTP_LENGTH = 5;
-
-const Phone = ({ onNext }: Props) => {
+const PhoneVerificationStep = ({ onNext }: PhoneVerificationProps) => {
   const { colors } = useTheme();
   const Styles = styles(colors);
 
-  const [step, setStep] = useState<"phone" | "otp">("phone");
-  const [phone, setPhone] = useState({ num: "" });
-  const [otp, setOtp] = useState("");
-  const hiddenInputRef = useRef<TextInput | null>(null);
+  const [step, setStep] = useState<"input" | "verify">("input");
+  const [phoneNumber, setPhoneNumber] = useState("");
+  const [countryCode, setCountryCode] = useState("+234");
+  const [otp, setOtp] = useState(["", "", "", "", ""]);
+  const [isResending, setIsResending] = useState(false);
+  const inputRefs = useRef<(TextInput | null)[]>([]);
+  const verifyRef = useRef<BottomSheetModal>(null);
 
-  const [selectedCountry, setSelectedCountry] = useState({
-    callingCode: "234",
-    cca2: "NG",
-  });
-
-  // resend timer
-  const [secondsLeft, setSecondsLeft] = useState(60);
-  const [isResendingAllowed, setIsResendingAllowed] = useState(false);
-
-  // Focus hidden input when OTP step shows
-  useEffect(() => {
-    if (step === "otp") {
-      // small delay to ensure layout is ready
-      const t = setTimeout(() => hiddenInputRef.current?.focus(), 100);
-      return () => clearTimeout(t);
+  // Handle phone number input
+  const handlePhoneChange = (text: string) => {
+    // Only allow numbers and limit to 10 digits
+    const cleaned = text.replace(/[^0-9]/g, "");
+    if (cleaned.length <= 10) {
+      setPhoneNumber(cleaned);
     }
-  }, [step]);
+  };
 
-  // countdown for resend
-  useEffect(() => {
-    if (step !== "otp") return;
-    setSecondsLeft(60);
-    setIsResendingAllowed(false);
-    const timer = setInterval(() => {
-      setSecondsLeft((s) => {
-        if (s <= 1) {
-          clearInterval(timer);
-          setIsResendingAllowed(true);
-          return 0;
-        }
-        return s - 1;
-      });
+  // Send OTP
+  const handleSendOTP = async () => {
+    if (phoneNumber.length < 10) {
+      Alert.alert("Error", "Please enter a valid phone number");
+      return;
+    }
+
+    // Simulate API call
+    setTimeout(() => {
+      verifyRef.current?.present();
     }, 1000);
-    return () => clearInterval(timer);
-  }, [step]);
+  };
 
-  // handle OTP text changes from hidden input
-  const handleHiddenInputChange = (text: string) => {
-    // keep only digits and cut to length
-    const cleaned = text.replace(/\D/g, "").slice(0, OTP_LENGTH);
-    setOtp(cleaned);
+  // Handle OTP change
+  const handleOtpChange = (value: string, index: number) => {
+    if (value && !/^\d+$/.test(value)) return;
 
-    if (cleaned.length === OTP_LENGTH) {
-      // small delay so last digit UI appears before submit
-      setTimeout(() => {
-        handleVerifyOtp(cleaned);
-      }, 150);
-      Keyboard.dismiss();
+    const newOtp = [...otp];
+    newOtp[index] = value;
+    setOtp(newOtp);
+
+    // Auto-focus next input
+    if (value && index < otp.length - 1) {
+      inputRefs.current[index + 1]?.focus();
     }
   };
 
-  const handleVerifyPhone = () => {
-    if (phone.num.trim().length < 1) return;
-    // TODO: call send OTP API here
-    setStep("otp");
+  const snapPoints = useMemo(() => ["25%", "50%", "75%", "90%"], []);
+
+  const handleKeyPress = (e: any, index: number) => {
+    if (e.nativeEvent.key === "Backspace" && !otp[index] && index > 0) {
+      inputRefs.current[index - 1]?.focus();
+    }
   };
 
-  const handleVerifyOtp = (code?: string) => {
-    const codeToVerify = code ?? otp;
-    if (codeToVerify.length !== OTP_LENGTH) return;
-    // TODO: verify OTP API
-    // on success:
-    onNext();
+  // Resend OTP
+  const handleResendCode = async () => {
+    setIsResending(true);
+    setTimeout(() => {
+      setIsResending(false);
+      Alert.alert("Success", "OTP code has been resent to your phone");
+    }, 1500);
   };
 
-  const handleResend = () => {
-    if (!isResendingAllowed) return;
-    // TODO: call resend OTP API
-    setOtp("");
-    setSecondsLeft(60);
-    setIsResendingAllowed(false);
-    hiddenInputRef.current?.focus();
+  // Verify OTP
+  const handleVerifyOTP = async () => {
+    const otpCode = otp.join("");
+
+    if (otpCode.length !== 5) {
+      Alert.alert("Error", "Please enter the complete OTP code");
+      return;
+    }
+
+    // Simulate API verification
+    if (otpCode === "12345") {
+      verifyRef.current?.close();
+      onNext();
+    } else {
+      Alert.alert("Error", "Invalid OTP code. Please try again.");
+      setOtp(["", "", "", "", ""]);
+      inputRefs.current[0]?.focus();
+    }
   };
 
-  const renderOtpBoxes = () => {
-    const digits = otp.split("");
-    return Array.from({ length: OTP_LENGTH }).map((_, i) => {
-      const char = digits[i] ?? "";
-      return (
-        <TouchableOpacity
-          key={i}
-          activeOpacity={0.9}
-          onPress={() => hiddenInputRef.current?.focus()}
-          className="w-12 h-14 border rounded-lg  items-center justify-center"
-          style={{
-            borderColor: char ? colors.slate?.[600] ?? "#111" : "#D1D5DB",
-            borderWidth: 1.5,
-          }}
-        >
-          <Text className="text-xl font-semibold" style={Styles.text}>
-            {char}
-          </Text>
-        </TouchableOpacity>
-      );
-    });
-  };
+  const isOtpComplete = otp.every((digit) => digit !== "");
+
+  // Phone Input Step
 
   return (
-    <SafeAreaViewContainer>
-      <KeyboardAwareScrollView
-        enableOnAndroid
-        extraScrollHeight={20}
-        enableAutomaticScroll
-        contentContainerClassName="flex-1 justify-center"
-      >
-        {step === "phone" && (
-          <View className="flex-col justify-between h-full">
-            <View className="gap-5">
-              <Image source={require("@/assets/icons/Call - Iconly Pro.png")} />
+    <View style={Styles.container}>
+      {/* Content */}
+      <View style={Styles.contentContainer}>
+        {/* Phone Icon */}
+        <View style={Styles.iconContainer}>
+          <Image
+            source={require("@/assets/icons/Call - Iconly Pro.png")}
+            style={Styles.phoneIcon}
+            resizeMode="contain"
+          />
+        </View>
 
-              <View>
-                <Text style={Styles.headText} className="font-semibold">
-                  Verify your phone number
-                </Text>
-                <Text style={Styles.text}>
-                  We will send an OTP to your phone number to verify your
-                  account.
-                </Text>
-              </View>
+        {/* Title and Description */}
+        <View style={Styles.textContainer}>
+          <Text style={Styles.headText}>Verify your phone number</Text>
+          <Text style={Styles.descriptionText}>
+            We will send an OTP to your phone number to verify your account.
+          </Text>
+        </View>
 
-              <TextField
-                value={phone.num}
-                label="Phone No."
-                onChange={(text) =>
-                  setPhone({ ...phone, num: text.toString() })
-                }
-                keyboardType="numeric"
-                placeholder="Phone No."
-                icon={require("@/assets/icons/Call - Iconly Pro-1.png")}
+        {/* Phone Number Input */}
+        <View style={Styles.phoneInputContainer}>
+          <Text style={Styles.inputLabel}>Phone No.</Text>
+          <View style={Styles.phoneInputWrapper}>
+            {/* Country Code Selector */}
+            <TouchableOpacity style={Styles.countryCodeButton}>
+              <Image
+                source={require("@/assets/icons/nigeria.png")}
+                style={Styles.flagIcon}
+                resizeMode="contain"
               />
-            </View>
-
-            <View className="w-full">
-              <AppButton
-                title="Continue"
-                onPress={handleVerifyPhone}
-                fullwidth
-                disabled={phone.num.length < 1}
+              <Text style={Styles.countryCodeText}>{countryCode}</Text>
+              <Image
+                source={require("@/assets/icons/chevrondown-bold.png")}
+                resizeMode="contain"
               />
-            </View>
-          </View>
-        )}
+            </TouchableOpacity>
 
-        {step === "otp" && (
-          <View className="flex-col justify-between h-full">
-            <View className="gap-5">
-              <View className="items-center">
-                <Text
-                  className="text-2xl font-semibold"
-                  style={{ color: colors.slate?.[650] }}
-                >
-                  Enter OTP
-                </Text>
-                <Text
-                  className="text-base mt-2"
-                  style={{ color: colors.slate?.[600] }}
-                >
-                  We sent a {OTP_LENGTH}-digit code to your phone number.
-                </Text>
-              </View>
+            {/* Phone Number Input */}
+            <TextInput
+              style={Styles.phoneInput}
+              placeholder="810-2934980"
+              placeholderTextColor={colors.slate[400]}
+              value={phoneNumber}
+              onChangeText={handlePhoneChange}
+              keyboardType="phone-pad"
+              maxLength={10}
+            />
 
-              {/* Hidden input captures all digits (best UX) */}
-              <TextInput
-                ref={hiddenInputRef}
-                value={otp}
-                onChangeText={handleHiddenInputChange}
-                keyboardType="number-pad"
-                maxLength={OTP_LENGTH}
-                returnKeyType="done"
-                className="absolute opacity-0"
-                importantForAutofill="yes"
-                autoFocus={true}
-              />
-
-              {/* Visible boxes */}
+            {/* Clear Button */}
+            {phoneNumber.length > 0 && (
               <TouchableOpacity
-                activeOpacity={1}
-                onPress={() => hiddenInputRef.current?.focus()}
-                className="flex-row justify-between mt-2"
+                style={Styles.clearButton}
+                onPress={() => setPhoneNumber("")}
               >
-                {renderOtpBoxes()}
+                <Image
+                  source={require("@/assets/icons/close-contained.png")}
+                  style={Styles.clearIcon}
+                  resizeMode="contain"
+                />
               </TouchableOpacity>
+            )}
+          </View>
+        </View>
+      </View>
 
-              {/* resend + timer */}
-              <View className="flex-row justify-center items-center mt-3">
-                <Text
-                  className="text-sm"
-                  style={{ color: colors.slate?.[600] }}
-                >
-                  Didn't receive code?{" "}
-                </Text>
-                <TouchableOpacity
-                  onPress={handleResend}
-                  disabled={!isResendingAllowed}
-                >
-                  <Text
-                    className={`text-sm font-semibold ${
-                      isResendingAllowed ? "text-blue-600" : ""
-                    }`}
-                    style={!isResendingAllowed ? Styles.text : undefined}
-                  >
-                    {isResendingAllowed
-                      ? "Resend"
-                      : `Resend in ${secondsLeft}s`}
-                  </Text>
-                </TouchableOpacity>
-              </View>
+      {/* Verify Button */}
+      <View style={Styles.buttonContainer}>
+        <AppButton
+          title="Verify phone number"
+          onPress={handleSendOTP}
+          fullwidth
+          size="large"
+          disabled={phoneNumber.length < 10}
+        />
+      </View>
+      <CustomBottomSheet
+        bottomSheetProps={{
+          ref: verifyRef,
+          snapPoints,
+          index: 2,
+          enableContentPanningGesture: true,
+          enableHandlePanningGesture: true,
+          enablePanDownToClose: true,
+        }}
+      >
+        <View style={Styles.container}>
+          {/* Content */}
+          <View>
+            {/* Title and Description */}
+            <View style={Styles.modalTextContainer}>
+              <Text style={Styles.headModalText}>Verify OTP</Text>
+              <Text style={[Styles.descriptionText, { textAlign: "center" }]}>
+                Please input the code sent to your phone number.
+              </Text>
             </View>
 
-            <View className="w-full">
+            {/* OTP Input */}
+            <View style={Styles.otpContainer}>
+              {otp.map((digit, index) => (
+                <TextInput
+                  key={index}
+                  ref={(ref) => {
+                    inputRefs.current[index] = ref;
+                  }}
+                  style={[Styles.otpInput, digit && Styles.otpInputFilled]}
+                  value={digit}
+                  onChangeText={(value) => handleOtpChange(value, index)}
+                  onKeyPress={(e) => handleKeyPress(e, index)}
+                  keyboardType="number-pad"
+                  maxLength={1}
+                  selectTextOnFocus
+                />
+              ))}
+            </View>
+
+            {/* Verify Button */}
+            <View style={Styles.buttonContainer}>
               <AppButton
-                title="Verify OTP"
-                onPress={() => handleVerifyOtp()}
+                title="Verify"
+                onPress={handleVerifyOTP}
                 fullwidth
-                disabled={otp.length < OTP_LENGTH}
+                size="large"
+                disabled={!isOtpComplete}
               />
             </View>
+            {/* Resend Link */}
+            <View style={Styles.resendContainer}>
+              <Text style={Styles.resendText}>Didn't receive OTP? </Text>
+              <TouchableOpacity
+                onPress={handleResendCode}
+                disabled={isResending}
+              >
+                <Text style={Styles.resendLink}>
+                  {isResending ? "Sending..." : "Resend code"}
+                </Text>
+              </TouchableOpacity>
+              <Text style={Styles.resendText}> 9:55</Text>
+            </View>
           </View>
-        )}
-      </KeyboardAwareScrollView>
-    </SafeAreaViewContainer>
+        </View>
+      </CustomBottomSheet>
+    </View>
   );
 };
 
-export default Phone;
+export default PhoneVerificationStep;
 
 const styles = (colors: ColorScheme) =>
   StyleSheet.create({
+    container: {
+      flex: 1,
+      justifyContent: "space-between",
+      paddingBottom: RFValue(20),
+    },
+    contentContainer: {
+      flex: 1,
+      paddingTop: RFValue(40),
+    },
+    iconContainer: {
+      marginBottom: RFValue(20),
+    },
+    phoneIcon: {
+      width: RFValue(40),
+      height: RFValue(40),
+    },
+    textContainer: {
+      marginBottom: RFValue(40),
+      gap: RFValue(8),
+    },
+    modalTextContainer: {
+      marginBottom: RFValue(20),
+      gap: RFValue(8),
+    },
     headText: {
       fontSize: RFValue(24),
+      fontWeight: "600",
       lineHeight: RFValue(32),
       color: colors.slate[650],
     },
-    container: {
-      backgroundColor: colors.background,
+    headModalText: {
+      fontSize: RFValue(24),
+      fontWeight: "600",
+      lineHeight: RFValue(32),
+      color: colors.slate[650],
+      textAlign: "center",
     },
-    text: {
+    descriptionText: {
       fontSize: RFValue(14),
-      lineHeight: RFValue(20),
+      lineHeight: RFValue(22),
       color: colors.slate[600],
+    },
+    phoneInputContainer: {
+      width: "100%",
+      gap: RFValue(12),
+    },
+    inputLabel: {
+      fontSize: RFValue(14),
+      fontWeight: "500",
+      color: colors.slate[650],
+    },
+    phoneInputWrapper: {
+      flexDirection: "row",
+      alignItems: "center",
+      backgroundColor: colors.slate[100],
+      borderRadius: RFValue(12),
+      borderWidth: 1,
+      borderColor: colors.slate[300],
+      paddingHorizontal: RFValue(12),
+      paddingVertical: RFValue(4),
+      gap: RFValue(8),
+    },
+    countryCodeButton: {
+      flexDirection: "row",
+      alignItems: "center",
+      gap: RFValue(6),
+      paddingVertical: RFValue(8),
+      paddingRight: RFValue(8),
+      borderRightWidth: 1,
+      borderRightColor: colors.slate[300],
+    },
+    flagIcon: {
+      width: RFValue(24),
+      height: RFValue(24),
+    },
+    countryCodeText: {
+      fontSize: RFValue(15),
+      fontWeight: "500",
+      color: colors.slate[650],
+    },
+    arrowIcon: {
+      width: RFValue(12),
+      height: RFValue(12),
+      tintColor: colors.slate[600],
+    },
+    phoneInput: {
+      flex: 1,
+      fontSize: RFValue(15),
+      fontWeight: "500",
+      color: colors.slate[650],
+      paddingVertical: RFValue(12),
+    },
+    clearButton: {
+      padding: RFValue(4),
+    },
+    clearIcon: {
+      width: RFValue(20),
+      height: RFValue(20),
+      tintColor: colors.slate[500],
     },
     otpContainer: {
       flexDirection: "row",
-      justifyContent: "space-between",
-      marginTop: 20,
+      gap: RFValue(12),
+      marginBottom: RFValue(10),
+      justifyContent: "center",
+    },
+    otpInput: {
+      width: RFValue(50),
+      height: RFValue(50),
+      borderRadius: RFValue(12),
+      borderWidth: 1.5,
+      borderColor: colors.slate[300],
+      backgroundColor: colors.background,
+      fontSize: RFValue(24),
+      fontWeight: "600",
+      color: colors.slate[650],
+      textAlign: "center",
+    },
+    otpInputFilled: {
+      borderColor: colors.slate[650],
+      backgroundColor: colors.slate[100],
+    },
+    resendContainer: {
+      flexDirection: "row",
+      alignItems: "center",
+      marginTop: RFValue(16),
+    },
+    resendText: {
+      fontSize: RFValue(14),
+      color: colors.slate[600],
+    },
+    resendLink: {
+      fontSize: RFValue(14),
+      color: "#3B82F6",
+      fontWeight: "600",
+    },
+    buttonContainer: {
+      marginTop: RFValue(20),
     },
   });
