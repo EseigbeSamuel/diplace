@@ -312,18 +312,6 @@ const Placedetails = () => {
           </View>
 
           <View>
-            {/* <TouchableOpacity
-              className="border border-gray-300 p-4 mt-6 rounded-2xl flex-row w-full justify-between"
-              // onPress={() => openDatePicker.current?.present()}
-              onPress={() => setShowDatePicker(true)}
-            >
-              <Text style={homeStyles.text}>{"Select Inspection Date"}</Text>
-              {isDarkMode ? (
-                <Image source={require("@/assets/icons/calender-white.png")} />
-              ) : (
-                <Image source={require("@/assets/icons/calender-dark.png")} />
-              )}
-            </TouchableOpacity> */}
             <TouchableOpacity
               className="border border-gray-300 dark:border-gray-600 p-4 mt-6 rounded-2xl flex-row w-full justify-between"
               onPress={() => setShowDatePicker(true)}
@@ -386,70 +374,20 @@ const Placedetails = () => {
       </CustomBottomSheet>
 
       {/* DATE PICKER MODAL */}
-      {/* <Modal visible={showDatePicker} transparent animationType="fade">
-        <View className="flex-1 justify-center items-center bg-black/40">
-          <View className="bg-white dark:bg-gray-900 rounded-2xl p-5 w-[90%]">
-            <Text className="text-center text-lg font-semibold dark:text-white mb-3">
-              Select a Date
-            </Text>
 
-            <Calendar
-              onDayPress={(day) => {
-                setSelectedDate(day.dateString);
-                setShowDatePicker(false);
-              }}
-              theme={{
-                backgroundColor: isDarkMode ? "#111827" : "#ffffff",
-                calendarBackground: isDarkMode ? "#111827" : "#ffffff",
-                dayTextColor: isDarkMode ? "#e5e7eb" : "#111827",
-                monthTextColor: isDarkMode ? "#ffffff" : "#111827",
-                textSectionTitleColor: isDarkMode ? "#9ca3af" : "#6b7280",
-                selectedDayBackgroundColor: "#2563eb",
-                selectedDayTextColor: "#ffffff",
-                todayTextColor: "#2563eb",
-                arrowColor: isDarkMode ? "#ffffff" : "#000000",
-              }}
-              markedDates={
-                selectedDate
-                  ? {
-                      [selectedDate]: {
-                        selected: true,
-                        selectedColor: "#2563eb",
-                        selectedTextColor: "#fff",
-                      },
-                    }
-                  : {}
-              }
-            />
-
-            <TouchableOpacity
-              onPress={() => setShowDatePicker(false)}
-              className="mt-5 bg-gray-200 dark:bg-gray-700 p-3 rounded-xl"
-            >
-              <Text className="text-center text-gray-800 dark:text-gray-200">
-                Close
-              </Text>
-            </TouchableOpacity>
-          </View>
-        </View>
-      </Modal> */}
       <Modal visible={showDatePicker} transparent animationType="fade">
         <View className="flex-1 justify-center items-center bg-black/30">
           <View className="w-[88%] rounded-3xl bg-white dark:bg-gray-900 p-5">
-            {/* TOP LABEL */}
             <Text className="text-gray-500 dark:text-gray-400 text-sm mb-2">
               Select date
             </Text>
 
-            {/* LARGE FORMATTED DATE */}
             <Text className="text-2xl font-semibold text-gray-900 dark:text-white mb-4">
               {selectedDate ? formatReadableDate(selectedDate) : "—"}
             </Text>
 
-            {/* DIVIDER */}
             <View className="h-[1px] bg-gray-200 dark:bg-gray-700 mb-4" />
 
-            {/* CALENDAR */}
             <Calendar
               onDayPress={(day) => setSelectedDate(day.dateString)}
               markingType={"custom"}
@@ -473,9 +411,8 @@ const Placedetails = () => {
                   : {}
               }
               theme={{
-                backgroundColor: isDarkMode ? "#111827" : "#ffffff",
-                calendarBackground: isDarkMode ? "#111827" : "#ffffff",
-
+                backgroundColor: isDarkMode ? "#181818" : "#FCFCFC",
+                calendarBackground: isDarkMode ? "#181818" : "#FCFCFC",
                 textSectionTitleColor: "#9ca3af",
                 monthTextColor: isDarkMode ? "#ffffff" : "#000000",
                 textMonthFontWeight: "600",
