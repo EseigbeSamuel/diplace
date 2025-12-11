@@ -1,311 +1,529 @@
-import AppButton from "@/components/button";
-import SafeAreaViewContainer from "@/components/safeareaview";
-import TextField from "@/components/textfield";
-import { useTheme } from "@/contexts/themeContext";
-import { ColorScheme } from "@/utils";
 import React, { useState } from "react";
 import {
-  ActivityIndicator,
-  FlatList,
-  Image,
-  Modal,
-  ScrollView,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
   View,
+  Text,
+  StyleSheet,
+  TouchableOpacity,
+  Image,
+  TextInput,
+  Modal,
+  ActivityIndicator,
+  ScrollView,
 } from "react-native";
 import { RFValue } from "react-native-responsive-fontsize";
+import AppButton from "@/components/button";
+import SafeAreaViewContainer from "@/components/safeareaview";
+import { useTheme } from "@/contexts/themeContext";
+import { ColorScheme } from "@/utils";
+import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 
-type props = {
+type IdentityVerificationProps = {
   onNext: () => void;
 };
 
-const ID_OPTIONS = [
-  { id: "nin", label: "Nat’l Identification No. (NIN)" },
-  { id: "bvn", label: "Bank Verification No. (BVN)" },
-  { id: "passport", label: "Int’l Passport" },
-  { id: "license", label: "Driver’s License" },
-];
+type IDType = "NIN" | "BVN" | "PASSPORT" | null;
 
-const Identification = ({ onNext }: props) => {
+interface PersonalInfo {
+  surname: string;
+  firstName: string;
+  middleName: string;
+  dateOfBirth: string;
+}
+
+const IdentityVerificationStep = ({ onNext }: IdentityVerificationProps) => {
   const { colors } = useTheme();
   const Styles = styles(colors);
 
-  const [modalVisible, setModalVisible] = useState(false);
-  const [selectedID, setSelectedID] = useState<{
-    id: string;
-    label: string;
-  } | null>(null);
-  const [docNumber, setDocNumber] = useState({ num: "" });
-  const [loading, setLoading] = useState(false);
-  const [userData, setUserData] = useState<any>(null);
-  const [active, setActive] = useState(false);
+  const [selectedIDType, setSelectedIDType] = useState<IDType>(null);
+  const [showIDTypeModal, setShowIDTypeModal] = useState(false);
+  const [documentNumber, setDocumentNumber] = useState("");
+  const [isFetching, setIsFetching] = useState(false);
+  const [personalInfo, setPersonalInfo] = useState<PersonalInfo | null>(null);
 
-  const isActive = () => {
-    setActive(true);
+  const idTypes = [
+    { id: "NIN", label: "Nat'l Identification No. (NIN)" },
+    { id: "BVN", label: "Bank Verification No. (BVN)" },
+    { id: "PASSPORT", label: "Int'l Passport" },
+  ];
+
+  const getIDTypeLabel = (type: IDType) => {
+    const idType = idTypes.find((item) => item.id === type);
+    return idType ? idType.label : "Select means of ID";
+  };
+
+  const handleSelectIDType = (type: IDType) => {
+    setSelectedIDType(type);
+    setShowIDTypeModal(false);
+    setDocumentNumber("");
+    setPersonalInfo(null);
   };
 
   const handleFetchData = async () => {
-    if (!selectedID || !docNumber) return;
-    setLoading(true);
+    if (!documentNumber) return;
 
+    setIsFetching(true);
+
+    // Simulate API call to fetch personal info
     setTimeout(() => {
-      setUserData({
+      // Mock data - replace with actual API response
+      setPersonalInfo({
         surname: "KALU",
-        firstName: "SARAHMY",
+        firstName: "SABHMY",
         middleName: "UKO",
-        dob: "28-10-1995",
+        dateOfBirth: "28-10-1995",
       });
-      setLoading(false);
-    }, 1500);
+      setIsFetching(false);
+    }, 2000);
   };
 
-  const handleContinue = () => {
-    if (userData) {
+  const handleDocumentNumberChange = (text: string) => {
+    // Only allow numbers
+    const cleaned = text.replace(/[^0-9]/g, "");
+    setDocumentNumber(cleaned);
+    if (text.length == 11) {
+      handleFetchData();
+    }
+  };
+
+  const handleComplete = () => {
+    if (selectedIDType && documentNumber && personalInfo) {
+      // Save to store if needed
       onNext();
     }
   };
 
+  const isComplete = selectedIDType && documentNumber && personalInfo;
+
   return (
-    <SafeAreaViewContainer className="flex-col justify-between h-full">
-      <View className="gap-5">
-        <View>
-          <Image source={require("@/assets/icons/Camera - Iconly Pro.png")} />
-        </View>
-
-        <View>
-          <Text style={Styles.headText} className="font-semibold ">
-            Verify your identity
-          </Text>
-          <Text style={Styles.text}>
-            Please select any means of identification to verify your account. We
-            only crosscheck your data to be sure you are real.
-          </Text>
-        </View>
-      </View>
-
-      <ScrollView
-        contentContainerStyle={{ flexGrow: 1 }}
-        keyboardShouldPersistTaps="handled"
+    <View>
+      <KeyboardAwareScrollView
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={Styles.scrollContent}
+        extraScrollHeight={30}
       >
-        <View className="flex-1">
-          {/* ID Selector */}
-          <TouchableOpacity
-            className="border border-gray-300 p-4 mt-6 rounded-2xl"
-            onPress={() => setModalVisible(true)}
-          >
-            <Text style={Styles.text} className="">
-              {selectedID ? selectedID.label : "Select means of ID"}
-            </Text>
-          </TouchableOpacity>
+        <View style={Styles.container}>
+          {/* Content */}
+          <View style={Styles.contentContainer}>
+            {/* ID Icon */}
 
-          {/* Document Number Input */}
-          {selectedID && (
-            <TextField
-              label="Document Number"
-              placeholder="Document Number"
-              value={docNumber.num}
-              onChange={(text) =>
-                setDocNumber({ ...docNumber, num: text.toString() })
-              }
-              keyboardType="numeric"
+            <Image
+              source={require("@/assets/icons/identification 2.png")}
+              style={Styles.idIcon}
+              resizeMode="contain"
             />
-          )}
 
-          {/* Loader */}
-          {loading && (
-            <View className="mt-4 flex-row items-center">
-              <ActivityIndicator size="small" color="gray" />
-              <Text className="ml-2 text-gray-600">Fetching data...</Text>
-            </View>
-          )}
-
-          {/* User Data */}
-          {userData && (
-            <View className="border border-gray-200 rounded-lg p-4 mt-4">
-              <Text style={Styles.medText} className="font-medium pb-2">
-                Personal Infomation
+            {/* Title and Description */}
+            <View style={Styles.textContainer}>
+              <Text style={Styles.headText}>Verify your identity</Text>
+              <Text style={Styles.descriptionText}>
+                Please select any means of identification to verify your
+                account. We only crosscheck your data to be sure you are real.
               </Text>
-              <View className="flex-row flex-wrap justify-between mt-3">
-                <View className="basis-1/2 pr-2 mb-3">
-                  <Text style={Styles.text}>Surname:</Text>
-                  <Text
-                    style={Styles.medText}
-                    className="font-medium capitalize"
-                  >
-                    {userData.surname}
-                  </Text>
-                </View>
-
-                <View className="basis-1/2 pl-2 mb-3">
-                  <Text style={Styles.text}>First Name:</Text>
-                  <Text
-                    style={Styles.medText}
-                    className="font-medium capitalize"
-                  >
-                    {userData.firstName}
-                  </Text>
-                </View>
-
-                <View className="basis-1/2 pr-2 mb-3">
-                  <Text style={Styles.text}>Middle Name:</Text>
-                  <Text
-                    style={Styles.medText}
-                    className="font-medium capitalize"
-                  >
-                    {userData.middleName}
-                  </Text>
-                </View>
-
-                <View className="basis-1/2 pl-2 mb-3">
-                  <Text style={Styles.text}>Date of Birth:</Text>
-                  <Text
-                    style={Styles.medText}
-                    className="font-medium capitalize"
-                  >
-                    {userData.dob}
-                  </Text>
-                </View>
-              </View>
             </View>
-          )}
-        </View>
-      </ScrollView>
 
-      {/* ID Options Modal */}
-      <Modal visible={modalVisible} animationType="slide" transparent>
-        <View className="flex-1 bg-black/40 justify-end">
-          <View
-            style={Styles.container}
-            className=" rounded-t-2xl p-6 max-h-[450px]"
-          >
-            <View className="w-full h-[30px]  items-center">
-              <View
-                style={{ backgroundColor: colors.slate?.[650] }}
-                className="rounded-full h-2 w-[50px] "
-              ></View>
-            </View>
-            <View>
-              <Text
-                style={Styles.headText}
-                className=" text-center font-semibold "
+            {/* Select ID Type */}
+            <View style={Styles.inputContainer}>
+              <TouchableOpacity
+                style={Styles.selectorButton}
+                onPress={() => setShowIDTypeModal(true)}
               >
-                Choose means of identification
-              </Text>
-              <Text style={Styles.text} className="text-center">
-                Select any means of identification to verify your account.
-              </Text>
+                <Text
+                  style={[
+                    Styles.selectorText,
+                    !selectedIDType && Styles.selectorPlaceholder,
+                  ]}
+                >
+                  {getIDTypeLabel(selectedIDType)}
+                </Text>
+                <Image
+                  source={require("@/assets/icons/chevron-right.png")}
+                  resizeMode="contain"
+                />
+              </TouchableOpacity>
             </View>
 
-            <FlatList
-              data={ID_OPTIONS}
-              keyExtractor={(item) => item.id}
-              contentContainerClassName="gap-3"
-              renderItem={({ item }) => {
-                const isSelected = selectedID?.id === item.id;
+            {/* Document Number Input */}
+            {selectedIDType && (
+              <View style={Styles.inputContainer}>
+                <TextInput
+                  style={Styles.textInput}
+                  placeholder="Document Number"
+                  placeholderTextColor={colors.slate[400]}
+                  value={documentNumber}
+                  onChangeText={handleDocumentNumberChange}
+                  keyboardType="numeric"
+                  maxLength={11}
+                />
+              </View>
+            )}
 
-                return (
-                  <TouchableOpacity
-                    style={Styles.border}
-                    className="border p-4 rounded-2xl"
-                    onPress={() => {
-                      setSelectedID(item);
-                      setModalVisible(false);
-                      setUserData(null);
-                      setDocNumber({ ...docNumber, num: "" });
-                    }}
-                  >
-                    <View className="flex-row items-center">
-                      {/* Radio circle */}
-                      <View
-                        style={isSelected ? Styles.border2 : Styles.border}
-                        className={`h-5 w-5 rounded-full border-2 items-center justify-center mr-3 
-            `}
-                      >
-                        {isSelected && (
-                          <View
-                            style={{ backgroundColor: colors.slate?.[650] }}
-                            className="h-2.5 w-2.5 rounded-full "
-                          />
-                        )}
-                      </View>
+            {/* Fetching Indicator */}
+            {isFetching && (
+              <View style={Styles.fetchingContainer}>
+                <ActivityIndicator size="small" color={colors.slate[650]} />
+                <Text style={Styles.fetchingText}>Fetching data...</Text>
+              </View>
+            )}
 
-                      <Text style={Styles.text2} className="text-base">
-                        {item.label}
+            {/* Personal Information */}
+            {personalInfo && !isFetching && (
+              <View style={Styles.personalInfoContainer}>
+                <Text style={Styles.sectionTitle}>Personal Information</Text>
+
+                <View style={Styles.infoGrid}>
+                  {/* Row 1 */}
+                  <View style={Styles.infoRow}>
+                    <View style={Styles.infoField}>
+                      <Text style={Styles.infoLabel}>Surname</Text>
+                      <Text style={Styles.infoValue}>
+                        {personalInfo.surname}
                       </Text>
                     </View>
-                  </TouchableOpacity>
-                );
-              }}
+
+                    <View style={Styles.infoField}>
+                      <Text style={Styles.infoLabel}>First Name</Text>
+                      <Text style={Styles.infoValue}>
+                        {personalInfo.firstName}
+                      </Text>
+                    </View>
+                  </View>
+
+                  {/* Row 2 */}
+                  <View style={Styles.infoRow}>
+                    <View style={Styles.infoField}>
+                      <Text style={Styles.infoLabel}>Middle Name</Text>
+                      <Text style={Styles.infoValue}>
+                        {personalInfo.middleName}
+                      </Text>
+                    </View>
+
+                    <View style={Styles.infoField}>
+                      <Text style={Styles.infoLabel}>Date of birth</Text>
+                      <Text style={Styles.infoValue}>
+                        {personalInfo.dateOfBirth}
+                      </Text>
+                    </View>
+                  </View>
+                </View>
+              </View>
+            )}
+          </View>
+
+          {/* Complete Button */}
+          <View style={Styles.buttonContainer}>
+            <AppButton
+              title="Complete"
+              onPress={handleComplete}
+              fullwidth
+              size="large"
+              disabled={!isComplete}
             />
-            <View style={Styles.border} className="py-3 border-t-2">
-              <Text style={Styles.small} className="italic text-center">
+          </View>
+        </View>
+      </KeyboardAwareScrollView>
+
+      {/* ID Type Selection Modal */}
+      <Modal
+        visible={showIDTypeModal}
+        transparent
+        animationType="slide"
+        onRequestClose={() => setShowIDTypeModal(false)}
+      >
+        <TouchableOpacity
+          style={Styles.modalOverlay}
+          activeOpacity={1}
+          onPress={() => setShowIDTypeModal(false)}
+        >
+          <TouchableOpacity
+            activeOpacity={1}
+            style={Styles.modalContent}
+            onPress={(e) => e.stopPropagation()}
+          >
+            <View style={Styles.modalHandle} />
+            <Text style={Styles.modalTitle}>
+              Choose means of identification
+            </Text>
+            <Text style={Styles.modalDescription}>
+              Select any means of identification to verify your account.
+            </Text>
+
+            <View style={Styles.idTypeOptions}>
+              {idTypes.map((type) => (
+                <TouchableOpacity
+                  key={type.id}
+                  style={Styles.idTypeOption}
+                  onPress={() => handleSelectIDType(type.id as IDType)}
+                >
+                  <View style={Styles.radioContainer}>
+                    <View
+                      style={[
+                        Styles.radioOuter,
+                        selectedIDType === type.id && Styles.radioOuterSelected,
+                      ]}
+                    >
+                      {selectedIDType === type.id && (
+                        <View style={Styles.radioInner} />
+                      )}
+                    </View>
+                  </View>
+                  <Text style={Styles.idTypeOptionText}>{type.label}</Text>
+                </TouchableOpacity>
+              ))}
+            </View>
+
+            {/* Security Note in Modal */}
+            <View style={Styles.modalSecurityNote}>
+              <Text style={Styles.modalSecurityText}>
                 🔐 Your data is 100% safe. We only crosscheck your data to be
                 sure you are real.
               </Text>
             </View>
-          </View>
-        </View>
+          </TouchableOpacity>
+        </TouchableOpacity>
       </Modal>
-
-      {!userData ? (
-        <View className="w-full ">
-          <AppButton
-            title={loading ? "Fetching..." : "Fetch Details"}
-            onPress={handleFetchData}
-            fullwidth
-          />
-        </View>
-      ) : (
-        <View className="w-full ">
-          <AppButton title="Continue" onPress={handleContinue} fullwidth />
-        </View>
-      )}
-    </SafeAreaViewContainer>
+    </View>
   );
 };
 
-export default Identification;
+export default IdentityVerificationStep;
+
 const styles = (colors: ColorScheme) =>
   StyleSheet.create({
+    scrollContent: {
+      flexGrow: 1,
+    },
     container: {
-      backgroundColor: colors.background,
+      flexGrow: 1,
+      justifyContent: "space-between",
+      paddingBottom: RFValue(20),
     },
-    border: {
-      borderColor: colors.slate[300],
-      backgroundAttachment: colors.slate[150],
+    contentContainer: {
+      paddingTop: RFValue(40),
+      gap: RFValue(8),
     },
-    border2: {
-      borderColor: colors.slate[650],
+    idIcon: {
+      width: RFValue(60),
+      height: RFValue(60),
+      tintColor: colors.slate[650],
     },
-    radio: {
-      borderColor: colors.slate[650],
-      backgroundColor: colors.background,
+    textContainer: {
+      gap: RFValue(12),
     },
     headText: {
       fontSize: RFValue(24),
+      fontWeight: "600",
       lineHeight: RFValue(32),
       color: colors.slate[650],
     },
-    medText: {
+    descriptionText: {
+      fontSize: RFValue(14),
+      lineHeight: RFValue(22),
+      color: colors.slate[600],
+    },
+    inputContainer: {
+      gap: RFValue(8),
+    },
+    inputLabel: {
+      fontSize: RFValue(14),
+      fontWeight: "500",
+      color: colors.slate[650],
+    },
+    selectorButton: {
+      flexDirection: "row",
+      alignItems: "center",
+      justifyContent: "space-between",
+      paddingVertical: RFValue(16),
+      paddingHorizontal: RFValue(16),
+      backgroundColor: colors.slate[200],
+      borderRadius: RFValue(12),
+      borderWidth: 1,
+      borderColor: colors.slate[300],
+    },
+    selectorText: {
+      fontSize: RFValue(15),
+      color: colors.slate[650],
+      fontWeight: "500",
+    },
+    selectorPlaceholder: {
+      color: colors.slate[500],
+    },
+    arrowIcon: {
+      width: RFValue(16),
+      height: RFValue(16),
+      tintColor: colors.slate[600],
+    },
+    textInput: {
+      paddingVertical: RFValue(16),
+      paddingHorizontal: RFValue(16),
+      backgroundColor: colors.slate[200],
+      borderRadius: RFValue(12),
+      borderWidth: 1,
+      borderColor: colors.slate[300],
+      fontSize: RFValue(15),
+      color: colors.slate[650],
+      fontWeight: "500",
+    },
+    fetchingContainer: {
+      flexDirection: "row",
+      alignItems: "center",
+      gap: RFValue(12),
+      paddingVertical: RFValue(8),
+      justifyContent: "flex-end",
+    },
+    fetchingText: {
+      fontSize: RFValue(14),
+      color: colors.slate[600],
+    },
+    personalInfoContainer: {
+      gap: RFValue(20),
+      paddingVertical: RFValue(16),
+      paddingHorizontal: RFValue(16),
+      backgroundColor: colors.slate[200],
+      borderRadius: RFValue(12),
+      borderWidth: 1,
+      borderColor: colors.slate[300],
+    },
+    sectionTitle: {
       fontSize: RFValue(16),
-      lineHeight: RFValue(24),
+      fontWeight: "600",
       color: colors.slate[650],
     },
-    text: {
-      fontSize: RFValue(14),
-      lineHeight: RFValue(20),
+    infoGrid: {
+      gap: RFValue(16),
+    },
+    infoRow: {
+      flexDirection: "row",
+      gap: RFValue(16),
+    },
+    infoField: {
+      flex: 1,
+      gap: RFValue(6),
+    },
+    infoLabel: {
+      fontSize: RFValue(13),
       color: colors.slate[600],
     },
-    text2: {
-      fontSize: RFValue(14),
-      lineHeight: RFValue(20),
+    infoValue: {
+      fontSize: RFValue(15),
+      fontWeight: "600",
       color: colors.slate[650],
     },
-    small: {
+    securityNote: {
+      flexDirection: "row",
+      alignItems: "flex-start",
+      gap: RFValue(8),
+      backgroundColor: colors.success[100],
+      paddingVertical: RFValue(12),
+      paddingHorizontal: RFValue(12),
+      borderRadius: RFValue(8),
+      marginTop: RFValue(8),
+    },
+    shieldIcon: {
+      width: RFValue(16),
+      height: RFValue(16),
+      tintColor: colors.success[300],
+      marginTop: RFValue(2),
+    },
+    securityText: {
+      flex: 1,
       fontSize: RFValue(12),
-      lineHeight: RFValue(16),
+      color: colors.success[300],
+      lineHeight: RFValue(18),
+    },
+    buttonContainer: {
+      marginTop: RFValue(32),
+    },
+    modalOverlay: {
+      flex: 1,
+      backgroundColor: "rgba(0, 0, 0, 0.5)",
+      justifyContent: "flex-end",
+    },
+    modalContent: {
+      backgroundColor: colors.background,
+      borderTopLeftRadius: RFValue(24),
+      borderTopRightRadius: RFValue(24),
+      paddingTop: RFValue(12),
+      paddingBottom: RFValue(32),
+      paddingHorizontal: RFValue(20),
+    },
+    modalHandle: {
+      width: RFValue(40),
+      height: RFValue(4),
+      backgroundColor: colors.slate[300],
+      borderRadius: RFValue(2),
+      alignSelf: "center",
+      marginBottom: RFValue(20),
+    },
+    modalTitle: {
+      fontSize: RFValue(18),
+      fontWeight: "600",
+      color: colors.slate[650],
+      marginBottom: RFValue(8),
+    },
+    modalDescription: {
+      fontSize: RFValue(14),
       color: colors.slate[600],
+      marginBottom: RFValue(24),
+    },
+    idTypeOptions: {
+      gap: RFValue(16),
+      marginBottom: RFValue(24),
+    },
+    idTypeOption: {
+      flexDirection: "row",
+      alignItems: "center",
+      paddingVertical: RFValue(16),
+      paddingHorizontal: RFValue(16),
+      backgroundColor: colors.background,
+      borderRadius: RFValue(12),
+      borderWidth: 1,
+      borderColor: colors.slate[300],
+    },
+    radioContainer: {
+      marginRight: RFValue(12),
+    },
+    radioOuter: {
+      width: RFValue(20),
+      height: RFValue(20),
+      borderRadius: RFValue(10),
+      borderWidth: 2,
+      borderColor: colors.slate[400],
+      alignItems: "center",
+      justifyContent: "center",
+    },
+    radioOuterSelected: {
+      borderColor: colors.slate[650],
+    },
+    radioInner: {
+      width: RFValue(10),
+      height: RFValue(10),
+      borderRadius: RFValue(5),
+      backgroundColor: colors.slate[650],
+    },
+    idTypeOptionText: {
+      fontSize: RFValue(15),
+      fontWeight: "500",
+      color: colors.slate[650],
+      flex: 1,
+    },
+    modalSecurityNote: {
+      flexDirection: "row",
+      alignItems: "flex-start",
+      gap: RFValue(8),
+      paddingVertical: RFValue(12),
+      paddingHorizontal: RFValue(12),
+      borderRadius: RFValue(8),
+    },
+    shieldIconSmall: {
+      width: RFValue(14),
+      height: RFValue(14),
+      tintColor: colors.success[300],
+      marginTop: RFValue(2),
+    },
+    modalSecurityText: {
+      flex: 1,
+      fontSize: RFValue(11),
+      color: colors.slate[500],
+      lineHeight: RFValue(16),
     },
   });

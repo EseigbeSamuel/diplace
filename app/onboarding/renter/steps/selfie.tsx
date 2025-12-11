@@ -14,13 +14,16 @@ const Selfie = ({ onNext }: props) => {
   const { colors } = useTheme();
   const Styles = styles(colors);
   return (
-    <SafeAreaViewContainer className="flex-col justify-between h-full">
-      <View className="gap-5">
+    <View className="flex-col justify-between h-full">
+      <View className="gap-4 pt-9 pb-8">
         <View>
-          <Image source={require("@/assets/icons/Camera - Iconly Pro.png")} />
+          <Image
+            source={require("@/assets/icons/Camera - Iconly Pro.png")}
+            className="size-14"
+          />
         </View>
         <View>
-          <Text style={Styles.headText} className="font-semibold ">
+          <Text style={Styles.headText} className="font-semibold pb-1">
             Smile, it’s time for a selfie!
           </Text>
           <Text style={Styles.text}>
@@ -29,10 +32,10 @@ const Selfie = ({ onNext }: props) => {
           </Text>
         </View>
       </View>
-      <View className="w-full ">
-        <AppButton title="Continue" onPress={onNext} fullwidth />
+      <View className="w-full mb-6">
+        <AppButton title="Continue" onPress={onNext} fullwidth size="large" />
       </View>
-    </SafeAreaViewContainer>
+    </View>
   );
 };
 
