@@ -1,3 +1,6 @@
+import Filter from "@/components/filter";
+import { AppHeader } from "@/components/header";
+import SafeAreaViewContainer from "@/components/safeareaview";
 import { mockChats } from "@/constants/mockChats";
 import { useTheme } from "@/contexts/themeContext";
 import { ColorScheme } from "@/utils";
@@ -6,11 +9,9 @@ import React, { useState } from "react";
 import {
   FlatList,
   Image,
-  SafeAreaView,
   StatusBar,
   StyleSheet,
   Text,
-  TextInput,
   TouchableOpacity,
   View,
 } from "react-native";
@@ -164,61 +165,14 @@ const ChatsPage: React.FC = () => {
   );
 
   return (
-    <SafeAreaView
-      style={[styles.container, { backgroundColor: colors.background }]}
-    >
+    <SafeAreaViewContainer>
       <StatusBar backgroundColor={colors.background} barStyle="dark-content" />
 
-      {/* Header */}
-      <View style={[styles.header, { backgroundColor: colors.background }]}>
-        <View style={styles.headerContent}>
-          <Text style={[styles.headerTitle, { color: colors.slate[650] }]}>
-            Chats
-          </Text>
-          <View style={styles.headerIcons}>
-            <TouchableOpacity style={styles.iconButton}>
-              <BellIcon color={colors.slate[400]} />
-              <View
-                style={[
-                  styles.notificationDot,
-                  { backgroundColor: colors.error[200] },
-                ]}
-              >
-                <Text style={{ color: "white" }}>5</Text>
-              </View>
-            </TouchableOpacity>
-            <TouchableOpacity style={styles.profileButton}>
-              <Image
-                source={{
-                  uri: "https://randomuser.me/api/portraits/men/10.jpg",
-                }}
-                style={styles.profileAvatar}
-              />
-            </TouchableOpacity>
-          </View>
-        </View>
+      <AppHeader title={"Chats"} />
+      <View className="py-3">
+        <Filter size="large" />
       </View>
 
-      {/* Search Bar */}
-      <View
-        style={[styles.searchContainer, { backgroundColor: colors.slate[200] }]}
-      >
-        <View style={[styles.searchIcon]}>
-          <Image
-            source={require("@/assets/icons/search.png")}
-            style={{ width: 38, height: 38 }}
-          />
-        </View>
-        <TextInput
-          style={[styles.searchInput, { color: colors.slate[650] }]}
-          placeholder="Search"
-          placeholderTextColor={colors.slate[500]}
-          value={searchQuery}
-          onChangeText={setSearchQuery}
-        />
-      </View>
-
-      {/* Filter Tabs */}
       <View style={styles.filterContainer}>
         {filterTabs.map(renderFilterTab)}
       </View>
@@ -239,7 +193,7 @@ const ChatsPage: React.FC = () => {
       >
         <Text style={styles.fabIcon}>+</Text>
       </TouchableOpacity>
-    </SafeAreaView>
+    </SafeAreaViewContainer>
   );
 };
 
@@ -248,7 +202,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   header: {
-    paddingHorizontal: 20,
+    // paddingHorizontal: 20,
     paddingTop: 10,
     paddingBottom: 15,
   },
@@ -323,7 +277,7 @@ const styles = StyleSheet.create({
   },
   filterContainer: {
     flexDirection: "row",
-    paddingHorizontal: 20,
+    // paddingHorizontal: 20,
     marginBottom: 15,
     gap: 10,
   },
@@ -363,7 +317,7 @@ const styles = StyleSheet.create({
   },
   chatItem: {
     flexDirection: "row",
-    paddingHorizontal: 20,
+    // paddingHorizontal: 20,
     paddingVertical: 12,
     alignItems: "center",
   },

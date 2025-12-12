@@ -1,18 +1,18 @@
-import React, { useState, useRef } from "react";
-import {
-  View,
-  Text,
-  StyleSheet,
-  TouchableOpacity,
-  Image,
-  Alert,
-} from "react-native";
-import { RFValue } from "react-native-responsive-fontsize";
-import { CameraView, CameraType, useCameraPermissions } from "expo-camera";
 import AppButton from "@/components/button";
 import SafeAreaViewContainer from "@/components/safeareaview";
 import { useTheme } from "@/contexts/themeContext";
 import { ColorScheme } from "@/utils";
+import { CameraView, useCameraPermissions } from "expo-camera";
+import React, { useRef, useState } from "react";
+import {
+  Alert,
+  Image,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
+import { RFValue } from "react-native-responsive-fontsize";
 
 type SelfieProps = {
   onNext: () => void;
@@ -100,7 +100,7 @@ const SelfieVerificationStep = ({ onNext }: SelfieProps) => {
             />
             <View style={Styles.previewOverlay}>
               <Text style={Styles.previewText}>
-                Perfect! Let's use this selfie.
+                Perfect! Let&apos;s use this selfie.
               </Text>
             </View>
           </View>

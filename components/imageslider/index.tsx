@@ -46,7 +46,7 @@ const ImageSlider = ({ data, autoPlay = true, interval = 3000 }: Props) => {
     }, interval);
 
     return () => clearInterval(timer);
-  }, [autoPlay, interval, data.length]);
+  }, [autoPlay, interval, data.length, itemWidth]);
 
   const handleScroll = (event: any) => {
     const offsetX = event.nativeEvent.contentOffset.x;
@@ -55,7 +55,7 @@ const ImageSlider = ({ data, autoPlay = true, interval = 3000 }: Props) => {
   };
 
   return (
-    <View className="w-full items-center">
+    <View className="items-center w-full">
       <ScrollView
         ref={scrollRef}
         horizontal
@@ -68,7 +68,7 @@ const ImageSlider = ({ data, autoPlay = true, interval = 3000 }: Props) => {
         {data.map((item) => (
           <View
             key={item.id}
-            className="overflow-hidden rounded-2xl mx-2"
+            className="mx-2 overflow-hidden rounded-2xl"
             style={{ width: itemWidth, height: 170 }}
           >
             <Image
@@ -81,7 +81,7 @@ const ImageSlider = ({ data, autoPlay = true, interval = 3000 }: Props) => {
               <BlurView
                 intensity={70}
                 tint={isDarkMode ? "dark" : "light"}
-                className="absolute -bottom-1 w-full flex-row items-center p-4 rounded-xl"
+                className="absolute flex-row items-center w-full gap-2 p-4 -bottom-1 rounded-xl"
               >
                 {isDarkMode ? (
                   <Image
@@ -90,7 +90,7 @@ const ImageSlider = ({ data, autoPlay = true, interval = 3000 }: Props) => {
                   />
                 ) : (
                   <Image
-                    source={require("@/assets/icons/location-black.png")}
+                    source={require("@/assets/icons/discover-location-white.png")}
                   />
                 )}
 

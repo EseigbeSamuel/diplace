@@ -44,9 +44,9 @@ export default function Filter(props: FilterProps) {
         className="w-[24px] h-[24px]"
       />
       <TextInput
-        className="w-full h-full"
+        className="w-full h-full placeholder:text-red-400"
         placeholder="Search"
-        onFocus={onFocus}
+        // onFocus={onFocus}
         style={{ color: colors.slate[650] }}
         {...rest}
       />

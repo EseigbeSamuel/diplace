@@ -1,18 +1,18 @@
-import React, { useState, useRef } from "react";
-import {
-  View,
-  Text,
-  StyleSheet,
-  TextInput,
-  TouchableOpacity,
-  Image,
-  Alert,
-} from "react-native";
-import { RFValue } from "react-native-responsive-fontsize";
 import AppButton from "@/components/button";
-import SafeAreaViewContainer from "@/components/safeareaview";
+import OTPInput from "@/components/otp";
 import { useTheme } from "@/contexts/themeContext";
 import { ColorScheme } from "@/utils";
+import React, { useRef, useState } from "react";
+import {
+  Alert,
+  Image,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
+} from "react-native";
+import { RFValue } from "react-native-responsive-fontsize";
 
 type EmailVerificationProps = {
   onNext: () => void;
@@ -25,30 +25,9 @@ const EmailVerificationStep = ({ onNext }: EmailVerificationProps) => {
   // Mock email - replace with actual user email from store
   const userEmail = "user***********@gmail.com";
 
-  const [otp, setOtp] = useState(["", "", "", "", ""]);
+  const [otp, setOtp] = useState("");
   const [isResending, setIsResending] = useState(false);
   const inputRefs = useRef<(TextInput | null)[]>([]);
-
-  const handleOtpChange = (value: string, index: number) => {
-    // Only allow numbers
-    if (value && !/^\d+$/.test(value)) return;
-
-    const newOtp = [...otp];
-    newOtp[index] = value;
-    setOtp(newOtp);
-
-    // Auto-focus next input
-    if (value && index < otp.length - 1) {
-      inputRefs.current[index + 1]?.focus();
-    }
-  };
-
-  const handleKeyPress = (e: any, index: number) => {
-    // Handle backspace
-    if (e.nativeEvent.key === "Backspace" && !otp[index] && index > 0) {
-      inputRefs.current[index - 1]?.focus();
-    }
-  };
 
   const handleResendCode = async () => {
     setIsResending(true);
@@ -60,25 +39,21 @@ const EmailVerificationStep = ({ onNext }: EmailVerificationProps) => {
   };
 
   const handleVerifyEmail = async () => {
-    const otpCode = otp.join("");
-
-    if (otpCode.length !== 5) {
+    if (otp.length !== 5) {
       Alert.alert("Error", "Please enter the complete OTP code");
       return;
     }
 
-    // Simulate API verification
-    // Replace with actual API call
-    if (otpCode === "12345") {
+    if (otp === "12345") {
       onNext();
     } else {
       Alert.alert("Error", "Invalid OTP code. Please try again.");
-      setOtp(["", "", "", "", ""]);
+      setOtp("");
       inputRefs.current[0]?.focus();
     }
   };
 
-  const isOtpComplete = otp.every((digit) => digit !== "");
+  const isOtpComplete = otp.length === 5;
 
   return (
     <View style={Styles.container}>
@@ -103,23 +78,7 @@ const EmailVerificationStep = ({ onNext }: EmailVerificationProps) => {
         </View>
 
         {/* OTP Input */}
-        <View style={Styles.otpContainer}>
-          {otp.map((digit, index) => (
-            <TextInput
-              key={index}
-              ref={(ref) => {
-                inputRefs.current[index] = ref;
-              }}
-              style={[Styles.otpInput, digit && Styles.otpInputFilled]}
-              value={digit}
-              onChangeText={(value) => handleOtpChange(value, index)}
-              onKeyPress={(e) => handleKeyPress(e, index)}
-              keyboardType="number-pad"
-              maxLength={1}
-              selectTextOnFocus
-            />
-          ))}
-        </View>
+        <OTPInput length={5} onComplete={(code) => setOtp(code)} />
 
         <View style={Styles.buttonContainer}>
           <AppButton
@@ -132,7 +91,7 @@ const EmailVerificationStep = ({ onNext }: EmailVerificationProps) => {
         </View>
         {/* Resend Link */}
         <View style={Styles.resendContainer}>
-          <Text style={Styles.resendText}>Didn't receive OTP? </Text>
+          <Text style={Styles.resendText}>Didn&apos;t receive OTP? </Text>
           <TouchableOpacity onPress={handleResendCode} disabled={isResending}>
             <Text style={Styles.resendLink}>
               {isResending ? "Sending..." : "Resend code"}

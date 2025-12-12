@@ -27,6 +27,7 @@ export const featuredSpaces = [
     duration: "annum",
   },
 ];
+
 export const spacesNearby = [
   {
     id: "1",
@@ -154,7 +155,7 @@ export const Tabs = [
     isActive: false,
   },
 ];
-// Constant array based on the provided data
+
 export const spacesData = [
   {
     id: "1",

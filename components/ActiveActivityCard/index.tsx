@@ -49,7 +49,7 @@ const ActiveActivityCard = ({
           <AppButton
             title={buttonTitle}
             onPress={() => {
-              router.push("/views/activities/activitySchedule");
+              router.push("/views/activities/activity-schedule/[index]");
             }}
             variant="secondary"
           />

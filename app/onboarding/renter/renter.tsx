@@ -1,16 +1,15 @@
-import SafeAreaViewContainer from "@/components/safeareaview";
 import { useTheme } from "@/contexts/themeContext";
 import { ColorScheme } from "@/utils";
 import React, { useState } from "react";
 import { Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { RFValue } from "react-native-responsive-fontsize";
+import SelfieVerificationStep from "./steps/capture-selfie";
+import EmailVerificationStep from "./steps/email";
 import Identification from "./steps/identification";
 import Info from "./steps/info";
 import Info2 from "./steps/info2";
-import Selfie from "./steps/selfie";
-import SelfieVerificationStep from "./steps/capture-selfie";
-import EmailVerificationStep from "./steps/email";
 import PhoneVerificationStep from "./steps/phone";
+import Selfie from "./steps/selfie";
 
 const Renter = () => {
   const { colors } = useTheme();
@@ -75,9 +74,9 @@ const Renter = () => {
   }
 
   return (
-    <SafeAreaViewContainer>
+    <View style={{ flex: 1, paddingHorizontal: 16, paddingTop: 10 }}>
       {current < 7 && (
-        <View className="w-full justify-between items-center flex-row">
+        <View className="flex-row items-center justify-between w-full">
           <View>
             <TouchableOpacity
               onPress={handleBack}
@@ -100,7 +99,7 @@ const Renter = () => {
         </View>
       )}
       <View style={{ flex: 1 }}>{renderStep()}</View>
-    </SafeAreaViewContainer>
+    </View>
   );
 };
 

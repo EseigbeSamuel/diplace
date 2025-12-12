@@ -67,7 +67,8 @@ const SpacesPosted = ({ layout }: { layout: "tiles" | "box" }) => {
         }
         showsVerticalScrollIndicator={false}
         keyExtractor={(item) => item.id}
-        contentContainerClassName="gap-4"
+        contentContainerStyle={{ gap: 16 }}
+        // contentContainerClassName="gap-4"
       />
       <CustomBottomSheet
         bottomSheetProps={{
@@ -76,23 +77,23 @@ const SpacesPosted = ({ layout }: { layout: "tiles" | "box" }) => {
           index: 2,
         }}
       >
-        <View className="flex-1 py-4 justify-center items-center">
+        <View className="items-center justify-center flex-1 py-4">
           <View>
             <Image
               source={require("@/assets/images/featuredSpaceImage1.png")}
               className="h-[100px] w-[100px] rounded-xl"
             />
           </View>
-          <View className="flex-1 gap-1 items-center justify-center py-2">
+          <View className="items-center justify-center flex-1 gap-1 py-2">
             <Text style={homeStyles.textBlack}>
               2 Bedroom in-suite apartment
             </Text>
             <Text style={homeStyles.subTitle}>Rewheremuara, Port Harcourt</Text>
           </View>
-          <View className="w-full flex-1 gap-4">
+          <View className="flex-1 w-full gap-4">
             <AppButton
               title="Update Status"
-              className=" w-full"
+              className="w-full "
               onPress={handleViewUpdateStatus}
               afterIcon={require("@/assets/icons/tag.png")}
             />
@@ -121,7 +122,7 @@ const SpacesPosted = ({ layout }: { layout: "tiles" | "box" }) => {
             />
             <AppButton
               title="Remove Space"
-              className=" w-full"
+              className="w-full "
               onPress={() => setDialogVisible(true)}
               variant="tertiary"
               afterIcon={require("@/assets/icons/delete.png")}
@@ -136,7 +137,7 @@ const SpacesPosted = ({ layout }: { layout: "tiles" | "box" }) => {
           index: 2,
         }}
       >
-        <View className="flex-1 py-4 justify-center items-center">
+        <View className="items-center justify-center flex-1 py-4">
           <View>
             <Text style={homeStyles.title} className="py-4 text-center">
               What is the current status of this property?
@@ -148,7 +149,7 @@ const SpacesPosted = ({ layout }: { layout: "tiles" | "box" }) => {
               className="h-[100px] w-[100px] rounded-xl"
             />
           </View>
-          <View className="flex-1 gap-1 items-center justify-center py-2">
+          <View className="items-center justify-center flex-1 gap-1 py-2">
             <Text style={homeStyles.textBlack}>
               2 Bedroom in-suite apartment
             </Text>
@@ -161,7 +162,7 @@ const SpacesPosted = ({ layout }: { layout: "tiles" | "box" }) => {
             </View>
           </View>
           <View
-            className="flex-1 flex-row justify-between items-center p-4 rounded-xl my-4"
+            className="flex-row items-center justify-between flex-1 p-4 my-4 rounded-xl"
             style={homeStyles.bgslate150}
           >
             <View className="flex-1">
@@ -178,7 +179,7 @@ const SpacesPosted = ({ layout }: { layout: "tiles" | "box" }) => {
               <Text className="text-[#2563EB]">Available</Text>
             </View>
           </View>
-          <View className="w-full flex-1 gap-4">
+          <View className="flex-1 w-full gap-4">
             <Selector
               image={require("@/assets/icons/Unlock.png")}
               title="Available"
@@ -192,7 +193,7 @@ const SpacesPosted = ({ layout }: { layout: "tiles" | "box" }) => {
               title="Rented"
             />
           </View>
-          <View className="flex-1 my-4 w-full">
+          <View className="flex-1 w-full my-4">
             <AppButton onPress={() => setDialogVisible(true)} title="Update" />
           </View>
         </View>

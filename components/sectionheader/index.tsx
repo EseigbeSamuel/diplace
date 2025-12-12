@@ -17,6 +17,7 @@ interface HeaderComponentProps {
   onRightIconPress?: () => void;
   rightIconView?: React.ReactNode;
   onLeftIconPress?: () => void;
+  isTransparent?: boolean;
 }
 
 const SectionHeader = ({
@@ -25,6 +26,7 @@ const SectionHeader = ({
   rightIconView,
   onRightIconPress,
   onLeftIconPress,
+  isTransparent = false,
 }: HeaderComponentProps) => {
   const navigation = useNavigation();
 
@@ -34,10 +36,10 @@ const SectionHeader = ({
   const { colors, isDarkMode } = useTheme();
   const Styles = styles(colors);
   return (
-    <View className="flex flex-row items-center justify-between pb-2">
+    <View className="z-50 flex flex-row items-center justify-between p-2">
       <TouchableOpacity
         onPress={onLeftIconPress || handleBackPress}
-        className="items-center justify-center rounded-full h-11 w-11"
+        className="items-center justify-center w-12 h-12 rounded-full"
         style={Styles.container}
       >
         <Image
@@ -58,7 +60,7 @@ const SectionHeader = ({
       </Text>
       <TouchableOpacity
         onPress={onRightIconPress}
-        className="p-4"
+        className="items-center justify-center w-12 h-12 rounded-full"
         style={Styles.container}
       >
         {rightIconSource ? (
@@ -76,6 +78,6 @@ export default SectionHeader;
 const styles = (colors: ColorScheme) =>
   StyleSheet.create({
     container: {
-      backgroundColor: colors.slate[150],
+      backgroundColor: "#F9F9FBBF",
     },
   });
