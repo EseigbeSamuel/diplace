@@ -1,14 +1,13 @@
-import { CustomBottomSheet } from "@/components/bottom-sheet";
 import AppButton from "@/components/button";
+import InspectionBottomSheet from "@/components/place-details/inspection-bottomsheet";
+import TimeslotBottomSheet from "@/components/place-details/timeslot-bottomshet";
 import SafeAreaViewContainer from "@/components/safeareaview";
 import SectionHeader from "@/components/sectionheader";
 import { useTheme } from "@/contexts/themeContext";
 import { ColorScheme } from "@/utils";
 import { BottomSheetModal } from "@gorhom/bottom-sheet";
-import { useRouter } from "expo-router";
-import React, { useMemo, useRef, useState } from "react";
+import React, { useRef, useState } from "react";
 import {
-  FlatList,
   Image,
   Modal,
   Pressable,
@@ -21,16 +20,6 @@ import {
 import { Calendar } from "react-native-calendars";
 import { RFValue } from "react-native-responsive-fontsize";
 
-type timeslot = {
-  id: string;
-  label: string;
-};
-const timeslotDB: timeslot[] = [
-  { id: "morning", label: "10AM - 12PM (Morning slot)" },
-  { id: "afternoon", label: "1PM - 3PM (Afternoon slot)" },
-  { id: "evening", label: "4PM - 6PM (Evening slot)" },
-];
-
 const Placedetails = () => {
   const { colors, isDarkMode } = useTheme();
   const homeStyles = styles(colors);
@@ -41,21 +30,9 @@ const Placedetails = () => {
   } | null>(null);
   const [selectedDate, setSelectedDate] = useState<string | null>(null);
   const [showDatePicker, setShowDatePicker] = useState(false);
-
-  const openDatePicker = useRef<BottomSheetModal>(null);
+  const openTimeSlot = useRef<BottomSheetModal>(null);
 
   const openInspection = useRef<BottomSheetModal>(null);
-  const openTimeSlot = useRef<BottomSheetModal>(null);
-  const router = useRouter();
-
-  const handleOpenInspection = () => {
-    openInspection.current?.present();
-  };
-  const handleOpenTimeSlot = () => {
-    openTimeSlot.current?.present();
-  };
-
-  const snapPoints = useMemo(() => ["75%", "90%"], []);
 
   const formatReadableDate = (
     dateString: string | Date | null | undefined
@@ -67,6 +44,14 @@ const Placedetails = () => {
       month: "short",
       day: "numeric",
     });
+  };
+
+  const handleOpenTimeSlot = () => {
+    openTimeSlot.current?.present();
+  };
+
+  const handleOpenInspection = () => {
+    openInspection.current?.present();
   };
 
   return (
@@ -291,94 +276,23 @@ const Placedetails = () => {
       </View>
 
       {/* inspection */}
-      <CustomBottomSheet
-        bottomSheetProps={{
-          ref: openInspection,
-          snapPoints,
-        }}
-      >
-        <View className="flex flex-col gap-5 ">
-          <View>
-            <Text
-              className="font-semibold text-center "
-              style={homeStyles.title2}
-            >
-              Schedule an Inspection
-            </Text>
-            <Text className="text-center " style={homeStyles.subTitlegray}>
-              Pick a convenient time to inspect this space in person. A small
-              inspection fee may apply, payable before confirmation.
-            </Text>
-          </View>
 
-          <View>
-            <TouchableOpacity
-              className="flex-row justify-between w-full p-4 mt-6 border border-gray-300 dark:border-gray-600 rounded-2xl"
-              onPress={() => setShowDatePicker(true)}
-            >
-              <Text
-                className="text-base dark:text-white"
-                style={homeStyles.text}
-              >
-                {selectedDate
-                  ? formatReadableDate(selectedDate)
-                  : "Select Inspection Date"}
-              </Text>
-
-              {isDarkMode ? (
-                <Image source={require("@/assets/icons/calender-white.png")} />
-              ) : (
-                <Image
-                  source={require("@/assets/icons/icon-calender-white.png")}
-                />
-              )}
-            </TouchableOpacity>
-
-            <TouchableOpacity
-              className="flex-row items-center justify-between w-full p-4 mt-6 border border-gray-300 dark:border-gray-600 rounded-2xl"
-              onPress={handleOpenTimeSlot}
-            >
-              <Text className="text-base dark:text-white">
-                {selectedTime ? selectedTime.label : "Choose Time Slot"}
-              </Text>
-              <Image
-                className="rotate-45"
-                source={require("@/assets/icons/angle.png")}
-              />
-            </TouchableOpacity>
-          </View>
-
-          <View className="flex flex-row justify-between w-full ">
-            <Text style={homeStyles.text}>inspection fee: </Text>
-            <Text style={homeStyles.title2} className="font-semibold ">
-              $1000
-            </Text>
-          </View>
-          <View className="flex flex-col gap-5 py-3 mt-2 border-t border-gray-300">
-            <Text style={homeStyles.small} className="italic text-center">
-              🔐 Fee is held by DiPlace and only released after a successful
-              inspection. Refunded if canceled or not completed.
-            </Text>
-
-            <View className="flex flex-col gap-5">
-              <AppButton
-                title="Schedule Inspection"
-                onPress={() => {
-                  router.push("/views/inspection/inspectionPayment");
-                  openInspection.current?.dismiss();
-                }}
-                size="large"
-                disabled={!selectedTime}
-              />
-              <Text style={homeStyles.text} className="font-medium text-center">
-                Skip & Proceed to Book Now
-              </Text>
-            </View>
-          </View>
-        </View>
-      </CustomBottomSheet>
-
+      <InspectionBottomSheet
+        handleOpenTimeSlot={handleOpenTimeSlot}
+        openInspection={openInspection}
+        selectedDate={selectedDate}
+        selectedTime={selectedTime}
+        setSelectedDate={setSelectedDate}
+        setSelectedTime={setSelectedTime}
+        setShowDatePicker={setShowDatePicker}
+        showDatePicker={showDatePicker}
+      />
       {/* DATE PICKER MODAL */}
+      <TimeslotBottomSheet
+        selectedTime={selectedTime}
+        setSelectedTime={setSelectedTime}
+        openTimeSlot={openTimeSlot}
+      />
 
       <Modal visible={showDatePicker} transparent animationType="fade">
         <View className="items-center justify-center flex-1 bg-black/30">
@@ -461,71 +375,6 @@ const Placedetails = () => {
       </Modal>
 
       {/* Time slot */}
-      <CustomBottomSheet
-        bottomSheetProps={{
-          ref: openTimeSlot,
-          snapPoints,
-        }}
-      >
-        <View className="flex flex-col gap-10">
-          <View>
-            <Text style={homeStyles.title2} className="text-center">
-              Choose Time Slot
-            </Text>
-            <Text style={homeStyles.subTitlegray} className="text-center">
-              Pick a convenient time for you from the agent’s available time
-              slot.
-            </Text>
-          </View>
-          <View>
-            <FlatList
-              data={timeslotDB}
-              keyExtractor={(item) => item.id}
-              // contentContainerClassName="gap-3"
-              contentContainerStyle={{ gap: 10 }}
-              renderItem={({ item }) => {
-                const isSelected = selectedTime?.id === item.id;
-
-                return (
-                  <TouchableOpacity
-                    style={homeStyles.border}
-                    className="p-4 border rounded-2xl"
-                    onPress={() => {
-                      setSelectedTime(item);
-                      openTimeSlot.current?.dismiss();
-                    }}
-                  >
-                    <View className="flex-row items-center">
-                      {/* Radio circle */}
-                      <View
-                        style={
-                          isSelected ? homeStyles.border2 : homeStyles.border
-                        }
-                        className={`h-5 w-5 rounded-full border-2 items-center justify-center mr-3 
-                            `}
-                      >
-                        {isSelected && (
-                          <View
-                            style={{ backgroundColor: colors.slate?.[650] }}
-                            className="h-2.5 w-2.5 rounded-full "
-                          />
-                        )}
-                      </View>
-
-                      <Text
-                        style={homeStyles.subTitlegray}
-                        className="text-base"
-                      >
-                        {item.label}
-                      </Text>
-                    </View>
-                  </TouchableOpacity>
-                );
-              }}
-            />
-          </View>
-        </View>
-      </CustomBottomSheet>
     </SafeAreaViewContainer>
   );
 };

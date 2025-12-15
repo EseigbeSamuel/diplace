@@ -46,7 +46,7 @@ const Profile = () => {
       showArrow: true,
     },
     {
-      icon: require("@/assets/icons/credit-card emoji.png"),
+      icon: require("@/assets/icons/credit-card.png"),
       label: "Your Reviews",
       onPress: () => {
         router.push("/views/profile/your-reviews");
