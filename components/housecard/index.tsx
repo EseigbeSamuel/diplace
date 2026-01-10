@@ -20,6 +20,7 @@ const HouseCard = ({
   price,
   badgeType,
   duration,
+  type,
   onPress,
 }: {
   imageSource: ImageSourcePropType;
@@ -28,6 +29,7 @@ const HouseCard = ({
   price: string;
   badgeType?: string;
   duration: string;
+  type?: "featured" | "nearby";
   onPress?: ((event: GestureResponderEvent) => void) | null | undefined;
 }) => {
   const { colors, isDarkMode } = useTheme();
@@ -124,19 +126,30 @@ const HouseCard = ({
   };
 
   return (
-    <Pressable onPress={onPress}>
-      <View className="flex-1">
-        <Image source={imageSource} className="rounded-lg" resizeMode="cover" />
+    <Pressable onPress={onPress} style={{ minWidth: RFValue(280) }}>
+      <View className="flex-1 gap-0.5">
+        <View className="rounded-2xl">
+          <Image
+            source={imageSource}
+            style={{
+              height: RFValue(155),
+              width: "100%",
+              borderRadius: RFValue(15),
+            }}
+          />
+        </View>
         <View className="flex flex-row justify-between pt-2">
           <Text style={homeStyles.title}>{title}</Text>
           <TouchableOpacity onPress={handleBookmarkPress}>
             <Image
               source={
                 isBookmarked
-                  ? require("@/assets/icons/Bookmark - Iconly Pro-1.png")
-                  : require("@/assets/icons/Bookmark - Iconly Pro.png")
+                  ? require("@/assets/icons/bookmark-light-active.png")
+                  : isDarkMode
+                  ? require("@/assets/icons/bookmark-inactive-white.png")
+                  : require("@/assets/icons/bookmark-inactive.png")
               }
-              className="w-6 h-6"
+              style={{ height: RFValue(19), width: RFValue(14.94) }}
             />
           </TouchableOpacity>
         </View>
@@ -152,9 +165,23 @@ const HouseCard = ({
           <Text style={homeStyles.subTitlegray}>{location}</Text>
         </View>
         <View className="flex flex-row items-center justify-between gap-2">
-          <Text style={homeStyles.title} className="font-semibold">
+          <Text
+            style={{
+              fontSize: RFValue(18),
+              fontFamily: "InstrumentSansSemiBold",
+              color: colors.slate[650],
+            }}
+            className="font-semibold"
+          >
             {price}
-            <Text style={homeStyles.subTitlegray}>/{duration}</Text>
+            <Text
+              style={[
+                homeStyles.subTitlegray,
+                { fontFamily: "InstrumentSansRegular" },
+              ]}
+            >
+              /{duration}
+            </Text>
           </Text>
           {renderBadge()}
         </View>
@@ -173,9 +200,10 @@ const styles = (colors: ColorScheme) =>
       color: colors.slate[600],
     },
     title: {
-      fontSize: RFValue(18),
+      fontSize: RFValue(16),
       color: colors.slate[650],
       lineHeight: RFValue(24),
+      fontFamily: "InstrumentSansRegular",
     },
     subTitle: {
       fontSize: RFValue(14),

@@ -1,5 +1,4 @@
 import AppButton from "@/components/button";
-import SafeAreaViewContainer from "@/components/safeareaview";
 import SectionHeader from "@/components/sectionheader";
 import { useTheme } from "@/contexts/themeContext";
 import { ColorScheme } from "@/utils";
@@ -16,13 +15,21 @@ const ActivitySchedule = () => {
     // Add your custom action here
   };
   return (
-    <SafeAreaViewContainer>
-      <SectionHeader
-        rightIconSource={require("@/assets/icons/more-2-line.png")} // Example right icon
-        onRightIconPress={handleRightIconPress}
-      />
+    <View className="relative flex-1 p-2">
+      <View className="absolute z-20 w-full top-6">
+        <SectionHeader
+          rightIconSource={require("@/assets/icons/more-2-line.png")} // Example right icon
+          onRightIconPress={handleRightIconPress}
+          isTransparent={true}
+        />
+      </View>
       <ScrollView showsVerticalScrollIndicator={false}>
-        <View className="h-[300px] bg-gray-500"></View>
+        <View className="h-[300px]">
+          <Image
+            source={require("@/assets/images/SpacesNearbyImage1.png")}
+            className="w-full h-full"
+          />
+        </View>
         <View className="flex flex-col -mt-8 bg-white rounded-t-3xl">
           <View className="flex flex-row gap-4 px-4 py-6 pb-6 ">
             <View className="w-[70%] ">
@@ -108,7 +115,13 @@ const ActivitySchedule = () => {
             </View>
           </View>
           <View className="border-t border-b border-gray-300 ">
-            <Text className="py-6 italic text-center text-gray-400">
+            <Text
+              style={{
+                fontFamily: "InstrumentSansRegular",
+                fontStyle: "italic",
+              }}
+              className="py-6 italic text-center text-gray-400"
+            >
               ⚠️ Heads up! The price you see is for the space only. Agent fees
               and other charges may apply.
             </Text>
@@ -144,7 +157,7 @@ const ActivitySchedule = () => {
           />
         </View>
       </View>
-    </SafeAreaViewContainer>
+    </View>
   );
 };
 
@@ -160,7 +173,8 @@ const styles = (colors: ColorScheme) =>
     },
     title: {
       fontSize: RFValue(24),
-      lineHeight: RFValue(24),
+      lineHeight: RFValue(32),
+      fontFamily: "InstrumentSansSemiBold",
     },
     mediumTitle: {
       fontSize: RFValue(16),
@@ -170,6 +184,7 @@ const styles = (colors: ColorScheme) =>
       fontSize: RFValue(14),
       lineHeight: RFValue(20),
       color: colors.slate[600],
+      fontFamily: "InstrumentSansRegular",
     },
     graybg: {
       backgroundColor: colors.slate[150],

@@ -26,7 +26,7 @@ export default function Login() {
         enableOnAndroid={true}
         extraScrollHeight={20}
         enableAutomaticScroll={true}
-        contentContainerClassName="flex-1 justify-center"
+        contentContainerStyle={{ flex: 1, justifyContent: "center" }}
       >
         <View className="gap-1 mb-6">
           <Text

@@ -58,7 +58,7 @@ const Placedetails = () => {
   const snapPoints = useMemo(() => ["75%", "90%"], []);
 
   const formatReadableDate = (
-    dateString: string | null | undefined
+    dateString: string | Date | null | undefined
   ): string => {
     if (!dateString) return "";
     const date = new Date(dateString);
@@ -305,7 +305,7 @@ const Placedetails = () => {
             >
               Schedule an Inspection
             </Text>
-            <Text className=" text-center " style={homeStyles.subTitlegray}>
+            <Text className="text-center " style={homeStyles.subTitlegray}>
               Pick a convenient time to inspect this space in person. A small
               inspection fee may apply, payable before confirmation.
             </Text>
@@ -313,7 +313,7 @@ const Placedetails = () => {
 
           <View>
             <TouchableOpacity
-              className="border border-gray-300 dark:border-gray-600 p-4 mt-6 rounded-2xl flex-row w-full justify-between"
+              className="flex-row justify-between w-full p-4 mt-6 border border-gray-300 dark:border-gray-600 rounded-2xl"
               onPress={() => setShowDatePicker(true)}
             >
               <Text
@@ -328,28 +328,33 @@ const Placedetails = () => {
               {isDarkMode ? (
                 <Image source={require("@/assets/icons/calender-white.png")} />
               ) : (
-                <Image source={require("@/assets/icons/calender-dark.png")} />
+                <Image
+                  source={require("@/assets/icons/icon-calender-white.png")}
+                />
               )}
             </TouchableOpacity>
 
             <TouchableOpacity
-              className="border border-gray-300 dark:border-gray-600 p-4 mt-6 rounded-2xl flex-row w-full justify-between"
+              className="flex-row items-center justify-between w-full p-4 mt-6 border border-gray-300 dark:border-gray-600 rounded-2xl"
               onPress={handleOpenTimeSlot}
             >
               <Text className="text-base dark:text-white">
                 {selectedTime ? selectedTime.label : "Choose Time Slot"}
               </Text>
-              <Image source={require("@/assets/icons/angle.png")} />
+              <Image
+                className="rotate-45"
+                source={require("@/assets/icons/angle.png")}
+              />
             </TouchableOpacity>
           </View>
 
-          <View className="flex flex-row w-full justify-between ">
+          <View className="flex flex-row justify-between w-full ">
             <Text style={homeStyles.text}>inspection fee: </Text>
             <Text style={homeStyles.title2} className="font-semibold ">
               $1000
             </Text>
           </View>
-          <View className="py-3 border-t border-gray-300 mt-2 flex-col flex gap-5">
+          <View className="flex flex-col gap-5 py-3 mt-2 border-t border-gray-300">
             <Text style={homeStyles.small} className="italic text-center">
               🔐 Fee is held by DiPlace and only released after a successful
               inspection. Refunded if canceled or not completed.
@@ -376,14 +381,22 @@ const Placedetails = () => {
       {/* DATE PICKER MODAL */}
 
       <Modal visible={showDatePicker} transparent animationType="fade">
-        <View className="flex-1 justify-center items-center bg-black/30">
-          <View className="w-[88%] rounded-3xl bg-white dark:bg-gray-900 p-5">
-            <Text className="text-gray-500 dark:text-gray-400 text-sm mb-2">
+        <View className="items-center justify-center flex-1 bg-black/30">
+          <View
+            style={{ backgroundColor: colors.background }}
+            className="w-[88%] rounded-3xl p-5"
+          >
+            <Text style={{ color: colors.slate[600] }} className="mb-2 text-sm">
               Select date
             </Text>
 
-            <Text className="text-2xl font-semibold text-gray-900 dark:text-white mb-4">
-              {selectedDate ? formatReadableDate(selectedDate) : "—"}
+            <Text
+              style={{ color: colors.slate[650] }}
+              className="mb-4 text-2xl font-semibold"
+            >
+              {selectedDate
+                ? formatReadableDate(selectedDate)
+                : formatReadableDate(new Date())}
             </Text>
 
             <View className="h-[1px] bg-gray-200 dark:bg-gray-700 mb-4" />
@@ -417,10 +430,8 @@ const Placedetails = () => {
                 monthTextColor: isDarkMode ? "#ffffff" : "#000000",
                 textMonthFontWeight: "600",
                 textMonthFontSize: 16,
-
                 dayTextColor: isDarkMode ? "#e5e7eb" : "#000000",
                 textDayFontSize: 15,
-
                 arrowColor: "#000",
                 todayTextColor: "#000",
               }}
@@ -430,7 +441,7 @@ const Placedetails = () => {
             {/* BOTTOM BUTTONS */}
             <View className="flex-row justify-end mt-3">
               <TouchableOpacity onPress={() => setShowDatePicker(false)}>
-                <Text className="text-gray-600 dark:text-gray-300 text-base mr-6">
+                <Text className="mr-6 text-base text-gray-600 dark:text-gray-300">
                   Cancel
                 </Text>
               </TouchableOpacity>
@@ -440,7 +451,7 @@ const Placedetails = () => {
                   setShowDatePicker(false);
                 }}
               >
-                <Text className="text-blue-600 dark:text-blue-400 text-base font-semibold">
+                <Text className="text-base font-semibold text-blue-600 dark:text-blue-400">
                   OK
                 </Text>
               </TouchableOpacity>
@@ -470,14 +481,15 @@ const Placedetails = () => {
             <FlatList
               data={timeslotDB}
               keyExtractor={(item) => item.id}
-              contentContainerClassName="gap-3"
+              // contentContainerClassName="gap-3"
+              contentContainerStyle={{ gap: 10 }}
               renderItem={({ item }) => {
                 const isSelected = selectedTime?.id === item.id;
 
                 return (
                   <TouchableOpacity
                     style={homeStyles.border}
-                    className="border p-4 rounded-2xl"
+                    className="p-4 border rounded-2xl"
                     onPress={() => {
                       setSelectedTime(item);
                       openTimeSlot.current?.dismiss();

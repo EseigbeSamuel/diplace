@@ -11,6 +11,8 @@ import Bank from "./steps/bank";
 import Info from "./steps/info";
 import Info2 from "./steps/info2";
 import Personal from "./steps/personal";
+import SelfieVerificationStep from "../renter/steps/capture-selfie";
+import EmailVerificationStep from "../renter/steps/email";
 
 const Agent = () => {
   const { colors } = useTheme();
@@ -24,15 +26,19 @@ const Agent = () => {
       case 2:
         return <Selfie onNext={handleNext} />;
       case 3:
-        return <Phone onNext={handleNext} />;
+        return <SelfieVerificationStep onNext={handleNext} />;
       case 4:
-        return <Identification onNext={handleNext} />;
+        return <EmailVerificationStep onNext={handleNext} />;
       case 5:
-        return <Personal onNext={handleNext} />;
+        return <Phone onNext={handleNext} />;
       case 6:
-        return <Bank onNext={handleNext} />;
+        return <Identification onNext={handleNext} />;
       case 7:
-        return <Info2 onNext={handleNext} />;
+        return <Personal onNext={handleNext} />;
+      case 8:
+        return <Bank onNext={handleNext} />;
+      case 9:
+        return <Info2 />;
 
       default:
         return <Info onNext={handleNext} />;
@@ -40,7 +46,7 @@ const Agent = () => {
   };
 
   const handleNext = () => {
-    if (current < 7) {
+    if (current < 9) {
       setCurrent(current + 1);
     }
   };
@@ -50,6 +56,30 @@ const Agent = () => {
       setCurrent(current - 1);
     }
   };
+
+  if (current === 3) {
+    return (
+      <View style={{ flex: 1 }}>
+        {" "}
+        <View className="w-[75%] justify-between px-3  top-16 z-50 fixed items-center flex-row">
+          <View>
+            <TouchableOpacity
+              onPress={handleBack}
+              className="p-4 bg-gray-100/50 rounded-full w-[50px] "
+            >
+              <Image
+                source={require("@/assets/icons/arrow-left-dark.png")}
+                className="w-6 h-6"
+                style={{ tintColor: "#ffffff" }}
+              />
+            </TouchableOpacity>
+          </View>
+          <Text className="text-xl text-white">Take a selfie</Text>
+        </View>
+        <View style={{ flex: 1 }}>{renderStep()}</View>
+      </View>
+    );
+  }
 
   return (
     <SafeAreaViewContainer>
@@ -65,7 +95,12 @@ const Agent = () => {
             />
           </TouchableOpacity>
         </View>
-        <Text style={Styles.skip} onPress={handleNext} className="text-red-600">
+        <Text className="text-xl">Verify account</Text>
+        <Text
+          style={Styles.skip}
+          onPress={handleNext}
+          className="text-red-600 text-xl"
+        >
           Skip
         </Text>
       </View>

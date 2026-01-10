@@ -6,7 +6,8 @@ import { tabItems } from "@/utils/permissions";
 import { BottomSheetModal } from "@gorhom/bottom-sheet";
 import { Tabs } from "expo-router";
 import React, { useMemo, useRef } from "react";
-import { Image, Pressable, Text, View } from "react-native";
+import { Image, Pressable, View } from "react-native";
+import { RFValue } from "react-native-responsive-fontsize";
 import { heightPercentageToDP as hp } from "react-native-responsive-screen";
 import AddSpaceBottomSheet from "../views/spaces/components/AddSpacesBottomContainer";
 
@@ -23,19 +24,26 @@ const TabLayout = () => {
   const snapPoints = useMemo(() => ["25%", "50%", "75%", "90%"], []);
 
   return (
-    <>
+    <View style={{ flex: 1, backgroundColor: colors.background }}>
       <Tabs
         screenOptions={{
           headerShown: false,
           tabBarStyle: {
             height: hp("11.57%"),
             backgroundColor: colors.background,
-            opacity: 40,
             paddingBottom: hp(0.8),
             paddingTop: hp(0.5),
-            borderTopLeftRadius: 20,
-            borderTopRightRadius: 20,
+            borderTopLeftRadius: RFValue(30),
+            borderTopRightRadius: RFValue(30),
+            shadowColor: "#000",
+            shadowOffset: { width: 0, height: -3 },
+            shadowOpacity: 0.12,
+            shadowRadius: 6,
+
+            // Android shadow
+            elevation: 10,
           },
+
           tabBarItemStyle: {
             paddingVertical: hp(0.8),
             backgroundColor: colors.background,
@@ -109,7 +117,7 @@ const TabLayout = () => {
           closeSheet={() => addSpaceRef.current?.close()}
         />
       </CustomBottomSheet>
-    </>
+    </View>
   );
 };
 

@@ -38,7 +38,7 @@ const Discover = () => {
           <FlatList
             data={categories}
             horizontal
-            contentContainerClassName="gap-2"
+            contentContainerStyle={{ gap: 8 }}
             showsHorizontalScrollIndicator={false}
             renderItem={({ item }) => (
               <Pressable
@@ -56,14 +56,14 @@ const Discover = () => {
                 }`}
               >
                 <Image className="size-[28px]" source={item.icon} />
-                <Text className="capitalize text-black">{item.name}</Text>
+                <Text className="text-black capitalize">{item.name}</Text>
               </Pressable>
             )}
             keyExtractor={(item) => item.id}
           />
         </View>
 
-        <View className="flex flex-col gap-3 w-full">
+        <View className="flex flex-col w-full gap-3">
           <Text style={homeStyles.title} className="font-semibold">
             Neighborhoods
           </Text>
@@ -90,7 +90,7 @@ const Discover = () => {
             data={featuredLister}
             horizontal
             showsHorizontalScrollIndicator={false}
-            contentContainerClassName="gap-4"
+            contentContainerStyle={{ gap: 16 }}
             renderItem={({ item }) => (
               <View
                 style={homeStyles.border}
@@ -147,7 +147,8 @@ const Discover = () => {
             keyExtractor={(item) => item.id}
             horizontal
             showsHorizontalScrollIndicator={false}
-            contentContainerClassName="gap-4"
+            //contentContainerStyle={{ gap: 16 }}
+            contentContainerStyle={{ gap: 16 }}
           />
         </View>
 
@@ -178,7 +179,7 @@ const Discover = () => {
             keyExtractor={(item) => item.id}
             horizontal
             showsHorizontalScrollIndicator={false}
-            contentContainerClassName="gap-4"
+            contentContainerStyle={{ gap: 16 }}
           />
         </View>
 
@@ -209,7 +210,7 @@ const Discover = () => {
             keyExtractor={(item) => item.id}
             horizontal
             showsHorizontalScrollIndicator={false}
-            contentContainerClassName="gap-4"
+            contentContainerStyle={{ gap: 16 }}
           />
         </View>
       </ScrollView>

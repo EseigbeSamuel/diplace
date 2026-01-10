@@ -1,7 +1,7 @@
 import { useTheme } from "@/contexts/themeContext";
 import { ColorScheme } from "@/utils";
 import React from "react";
-import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { RFValue } from "react-native-responsive-fontsize";
 
 type RadioCardProps = {
@@ -26,7 +26,7 @@ const RadioCard: React.FC<RadioCardProps> = ({
       onPress={() => onSelect(value)}
       activeOpacity={0.8}
       style={isActive ? Styles.border : Styles.border2}
-      className={`flex-row w-full items-center justify-between px-4 py-3 rounded-xl mb-3 
+      className={`flex-row w-full items-center justify-between px-4 py-4 rounded-xl mb-3 
        border-2
       `}
     >
@@ -34,12 +34,15 @@ const RadioCard: React.FC<RadioCardProps> = ({
         {/* Circle radio */}
         <View
           style={isActive ? Styles.border : Styles.border2}
-          className="h-5 w-5 rounded-full border-2 items-center justify-center mr-3"
+          className={`  items-center justify-center mr-3 ${
+            isActive ? "" : "border-2 h-5 w-5 rounded-full"
+          }`}
         >
           {isActive && (
-            <View
-              style={Styles.container}
-              className="h-2.5 w-2.5 rounded-full "
+            <Image
+              source={require("../../assets/icons/checkbox-circle-fill.png")}
+              className="w-5 h-5"
+              style={{ tintColor: colors.slate[100] }}
             />
           )}
         </View>
@@ -57,7 +60,7 @@ export default RadioCard;
 const styles = (colors: ColorScheme) =>
   StyleSheet.create({
     border: {
-      borderColor: colors.slate[650],
+      borderColor: colors.slate[100],
     },
     border2: {
       borderColor: colors.slate[300],
@@ -68,12 +71,12 @@ const styles = (colors: ColorScheme) =>
     headText: {
       fontSize: RFValue(24),
       lineHeight: RFValue(32),
-      color: colors.slate[650],
+      color: colors.slate[100],
     },
     text: {
       fontSize: RFValue(14),
       lineHeight: RFValue(20),
-      color: colors.slate[650],
+      color: colors.slate[100],
     },
     small: {
       fontSize: RFValue(12),
