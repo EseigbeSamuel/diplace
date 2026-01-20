@@ -55,7 +55,7 @@ const ActiveActivity = () => {
             image={
               isDarkMode
                 ? require("@/assets/icons/calender-white.png")
-                : require("@/assets/icons/calendar.png")
+                : require("@/assets/icons/Calendar.png")
             }
             location="Rumuewhera, Port Harcourt"
           />
