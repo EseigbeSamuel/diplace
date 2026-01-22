@@ -75,8 +75,8 @@ const TabLayout = () => {
                           <Image
                             source={
                               isDarkMode
-                                ? require("@/assets/icons/plus-white.png")
-                                : require("@/assets/icons/Plus.png")
+                                ? require("@/assets/icons/plus.png")
+                                : require("@/assets/icons/plus-white.png")
                             }
                             style={{ width: 48, height: 48 }}
                             resizeMode="contain"

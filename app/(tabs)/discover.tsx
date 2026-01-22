@@ -99,18 +99,19 @@ const Discover = () => {
 
                   {item.location && (
                     <BlurView
-                      intensity={70}
+                      intensity={10}
                       tint={isDarkMode ? "dark" : "light"}
                       className="absolute flex-row items-center w-full gap-2 p-4 -bottom-1 rounded-xl"
                     >
                       {isDarkMode ? (
                         <Image
                           source={require("@/assets/icons/location-white.png")}
-                          className="w-3.5 h-3.5 mr-2"
+                          className="w-4 h-4"
                         />
                       ) : (
                         <Image
-                          source={require("@/assets/icons/discover-location-white.png")}
+                          source={require("@/assets/icons/location-black.png")}
+                          className="w-4 h-4"
                         />
                       )}
 
@@ -166,10 +167,17 @@ const Discover = () => {
               className="flex-row items-center gap-2"
             >
               <Text style={homeStyles.text}>View more</Text>
-              <Image
-                source={require("@/assets/icons/arrow-right-dark.png")}
-                className="w-[20px] h-[20px]"
-              />
+              {isDarkMode ? (
+                <Image
+                  source={require("@/assets/icons/arrow-right-light.png")}
+                  className="w-[20px] h-[20px]"
+                />
+              ) : (
+                <Image
+                  source={require("@/assets/icons/arrow-right-dark.png")}
+                  className="w-[20px] h-[20px]"
+                />
+              )}
             </Pressable>
           </View>
           <FlatList
@@ -184,13 +192,19 @@ const Discover = () => {
               >
                 <Image source={item.imageSource} />
                 <View>
-                  <Text
-                    style={homeStyles.text}
-                    className="font-medium capitalize"
-                  >
-                    {item.name}
-                  </Text>
-                  <View className="flex flex-row items-center">
+                  <View className="flex flex-row items-center gap-1">
+                    <Text
+                      style={homeStyles.text}
+                      className="font-medium capitalize"
+                    >
+                      {item.name}
+                    </Text>
+                    <Image
+                      source={require("@/assets/icons/badge-check-green.png")}
+                    />
+                  </View>
+
+                  <View className="flex flex-row items-center gap-1">
                     <Image
                       source={require("@/assets/icons/star.png")}
                       className="size-[20px]"
@@ -216,10 +230,18 @@ const Discover = () => {
               className="flex-row items-center gap-2"
             >
               <Text style={homeStyles.text}>View More</Text>
-              <Image
-                source={require("@/assets/icons/arrow-right-dark.png")}
-                className="w-[20px] h-[20px]"
-              />
+
+              {isDarkMode ? (
+                <Image
+                  source={require("@/assets/icons/arrow-right-light.png")}
+                  className="w-[20px] h-[20px]"
+                />
+              ) : (
+                <Image
+                  source={require("@/assets/icons/arrow-right-dark.png")}
+                  className="w-[20px] h-[20px]"
+                />
+              )}
             </Pressable>
           </View>
           <FlatList
@@ -248,10 +270,17 @@ const Discover = () => {
               className="flex-row items-center gap-2"
             >
               <Text style={homeStyles.text}>View More</Text>
-              <Image
-                source={require("@/assets/icons/arrow-right-dark.png")}
-                className="w-[20px] h-[20px]"
-              />
+              {isDarkMode ? (
+                <Image
+                  source={require("@/assets/icons/arrow-right-light.png")}
+                  className="w-[20px] h-[20px]"
+                />
+              ) : (
+                <Image
+                  source={require("@/assets/icons/arrow-right-dark.png")}
+                  className="w-[20px] h-[20px]"
+                />
+              )}
             </Pressable>
           </View>
           <FlatList
@@ -279,10 +308,17 @@ const Discover = () => {
               className="flex-row items-center gap-2"
             >
               <Text style={homeStyles.text}>View More</Text>
-              <Image
-                source={require("@/assets/icons/arrow-right-dark.png")}
-                className="w-[20px] h-[20px]"
-              />
+              {isDarkMode ? (
+                <Image
+                  source={require("@/assets/icons/arrow-right-light.png")}
+                  className="w-[20px] h-[20px]"
+                />
+              ) : (
+                <Image
+                  source={require("@/assets/icons/arrow-right-dark.png")}
+                  className="w-[20px] h-[20px]"
+                />
+              )}
             </Pressable>
           </View>
           <FlatList

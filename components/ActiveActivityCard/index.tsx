@@ -43,7 +43,9 @@ const ActiveActivityCard = ({
           >
             {title}
           </Text>
-          <Text>{location}</Text>
+          <Text style={{ color: colors.slate[650], fontSize: RFValue(14) }}>
+            {location}
+          </Text>
         </View>
         <View>
           <AppButton

@@ -32,7 +32,9 @@ const ActiveActivity = () => {
             You have an inspection scheduled between 10AM - 12PM.
           </Text>
           <View className="flex flex-row items-center gap-2">
-            <Text className="pt-7">View schedule</Text>
+            <Text style={{ color: colors.slate[650] }} className="pt-7">
+              View schedule
+            </Text>
             {/* <Image
               source={require("@/assets/icons/arrow-right-up-outline-dark.png")}
               className="w-5 h-5"
@@ -55,7 +57,7 @@ const ActiveActivity = () => {
             image={
               isDarkMode
                 ? require("@/assets/icons/calender-white.png")
-                : require("@/assets/icons/Calendar.png")
+                : require("@/assets/icons/calendar.png")
             }
             location="Rumuewhera, Port Harcourt"
           />
@@ -94,7 +96,11 @@ const ActiveActivity = () => {
           buttonTitle="View"
           date="Due: 10th Aug, 2025"
           title="Atraz Palace Event Hall"
-          image={require("@/assets/icons/Lock.png")}
+          image={
+            isDarkMode
+              ? require("@/assets/icons/lock-light.png")
+              : require("@/assets/icons/Lock.png")
+          }
           location="GRA Phase II, Port Harcourt"
         />
       </View>
@@ -108,7 +114,11 @@ const ActiveActivity = () => {
         <ActiveActivityCard
           buttonTitle="Book"
           title="2 Bedroom in-suite apartment"
-          image={require("@/assets/icons/Lock.png")}
+          image={
+            isDarkMode
+              ? require("@/assets/icons/lock-light.png")
+              : require("@/assets/icons/Lock.png")
+          }
           location="GRA Phase II, Port Harcourt"
         />
       </View>

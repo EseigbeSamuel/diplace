@@ -80,7 +80,7 @@ export const categories = [
   { id: "3", icon: require("@/assets/icons/Offices.png"), name: "offices" },
   {
     id: "4",
-    icon: require("@/assets/icons/Event-center.png"),
+    icon: require("@/assets/icons/event-center.png"),
     name: "event center",
   },
 ];

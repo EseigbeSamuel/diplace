@@ -314,7 +314,7 @@ export default function OwnersHome() {
 
                 <View className="flex-row justify-center items-center gap-2">
                   <Text className="text-white text-3xl font-bold">
-                    {hidden ? "******" : "₦500,000.00"}
+                    {hidden ? "*********" : "₦500,000.00"}
                   </Text>
 
                   <TouchableOpacity onPress={() => setHidden(!hidden)}>

@@ -17,7 +17,7 @@ const HistoryCard = ({
   description: string;
   action: string;
 }) => {
-  const { colors } = useTheme();
+  const { colors, isDarkMode } = useTheme();
   const homeStyles = styles(colors);
   const renderBadge = () => {
     switch (badgeType) {
@@ -47,10 +47,17 @@ const HistoryCard = ({
         style={homeStyles.graybg}
         className="rounded-[999px] h-12 w-12 flex justify-center items-center p-3"
       >
-        <Image
-          source={require("@/assets/icons/history-light.png")}
-          className="w-6 h-6"
-        />
+        {isDarkMode ? (
+          <Image
+            source={require("@/assets/icons/history-light.png")}
+            className="w-6 h-6"
+          />
+        ) : (
+          <Image
+            source={require("@/assets/icons/history-dark.png")}
+            className="w-6 h-6"
+          />
+        )}
       </View>
       <View className="flex-1">
         <View className="flex flex-row items-center justify-between">
@@ -67,9 +74,13 @@ const HistoryCard = ({
           <View>{renderBadge()}</View>
         </View>
         <View>
-          <Text className="text-lg font-semibold">{title}</Text>
+          <Text style={homeStyles.title} className=" font-semibold">
+            {title}
+          </Text>
           <View className="">
-            <Text className="">{description}</Text>
+            <Text style={homeStyles.text} className="">
+              {description}
+            </Text>
           </View>
         </View>
       </View>
@@ -89,11 +100,17 @@ const styles = (colors: ColorScheme) =>
     title: {
       fontSize: RFValue(18),
       lineHeight: RFValue(24),
+      color: colors.slate[650],
     },
     subTitle: {
       fontSize: RFValue(14),
       lineHeight: RFValue(20),
       color: colors.slate[600],
+    },
+    text: {
+      fontSize: RFValue(14),
+      lineHeight: RFValue(20),
+      color: colors.slate[650],
     },
     graybg: {
       backgroundColor: colors.slate[150],
