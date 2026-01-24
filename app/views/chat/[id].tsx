@@ -374,7 +374,10 @@ const ChatPage = () => {
         </View>
 
         <View style={styles.headerActions}>
-          <TouchableOpacity style={styles.headerButton}>
+          <TouchableOpacity
+            style={styles.headerButton}
+            onPress={() => router.push("/views/call/incomingCall")}
+          >
             {isDarkMode ? (
               <Image
                 source={require("@/assets/icons/phone-keypad-light.png")}
