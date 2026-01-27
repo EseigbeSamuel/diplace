@@ -29,10 +29,22 @@ const OutgoingCall = () => {
         <View className="flex-col flex justify-end ">
           <View
             style={custom.container}
-            className="py-2 px-4 rounded-3xl flex-row flex items-center "
+            className="py-2 px-4 gap-3 rounded-3xl flex-row flex items-center "
           >
             <View className="rounded-full p-2 ">
               <Image source={require("@/assets/icons/chat.png")} />
+            </View>
+            <View
+              style={{ backgroundColor: colors.success[300] }}
+              className="rounded-full p-2  "
+            >
+              <Image source={require("@/assets/icons/calling.png")} />
+            </View>
+            <View className="rounded-full p-2 ">
+              <Image
+                style={{ backgroundColor: colors.warning[300] }}
+                source={require("@/assets/icons/calling.png")}
+              />{" "}
             </View>
           </View>
         </View>

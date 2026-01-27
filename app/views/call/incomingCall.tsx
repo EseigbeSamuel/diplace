@@ -11,7 +11,7 @@ const IncomingCall = () => {
   const custom = styles(colors);
   return (
     <SafeAreaViewContainer>
-      <SectionHeader title="Incoming Call" />
+      <SectionHeader title="Calling ibe" />
       <View style={custom.container2} className="h-full w-full flex flex-col ">
         <View className="flex flex-col h-full w-full justify-center items-center">
           <View className="rounded-full size-[200px] ">
@@ -29,10 +29,22 @@ const IncomingCall = () => {
         <View className="flex-col flex justify-end ">
           <View
             style={custom.container}
-            className="py-2 px-4 rounded-3xl flex-row flex items-center "
+            className="py-2 px-4 gap-3 rounded-3xl flex-row flex items-center "
           >
             <View className="rounded-full p-2 ">
               <Image source={require("@/assets/icons/chat.png")} />
+            </View>
+            <View
+              style={{ backgroundColor: colors.success[300] }}
+              className="rounded-full p-2  "
+            >
+              <Image source={require("@/assets/icons/calling.png")} />
+            </View>
+            <View className="rounded-full p-2 ">
+              <Image
+                style={{ backgroundColor: colors.warning[300] }}
+                source={require("@/assets/icons/calling.png")}
+              />{" "}
             </View>
           </View>
         </View>
