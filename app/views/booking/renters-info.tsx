@@ -1,0 +1,308 @@
+import React, { useState } from "react";
+import {
+  Image,
+  Pressable,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TextInput,
+  View,
+  KeyboardAvoidingView,
+  Platform,
+} from "react-native";
+import { RFValue } from "react-native-responsive-fontsize";
+import SafeAreaViewContainer from "@/components/safeareaview";
+import { useTheme } from "@/contexts/themeContext";
+import { ColorScheme } from "@/utils";
+import { useRouter } from "expo-router";
+import AppButton from "@/components/button";
+import TextField from "@/components/textfield";
+
+const RentersInformation = () => {
+  const router = useRouter();
+  const { colors } = useTheme();
+  const styles = getStyles(colors);
+
+  const [fullName, setFullName] = useState("");
+  const [occupation, setOccupation] = useState("");
+  const [email, setEmail] = useState("");
+  const [phoneNumber, setPhoneNumber] = useState("");
+  const [countryCode, setCountryCode] = useState("+234");
+
+  const isFormValid = fullName && occupation && email && phoneNumber;
+
+  const handleContinue = () => {
+    if (isFormValid) {
+      router.push({
+        pathname: "/views/booking/event-details",
+        params: {
+          fullName,
+          occupation,
+          email,
+          phoneNumber: `${countryCode} ${phoneNumber}`,
+        },
+      });
+    }
+  };
+
+  return (
+    <SafeAreaViewContainer>
+      <KeyboardAvoidingView
+        behavior={Platform.OS === "ios" ? "padding" : "height"}
+        style={styles.flex}
+      >
+        {/* Header */}
+        <View style={styles.header}>
+          <Pressable onPress={() => router.back()}>
+            <Image
+              source={require("@/assets/icons/arrow-left-light.png")}
+              style={styles.backIcon}
+            />
+          </Pressable>
+          <Text style={styles.headerTitle}>Tenant's information</Text>
+          <Text style={styles.stepIndicator}>1/4</Text>
+        </View>
+
+        <ScrollView
+          showsVerticalScrollIndicator={false}
+          contentContainerStyle={styles.scrollContent}
+        >
+          <View style={styles.container}>
+            {/* Title Section */}
+            <View style={styles.titleSection}>
+              <Text style={styles.title}>Tenant's Information</Text>
+              <Text style={styles.subtitle}>
+                Let us know who is booking this space.
+              </Text>
+            </View>
+
+            {/* Personal Information Section */}
+            <View style={styles.section}>
+              <Text style={styles.sectionLabel}>Personal Information</Text>
+
+              {/* Full Name / Organization Input */}
+
+              <TextField
+                label="Full Name / Organization"
+                value={fullName}
+                onChange={(text) => setFullName(text.toString())}
+                placeholder="Rhema Generation Inc."
+                icon={require("@/assets/icons/Profile - Iconly Pro.png")}
+              />
+              <TextField
+                label="Occupation"
+                value={occupation}
+                onChange={(text) => setOccupation(text.toString())}
+                placeholder="Event Planner"
+                icon={require("@/assets/icons/Work - Iconly Pro.png")}
+              />
+            </View>
+
+            {/* Contact Details Section */}
+            <View style={styles.section}>
+              <Text style={styles.sectionLabel}>Contact Details</Text>
+
+              <TextField
+                label="Email"
+                value={email}
+                onChange={(text) => setEmail(text.toString())}
+                placeholder="info@rgworld.com"
+                icon={require("@/assets/icons/mail-outline-light.png")}
+              />
+
+              {/* Phone Number Input */}
+              <View style={styles.inputContainer}>
+                <Image
+                  source={require("@/assets/icons/calling.png")}
+                  style={styles.inputIcon}
+                />
+                <View style={styles.phoneInputWrapper}>
+                  <View style={styles.countryCodeContainer}>
+                    <Image
+                      source={require("@/assets/icons/nigeria.png")}
+                      style={styles.flagIcon}
+                    />
+                    <Text style={styles.countryCode}>{countryCode}</Text>
+                    <Image
+                      source={require("@/assets/icons/chevrondown-bold.png")}
+                      // style={styles.chevronIcon}
+                    />
+                  </View>
+                  <View style={styles.phoneDivider} />
+                  <TextInput
+                    style={styles.phoneInput}
+                    value={phoneNumber}
+                    onChangeText={setPhoneNumber}
+                    placeholder="810-293-4980"
+                    placeholderTextColor={colors.slate[450]}
+                    keyboardType="phone-pad"
+                  />
+                </View>
+              </View>
+            </View>
+          </View>
+        </ScrollView>
+
+        {/* Continue Button */}
+        <View className="">
+          <AppButton
+            title="Continue"
+            onPress={handleContinue}
+            disabled={!isFormValid}
+            fullwidth
+          />
+        </View>
+      </KeyboardAvoidingView>
+    </SafeAreaViewContainer>
+  );
+};
+
+export default RentersInformation;
+
+const getStyles = (colors: ColorScheme) =>
+  StyleSheet.create({
+    flex: {
+      flex: 1,
+      paddingBottom: RFValue(16),
+    },
+    header: {
+      flexDirection: "row",
+      alignItems: "center",
+      justifyContent: "space-between",
+      paddingVertical: RFValue(16),
+    },
+    backIcon: {
+      width: RFValue(20),
+      height: RFValue(20),
+      tintColor: colors.slate[650],
+    },
+    headerTitle: {
+      fontSize: RFValue(16),
+      fontWeight: "600",
+      color: colors.slate[650],
+      flex: 1,
+      textAlign: "center",
+    },
+    stepIndicator: {
+      fontSize: RFValue(14),
+      color: colors.slate[500],
+      fontWeight: "500",
+    },
+    scrollContent: {
+      flexGrow: 1,
+    },
+    container: {
+      flex: 1,
+    },
+    titleSection: {
+      marginTop: RFValue(16),
+      marginBottom: RFValue(32),
+    },
+    title: {
+      fontSize: RFValue(22),
+      fontWeight: "700",
+      color: colors.slate[650],
+      marginBottom: RFValue(8),
+    },
+    subtitle: {
+      fontSize: RFValue(14),
+      color: colors.slate[500],
+      lineHeight: RFValue(20),
+    },
+    section: {
+      marginBottom: RFValue(32),
+    },
+    sectionLabel: {
+      fontSize: RFValue(15),
+      fontWeight: "600",
+      color: colors.slate[650],
+      marginBottom: RFValue(16),
+    },
+    inputContainer: {
+      flexDirection: "row",
+      alignItems: "flex-start",
+      backgroundColor: colors.slate[150],
+      borderRadius: RFValue(12),
+      paddingHorizontal: RFValue(16),
+      paddingVertical: RFValue(16),
+      marginBottom: RFValue(16),
+      borderWidth: 1,
+      borderColor: colors.slate[300],
+    },
+    inputIcon: {
+      width: RFValue(20),
+      height: RFValue(20),
+      tintColor: colors.slate[550],
+      marginRight: RFValue(12),
+    },
+    inputWrapper: {
+      flex: 1,
+    },
+    inputLabel: {
+      fontSize: RFValue(12),
+      color: colors.slate[500],
+      marginBottom: RFValue(6),
+    },
+    input: {
+      fontSize: RFValue(15),
+      color: colors.slate[650],
+      padding: 0,
+    },
+    phoneInputWrapper: {
+      flex: 1,
+      flexDirection: "row",
+      alignItems: "center",
+    },
+    countryCodeContainer: {
+      flexDirection: "row",
+      alignItems: "center",
+    },
+    flagIcon: {
+      width: RFValue(20),
+      height: RFValue(20),
+      marginRight: RFValue(6),
+    },
+    countryCode: {
+      fontSize: RFValue(15),
+      color: colors.slate[650],
+      fontWeight: "500",
+      marginRight: RFValue(4),
+    },
+    chevronIcon: {
+      width: RFValue(12),
+      height: RFValue(12),
+      tintColor: colors.slate[500],
+    },
+    phoneDivider: {
+      width: 1,
+      height: RFValue(20),
+      backgroundColor: colors.slate[300],
+      marginHorizontal: RFValue(12),
+    },
+    phoneInput: {
+      flex: 1,
+      fontSize: RFValue(15),
+      color: colors.slate[650],
+      padding: 0,
+    },
+    footer: {
+      paddingHorizontal: RFValue(20),
+      paddingVertical: RFValue(16),
+      borderTopWidth: 1,
+      borderTopColor: colors.slate[300],
+    },
+    continueButton: {
+      backgroundColor: colors.slate[650],
+      borderRadius: RFValue(12),
+      paddingVertical: RFValue(16),
+      alignItems: "center",
+      justifyContent: "center",
+    },
+    continueButtonDisabled: {
+      backgroundColor: colors.slate[300],
+    },
+
+    continueButtonTextDisabled: {
+      color: colors.slate[500],
+    },
+  });
