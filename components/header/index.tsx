@@ -29,13 +29,15 @@ export const AppHeader = (props: HeaderProps) => {
           style={{ backgroundColor: colors.slate[150] }}
           className="h-[48px] w-[48px] rounded-full relative justify-center items-center"
         >
-          <Image
-            source={
-              isDarkMode
-                ? require("@/assets/icons/notification-light.png")
-                : require("@/assets/icons/notification.png")
-            }
-          />
+          <Pressable onPress={() => router.push("/views/notifications")}>
+            <Image
+              source={
+                isDarkMode
+                  ? require("@/assets/icons/notification-light.png")
+                  : require("@/assets/icons/notification.png")
+              }
+            />
+          </Pressable>
           <View className="absolute top-0 right-0 items-center justify-center w-[18px] h-[18px] font-semibold bg-red-500 rounded-full">
             <Text className="text-xs text-white">2</Text>
           </View>

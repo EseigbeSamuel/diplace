@@ -1,22 +1,22 @@
-import React, { useState, useRef, useEffect } from "react";
+import { mockMessages } from "@/constants/mockMessages";
+import { useTheme } from "@/contexts/themeContext";
+import { ColorScheme } from "@/utils";
+import { useRouter } from "expo-router";
+import React, { useEffect, useRef, useState } from "react";
 import {
-  View,
-  Text,
+  Dimensions,
   FlatList,
-  TouchableOpacity,
-  TextInput,
-  StyleSheet,
-  SafeAreaView,
-  StatusBar,
   Image,
   KeyboardAvoidingView,
   Platform,
-  Dimensions,
+  SafeAreaView,
+  StatusBar,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
 } from "react-native";
-import { useTheme } from "@/contexts/themeContext";
-import { ColorScheme } from "@/utils";
-import { mockMessages } from "@/constants/mockMessages";
-import { useRouter } from "expo-router";
 
 const { width: screenWidth } = Dimensions.get("window");
 
@@ -249,7 +249,7 @@ const MessageItem: React.FC<MessageItemProps> = ({
 };
 
 const ChatPage = () => {
-  const { colors } = useTheme();
+  const { colors, isDarkMode } = useTheme();
   const [messages, setMessages] = useState<Message[]>(mockMessages);
   const [inputText, setInputText] = useState("");
   const [replyTo, setReplyTo] = useState<string | null>(null);
@@ -334,10 +334,17 @@ const ChatPage = () => {
           style={styles.backButton}
           onPress={() => router.back()}
         >
-          <Image
-            source={require("@/assets/icons/arrow-left-dark.png")}
-            style={{ width: 25, height: 20 }}
-          />
+          {isDarkMode ? (
+            <Image
+              source={require("@/assets/icons/arrow-left-light.png")}
+              style={{ width: 25, height: 20 }}
+            />
+          ) : (
+            <Image
+              source={require("@/assets/icons/arrow-left-dark.png")}
+              style={{ width: 25, height: 20 }}
+            />
+          )}
         </TouchableOpacity>
 
         <View style={styles.contactInfo}>
@@ -367,11 +374,21 @@ const ChatPage = () => {
         </View>
 
         <View style={styles.headerActions}>
-          <TouchableOpacity style={styles.headerButton}>
-            <Image
-              source={require("@/assets/icons/phone-keypad.png")}
-              style={{ height: 25, width: 25 }}
-            />
+          <TouchableOpacity
+            style={styles.headerButton}
+            onPress={() => router.push("/views/call/incomingCall")}
+          >
+            {isDarkMode ? (
+              <Image
+                source={require("@/assets/icons/phone-keypad-light.png")}
+                style={{ height: 25, width: 25 }}
+              />
+            ) : (
+              <Image
+                source={require("@/assets/icons/phone-keypad.png")}
+                style={{ height: 25, width: 25 }}
+              />
+            )}
           </TouchableOpacity>
           <TouchableOpacity style={styles.headerButton}>
             <Text
@@ -459,10 +476,17 @@ const ChatPage = () => {
             onPress={sendMessage}
             disabled={inputText.trim().length === 0}
           >
-            <Image
-              source={require("@/assets/icons/Send - Iconly Pro.png")}
-              style={{ width: 25, height: 25 }}
-            />
+            {isDarkMode ? (
+              <Image
+                source={require("@/assets/icons/send-light.png")}
+                style={{ width: 25, height: 25 }}
+              />
+            ) : (
+              <Image
+                source={require("@/assets/icons/send-dark.png")}
+                style={{ width: 25, height: 25 }}
+              />
+            )}
           </TouchableOpacity>
         </View>
       </KeyboardAvoidingView>
