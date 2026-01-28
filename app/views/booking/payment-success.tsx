@@ -13,7 +13,6 @@ import { useTheme } from "@/contexts/themeContext";
 import { ColorScheme } from "@/utils";
 import { useRouter, useLocalSearchParams } from "expo-router";
 import AppButton from "@/components/button";
-import SectionHeader from "@/components/sectionheader";
 
 const PaymentSuccessScreen = () => {
   const router = useRouter();
