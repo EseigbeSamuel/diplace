@@ -7,6 +7,7 @@
     "icon": "./assets/images/icon.png",
     "scheme": "mobile",
     "userInterfaceStyle": "automatic",
+    "newArchEnabled": true,
     "ios": {
       "supportsTablet": true
     },
@@ -36,15 +37,7 @@
       ],
       "expo-font",
       "expo-web-browser",
-      "expo-maps",
-      [
-        "expo-build-properties",
-        {
-          "android": {
-            "newArchEnabled": false
-          }
-        }
-      ]
+      "expo-maps"
     ],
     "experiments": {
       "typedRoutes": true
