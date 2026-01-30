@@ -1,11 +1,11 @@
 import AppButton from "@/components/button";
-import CarouselCard from "@/components/carousel-card";
+// import CarouselCard from "@/components/carousel-card";
 import SafeAreaViewContainer from "@/components/safeareaview";
 import { useTheme } from "@/contexts/themeContext";
 import { useRouter } from "expo-router";
 import React, { useRef, useState } from "react";
 import { ImageSourcePropType, Text, View } from "react-native";
-import Carousel from "react-native-reanimated-carousel";
+// import Carousel from "react-native-reanimated-carousel";
 import { RFValue } from "react-native-responsive-fontsize";
 
 export interface IOnboardingSplash {
@@ -55,7 +55,7 @@ export default function GetStarted() {
         DiPlace
       </Text>
 
-      <Carousel
+      {/* <Carousel
         ref={carouselRef}
         width={RFValue(250)}
         height={RFValue(330)}
@@ -75,7 +75,7 @@ export default function GetStarted() {
             />
           );
         }}
-      />
+      /> */}
 
       <View className="flex-row justify-center mt-3">
         {OnboardingSplash.map((_, i) => (

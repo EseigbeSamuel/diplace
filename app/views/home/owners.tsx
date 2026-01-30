@@ -20,7 +20,7 @@ import {
   View,
 } from "react-native";
 import { useSharedValue } from "react-native-reanimated";
-import Carousel from "react-native-reanimated-carousel";
+// import Carousel from "react-native-reanimated-carousel";
 import { RFValue } from "react-native-responsive-fontsize";
 import AddSpaceBottomSheet from "../spaces/components/AddSpacesBottomContainer";
 
@@ -222,7 +222,7 @@ export default function OwnersHome() {
 
             {/* Promo Slider */}
             <View className="w-full">
-              <Carousel
+              {/* <Carousel
                 loop
                 width={CARD_WIDTH}
                 height={130}
@@ -269,7 +269,7 @@ export default function OwnersHome() {
                     </View>
                   </View>
                 )}
-              />
+              /> */}
 
               {/* Pagination */}
               <View className="flex-row justify-center items-center mt-2">

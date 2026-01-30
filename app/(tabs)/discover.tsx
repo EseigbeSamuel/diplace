@@ -20,7 +20,7 @@ import {
   View,
 } from "react-native";
 import { useSharedValue } from "react-native-reanimated";
-import Carousel from "react-native-reanimated-carousel";
+// import Carousel from "react-native-reanimated-carousel";
 import { RFValue } from "react-native-responsive-fontsize";
 
 const Discover = () => {
@@ -55,12 +55,12 @@ const Discover = () => {
                   item.name === "apartment"
                     ? "bg-blue-50 border-blue-500"
                     : item.name === "shops"
-                      ? "bg-amber-50 border-amber-500"
-                      : item.name === "offices"
-                        ? "bg-green-50 border-green-500"
-                        : item.name === "event center"
-                          ? "bg-pink-50 border-pink-500"
-                          : "bg-gray-50 border-gray-300"
+                    ? "bg-amber-50 border-amber-500"
+                    : item.name === "offices"
+                    ? "bg-green-50 border-green-500"
+                    : item.name === "event center"
+                    ? "bg-pink-50 border-pink-500"
+                    : "bg-gray-50 border-gray-300"
                 }`}
               >
                 <Image className="size-[28px]" source={item.icon} />
@@ -75,7 +75,7 @@ const Discover = () => {
           <Text style={homeStyles.title} className="font-semibold">
             Neighborhoods
           </Text>
-          <View className="w-full">
+          {/* <View className="w-full">
             <Carousel
               loop
               width={CARD_WIDTH}
@@ -127,7 +127,7 @@ const Discover = () => {
               )}
             />
 
-            {/* Pagination */}
+            
             <View className="flex-row justify-center items-center mt-2">
               {slider.map((_, index) => {
                 const isActive = activeIndex === index;
@@ -154,7 +154,7 @@ const Discover = () => {
                 );
               })}
             </View>
-          </View>
+          </View> */}
         </View>
 
         <View className="flex flex-col gap-3 my-5">
