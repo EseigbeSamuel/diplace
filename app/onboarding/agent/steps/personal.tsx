@@ -17,6 +17,8 @@ import AppButton from "@/components/button";
 import SafeAreaViewContainer from "@/components/safeareaview";
 import { useTheme } from "@/contexts/themeContext";
 import { ColorScheme } from "@/utils";
+import TextField from "@/components/textfield";
+import { SimpleSelector } from "@/components/selector";
 
 type PersonalDataProps = {
   onNext: () => void;
@@ -191,41 +193,22 @@ const PersonalDataStep = ({ onNext }: PersonalDataProps) => {
               </View>
 
               {/* City Selector */}
-              <View style={Styles.inputContainer}>
-                {selectedCity && <Text style={Styles.inputLabel}>City</Text>}
-                <TouchableOpacity
-                  style={Styles.selectorButton}
-                  onPress={() => setShowCityModal(true)}
-                >
-                  <Text
-                    style={[
-                      Styles.selectorText,
-                      !selectedCity && Styles.selectorPlaceholder,
-                    ]}
-                  >
-                    {selectedCity || "City"}
-                  </Text>
-                  <Image
-                    source={require("@/assets/icons/chevron-right.png")}
-                    resizeMode="contain"
-                  />
-                </TouchableOpacity>
-              </View>
+
+              <TextField
+                label="City"
+                value={selectedCity}
+                onChange={(text) => setSelectedCity(text.toString())}
+                type="dropdown"
+                onDropdownPress={() => setShowCityModal(true)}
+              />
 
               {/* Address Input */}
-              <View style={Styles.inputContainer}>
-                <Text style={Styles.inputLabel}>Address</Text>
-                <TextInput
-                  style={[Styles.textInput, Styles.addressInput]}
-                  placeholder="Enter your address"
-                  placeholderTextColor={colors.slate[400]}
-                  value={address}
-                  onChangeText={setAddress}
-                  multiline
-                  numberOfLines={2}
-                  textAlignVertical="top"
-                />
-              </View>
+
+              <TextField
+                label="Address"
+                value={address}
+                onChange={(text) => setAddress(text.toString())}
+              />
             </View>
           </View>
 
@@ -264,25 +247,12 @@ const PersonalDataStep = ({ onNext }: PersonalDataProps) => {
 
             <View style={Styles.cityOptions}>
               {cities.map((city) => (
-                <TouchableOpacity
+                <SimpleSelector
+                  isChecked={selectedCity === city}
+                  onChange={() => handleSelectCity(city)}
+                  title={city}
                   key={city}
-                  style={Styles.cityOption}
-                  onPress={() => handleSelectCity(city)}
-                >
-                  <View style={Styles.radioContainer}>
-                    <View
-                      style={[
-                        Styles.radioOuter,
-                        selectedCity === city && Styles.radioOuterSelected,
-                      ]}
-                    >
-                      {selectedCity === city && (
-                        <View style={Styles.radioInner} />
-                      )}
-                    </View>
-                  </View>
-                  <Text style={Styles.cityOptionText}>{city}</Text>
-                </TouchableOpacity>
+                />
               ))}
             </View>
           </TouchableOpacity>
@@ -315,6 +285,7 @@ const styles = (colors: ColorScheme) =>
     userIcon: {
       width: RFValue(60),
       height: RFValue(60),
+      tintColor: colors.slate[650],
     },
     textContainer: {
       gap: RFValue(8),
@@ -450,6 +421,7 @@ const styles = (colors: ColorScheme) =>
       fontWeight: "600",
       color: colors.slate[650],
       marginBottom: RFValue(24),
+      textAlign: "center",
     },
     cityOptions: {
       gap: RFValue(16),

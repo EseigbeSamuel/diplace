@@ -1,7 +1,7 @@
 {
   "expo": {
     "name": "Di Place",
-    "slug": "di-place",
+    "slug": "diplace",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
@@ -45,8 +45,9 @@
     "extra": {
       "router": {},
       "eas": {
-        "projectId": "e5158fd1-8cd6-4d40-bbee-623efd863c1c"
+        "projectId": "7ec07d56-2561-4e0a-add5-51e27d39afb7"
       }
-    }
+    },
+    "owner": "toniaroyce"
   }
 }

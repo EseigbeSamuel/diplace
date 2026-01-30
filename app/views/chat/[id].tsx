@@ -1,3 +1,6 @@
+import AppButton from "@/components/button";
+import SafeAreaViewContainer from "@/components/safeareaview";
+import { SimpleSelector } from "@/components/selector";
 import { mockMessages } from "@/constants/mockMessages";
 import { useTheme } from "@/contexts/themeContext";
 import { ColorScheme } from "@/utils";
@@ -9,6 +12,7 @@ import {
   Image,
   KeyboardAvoidingView,
   Platform,
+  Pressable,
   SafeAreaView,
   StatusBar,
   StyleSheet,
@@ -16,6 +20,7 @@ import {
   TextInput,
   TouchableOpacity,
   View,
+  Modal,
 } from "react-native";
 
 const { width: screenWidth } = Dimensions.get("window");
@@ -43,6 +48,17 @@ const contactInfo = {
   avatar: "https://randomuser.me/api/portraits/men/1.jpg",
   isVerified: true,
 };
+
+// Report reasons
+const reportReasons = [
+  "Was rude and unprofessional",
+  "Unresponsive & poor communication",
+  "Didn't show up for inspection",
+  "Scam & suspicious behaviour",
+  "Fraudulent activity & extra charges",
+  "Gave out space already to someone",
+  "Collected payment outside DiPlace",
+];
 
 interface MessageItemProps {
   item: Message;
@@ -255,6 +271,18 @@ const ChatPage = () => {
   const [replyTo, setReplyTo] = useState<string | null>(null);
   const flatListRef = useRef<FlatList>(null);
 
+  // Menu states
+  const [showMenu, setShowMenu] = useState(false);
+  const [showReviewModal, setShowReviewModal] = useState(false);
+  const [showReportModal, setShowReportModal] = useState(false);
+
+  // Review states
+  const [rating, setRating] = useState(0);
+  const [reviewComment, setReviewComment] = useState("");
+
+  // Report state
+  const [selectedReport, setSelectedReport] = useState<string | null>(null);
+
   const router = useRouter();
 
   // Auto scroll to bottom when new messages are added
@@ -310,14 +338,46 @@ const ChatPage = () => {
     }, 1500);
   };
 
+  const handleSubmitReview = () => {
+    // Handle review submission
+    console.log("Review submitted:", { rating, reviewComment });
+    setShowReviewModal(false);
+    setRating(0);
+    setReviewComment("");
+  };
+
+  const handleSubmitReport = () => {
+    // Handle report submission
+    console.log("Report submitted:", selectedReport);
+    setShowReportModal(false);
+    setSelectedReport(null);
+  };
+
   const renderMessage = ({ item }: { item: Message }) => (
     <MessageItem item={item} colors={colors} messages={messages} />
   );
 
+  const renderStars = (currentRating: number) => {
+    return (
+      <View style={styles.starsContainer}>
+        {[1, 2, 3, 4, 5].map((star) => (
+          <TouchableOpacity key={star} onPress={() => setRating(star)}>
+            <Text
+              style={[
+                styles.starIcon,
+                star > currentRating ? { color: colors.slate[600] } : {},
+              ]}
+            >
+              {star <= currentRating ? "⭐" : "☆"}
+            </Text>
+          </TouchableOpacity>
+        ))}
+      </View>
+    );
+  };
+
   return (
-    <SafeAreaView
-      style={[styles.container, { backgroundColor: colors.background }]}
-    >
+    <SafeAreaViewContainer>
       <StatusBar backgroundColor={colors.background} barStyle="dark-content" />
 
       {/* Header */}
@@ -380,17 +440,20 @@ const ChatPage = () => {
           >
             {isDarkMode ? (
               <Image
-                source={require("@/assets/icons/phone-keypad-light.png")}
-                style={{ height: 25, width: 25 }}
+                source={require("@/assets/icons/calling.png")}
+                style={{ height: 25, width: 25, tintColor: colors.slate[650] }}
               />
             ) : (
               <Image
-                source={require("@/assets/icons/phone-keypad.png")}
-                style={{ height: 25, width: 25 }}
+                source={require("@/assets/icons/calling.png")}
+                style={{ height: 25, width: 25, tintColor: colors.slate[650] }}
               />
             )}
           </TouchableOpacity>
-          <TouchableOpacity style={styles.headerButton}>
+          <TouchableOpacity
+            style={styles.headerButton}
+            onPress={() => setShowMenu(true)}
+          >
             <Text
               style={[styles.headerButtonIcon, { color: colors.slate[650] }]}
             >
@@ -490,7 +553,181 @@ const ChatPage = () => {
           </TouchableOpacity>
         </View>
       </KeyboardAvoidingView>
-    </SafeAreaView>
+
+      {/* Three Dots Menu Modal */}
+      <Modal
+        visible={showMenu}
+        transparent
+        animationType="fade"
+        onRequestClose={() => setShowMenu(false)}
+      >
+        <Pressable
+          style={styles.menuOverlay}
+          onPress={() => setShowMenu(false)}
+        >
+          <View
+            style={[
+              styles.menuContainer,
+              { backgroundColor: colors.background },
+            ]}
+          >
+            <TouchableOpacity
+              style={styles.menuItem}
+              onPress={() => {
+                setShowMenu(false);
+                // Handle search
+              }}
+            >
+              <Image
+                source={require("@/assets/icons/search.png")}
+                style={[styles.menuIcon, { tintColor: colors.slate[650] }]}
+              />
+              <Text style={[styles.menuText, { color: colors.slate[650] }]}>
+                Search
+              </Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              style={styles.menuItem}
+              onPress={() => {
+                setShowMenu(false);
+                setShowReviewModal(true);
+              }}
+            >
+              <Image
+                source={require("@/assets/icons/Star - Iconly Pro.png")}
+                style={[styles.menuIcon, { tintColor: colors.slate[650] }]}
+              />
+              <Text style={[styles.menuText, { color: colors.slate[650] }]}>
+                Give a review
+              </Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              style={styles.menuItem}
+              onPress={() => {
+                setShowMenu(false);
+                setShowReportModal(true);
+              }}
+            >
+              <Image
+                source={require("@/assets/icons/flag.png")}
+                style={[styles.menuIcon, { tintColor: colors.slate[650] }]}
+              />
+              <Text style={[styles.menuText, { color: colors.slate[650] }]}>
+                Report this lister
+              </Text>
+            </TouchableOpacity>
+          </View>
+        </Pressable>
+      </Modal>
+
+      {/* Give Review Modal */}
+      <Modal
+        visible={showReviewModal}
+        transparent
+        animationType="slide"
+        onRequestClose={() => setShowReviewModal(false)}
+      >
+        <Pressable
+          style={styles.modalOverlay}
+          onPress={() => setShowReviewModal(false)}
+        >
+          <Pressable
+            style={[
+              styles.modalContent,
+              { backgroundColor: colors.background },
+            ]}
+            onPress={(e) => e.stopPropagation()}
+          >
+            <View style={styles.modalHandle} />
+
+            <Text style={[styles.modalTitle, { color: colors.slate[650] }]}>
+              Give review
+            </Text>
+            <Text style={[styles.modalSubtitle, { color: colors.slate[500] }]}>
+              Please provide feedback about your experience and rate the person
+              who listed this property.
+            </Text>
+
+            {/* Star Rating */}
+            {renderStars(rating)}
+
+            {/* Comment Input */}
+            <View style={styles.commentSection}>
+              <Text style={[styles.commentLabel, { color: colors.slate[650] }]}>
+                Add Comment
+              </Text>
+              <TextInput
+                style={[
+                  styles.commentInput,
+                  {
+                    backgroundColor: colors.slate[150],
+                    borderColor: colors.slate[300],
+                    color: colors.slate[650],
+                  },
+                ]}
+                placeholder="Give your feedback..."
+                placeholderTextColor={colors.slate[450]}
+                multiline
+                numberOfLines={6}
+                textAlignVertical="top"
+                value={reviewComment}
+                onChangeText={setReviewComment}
+              />
+            </View>
+
+            <AppButton title="Submit" onPress={handleSubmitReview} />
+          </Pressable>
+        </Pressable>
+      </Modal>
+
+      {/* Report Modal */}
+      <Modal
+        visible={showReportModal}
+        transparent
+        animationType="slide"
+        onRequestClose={() => setShowReportModal(false)}
+      >
+        <Pressable
+          style={styles.modalOverlay}
+          onPress={() => setShowReportModal(false)}
+        >
+          <Pressable
+            style={[
+              styles.modalContent,
+              { backgroundColor: colors.background },
+            ]}
+            onPress={(e) => e.stopPropagation()}
+          >
+            <View style={styles.modalHandle} />
+
+            <Text style={[styles.modalTitle, { color: colors.slate[650] }]}>
+              Report the lister
+            </Text>
+            <Text style={[styles.modalSubtitle, { color: colors.slate[500] }]}>
+              Let us know what the case is with the agent/space manager.
+            </Text>
+
+            {/* Report Reasons */}
+            <View style={styles.reportList}>
+              {reportReasons.map((reason, index) => (
+                <SimpleSelector
+                  title={reason}
+                  isChecked={selectedReport === reason}
+                  onChange={() => setSelectedReport(reason)}
+                  key={index}
+                />
+              ))}
+            </View>
+
+            {/* Submit Button */}
+
+            <AppButton title="Submit" onPress={handleSubmitReport} />
+          </Pressable>
+        </Pressable>
+      </Modal>
+    </SafeAreaViewContainer>
   );
 };
 
@@ -501,7 +738,6 @@ const styles = StyleSheet.create({
   header: {
     flexDirection: "row",
     alignItems: "center",
-    paddingHorizontal: 16,
     paddingVertical: 12,
     borderBottomWidth: 1,
   },
@@ -554,6 +790,7 @@ const styles = StyleSheet.create({
   headerActions: {
     flexDirection: "row",
     gap: 8,
+    alignItems: "center",
   },
   headerButton: {
     padding: 8,
@@ -577,7 +814,6 @@ const styles = StyleSheet.create({
   },
   propertyMessageContainer: {
     alignItems: "flex-start",
-    marginHorizontal: 16,
     marginVertical: 8,
   },
   propertyContainer: {
@@ -638,9 +874,7 @@ const styles = StyleSheet.create({
   viewDetailsButton: {
     borderWidth: 1,
   },
-  rentButton: {
-    // Background color set inline
-  },
+  rentButton: {},
   propertyButtonText: {
     fontSize: 13,
     fontWeight: "500",
@@ -651,7 +885,6 @@ const styles = StyleSheet.create({
     marginLeft: 8,
   },
   messageContainer: {
-    marginHorizontal: 16,
     marginVertical: 3,
   },
   userMessageContainer: {
@@ -726,7 +959,6 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
   },
   inputContainer: {
-    paddingHorizontal: 16,
     paddingVertical: 12,
     borderTopWidth: 1,
   },
@@ -755,6 +987,136 @@ const styles = StyleSheet.create({
     color: "white",
     fontSize: 16,
     fontWeight: "600",
+  },
+  // Menu Styles
+  menuOverlay: {
+    flex: 1,
+    backgroundColor: "rgba(0, 0, 0, 0.5)",
+    justifyContent: "flex-start",
+    alignItems: "flex-end",
+  },
+  menuContainer: {
+    marginTop: 60,
+    marginRight: 16,
+    borderRadius: 12,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.25,
+    shadowRadius: 8,
+    elevation: 5,
+    minWidth: 200,
+  },
+  menuItem: {
+    flexDirection: "row",
+    alignItems: "center",
+    paddingVertical: 14,
+    paddingHorizontal: 16,
+    gap: 12,
+  },
+  menuIcon: {
+    width: 20,
+    height: 20,
+  },
+  menuText: {
+    fontSize: 15,
+    fontWeight: "500",
+  },
+  // Modal Styles
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: "rgba(0, 0, 0, 0.5)",
+    justifyContent: "flex-end",
+  },
+  modalContent: {
+    borderTopLeftRadius: 24,
+    borderTopRightRadius: 24,
+    paddingHorizontal: 20,
+    paddingBottom: 32,
+    maxHeight: "85%",
+  },
+  modalHandle: {
+    width: 40,
+    height: 4,
+    backgroundColor: "#ccc",
+    borderRadius: 2,
+    alignSelf: "center",
+    marginVertical: 12,
+  },
+  modalTitle: {
+    fontSize: 20,
+    fontWeight: "700",
+    textAlign: "center",
+    marginBottom: 8,
+  },
+  modalSubtitle: {
+    fontSize: 13,
+    textAlign: "center",
+    lineHeight: 18,
+    marginBottom: 24,
+  },
+  // Review Modal
+  starsContainer: {
+    flexDirection: "row",
+    justifyContent: "center",
+    gap: 8,
+    marginBottom: 24,
+  },
+  starIcon: {
+    fontSize: 32,
+  },
+  commentSection: {
+    marginBottom: 24,
+  },
+  commentLabel: {
+    fontSize: 14,
+    fontWeight: "500",
+    marginBottom: 8,
+  },
+  commentInput: {
+    borderRadius: 12,
+    padding: 16,
+    borderWidth: 1,
+    fontSize: 15,
+    minHeight: 120,
+  },
+  submitButton: {
+    paddingVertical: 16,
+    borderRadius: 12,
+    alignItems: "center",
+  },
+  submitButtonText: {
+    fontSize: 16,
+    fontWeight: "600",
+  },
+  // Report Modal
+  reportList: {
+    gap: 12,
+    marginBottom: 24,
+  },
+  reportItem: {
+    flexDirection: "row",
+    alignItems: "center",
+    padding: 16,
+    borderRadius: 12,
+    borderWidth: 1,
+    gap: 12,
+  },
+  radioButton: {
+    width: 20,
+    height: 20,
+    borderRadius: 10,
+    borderWidth: 2,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  radioButtonInner: {
+    width: 10,
+    height: 10,
+    borderRadius: 5,
+  },
+  reportText: {
+    flex: 1,
+    fontSize: 14,
   },
 });
 

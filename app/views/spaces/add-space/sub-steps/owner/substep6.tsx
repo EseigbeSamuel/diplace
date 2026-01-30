@@ -63,7 +63,7 @@ const LandlordAccountInfoSubstep: React.FC<LandlordAccountInfoSubstepProps> = ({
               <View style={styles.cardHeader}>
                 <View style={styles.bankIconContainer}>
                   <Image
-                    source={require("@/assets/icons/bank-fill.png")}
+                    source={require("@/assets/icons/bank emoji.png")}
                     style={styles.bankIcon}
                   />
                 </View>
@@ -202,27 +202,25 @@ const createStyles = (colors: ColorScheme) =>
       width: RFValue(48),
       height: RFValue(48),
       borderRadius: RFValue(12),
-      backgroundColor: "rgba(255, 255, 255, 0.15)",
       alignItems: "center",
       justifyContent: "center",
     },
     bankIcon: {
-      width: RFValue(24),
-      height: RFValue(24),
-      tintColor: "#FFFFFF",
+      width: RFValue(48),
+      height: RFValue(48),
     },
     accountNumberSection: {
       alignItems: "flex-end",
     },
     accountNumberLabel: {
       fontSize: RFValue(11),
-      color: "rgba(255, 255, 255, 0.7)",
+      color: colors.slate[200],
       marginBottom: RFValue(4),
     },
     accountNumber: {
       fontSize: RFValue(20),
       fontWeight: "700",
-      color: "#FFFFFF",
+      color: colors.slate[100],
       letterSpacing: 1,
     },
     cardFooter: {
@@ -234,26 +232,26 @@ const createStyles = (colors: ColorScheme) =>
     },
     accountNameLabel: {
       fontSize: RFValue(11),
-      color: "rgba(255, 255, 255, 0.7)",
+      color: colors.slate[200],
       marginBottom: RFValue(4),
     },
     accountName: {
       fontSize: RFValue(14),
       fontWeight: "600",
-      color: "#FFFFFF",
+      color: colors.slate[100],
     },
     bankSection: {
       alignItems: "flex-end",
     },
     bankLabel: {
       fontSize: RFValue(11),
-      color: "rgba(255, 255, 255, 0.7)",
+      color: colors.slate[200],
       marginBottom: RFValue(4),
     },
     bankName: {
       fontSize: RFValue(12),
       fontWeight: "600",
-      color: "#FFFFFF",
+      color: colors.slate[100],
       textAlign: "right",
     },
 

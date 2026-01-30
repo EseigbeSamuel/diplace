@@ -25,13 +25,6 @@ interface ChatItemProps {
   isDarkMode: boolean;
 }
 
-// Notification Bell Icon Component
-const BellIcon = ({ color }: { color: string }) => (
-  <View style={[styles.bellIcon, { backgroundColor: color }]}>
-    <Image source={require("@/assets/icons/notification.png")} />
-  </View>
-);
-
 // Verified Badge Component
 const VerifiedBadge = () => (
   <View style={styles.verifiedBadge}>
@@ -188,18 +181,6 @@ const ChatsPage: React.FC = () => {
         showsVerticalScrollIndicator={false}
         contentContainerStyle={styles.chatListContent}
       />
-
-      {/* Floating Action Button */}
-      <TouchableOpacity
-        style={[styles.fab, { backgroundColor: colors.slate[650] }]}
-      >
-        {isDarkMode ? (
-          <Text style={[styles.fabIcon, { color: "black" }]}>+</Text>
-        ) : (
-          <Text style={styles.fabIcon}>+</Text>
-        )}
-        {/* <Text style={styles.fabIcon}>+</Text> */}
-      </TouchableOpacity>
     </SafeAreaViewContainer>
   );
 };

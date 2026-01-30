@@ -527,8 +527,6 @@ const getStyles = (colors: ColorScheme) =>
       paddingTop: RFValue(16),
       paddingBottom: RFValue(24),
       backgroundColor: colors.background,
-      borderTopWidth: 1,
-      borderTopColor: colors.slate[300],
     },
     securePaymentNote: {
       flexDirection: "row",

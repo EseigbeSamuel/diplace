@@ -928,6 +928,7 @@ const createStyles = (colors: ColorScheme) =>
       flex: 1,
       paddingBottom: RFValue(50),
       paddingTop: RFValue(24),
+      backgroundColor: colors.background,
     },
     contentContainer: {
       paddingHorizontal: RFValue(16),

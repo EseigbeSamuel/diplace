@@ -15,6 +15,7 @@ import AppButton from "@/components/button";
 import { useTheme } from "@/contexts/themeContext";
 import { ColorScheme } from "@/utils";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
+import TextField from "@/components/textfield";
 
 const ChangePassword = () => {
   const { colors } = useTheme();
@@ -60,100 +61,36 @@ const ChangePassword = () => {
           >
             <View style={passwordStyles.formSection}>
               {/* Current Password */}
-              <View style={passwordStyles.inputGroup}>
-                <View style={passwordStyles.inputContainer}>
-                  <Image
-                    source={require("@/assets/icons/Lock.png")}
-                    style={passwordStyles.inputIcon}
-                  />
-                  <TextInput
-                    style={passwordStyles.textInput}
-                    value={currentPassword}
-                    onChangeText={setCurrentPassword}
-                    placeholder="Current Password"
-                    placeholderTextColor={colors.slate[450]}
-                    secureTextEntry={!showCurrentPassword}
-                  />
-                  <Pressable
-                    onPress={() => setShowCurrentPassword(!showCurrentPassword)}
-                  >
-                    <Image
-                      source={
-                        showCurrentPassword
-                          ? require("@/assets/icons/password-show.png")
-                          : require("@/assets/icons/password-hide.png")
-                      }
-                      style={passwordStyles.eyeIcon}
-                    />
-                  </Pressable>
-                </View>
-              </View>
+
+              <TextField
+                type="password"
+                label="Current Password"
+                value={currentPassword}
+                onChange={(value) => setCurrentPassword(value.toString())}
+                icon={require("@/assets/icons/Lock.png")}
+              />
 
               {/* New Password */}
-              <View style={passwordStyles.inputGroup}>
-                <View style={passwordStyles.inputContainer}>
-                  <Image
-                    source={require("@/assets/icons/Lock.png")}
-                    style={passwordStyles.inputIcon}
-                  />
-                  <TextInput
-                    style={passwordStyles.textInput}
-                    value={newPassword}
-                    onChangeText={setNewPassword}
-                    placeholder="New Password"
-                    placeholderTextColor={colors.slate[450]}
-                    secureTextEntry={!showNewPassword}
-                  />
-                  <Pressable
-                    onPress={() => setShowNewPassword(!showNewPassword)}
-                  >
-                    <Image
-                      source={
-                        showNewPassword
-                          ? require("@/assets/icons/password-show.png")
-                          : require("@/assets/icons/password-hide.png")
-                      }
-                      style={passwordStyles.eyeIcon}
-                    />
-                  </Pressable>
-                </View>
-                <Text style={passwordStyles.helperText}>
-                  Must be at least 8 characters
-                </Text>
-              </View>
+
+              <TextField
+                type="password"
+                label="New Password"
+                value={newPassword}
+                onChange={(value) => setNewPassword(value.toString())}
+                icon={require("@/assets/icons/Lock.png")}
+                subText="Must be at least 8 characters"
+              />
 
               {/* Confirm New Password */}
-              <View style={passwordStyles.inputGroup}>
-                <View style={passwordStyles.inputContainer}>
-                  <Image
-                    source={require("@/assets/icons/Lock.png")}
-                    style={passwordStyles.inputIcon}
-                  />
-                  <TextInput
-                    style={passwordStyles.textInput}
-                    value={confirmPassword}
-                    onChangeText={setConfirmPassword}
-                    placeholder="Confirm New Password"
-                    placeholderTextColor={colors.slate[450]}
-                    secureTextEntry={!showConfirmPassword}
-                  />
-                  <Pressable
-                    onPress={() => setShowConfirmPassword(!showConfirmPassword)}
-                  >
-                    <Image
-                      source={
-                        showConfirmPassword
-                          ? require("@/assets/icons/password-show.png")
-                          : require("@/assets/icons/password-hide.png")
-                      }
-                      style={passwordStyles.eyeIcon}
-                    />
-                  </Pressable>
-                </View>
-                <Text style={passwordStyles.helperText}>
-                  Must match with the new password
-                </Text>
-              </View>
+
+              <TextField
+                type="password"
+                label="Confirm New Password"
+                value={confirmPassword}
+                onChange={(value) => setConfirmPassword(value.toString())}
+                icon={require("@/assets/icons/Lock.png")}
+                subText="Must match with the new password"
+              />
             </View>
           </KeyboardAwareScrollView>
         </View>
@@ -165,7 +102,7 @@ const ChangePassword = () => {
           title="Save changes"
           onPress={handleSaveChanges}
           size="large"
-          variant={isFormValid ? "primary" : "secondary"}
+          variant="primary"
           disabled={!isFormValid}
           fullwidth={true}
         />
@@ -197,7 +134,7 @@ const styles = (colors: ColorScheme) =>
       lineHeight: RFValue(20),
     },
     formSection: {
-      gap: RFValue(24),
+      gap: RFValue(10),
     },
     inputGroup: {
       gap: RFValue(8),
@@ -233,10 +170,6 @@ const styles = (colors: ColorScheme) =>
       paddingLeft: RFValue(4),
     },
     buttonContainer: {
-      paddingHorizontal: RFValue(16),
       paddingVertical: RFValue(20),
-      backgroundColor: colors.background,
-      borderTopWidth: 1,
-      borderTopColor: colors.slate[300],
     },
   });

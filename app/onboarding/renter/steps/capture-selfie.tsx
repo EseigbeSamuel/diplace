@@ -90,47 +90,57 @@ const SelfieVerificationStep = ({ onNext }: SelfieProps) => {
   // If photo captured, show preview
   if (capturedPhoto) {
     return (
-      <SafeAreaViewContainer>
-        <View style={Styles.container}>
-          <View style={Styles.previewContainer}>
-            <Image
-              source={{ uri: capturedPhoto }}
-              style={Styles.previewImage}
-              resizeMode="cover"
-            />
-            <View style={Styles.previewOverlay}>
-              <Text style={Styles.previewText}>
-                Perfect! Let&apos;s use this selfie.
-              </Text>
-            </View>
+      <View style={Styles.container}>
+        <View style={Styles.previewContainer}>
+          <Image
+            source={{ uri: capturedPhoto }}
+            style={Styles.previewImage}
+            resizeMode="cover"
+          />
+          <View style={Styles.previewOverlay}>
+            <Text style={Styles.previewText}>
+              Perfect! Let&apos;s use this selfie.
+            </Text>
           </View>
+        </View>
 
-          <View style={Styles.buttonContainer}>
-            <View style={Styles.buttonRow}>
-              <TouchableOpacity
-                style={Styles.retakeButton}
-                onPress={retakePhoto}
-              >
-                <Text style={Styles.retakeText}>Retake</Text>
-              </TouchableOpacity>
+        <View style={Styles.buttonContainer}>
+          <View style={Styles.buttonRow}>
+            <TouchableOpacity style={Styles.retakeButton} onPress={retakePhoto}>
+              <Text style={Styles.retakeText}>Retake</Text>
+            </TouchableOpacity>
 
-              <View style={Styles.continueButtonWrapper}>
-                <AppButton
-                  title="Continue"
-                  onPress={handleContinue}
-                  size="large"
-                />
-              </View>
+            <View style={Styles.continueButtonWrapper}>
+              <AppButton
+                title="Continue"
+                onPress={handleContinue}
+                size="large"
+              />
             </View>
           </View>
         </View>
-      </SafeAreaViewContainer>
+      </View>
     );
   }
 
   // Camera view
   return (
     <View style={Styles.cameraContainer}>
+      <View className="w-[70%]  justify-between px-3  top-32 z-50 fixed items-center flex-row">
+        <View>
+          <TouchableOpacity
+            // onPress={handleBack}
+            className="p-4 bg-gray-100/50 rounded-full w-[50px] "
+          >
+            <Image
+              source={require("@/assets/icons/arrow-left-dark.png")}
+              className="w-6 h-6"
+              style={{ tintColor: "#ffffff" }}
+            />
+          </TouchableOpacity>
+        </View>
+        <Text className="text-xl text-white">Take a selfie</Text>
+      </View>
       <CameraView
         ref={cameraRef}
         style={Styles.camera}
@@ -223,7 +233,13 @@ const styles = (colors: ColorScheme) =>
       flex: 1,
     },
     cameraContainer: {
+      position: "absolute",
+      top: -50,
+      bottom: 0,
+      left: 0,
+      right: 0,
       flex: 1,
+      inset: 0,
     },
     camera: {
       flex: 1,

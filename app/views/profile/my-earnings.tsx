@@ -1,5 +1,6 @@
 import SafeAreaViewContainer from "@/components/safeareaview";
 import SectionHeader from "@/components/sectionheader";
+import ViewHeader from "@/components/view-header";
 import { useTheme } from "@/contexts/themeContext";
 import { ColorScheme } from "@/utils";
 import { useRouter } from "expo-router";
@@ -90,7 +91,7 @@ const MyEarnings = () => {
 
   return (
     <SafeAreaViewContainer>
-      <SectionHeader title="My Earnings" />
+      <ViewHeader title="My Earnings" />
       <ScrollView showsVerticalScrollIndicator={false}>
         {/* Earnings Card */}
         <View style={earningsStyles.earningsCard}>
@@ -105,13 +106,13 @@ const MyEarnings = () => {
             </View>
             <View style={earningsStyles.earningsStats}>
               <Image
-                source={require("@/assets/icons/arrow-right-up-outline-dark.png")}
+                source={require("@/assets/icons/trend-up-thin.png")}
                 style={earningsStyles.trendingIcon}
               />
               <Text style={earningsStyles.statsText}>+5.5%</Text>
               <Text style={earningsStyles.statsLabel}>All time</Text>
               <Image
-                source={require("@/assets/icons/badge-check-1.png")}
+                source={require("@/assets/icons/chevron-down.png")}
                 style={earningsStyles.chevronDownIcon}
               />
             </View>
@@ -119,7 +120,7 @@ const MyEarnings = () => {
         </View>
 
         {/* Recent Earnings Section */}
-        <View style={earningsStyles.section}>
+        <View>
           <View style={earningsStyles.sectionHeader}>
             <Text style={earningsStyles.sectionTitle}>Recent Earnings</Text>
             <Pressable onPress={handleSeeAll}>
@@ -171,7 +172,6 @@ const styles = (colors: ColorScheme) =>
   StyleSheet.create({
     earningsCard: {
       marginHorizontal: RFValue(3),
-      marginTop: RFValue(20),
       marginBottom: RFValue(24),
       backgroundColor: colors.slate[650],
       borderRadius: RFValue(16),
@@ -183,7 +183,7 @@ const styles = (colors: ColorScheme) =>
     },
     earningsLabel: {
       fontSize: RFValue(14),
-      color: "rgba(255, 255, 255, 0.7)",
+      color: colors.slate[200],
       marginBottom: RFValue(8),
     },
     earningsAmountRow: {
@@ -194,13 +194,13 @@ const styles = (colors: ColorScheme) =>
     earningsAmount: {
       fontSize: RFValue(27),
       fontWeight: "700",
-      color: "#FFFFFF",
+      color: colors.slate[100],
       marginRight: RFValue(12),
     },
     eyeIcon: {
       width: RFValue(24),
       height: RFValue(24),
-      tintColor: "rgba(255, 255, 255, 0.7)",
+      tintColor: colors.slate[200],
     },
     earningsStats: {
       flexDirection: "row",
@@ -210,25 +210,22 @@ const styles = (colors: ColorScheme) =>
     trendingIcon: {
       width: RFValue(16),
       height: RFValue(16),
-      tintColor: colors.success[200],
+      tintColor: colors.success[300],
     },
     statsText: {
       fontSize: RFValue(14),
-      color: colors.success[200],
+      color: colors.success[300],
       fontWeight: "600",
     },
     statsLabel: {
       fontSize: RFValue(14),
-      color: "rgba(255, 255, 255, 0.7)",
+      color: colors.slate[200],
       marginRight: RFValue(4),
     },
     chevronDownIcon: {
       width: RFValue(16),
       height: RFValue(16),
-      tintColor: "rgba(255, 255, 255, 0.7)",
-    },
-    section: {
-      paddingHorizontal: RFValue(3),
+      tintColor: colors.slate[200],
     },
     sectionHeader: {
       flexDirection: "row",
@@ -262,6 +259,9 @@ const styles = (colors: ColorScheme) =>
       flexDirection: "row",
       justifyContent: "space-between",
       alignItems: "center",
+      paddingVertical: RFValue(12),
+      borderBottomWidth: 1,
+      borderBottomColor: colors.slate[300],
     },
     transactionLeft: {
       flexDirection: "row",

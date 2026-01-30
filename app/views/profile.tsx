@@ -1,9 +1,11 @@
+import MediaPickerModal from "@/components/media-picker-modal";
 import SafeAreaViewContainer from "@/components/safeareaview";
 import SectionHeader from "@/components/sectionheader";
 import { useTheme } from "@/contexts/themeContext";
+import { useUser } from "@/contexts/user-context";
 import { ColorScheme } from "@/utils";
 import { useRouter } from "expo-router";
-import React from "react";
+import React, { useState } from "react";
 import {
   Image,
   Pressable,
@@ -17,91 +19,180 @@ import { RFValue } from "react-native-responsive-fontsize";
 
 const Profile = () => {
   const router = useRouter();
+  const { userType } = useUser();
   const { colors, isDarkMode, toggleTheme } = useTheme();
   const profileStyles = styles(colors);
+  const [showMediaModal, setShowMediaModal] = useState(false);
 
-  const menuItems = [
-    {
-      icon: require("@/assets/icons/Profile - Iconly Pro.png"),
-      label: "My Account",
-      onPress: () => {
-        router.push("/views/profile/my-acount");
-      },
-      showArrow: true,
-    },
-    {
-      icon: require("@/assets/icons/money-bag.png"),
-      label: "My Earnings",
-      onPress: () => {
-        router.push("/views/profile/my-earnings");
-      },
-      showArrow: true,
-    },
-    {
-      icon: require("@/assets/icons/bank-light.png"),
-      label: "Payment Details",
-      onPress: () => {
-        router.push("/views/profile/payment-details");
-      },
-      showArrow: true,
-    },
-    {
-      icon: require("@/assets/icons/credit-card emoji.png"),
-      label: "Your Reviews",
-      onPress: () => {
-        router.push("/views/profile/your-reviews");
-      },
-      showArrow: true,
-    },
-    {
-      icon: require("@/assets/icons/chat-active.png"),
-      label: "Refer a Friend",
-      onPress: () => {},
-      rightElement: (
-        <Pressable style={profileStyles.shareButton}>
-          <Image
-            source={require("@/assets/icons/share-solid.png")}
-            style={profileStyles.smallIcon}
-          />
-          <Text style={profileStyles.shareText}>Share link</Text>
-        </Pressable>
-      ),
-    },
-    {
-      icon: require("@/assets/icons/Shield Done-1.png"),
-      label: "Security",
-      onPress: () => {
-        router.push("/views/profile/security");
-      },
-      showArrow: true,
-    },
-    {
-      icon: require("@/assets/icons/Discovery - Iconly Pro-1.png"),
-      label: "Dark mode",
-      rightElement: (
-        <Switch
-          value={isDarkMode}
-          onValueChange={toggleTheme}
-          trackColor={{ false: colors.slate[300], true: colors.info[200] }}
-          thumbColor={colors.background}
-        />
-      ),
-    },
-    {
-      icon: require("@/assets/icons/Lock-fill.png"),
-      label: "Support",
-      onPress: () => {
-        router.push("/views/profile/support");
-      },
-      showArrow: true,
-    },
-    {
-      icon: require("@/assets/icons/Login - Iconly Pro-1.png"),
-      label: "Log out",
-      onPress: () => {},
-      isLogout: true,
-    },
-  ];
+  const menuItems =
+    userType === "owner"
+      ? [
+          {
+            icon: require("@/assets/icons/user-icon.png"),
+            label: "My Account",
+            onPress: () => {
+              router.push("/views/profile/my-acount");
+            },
+            showArrow: true,
+          },
+          {
+            icon: require("@/assets/icons/money-bag.png"),
+            label: "My Earnings",
+            onPress: () => {
+              router.push("/views/profile/my-earnings");
+            },
+            showArrow: true,
+          },
+          {
+            icon: require("@/assets/icons/bank emoji.png"),
+            label: "Payment Details",
+            onPress: () => {
+              router.push("/views/profile/payment-details");
+            },
+            showArrow: true,
+          },
+          {
+            icon: require("@/assets/icons/reviews.png"),
+            label: "Your Reviews",
+            onPress: () => {
+              router.push("/views/profile/your-reviews");
+            },
+            showArrow: true,
+          },
+          {
+            icon: require("@/assets/icons/interaction.png"),
+            label: "Refer a Friend",
+            onPress: () => {},
+            rightElement: (
+              <Pressable style={profileStyles.shareButton}>
+                <Image
+                  source={require("@/assets/icons/share-solid.png")}
+                  style={profileStyles.smallIcon}
+                />
+                <Text style={profileStyles.shareText}>Share link</Text>
+              </Pressable>
+            ),
+          },
+          {
+            icon: require("@/assets/icons/shield-icon.png"),
+            label: "Security",
+            onPress: () => {
+              router.push("/views/profile/security");
+            },
+            showArrow: true,
+          },
+          {
+            icon: require("@/assets/icons/brush-icon.png"),
+            label: "Dark mode",
+            rightElement: (
+              <Switch
+                value={isDarkMode}
+                onValueChange={toggleTheme}
+                trackColor={{
+                  false: colors.slate[300],
+                  true: colors.info[200],
+                }}
+                thumbColor={colors.background}
+              />
+            ),
+          },
+          {
+            icon: require("@/assets/icons/help-icon.png"),
+            label: "Support",
+            onPress: () => {
+              router.push("/views/profile/support");
+            },
+            showArrow: true,
+          },
+          {
+            icon: require("@/assets/icons/logout.png"),
+            label: "Log out",
+            onPress: () => {
+              router.push("/auth/login");
+            },
+            isLogout: true,
+          },
+        ]
+      : [
+          {
+            icon: require("@/assets/icons/user-icon.png"),
+            label: "My Account",
+            onPress: () => {
+              router.push("/views/profile/my-acount");
+            },
+            showArrow: true,
+          },
+          {
+            icon: require("@/assets/icons/bookmark-active-dark.png"),
+            label: "Bookmarks",
+            onPress: () => {
+              router.push("/views/profile/bookmarks");
+            },
+            showArrow: true,
+          },
+
+          {
+            icon: require("@/assets/icons/interaction.png"),
+            label: "Refer a Friend",
+            onPress: () => {},
+            rightElement: (
+              <Pressable style={profileStyles.shareButton}>
+                <Image
+                  source={require("@/assets/icons/share-solid.png")}
+                  style={profileStyles.smallIcon}
+                />
+                <Text style={profileStyles.shareText}>Share link</Text>
+              </Pressable>
+            ),
+          },
+          {
+            icon: require("@/assets/icons/credit-card emoji.png"),
+            label: "Card Details",
+            onPress: () => {
+              router.push("/views/profile/card-details");
+            },
+            showArrow: true,
+          },
+          {
+            icon: require("@/assets/icons/shield-icon.png"),
+            label: "Security",
+            onPress: () => {
+              router.push("/views/profile/security");
+            },
+            showArrow: true,
+          },
+          {
+            icon: require("@/assets/icons/brush-icon.png"),
+            label: "Dark mode",
+            rightElement: (
+              <Switch
+                value={isDarkMode}
+                onValueChange={toggleTheme}
+                trackColor={{
+                  false: colors.slate[300],
+                  true: colors.info[200],
+                }}
+                thumbColor={colors.background}
+              />
+            ),
+          },
+          {
+            icon: require("@/assets/icons/help-icon.png"),
+            label: "Support",
+            onPress: () => {
+              router.push("/views/profile/support");
+            },
+            showArrow: true,
+          },
+          {
+            icon: require("@/assets/icons/logout.png"),
+            label: "Log out",
+            onPress: () => {
+              router.push("/auth/login");
+            },
+            isLogout: true,
+          },
+        ];
 
   return (
     <SafeAreaViewContainer>
@@ -111,12 +202,15 @@ const Profile = () => {
         <View style={profileStyles.profileHeader}>
           <View style={profileStyles.avatarContainer}>
             <Image
-              source={{ uri: "https://randomuser.me/api/portraits/men/1.jpg" }}
+              source={require("@/assets/images/sammy.jpg")}
               style={profileStyles.avatar}
             />
-            <Pressable style={profileStyles.editBadge}>
+            <Pressable
+              style={profileStyles.editBadge}
+              onPress={() => setShowMediaModal(true)}
+            >
               <Image
-                source={require("@/assets/icons/Camera - Iconly Pro-1.png")}
+                source={require("@/assets/icons/Camera - Iconly Pro.png")}
                 style={profileStyles.editIcon}
               />
             </Pressable>
@@ -133,7 +227,7 @@ const Profile = () => {
 
             <View style={profileStyles.contactRow}>
               <Image
-                source={require("@/assets/icons/chat.png")}
+                source={require("@/assets/icons/mail-outline-light.png")}
                 style={profileStyles.contactIcon}
               />
               <Text style={profileStyles.contactText}>ibealex@gmail.com</Text>
@@ -153,11 +247,14 @@ const Profile = () => {
         <Pressable style={profileStyles.upgradeBanner}>
           <View style={profileStyles.upgradeContent}>
             <Text style={profileStyles.upgradeTitle}>
-              Upgrade to Featured Agent
+              {userType === "owner"
+                ? "Upgrade to Featured Agent"
+                : "Earn as a Space Manager / Agent"}
             </Text>
             <Text style={profileStyles.upgradeDescription}>
-              Boost your visibility and attract more renters faster. Featured
-              Agents earn more with priority listings.
+              {userType === "owner"
+                ? "Boost your visibility and attract more renters faster. Featured Agents earn more with priority listings."
+                : "Become an agent or space manager, list properties and earn commissions"}
             </Text>
           </View>
           <Image
@@ -167,7 +264,7 @@ const Profile = () => {
         </Pressable>
 
         {/* Menu Items */}
-        <View style={profileStyles.menuContainer}>
+        <View>
           {menuItems.map((item, index) => (
             <Pressable
               key={index}
@@ -178,13 +275,14 @@ const Profile = () => {
               onPress={item.onPress}
             >
               <View style={profileStyles.menuItemLeft}>
-                <View
-                  style={[
-                    profileStyles.iconContainer,
-                    item.isLogout && profileStyles.logoutIconContainer,
-                  ]}
-                >
-                  <Image source={item.icon} style={profileStyles.menuIcon} />
+                <View style={[profileStyles.iconContainer]}>
+                  <Image
+                    source={item.icon}
+                    style={[
+                      profileStyles.menuIcon,
+                      item.isLogout && profileStyles.logoutIconContainer,
+                    ]}
+                  />
                 </View>
                 <Text
                   style={[
@@ -200,13 +298,20 @@ const Profile = () => {
                 item.rightElement
               ) : item.showArrow ? (
                 <Image
-                  source={require("@/assets/icons/arrow-right-light.png")}
+                  source={require("@/assets/icons/chevron-right.png")}
                   style={profileStyles.chevronIcon}
                 />
               ) : null}
             </Pressable>
           ))}
         </View>
+        <MediaPickerModal
+          visible={showMediaModal}
+          onClose={() => setShowMediaModal(false)}
+          onCameraRoll={() => {}}
+          onChoosePhoto={() => {}}
+          onTakePicture={() => {}}
+        />
 
         {/* Switch to Renter Mode Button */}
         {/* <View style={profileStyles.switchButtonContainer}>
@@ -229,9 +334,7 @@ const styles = (colors: ColorScheme) =>
   StyleSheet.create({
     profileHeader: {
       alignItems: "center",
-      paddingVertical: RFValue(24),
-      borderBottomWidth: 1,
-      borderBottomColor: colors.slate[300],
+      paddingVertical: RFValue(16),
     },
     avatarContainer: {
       position: "relative",
@@ -246,7 +349,7 @@ const styles = (colors: ColorScheme) =>
       position: "absolute",
       bottom: 0,
       right: 0,
-      backgroundColor: colors.info[200],
+      backgroundColor: colors.slate[200],
       width: RFValue(28),
       height: RFValue(28),
       borderRadius: RFValue(14),
@@ -258,7 +361,7 @@ const styles = (colors: ColorScheme) =>
     editIcon: {
       width: RFValue(14),
       height: RFValue(14),
-      tintColor: "#FFFFFF",
+      tintColor: colors.slate[600],
     },
     profileInfo: {
       alignItems: "center",
@@ -294,13 +397,13 @@ const styles = (colors: ColorScheme) =>
       color: colors.slate[600],
     },
     upgradeBanner: {
-      backgroundColor: colors.info[100],
-      marginHorizontal: RFValue(16),
-      marginVertical: RFValue(16),
+      backgroundColor: colors.slate[200],
+
+      marginBottom: RFValue(16),
       padding: RFValue(16),
       borderRadius: RFValue(12),
       flexDirection: "row",
-      alignItems: "center",
+      alignItems: "flex-start",
       justifyContent: "space-between",
     },
     upgradeContent: {
@@ -323,16 +426,12 @@ const styles = (colors: ColorScheme) =>
       height: RFValue(20),
       tintColor: colors.slate[650],
     },
-    menuContainer: {
-      paddingHorizontal: RFValue(4),
-    },
+
     menuItem: {
       flexDirection: "row",
       alignItems: "center",
       justifyContent: "space-between",
       paddingVertical: RFValue(16),
-      borderBottomWidth: 1,
-      borderBottomColor: colors.slate[300],
     },
     menuItemLeft: {
       flexDirection: "row",
@@ -341,33 +440,27 @@ const styles = (colors: ColorScheme) =>
     iconContainer: {
       width: RFValue(40),
       height: RFValue(40),
-      borderRadius: RFValue(8),
-      backgroundColor: colors.slate[200],
       alignItems: "center",
       justifyContent: "center",
       marginRight: RFValue(12),
     },
     menuIcon: {
-      width: RFValue(20),
-      height: RFValue(20),
-      tintColor: colors.slate[650],
+      width: RFValue(26),
+      height: RFValue(26),
     },
     menuLabel: {
       fontSize: RFValue(15),
       color: colors.slate[650],
     },
     chevronIcon: {
-      width: RFValue(20),
-      height: RFValue(20),
-      tintColor: colors.slate[500],
+      tintColor: colors.slate[600],
+      marginRight: RFValue(4),
     },
     shareButton: {
       flexDirection: "row",
       alignItems: "center",
       paddingHorizontal: RFValue(12),
       paddingVertical: RFValue(6),
-      borderRadius: RFValue(6),
-      backgroundColor: colors.slate[200],
     },
     smallIcon: {
       width: RFValue(14),
@@ -383,7 +476,7 @@ const styles = (colors: ColorScheme) =>
       borderBottomWidth: 0,
     },
     logoutIconContainer: {
-      backgroundColor: colors.error[100],
+      tintColor: colors.error[200],
     },
     logoutLabel: {
       color: colors.error[300],

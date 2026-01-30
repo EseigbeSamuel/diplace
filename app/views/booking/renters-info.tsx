@@ -110,35 +110,14 @@ const RentersInformation = () => {
                 icon={require("@/assets/icons/mail-outline-light.png")}
               />
 
-              {/* Phone Number Input */}
-              <View style={styles.inputContainer}>
-                <Image
-                  source={require("@/assets/icons/calling.png")}
-                  style={styles.inputIcon}
-                />
-                <View style={styles.phoneInputWrapper}>
-                  <View style={styles.countryCodeContainer}>
-                    <Image
-                      source={require("@/assets/icons/nigeria.png")}
-                      style={styles.flagIcon}
-                    />
-                    <Text style={styles.countryCode}>{countryCode}</Text>
-                    <Image
-                      source={require("@/assets/icons/chevrondown-bold.png")}
-                      // style={styles.chevronIcon}
-                    />
-                  </View>
-                  <View style={styles.phoneDivider} />
-                  <TextInput
-                    style={styles.phoneInput}
-                    value={phoneNumber}
-                    onChangeText={setPhoneNumber}
-                    placeholder="810-293-4980"
-                    placeholderTextColor={colors.slate[450]}
-                    keyboardType="phone-pad"
-                  />
-                </View>
-              </View>
+              <TextField
+                type="phone"
+                label="Phone No."
+                value={phoneNumber}
+                onChange={(text) => setPhoneNumber(text.toString())}
+                countryCode={countryCode}
+                onCountryCodeChange={setCountryCode}
+              />
             </View>
           </View>
         </ScrollView>

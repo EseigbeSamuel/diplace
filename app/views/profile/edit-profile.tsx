@@ -16,9 +16,12 @@ import AppButton from "@/components/button";
 import { useTheme } from "@/contexts/themeContext";
 import { ColorScheme } from "@/utils";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
+import MediaPickerModal from "@/components/media-picker-modal";
+import { useUser } from "@/contexts/user-context";
 
 const EditProfile = () => {
   const { colors } = useTheme();
+  const { userType } = useUser();
   const editProfileStyles = styles(colors);
 
   // Form state
@@ -71,7 +74,7 @@ const EditProfile = () => {
 
   return (
     <SafeAreaViewContainer>
-      <SectionHeader title="Edit profile" />
+      <SectionHeader title="" />
       <KeyboardAwareScrollView
         showsVerticalScrollIndicator={false}
         keyboardShouldPersistTaps="handled"
@@ -82,9 +85,7 @@ const EditProfile = () => {
           <View style={editProfileStyles.photoSection}>
             <View style={editProfileStyles.avatarContainer}>
               <Image
-                source={{
-                  uri: "https://randomuser.me/api/portraits/men/1.jpg",
-                }}
+                source={require("@/assets/images/sammy.jpg")}
                 style={editProfileStyles.avatar}
               />
               <Pressable
@@ -111,10 +112,11 @@ const EditProfile = () => {
 
           {/* Personal Information Section */}
           <View style={editProfileStyles.section}>
-            <Text style={editProfileStyles.sectionTitle}>
-              Personal Information
-            </Text>
-
+            {userType === "owner" && (
+              <Text style={editProfileStyles.sectionTitle}>
+                Personal Information
+              </Text>
+            )}
             {/* Full Name Input */}
             <View style={editProfileStyles.inputContainer}>
               <View style={editProfileStyles.inputIconContainer}>
@@ -136,24 +138,28 @@ const EditProfile = () => {
             </View>
 
             {/* Business Name Input */}
-            <View style={editProfileStyles.inputContainer}>
-              <View style={editProfileStyles.inputIconContainer}>
-                <Image
-                  source={require("@/assets/icons/Wallet - Iconly Pro.png")}
-                  style={editProfileStyles.inputIcon}
-                />
+            {userType === "owner" && (
+              <View style={editProfileStyles.inputContainer}>
+                <View style={editProfileStyles.inputIconContainer}>
+                  <Image
+                    source={require("@/assets/icons/Work - Iconly Pro.png")}
+                    style={editProfileStyles.inputIcon}
+                  />
+                </View>
+                <View style={editProfileStyles.inputWrapper}>
+                  <Text style={editProfileStyles.inputLabel}>
+                    Business Name
+                  </Text>
+                  <TextInput
+                    style={editProfileStyles.input}
+                    value={businessName}
+                    onChangeText={setBusinessName}
+                    placeholder="Enter your business name"
+                    placeholderTextColor={colors.slate[450]}
+                  />
+                </View>
               </View>
-              <View style={editProfileStyles.inputWrapper}>
-                <Text style={editProfileStyles.inputLabel}>Business Name</Text>
-                <TextInput
-                  style={editProfileStyles.input}
-                  value={businessName}
-                  onChangeText={setBusinessName}
-                  placeholder="Enter your business name"
-                  placeholderTextColor={colors.slate[450]}
-                />
-              </View>
-            </View>
+            )}
 
             {/* Email Input */}
             <View style={editProfileStyles.inputContainer}>
@@ -181,7 +187,7 @@ const EditProfile = () => {
             <View style={editProfileStyles.inputContainer}>
               <View style={editProfileStyles.inputIconContainer}>
                 <Image
-                  source={require("@/assets/icons/Call - Iconly Pro.png")}
+                  source={require("@/assets/icons/calling.png")}
                   style={editProfileStyles.inputIcon}
                 />
               </View>
@@ -200,122 +206,64 @@ const EditProfile = () => {
           </View>
 
           {/* Location Section */}
-          <View style={editProfileStyles.section}>
-            <Text style={editProfileStyles.sectionTitle}>Location</Text>
+          {userType === "owner" && (
+            <View style={editProfileStyles.section}>
+              <Text style={editProfileStyles.sectionTitle}>Location</Text>
 
-            {/* City Selector */}
-            <Pressable
-              style={editProfileStyles.inputContainer}
-              onPress={handleCityPress}
-            >
-              <View style={editProfileStyles.inputWrapper}>
-                <Text style={editProfileStyles.inputLabel}>City</Text>
-                <View style={editProfileStyles.selectableInput}>
-                  <Text style={editProfileStyles.selectableText}>{city}</Text>
-                  <Image
-                    source={require("@/assets/icons/arrow-right-light.png")}
-                    style={editProfileStyles.chevronIcon}
+              {/* City Selector */}
+              <Pressable
+                style={editProfileStyles.inputContainer}
+                onPress={handleCityPress}
+              >
+                <View style={editProfileStyles.inputWrapper}>
+                  <Text style={editProfileStyles.inputLabel}>City</Text>
+                  <View style={editProfileStyles.selectableInput}>
+                    <Text style={editProfileStyles.selectableText}>{city}</Text>
+                    <Image
+                      source={require("@/assets/icons/chevron-right.png")}
+                      style={editProfileStyles.chevronIcon}
+                    />
+                  </View>
+                </View>
+              </Pressable>
+
+              {/* Address Input */}
+              <View style={editProfileStyles.inputContainer}>
+                <View style={editProfileStyles.inputWrapper}>
+                  <Text style={editProfileStyles.inputLabel}>Address</Text>
+                  <TextInput
+                    style={editProfileStyles.input}
+                    value={address}
+                    onChangeText={setAddress}
+                    placeholder="Enter your address"
+                    placeholderTextColor={colors.slate[450]}
+                    multiline
                   />
                 </View>
               </View>
-            </Pressable>
-
-            {/* Address Input */}
-            <View style={editProfileStyles.inputContainer}>
-              <View style={editProfileStyles.inputWrapper}>
-                <Text style={editProfileStyles.inputLabel}>Address</Text>
-                <TextInput
-                  style={editProfileStyles.input}
-                  value={address}
-                  onChangeText={setAddress}
-                  placeholder="Enter your address"
-                  placeholderTextColor={colors.slate[450]}
-                  multiline
-                />
-              </View>
             </View>
-          </View>
-
-          {/* Save Button */}
-          <View style={editProfileStyles.buttonContainer}>
-            <AppButton
-              title="Save changes"
-              onPress={handleSaveChanges}
-              size="large"
-              fullwidth={true}
-            />
-          </View>
+          )}
         </ScrollView>
       </KeyboardAwareScrollView>
 
+      {/* Save Button */}
+      <View style={editProfileStyles.buttonContainer}>
+        <AppButton
+          title="Save changes"
+          onPress={handleSaveChanges}
+          size="large"
+          fullwidth={true}
+        />
+      </View>
+
       {/* Media Selection Modal */}
-      <Modal
+      <MediaPickerModal
         visible={showMediaModal}
-        transparent={true}
-        animationType="slide"
-        onRequestClose={() => setShowMediaModal(false)}
-      >
-        <View style={editProfileStyles.modalOverlay}>
-          <Pressable
-            style={editProfileStyles.modalBackdrop}
-            onPress={() => setShowMediaModal(false)}
-          />
-          <View style={editProfileStyles.modalContent}>
-            {/* Modal Header */}
-            <View style={editProfileStyles.modalHeader}>
-              <Text style={editProfileStyles.modalTitle}>
-                Select media from
-              </Text>
-            </View>
-
-            {/* Media Options */}
-            <View style={editProfileStyles.mediaOptions}>
-              <Pressable
-                style={editProfileStyles.mediaOption}
-                onPress={handleTakePicture}
-              >
-                <View style={editProfileStyles.mediaIconContainer}>
-                  <Image
-                    source={require("@/assets/icons/Camera - Iconly Pro.png")}
-                    style={editProfileStyles.mediaIcon}
-                  />
-                </View>
-                <Text style={editProfileStyles.mediaOptionText}>
-                  Take picture
-                </Text>
-              </Pressable>
-
-              <Pressable
-                style={editProfileStyles.mediaOption}
-                onPress={handleChoosePhoto}
-              >
-                <View style={editProfileStyles.mediaIconContainer}>
-                  <Image
-                    source={require("@/assets/icons/Camera - Iconly Pro-1.png")}
-                    style={editProfileStyles.mediaIcon}
-                  />
-                </View>
-                <Text style={editProfileStyles.mediaOptionText}>Photo</Text>
-              </Pressable>
-
-              <Pressable
-                style={editProfileStyles.mediaOption}
-                onPress={handleCameraRoll}
-              >
-                <View style={editProfileStyles.mediaIconContainer}>
-                  <Image
-                    source={require("@/assets/icons/Camera - Iconly Pro.png")}
-                    style={editProfileStyles.mediaIcon}
-                  />
-                </View>
-                <Text style={editProfileStyles.mediaOptionText}>
-                  Camera roll
-                </Text>
-              </Pressable>
-            </View>
-          </View>
-        </View>
-      </Modal>
+        onClose={() => setShowMediaModal(false)}
+        onCameraRoll={handleCameraRoll}
+        onChoosePhoto={handleChoosePhoto}
+        onTakePicture={handleTakePicture}
+      />
     </SafeAreaViewContainer>
   );
 };
@@ -327,8 +275,6 @@ const styles = (colors: ColorScheme) =>
     photoSection: {
       alignItems: "center",
       paddingVertical: RFValue(24),
-      borderBottomWidth: 1,
-      borderBottomColor: colors.slate[300],
     },
     avatarContainer: {
       position: "relative",
@@ -360,11 +306,6 @@ const styles = (colors: ColorScheme) =>
     removePhotoButton: {
       flexDirection: "row",
       alignItems: "center",
-      paddingHorizontal: RFValue(16),
-      paddingVertical: RFValue(8),
-      borderRadius: RFValue(8),
-      borderWidth: 1,
-      borderColor: colors.error[300],
     },
     removeIcon: {
       width: RFValue(16),
@@ -388,7 +329,7 @@ const styles = (colors: ColorScheme) =>
     },
     inputContainer: {
       flexDirection: "row",
-      backgroundColor: colors.slate[150],
+      backgroundColor: colors.slate[200],
       borderRadius: RFValue(12),
       padding: RFValue(16),
       marginBottom: RFValue(12),
@@ -426,14 +367,12 @@ const styles = (colors: ColorScheme) =>
       color: colors.slate[650],
     },
     chevronIcon: {
-      width: RFValue(20),
-      height: RFValue(20),
-      tintColor: colors.slate[500],
+      tintColor: colors.slate[600],
     },
     buttonContainer: {
-      paddingHorizontal: RFValue(16),
-      paddingVertical: RFValue(24),
-      paddingBottom: RFValue(40),
+      position: "fixed",
+      bottom: 0,
+      paddingBottom: RFValue(30),
     },
     modalOverlay: {
       flex: 1,
