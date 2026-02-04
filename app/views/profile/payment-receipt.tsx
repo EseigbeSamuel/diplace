@@ -90,7 +90,7 @@ const PaymentReceipt = ({ receiptData, onClose }: PaymentReceiptProps) => {
               <View style={receiptStyles.successSection}>
                 <View style={receiptStyles.successIconContainer}>
                   <Image
-                    source={require("@/assets/icons/success.png")}
+                    source={require("@/assets/icons/tick-circle.png")}
                     style={receiptStyles.successIcon}
                   />
                 </View>
@@ -212,15 +212,12 @@ const styles = (colors: ColorScheme) =>
   StyleSheet.create({
     header: {
       backgroundColor: colors.background,
-      borderBottomWidth: 1,
-      borderBottomColor: colors.slate[300],
     },
     headerContent: {
       flexDirection: "row",
       alignItems: "center",
       justifyContent: "center",
       paddingVertical: RFValue(16),
-      paddingHorizontal: RFValue(20),
       position: "relative",
     },
     headerTitle: {
@@ -230,7 +227,7 @@ const styles = (colors: ColorScheme) =>
     },
     closeButton: {
       position: "absolute",
-      right: RFValue(20),
+      right: RFValue(8),
       padding: RFValue(4),
     },
     closeIcon: {
@@ -265,9 +262,11 @@ const styles = (colors: ColorScheme) =>
       top: "50%",
       width: RFValue(20),
       height: RFValue(20),
-      borderRadius: RFValue(10),
+      borderRadius: RFValue(30),
       backgroundColor: colors.slate[150],
       marginTop: -RFValue(10),
+      borderWidth: 1,
+      borderColor: colors.slate[300],
       zIndex: 1,
     },
     notchRight: {
@@ -278,11 +277,15 @@ const styles = (colors: ColorScheme) =>
       height: RFValue(20),
       borderRadius: RFValue(10),
       backgroundColor: colors.slate[150],
+
+      borderWidth: 1,
+      borderColor: colors.slate[300],
       marginTop: -RFValue(10),
       zIndex: 1,
     },
     cardContent: {
-      padding: RFValue(24),
+      paddingVertical: RFValue(24),
+      paddingHorizontal: RFValue(16),
     },
     successSection: {
       alignItems: "center",
@@ -296,6 +299,9 @@ const styles = (colors: ColorScheme) =>
       alignItems: "center",
       justifyContent: "center",
       marginBottom: RFValue(16),
+
+      borderWidth: 1,
+      borderColor: colors.success[200],
     },
     successIcon: {
       width: RFValue(32),
@@ -324,13 +330,11 @@ const styles = (colors: ColorScheme) =>
     detailLabel: {
       fontSize: RFValue(14),
       color: colors.slate[500],
-      flex: 1,
     },
     detailValue: {
       fontSize: RFValue(14),
       color: colors.slate[650],
       fontWeight: "500",
-      flex: 1,
       textAlign: "right",
     },
     propertySection: {
@@ -339,7 +343,6 @@ const styles = (colors: ColorScheme) =>
       alignItems: "flex-start",
     },
     propertyContent: {
-      flex: 1,
       alignItems: "flex-end",
     },
     propertyName: {

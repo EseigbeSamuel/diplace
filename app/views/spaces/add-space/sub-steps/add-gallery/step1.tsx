@@ -16,6 +16,7 @@ import { useTheme } from "@/contexts/themeContext";
 import { ColorScheme } from "@/utils";
 import { MediaItem } from "@/types/add-space-types";
 import { useSpaceStore } from "@/store/useSpace";
+import MediaPickerModal from "@/components/media-picker-modal";
 
 interface MediaUploadSubstepProps {
   onNext: () => void;
@@ -160,6 +161,12 @@ const MediaUploadSubstep: React.FC<MediaUploadSubstepProps> = ({
               <Image
                 source={require("@/assets/icons/Upload - Iconly Pro.png")}
                 className="size-7"
+                style={{
+                  width: RFValue(20),
+                  height: RFValue(20),
+                  tintColor: colors.slate[650],
+                  marginRight: RFValue(6),
+                }}
               />
             </Pressable>
           )}
@@ -176,7 +183,7 @@ const MediaUploadSubstep: React.FC<MediaUploadSubstepProps> = ({
                 onPress={handleOpenMediaPicker}
               >
                 <Image
-                  source={require("@/assets/icons/Upload - Iconly Pro-1.png")}
+                  source={require("@/assets/icons/Upload - Iconly Pro.png")}
                   style={styles.uploadIcon}
                 />
                 <Text style={styles.uploadMoreText}>Upload new</Text>
@@ -229,57 +236,14 @@ const MediaUploadSubstep: React.FC<MediaUploadSubstepProps> = ({
       </View>
 
       {/* Media Picker Modal */}
-      <Modal
+
+      <MediaPickerModal
         visible={showMediaPicker}
-        transparent
-        animationType="slide"
-        onRequestClose={() => setShowMediaPicker(false)}
-      >
-        <Pressable
-          style={styles.modalOverlay}
-          onPress={() => setShowMediaPicker(false)}
-        >
-          <View style={styles.modalContent}>
-            <View style={styles.modalHandle} />
-            <Text style={styles.modalTitle}>Select media from</Text>
-
-            <View style={styles.mediaOptions}>
-              {/* Take Picture */}
-              <Pressable style={styles.mediaOption} onPress={takePicture}>
-                <View style={styles.mediaOptionIconContainer}>
-                  <Image
-                    source={require("@/assets/icons/Camera - Iconly Pro-1.png")}
-                    style={styles.mediaOptionIcon}
-                  />
-                </View>
-                <Text style={styles.mediaOptionText}>Take picture</Text>
-              </Pressable>
-
-              {/* Photos */}
-              <Pressable style={styles.mediaOption} onPress={pickFromGallery}>
-                <View style={styles.mediaOptionIconContainer}>
-                  <Image
-                    source={require("@/assets/icons/photos.png")}
-                    style={styles.mediaOptionIcon}
-                  />
-                </View>
-                <Text style={styles.mediaOptionText}>Photos</Text>
-              </Pressable>
-
-              {/* Camera Roll */}
-              <Pressable style={styles.mediaOption} onPress={recordVideo}>
-                <View style={styles.mediaOptionIconContainer}>
-                  <Image
-                    source={require("@/assets/icons/camera-light.png")}
-                    style={styles.mediaOptionIcon}
-                  />
-                </View>
-                <Text style={styles.mediaOptionText}>Camera roll</Text>
-              </Pressable>
-            </View>
-          </View>
-        </Pressable>
-      </Modal>
+        onClose={() => setShowMediaPicker(false)}
+        onCameraRoll={recordVideo}
+        onChoosePhoto={pickFromGallery}
+        onTakePicture={takePicture}
+      />
     </View>
   );
 };
@@ -385,8 +349,8 @@ const createStyles = (colors: ColorScheme) =>
     },
     removeButton: {
       position: "absolute",
-      top: RFValue(8),
-      right: RFValue(8),
+      top: RFValue(2),
+      right: RFValue(0),
       width: RFValue(24),
       height: RFValue(24),
       alignItems: "center",
@@ -395,6 +359,7 @@ const createStyles = (colors: ColorScheme) =>
     removeIcon: {
       width: RFValue(20),
       height: RFValue(20),
+      tintColor: colors.slate[650],
     },
     videoBadge: {
       position: "absolute",

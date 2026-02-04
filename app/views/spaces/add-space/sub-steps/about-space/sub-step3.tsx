@@ -327,7 +327,7 @@ const LocationPickerSubstep: React.FC<LocationPickerSubstepProps> = ({
       <View style={styles.mapContainer}>
         <Pressable style={styles.searchInput} onPress={handleSearchOpen}>
           <Image
-            source={require("@/assets/icons/location.png")}
+            source={require("@/assets/icons/location-black.png")}
             style={styles.locationIcon}
           />
           <Text
@@ -410,7 +410,7 @@ const LocationPickerSubstep: React.FC<LocationPickerSubstepProps> = ({
           <View style={styles.modalSearchContainer}>
             <View style={styles.modalSearchInput}>
               <Image
-                source={require("@/assets/icons/location-1.png")}
+                source={require("@/assets/icons/location-black.png")}
                 style={styles.searchIconSmall}
               />
               <TextInput
@@ -513,17 +513,17 @@ const LocationPickerSubstep: React.FC<LocationPickerSubstepProps> = ({
       >
         <View style={styles.confirmModalContainer}>
           {/* Close Button */}
-          <Pressable
-            onPress={() => setConfirmModalVisible(false)}
-            style={styles.confirmCloseButton}
-          >
-            <Image
-              source={require("@/assets/icons/X-close.png")}
-              style={styles.closeIcon}
-            />
-          </Pressable>
 
           <ScrollView contentContainerStyle={styles.confirmContent}>
+            <Pressable
+              onPress={() => setConfirmModalVisible(false)}
+              style={styles.confirmCloseButton}
+            >
+              <Image
+                source={require("@/assets/icons/X-close.png")}
+                style={styles.closeIcon}
+              />
+            </Pressable>
             <Text style={styles.confirmTitle}>Confirm location</Text>
 
             {/* Location Details */}

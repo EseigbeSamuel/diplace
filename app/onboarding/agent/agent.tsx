@@ -61,21 +61,6 @@ const Agent = () => {
     return (
       <View style={{ flex: 1 }}>
         {" "}
-        <View className="w-[75%] justify-between px-3  top-16 z-50 fixed items-center flex-row">
-          <View>
-            <TouchableOpacity
-              onPress={handleBack}
-              className="p-4 bg-gray-100/50 rounded-full w-[50px] "
-            >
-              <Image
-                source={require("@/assets/icons/arrow-left-dark.png")}
-                className="w-6 h-6"
-                style={{ tintColor: "#ffffff" }}
-              />
-            </TouchableOpacity>
-          </View>
-          <Text className="text-xl text-white">Take a selfie</Text>
-        </View>
         <View style={{ flex: 1 }}>{renderStep()}</View>
       </View>
     );
@@ -87,15 +72,19 @@ const Agent = () => {
         <View>
           <TouchableOpacity
             onPress={handleBack}
-            className="p-4 bg-gray-100 rounded-full w-[50px] "
+            className="p-4 rounded-full w-[50px] "
+            style={{ backgroundColor: colors.slate[200] }}
           >
             <Image
               source={require("@/assets/icons/arrow-left-dark.png")}
               className="w-6 h-6"
+              style={{ tintColor: colors.slate[650] }}
             />
           </TouchableOpacity>
         </View>
-        <Text className="text-xl">Verify account</Text>
+        <Text className="text-xl" style={{ color: colors.slate[650] }}>
+          Verify account
+        </Text>
         <Text
           style={Styles.skip}
           onPress={handleNext}
@@ -115,5 +104,6 @@ const styles = (colors: ColorScheme) =>
     skip: {
       fontSize: RFValue(14),
       lineHeight: RFValue(20),
+      color: colors.error[200],
     },
   });

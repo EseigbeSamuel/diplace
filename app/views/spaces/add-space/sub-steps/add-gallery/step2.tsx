@@ -314,7 +314,7 @@ const VirtualTourSubstep: React.FC<VirtualTourSubstepProps> = ({
               onPress={handleBeginTour}
               size="large"
               fullwidth={true}
-              afterIcon={require("@/assets/icons/Camera - Iconly Pro-1.png")}
+              afterIcon={require("@/assets/icons/Video - Iconly Pro.png")}
             />
             <Pressable style={styles.skipButton} onPress={onNext}>
               <Text style={styles.skipText}>Skip</Text>
@@ -448,27 +448,25 @@ const VirtualTourSubstep: React.FC<VirtualTourSubstepProps> = ({
 
             {/* Bottom Buttons */}
             <View style={styles.cameraBottomButtons}>
-              <Pressable
-                style={styles.nextRoomButton}
+              <AppButton
+                title="Next Room"
                 onPress={() => {
                   stopRecording();
                   setTimeout(() => setShowRoomNameModal(true), 500);
                 }}
                 disabled={!isRecording}
-              >
-                <Text style={styles.nextRoomText}>Next Room</Text>
-                <Image source={require("@/assets/icons/chevron-right.png")} />
-              </Pressable>
+                afterIcon={require("@/assets/icons/chevron-right.png")}
+                variant="secondary"
+              />
 
-              <Pressable
-                style={styles.finishTourButton}
+              <AppButton
+                title="Finish Tour"
                 onPress={() => {
                   stopRecording();
                   setTimeout(() => setShowFinishModal(true), 500);
                 }}
-              >
-                <Text style={styles.finishTourText}>Finish Tour</Text>
-              </Pressable>
+                variant="primary"
+              />
             </View>
           </CameraView>
         </View>
@@ -529,23 +527,18 @@ const VirtualTourSubstep: React.FC<VirtualTourSubstepProps> = ({
 
             {/* Bottom Buttons */}
             <View style={styles.previewBottomButtons}>
-              <Pressable
-                style={styles.nextRoomButtonAlt}
+              <AppButton
+                title="Next Room"
                 onPress={handleProceedToNextRoom}
-              >
-                <Text style={styles.nextRoomText}>Next Room</Text>
-                <Image
-                  source={require("@/assets/icons/arrow-right-light.png")}
-                  style={styles.nextRoomArrow}
-                />
-              </Pressable>
+                afterIcon={require("@/assets/icons/chevron-right.png")}
+                variant="secondary"
+              />
 
-              <Pressable
-                style={styles.finishTourButton}
+              <AppButton
+                title="Finish Tour"
                 onPress={handleFinishTour}
-              >
-                <Text style={styles.finishTourText}>Finish Tour</Text>
-              </Pressable>
+                variant="primary"
+              />
             </View>
           </View>
         </View>
@@ -603,23 +596,18 @@ const VirtualTourSubstep: React.FC<VirtualTourSubstepProps> = ({
             </View>
 
             <View style={styles.previewBottomButtons}>
-              <Pressable
-                style={styles.nextRoomButtonAlt}
+              <AppButton
+                title="Next Room"
                 onPress={handleProceedToNextRoom}
-              >
-                <Text style={styles.nextRoomText}>Next Room</Text>
-                <Image
-                  source={require("@/assets/icons/arrow-right-light.png")}
-                  style={styles.nextRoomArrow}
-                />
-              </Pressable>
+                afterIcon={require("@/assets/icons/chevron-right.png")}
+                variant="secondary"
+              />
 
-              <Pressable
-                style={styles.finishTourButton}
+              <AppButton
+                title="Finish Tour"
                 onPress={handleUploadTour}
-              >
-                <Text style={styles.finishTourText}>Finish Tour</Text>
-              </Pressable>
+                variant="primary"
+              />
             </View>
           </View>
         </View>

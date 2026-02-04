@@ -13,6 +13,7 @@ import SectionHeader from "@/components/sectionheader";
 import { useTheme } from "@/contexts/themeContext";
 import { ColorScheme } from "@/utils";
 import { useRouter } from "expo-router";
+import ViewHeader from "@/components/view-header";
 
 const Security = () => {
   const { colors } = useTheme();
@@ -24,15 +25,15 @@ const Security = () => {
   };
 
   const handleForgotPassword = () => {
-    // Navigate to Forgot Password screen
+    router.push("/auth/forgot-password");
     console.log("Navigate to Forgot Password");
   };
 
   return (
     <SafeAreaViewContainer>
-      <SectionHeader title="Security" />
+      <ViewHeader title="Security" />
       <ScrollView showsVerticalScrollIndicator={false}>
-        <View style={securityStyles.container}>
+        <View>
           {/* Change Password */}
           <Pressable
             style={securityStyles.menuItem}
@@ -46,7 +47,7 @@ const Security = () => {
               <Text style={securityStyles.menuText}>Change Password</Text>
             </View>
             <Image
-              source={require("@/assets/icons/arrow-right-light.png")}
+              source={require("@/assets/icons/chevron-right.png")}
               style={securityStyles.chevronIcon}
             />
           </Pressable>
@@ -58,7 +59,7 @@ const Security = () => {
           >
             <View style={securityStyles.menuItemLeft}>
               <Image
-                source={require("@/assets/icons/Lock.png")}
+                source={require("@/assets/icons/Danger Circle - Iconly Pro.png")}
                 style={securityStyles.menuIcon}
               />
               <Text style={securityStyles.menuText}>Forgot Password</Text>
@@ -74,17 +75,12 @@ export default Security;
 
 const styles = (colors: ColorScheme) =>
   StyleSheet.create({
-    container: {
-      paddingHorizontal: RFValue(3),
-      paddingTop: RFValue(20),
-    },
     menuItem: {
       flexDirection: "row",
       alignItems: "center",
       justifyContent: "space-between",
       paddingVertical: RFValue(16),
-      borderBottomWidth: 1,
-      borderBottomColor: colors.slate[300],
+      paddingHorizontal: RFValue(8),
     },
     menuItemLeft: {
       flexDirection: "row",
@@ -101,8 +97,6 @@ const styles = (colors: ColorScheme) =>
       color: colors.slate[650],
     },
     chevronIcon: {
-      width: RFValue(20),
-      height: RFValue(20),
-      tintColor: colors.slate[500],
+      tintColor: colors.slate[600],
     },
   });

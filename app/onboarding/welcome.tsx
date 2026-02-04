@@ -91,6 +91,7 @@ import { useTheme } from "@/contexts/themeContext";
 import { ColorScheme } from "@/utils";
 import { useRouter } from "expo-router";
 import RadioCard from "@/components/radio-card/radioCard";
+import { SimpleSelector } from "@/components/selector";
 
 const { width, height } = Dimensions.get("window");
 
@@ -142,17 +143,15 @@ const GetStarted: React.FC = () => {
 
             {/* Selection Options */}
             <View style={styles.optionsContainer}>
-              <RadioCard
-                label="I am a Renter looking for a space"
-                value="renter"
-                selected={selectedType}
-                onSelect={setSelectedType}
+              <SimpleSelector
+                title="I am a Renter looking for a space"
+                isChecked={selectedType === "renter"}
+                onChange={() => setSelectedType("renter")}
               />
-              <RadioCard
-                label="I am a space Agent / Manager / Owner"
-                value="agent"
-                selected={selectedType}
-                onSelect={setSelectedType}
+              <SimpleSelector
+                title="I am a space Agent / Manager / Owner"
+                isChecked={selectedType === "agent"}
+                onChange={() => setSelectedType("agent")}
               />
             </View>
 

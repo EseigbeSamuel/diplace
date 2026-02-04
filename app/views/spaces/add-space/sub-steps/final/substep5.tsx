@@ -163,13 +163,13 @@ const createStyles = (colors: ColorScheme) =>
     },
     totalPackageLabel: {
       fontSize: RFValue(14),
-      color: "rgba(255, 255, 255, 0.8)",
+      color: colors.slate[200],
       marginBottom: RFValue(8),
     },
     totalPackageAmount: {
       fontSize: RFValue(24),
       fontWeight: "700",
-      color: "#FFFFFF",
+      color: colors.slate[100],
     },
     moneyBagIcon: {
       width: RFValue(48),

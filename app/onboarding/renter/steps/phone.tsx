@@ -2,6 +2,7 @@ import { CustomBottomSheet } from "@/components/bottom-sheet";
 import AppButton from "@/components/button";
 import OTPInput from "@/components/otp";
 import SafeAreaViewContainer from "@/components/safeareaview";
+import TextField from "@/components/textfield";
 import { useTheme } from "@/contexts/themeContext";
 import { ColorScheme } from "@/utils";
 import { BottomSheetModal } from "@gorhom/bottom-sheet";
@@ -75,7 +76,7 @@ const PhoneVerificationStep = ({ onNext }: PhoneVerificationProps) => {
     }
 
     // Simulate API verification
-    if (otp === "12345") {
+    if (otp.length === 5) {
       verifyRef.current?.close();
       onNext();
     } else {
@@ -85,143 +86,107 @@ const PhoneVerificationStep = ({ onNext }: PhoneVerificationProps) => {
     }
   };
 
-  const isOtpComplete = otp.length === 6;
+  const isOtpComplete = otp.length === 5;
 
   // Phone Input Step
 
   return (
-    <SafeAreaViewContainer className="justify-center flex-1 bg-white">
-      <KeyboardAwareScrollView
-        enableOnAndroid={true}
-        extraScrollHeight={20}
-        enableAutomaticScroll={true}
-        contentContainerStyle={{ flex: 1, paddingBottom: RFValue(20) }}
-        // contentContainerClassName="flex-1 justify-center"
-      >
-        <View style={styles.contentContainer}>
-          {/* Phone Icon */}
-          <View style={styles.iconContainer}>
-            <Image
-              source={require("@/assets/icons/Call - Iconly Pro.png")}
-              style={styles.phoneIcon}
-              resizeMode="contain"
-            />
-          </View>
-
-          {/* Title and Description */}
-          <View style={styles.textContainer}>
-            <Text style={styles.headText}>Verify your phone number</Text>
-            <Text style={styles.descriptionText}>
-              We will send an OTP to your phone number to verify your account.
-            </Text>
-          </View>
-
-          {/* Phone Number Input */}
-          <View style={styles.phoneInputContainer}>
-            <Text style={styles.inputLabel}>Phone No.</Text>
-            <View style={styles.phoneInputWrapper}>
-              {/* Country Code Selector */}
-              <TouchableOpacity style={styles.countryCodeButton}>
-                <Image
-                  source={require("@/assets/icons/nigeria.png")}
-                  style={styles.flagIcon}
-                  resizeMode="contain"
-                />
-                <Text style={styles.countryCodeText}>{countryCode}</Text>
-                <Image
-                  source={require("@/assets/icons/chevrondown-bold.png")}
-                  resizeMode="contain"
-                />
-              </TouchableOpacity>
-
-              {/* Phone Number Input */}
-              <TextInput
-                style={styles.phoneInput}
-                placeholder="810-2934980"
-                placeholderTextColor={colors.slate[400]}
-                value={phoneNumber}
-                onChangeText={handlePhoneChange}
-                keyboardType="phone-pad"
-                maxLength={10}
-              />
-
-              {/* Clear Button */}
-              {phoneNumber.length > 0 && (
-                <TouchableOpacity
-                  style={styles.clearButton}
-                  onPress={() => setPhoneNumber("")}
-                >
-                  <Image
-                    source={require("@/assets/icons/close-contained.png")}
-                    style={styles.clearIcon}
-                    resizeMode="contain"
-                  />
-                </TouchableOpacity>
-              )}
-            </View>
-          </View>
-        </View>
-        <View style={styles.buttonContainer}>
-          <AppButton
-            title="Verify phone number"
-            onPress={handleSendOTP}
-            fullwidth
-            size="large"
-            disabled={phoneNumber.length < 10}
+    <KeyboardAwareScrollView
+      enableOnAndroid={true}
+      extraScrollHeight={20}
+      enableAutomaticScroll={true}
+      contentContainerStyle={{ flex: 1, paddingBottom: RFValue(20) }}
+      // contentContainerClassName="flex-1 justify-center"
+    >
+      <View style={styles.contentContainer}>
+        {/* Phone Icon */}
+        <View style={styles.iconContainer}>
+          <Image
+            source={require("@/assets/icons/Call - Iconly Pro.png")}
+            style={styles.phoneIcon}
+            resizeMode="contain"
           />
         </View>
-        <CustomBottomSheet
-          bottomSheetProps={{
-            ref: verifyRef,
-            snapPoints,
-            index: 2,
-            enableContentPanningGesture: true,
-            enableHandlePanningGesture: true,
-            enablePanDownToClose: true,
-          }}
-        >
-          <View style={styles.container}>
-            {/* Content */}
-            <View>
-              {/* Title and Description */}
-              <View style={styles.modalTextContainer}>
-                <Text style={styles.headModalText}>Verify OTP</Text>
-                <Text style={[styles.descriptionText, { textAlign: "center" }]}>
-                  Please input the code sent to your phone number.
+
+        {/* Title and Description */}
+        <View style={styles.textContainer}>
+          <Text style={styles.headText}>Verify your phone number</Text>
+          <Text style={styles.descriptionText}>
+            We will send an OTP to your phone number to verify your account.
+          </Text>
+        </View>
+
+        {/* Phone Number Input */}
+
+        <TextField
+          label="Phone No."
+          value={phoneNumber}
+          onChange={(text) => handlePhoneChange(text.toString())}
+          type="phone"
+          countryCode={countryCode}
+          onCountryCodeChange={setCountryCode}
+        />
+      </View>
+      <View style={styles.buttonContainer}>
+        <AppButton
+          title="Verify phone number"
+          onPress={handleSendOTP}
+          fullwidth
+          size="large"
+          disabled={phoneNumber.length < 10}
+        />
+      </View>
+      <CustomBottomSheet
+        bottomSheetProps={{
+          ref: verifyRef,
+          snapPoints,
+          index: 2,
+          enableContentPanningGesture: true,
+          enableHandlePanningGesture: true,
+          enablePanDownToClose: true,
+        }}
+      >
+        <View style={styles.container}>
+          {/* Content */}
+          <View>
+            {/* Title and Description */}
+            <View style={styles.modalTextContainer}>
+              <Text style={styles.headModalText}>Verify OTP</Text>
+              <Text style={[styles.descriptionText, { textAlign: "center" }]}>
+                Please input the code sent to your phone number.
+              </Text>
+            </View>
+
+            {/* OTP Input */}
+            <OTPInput length={5} onComplete={(code) => setOtp(code)} />
+
+            {/* Verify Button */}
+            <View style={styles.buttonContainer}>
+              <AppButton
+                title="Verify"
+                onPress={handleVerifyOTP}
+                fullwidth
+                size="large"
+                disabled={!isOtpComplete}
+              />
+            </View>
+            {/* Resend Link */}
+            <View style={styles.resendContainer}>
+              <Text style={styles.resendText}>Didn&apos;t receive OTP? </Text>
+              <TouchableOpacity
+                onPress={handleResendCode}
+                disabled={isResending}
+              >
+                <Text style={styles.resendLink}>
+                  {isResending ? "Sending..." : "Resend code"}
                 </Text>
-              </View>
-
-              {/* OTP Input */}
-              <OTPInput length={6} onComplete={(code) => setOtp(code)} />
-
-              {/* Verify Button */}
-              <View style={styles.buttonContainer}>
-                <AppButton
-                  title="Verify"
-                  onPress={handleVerifyOTP}
-                  fullwidth
-                  size="large"
-                  disabled={!isOtpComplete}
-                />
-              </View>
-              {/* Resend Link */}
-              <View style={styles.resendContainer}>
-                <Text style={styles.resendText}>Didn&apos;t receive OTP? </Text>
-                <TouchableOpacity
-                  onPress={handleResendCode}
-                  disabled={isResending}
-                >
-                  <Text style={styles.resendLink}>
-                    {isResending ? "Sending..." : "Resend code"}
-                  </Text>
-                </TouchableOpacity>
-                <Text style={styles.resendText}> 9:55</Text>
-              </View>
+              </TouchableOpacity>
+              <Text style={styles.resendText}> 9:55</Text>
             </View>
           </View>
-        </CustomBottomSheet>
-      </KeyboardAwareScrollView>
-    </SafeAreaViewContainer>
+        </View>
+      </CustomBottomSheet>
+    </KeyboardAwareScrollView>
   );
 };
 
@@ -244,6 +209,7 @@ const styleSheet = (colors: ColorScheme) =>
     phoneIcon: {
       width: RFValue(40),
       height: RFValue(40),
+      tintColor: colors.slate[650],
     },
     textContainer: {
       marginBottom: RFValue(40),

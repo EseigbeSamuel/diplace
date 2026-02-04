@@ -18,6 +18,7 @@ import { ColorScheme } from "@/utils";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import { useRouter } from "expo-router";
 import { useSpaceStore } from "@/store/useSpace";
+import TextField from "@/components/textfield";
 
 interface Bank {
   id: number;
@@ -131,18 +132,18 @@ const AddBankDetails = ({
 
   return (
     <SafeAreaViewContainer>
-      <Pressable onPress={onClose} style={addBankStyles.confirmCloseButton}>
-        <Image
-          source={require("@/assets/icons/X-close.png")}
-          style={addBankStyles.closeIcon}
-        />
-      </Pressable>
       <View style={addBankStyles.container}>
         <KeyboardAwareScrollView
           showsVerticalScrollIndicator={false}
           keyboardShouldPersistTaps="handled"
           contentContainerStyle={{ paddingBottom: 40 }}
         >
+          <Pressable onPress={onClose} style={addBankStyles.confirmCloseButton}>
+            <Image
+              source={require("@/assets/icons/X-close.png")}
+              style={addBankStyles.closeIcon}
+            />
+          </Pressable>
           <View style={addBankStyles.container}>
             {/* Header */}
             <View style={addBankStyles.headerSection}>
@@ -154,7 +155,7 @@ const AddBankDetails = ({
               <View style={addBankStyles.cardHeader}>
                 <View style={addBankStyles.bankIconContainer}>
                   <Image
-                    source={require("@/assets/icons/bank-fill.png")}
+                    source={require("@/assets/icons/bank emoji.png")}
                     style={addBankStyles.bankIcon}
                   />
                 </View>
@@ -193,50 +194,25 @@ const AddBankDetails = ({
             >
               <View style={addBankStyles.formSection}>
                 {/* Bank Name Selector */}
-                <Pressable
-                  style={addBankStyles.selectorContainer}
-                  onPress={() => setShowBankModal(true)}
-                >
-                  <View style={addBankStyles.selectorValue}>
-                    <Text style={addBankStyles.selectorLabel}>Bank Name</Text>
-                    <Image
-                      source={require("@/assets/icons/chevron-right.png")}
-                    />
-                  </View>
-                  <View style={addBankStyles.selectorValue}>
-                    {selectedBank && (
-                      <Text
-                        style={[
-                          addBankStyles.selectorText,
-                          !selectedBank && addBankStyles.placeholder,
-                        ]}
-                      >
-                        {selectedBank || "Select bank"}
-                      </Text>
-                    )}
-                  </View>
-                </Pressable>
+
+                <TextField
+                  label="Bank Name"
+                  type="dropdown"
+                  value={selectedBank}
+                  onDropdownPress={() => setShowBankModal(true)}
+                  onChange={(value) => setSelectedBank(value.toString())}
+                />
 
                 {/* Account Number Input */}
-                <View style={addBankStyles.inputWrapper}>
-                  <Text style={addBankStyles.inputLabel}>Account Number</Text>
-                  <View style={addBankStyles.inputContainer}>
-                    {selectedBank && (
-                      <TextInput
-                        style={addBankStyles.textInput}
-                        value={accountNumber}
-                        onChangeText={setAccountNumber}
-                        placeholder="Enter account number"
-                        placeholderTextColor={colors.slate[450]}
-                        keyboardType="numeric"
-                        maxLength={10}
-                        editable={!!selectedBank}
-                      />
-                    )}
-                  </View>
 
-                  {/* Verifying/Account Name Display */}
-                </View>
+                <TextField
+                  label="Account Number"
+                  value={accountNumber}
+                  onChange={(value) => setAccountNumber(value.toString())}
+                  keyboardType="numeric"
+                  maxLength={10}
+                  editable={!!selectedBank}
+                />
                 {accountNumber.length === 10 && (
                   <View>
                     {isVerifying ? (
@@ -250,14 +226,12 @@ const AddBankDetails = ({
                         />
                       </View>
                     ) : accountName ? (
-                      <View style={addBankStyles.accountNameDisplay}>
-                        <Text style={addBankStyles.accountNameDisplayLabel}>
-                          Account Name
-                        </Text>
-                        <Text style={addBankStyles.accountNameDisplayValue}>
-                          {accountName}
-                        </Text>
-                      </View>
+                      <TextField
+                        label="Account Name"
+                        value={accountName}
+                        onChange={(value) => setAccountName(value.toString())}
+                        editable={false}
+                      />
                     ) : null}
                   </View>
                 )}
@@ -353,7 +327,7 @@ const styles = (colors: ColorScheme) =>
       paddingTop: 20,
     },
     headerSection: {
-      paddingTop: RFValue(20),
+      paddingTop: RFValue(8),
       marginBottom: RFValue(16),
     },
     title: {
@@ -365,7 +339,7 @@ const styles = (colors: ColorScheme) =>
       backgroundColor: colors.slate[650],
       borderRadius: RFValue(16),
       padding: RFValue(20),
-      marginBottom: RFValue(32),
+      marginBottom: RFValue(16),
       minHeight: RFValue(180),
     },
     cardHeader: {
@@ -378,27 +352,25 @@ const styles = (colors: ColorScheme) =>
       width: RFValue(48),
       height: RFValue(48),
       borderRadius: RFValue(12),
-      backgroundColor: "rgba(255, 255, 255, 0.15)",
       alignItems: "center",
       justifyContent: "center",
     },
     bankIcon: {
-      width: RFValue(24),
-      height: RFValue(24),
-      tintColor: "#FFFFFF",
+      width: RFValue(48),
+      height: RFValue(48),
     },
     accountNumberSection: {
       alignItems: "flex-end",
     },
     accountNumberLabel: {
       fontSize: RFValue(11),
-      color: "rgba(255, 255, 255, 0.7)",
+      color: colors.slate[200],
       marginBottom: RFValue(4),
     },
     accountNumber: {
       fontSize: RFValue(20),
       fontWeight: "700",
-      color: "#FFFFFF",
+      color: colors.slate[100],
       letterSpacing: 1,
     },
     cardFooter: {
@@ -410,30 +382,30 @@ const styles = (colors: ColorScheme) =>
     },
     accountNameLabel: {
       fontSize: RFValue(11),
-      color: "rgba(255, 255, 255, 0.7)",
+      color: colors.slate[200],
       marginBottom: RFValue(4),
     },
     accountName: {
       fontSize: RFValue(14),
       fontWeight: "600",
-      color: "#FFFFFF",
+      color: colors.slate[100],
     },
     bankSection: {
       alignItems: "flex-end",
     },
     bankLabel: {
       fontSize: RFValue(11),
-      color: "rgba(255, 255, 255, 0.7)",
+      color: colors.slate[200],
       marginBottom: RFValue(4),
     },
     bankName: {
       fontSize: RFValue(12),
       fontWeight: "600",
-      color: "#FFFFFF",
+      color: colors.slate[100],
       textAlign: "right",
     },
     formSection: {
-      gap: RFValue(16),
+      gap: RFValue(4),
     },
     selectorContainer: {
       paddingVertical: RFValue(12),
@@ -449,9 +421,6 @@ const styles = (colors: ColorScheme) =>
       marginBottom: RFValue(8),
     },
     confirmCloseButton: {
-      position: "absolute",
-      top: RFValue(16),
-      left: RFValue(16),
       width: RFValue(32),
       height: RFValue(32),
       alignItems: "center",

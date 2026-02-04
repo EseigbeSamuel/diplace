@@ -1,5 +1,6 @@
 import SafeAreaViewContainer from "@/components/safeareaview";
 import SectionHeader from "@/components/sectionheader";
+import ViewHeader from "@/components/view-header";
 import { useTheme } from "@/contexts/themeContext";
 import { ColorScheme } from "@/utils";
 import { useRouter } from "expo-router";
@@ -137,7 +138,7 @@ const RecentEarnings = () => {
 
   return (
     <SafeAreaViewContainer>
-      <SectionHeader title="Recent Earnings" />
+      <ViewHeader title="Recent Earnings" />
       <ScrollView showsVerticalScrollIndicator={false}>
         {/* Filter Section */}
         <View style={recentEarningsStyles.filterContainer}>
@@ -149,7 +150,7 @@ const RecentEarnings = () => {
               {selectedFilter}
             </Text>
             <Image
-              source={require("@/assets/icons/arrow-right-light.png")}
+              source={require("@/assets/icons/chevron-down.png")}
               style={recentEarningsStyles.chevronIcon}
             />
           </Pressable>
@@ -206,8 +207,6 @@ export default RecentEarnings;
 const styles = (colors: ColorScheme) =>
   StyleSheet.create({
     filterContainer: {
-      paddingHorizontal: RFValue(16),
-      paddingVertical: RFValue(16),
       alignItems: "flex-end",
     },
     filterButton: {
@@ -215,7 +214,7 @@ const styles = (colors: ColorScheme) =>
       alignItems: "center",
       paddingHorizontal: RFValue(12),
       paddingVertical: RFValue(8),
-      backgroundColor: colors.slate[150],
+      backgroundColor: colors.slate[200],
       borderRadius: RFValue(8),
       gap: RFValue(8),
     },
@@ -248,6 +247,9 @@ const styles = (colors: ColorScheme) =>
       flexDirection: "row",
       justifyContent: "space-between",
       alignItems: "center",
+      paddingVertical: RFValue(12),
+      borderBottomWidth: 1,
+      borderBottomColor: colors.slate[300],
     },
     transactionLeft: {
       flexDirection: "row",

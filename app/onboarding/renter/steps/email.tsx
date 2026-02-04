@@ -44,7 +44,7 @@ const EmailVerificationStep = ({ onNext }: EmailVerificationProps) => {
       return;
     }
 
-    if (otp === "12345") {
+    if (otp.length === 5) {
       onNext();
     } else {
       Alert.alert("Error", "Invalid OTP code. Please try again.");

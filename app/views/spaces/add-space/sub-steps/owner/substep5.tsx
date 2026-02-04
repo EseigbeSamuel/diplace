@@ -15,6 +15,7 @@ import * as DocumentPicker from "expo-document-picker";
 import { useTheme } from "@/contexts/themeContext";
 import { ColorScheme } from "@/utils";
 import { useSpaceStore } from "@/store/useSpace";
+import MediaPickerModal from "@/components/media-picker-modal";
 
 interface RentalAgreementSubstepProps {
   onNext: () => void;
@@ -235,58 +236,13 @@ const RentalAgreementSubstep: React.FC<RentalAgreementSubstepProps> = ({
         </TouchableOpacity>
       </View>
 
-      {/* Document Picker Modal */}
-      <Modal
+      <MediaPickerModal
         visible={showPicker}
-        transparent
-        animationType="slide"
-        onRequestClose={() => setShowPicker(false)}
-      >
-        <TouchableOpacity
-          style={styles.modalOverlay}
-          activeOpacity={1}
-          onPress={() => setShowPicker(false)}
-        >
-          <TouchableOpacity
-            activeOpacity={1}
-            style={styles.modalContent}
-            onPress={(e) => e.stopPropagation()}
-          >
-            <View style={styles.modalHandle} />
-            <Text style={styles.modalTitle}>Select from device</Text>
-
-            <View style={styles.optionsContainer}>
-              <TouchableOpacity
-                style={styles.optionButton}
-                onPress={handleSelectFromFiles}
-              >
-                <View style={styles.optionIconBlue}>
-                  <Image
-                    source={require("@/assets/icons/folder.png")}
-                    style={styles.optionImage}
-                    resizeMode="contain"
-                  />
-                </View>
-                <Text style={styles.optionText}>Files</Text>
-              </TouchableOpacity>
-
-              <TouchableOpacity
-                style={styles.optionButton}
-                onPress={handleSelectFromCamera}
-              >
-                <View style={styles.optionIconOrange}>
-                  <Image
-                    source={require("@/assets/icons/photos.png")}
-                    style={styles.optionImage}
-                    resizeMode="contain"
-                  />
-                </View>
-                <Text style={styles.optionText}>Camera roll</Text>
-              </TouchableOpacity>
-            </View>
-          </TouchableOpacity>
-        </TouchableOpacity>
-      </Modal>
+        onClose={() => setShowPicker(false)}
+        onCameraRoll={handleSelectFromCamera}
+        onChoosePhoto={handleSelectFromFiles}
+        showTakePicture={false}
+      />
     </View>
   );
 };

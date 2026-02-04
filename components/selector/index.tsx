@@ -36,6 +36,7 @@ export const SimpleSelector = ({
               ? require("@/assets/icons/checkbox-circle-fill.png")
               : require("@/assets/icons/checkbox-blank-circle-outline.png")
           }
+          style={Styles.checkbox}
           className="w-6 h-6"
         />
         <Text style={Styles.subTitle}>{title}</Text>
@@ -94,8 +95,7 @@ const styles = (colors: ColorScheme) =>
       color: colors.slate[650],
     },
     checkbox: {
-      backgroundColor: colors.slate[650],
-      color: colors.slate[650],
+      tintColor: colors.slate[650],
     },
     checkboxButton: {
       color: colors.slate[100],

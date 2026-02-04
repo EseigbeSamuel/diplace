@@ -18,7 +18,7 @@ import {
 
 import { RFValue } from "react-native-responsive-fontsize";
 export default function RenterHome() {
-  const { colors } = useTheme();
+  const { colors, isDarkMode } = useTheme();
   const homeStyles = styles(colors);
 
   return (
@@ -82,11 +82,19 @@ export default function RenterHome() {
                 onPress={() => router.push("/views/apartments")}
                 className="flex-row items-center gap-2"
               >
-                <Text>View More</Text>
-                <Image
-                  source={require("@/assets/icons/arrow-right-dark.png")}
-                  className="w-[20px] h-[20px]"
-                />
+                <Text style={homeStyles.text}>View More</Text>
+
+                {isDarkMode ? (
+                  <Image
+                    source={require("@/assets/icons/arrow-right-light.png")}
+                    className="w-[20px] h-[20px]"
+                  />
+                ) : (
+                  <Image
+                    source={require("@/assets/icons/arrow-right-dark.png")}
+                    className="w-[20px] h-[20px]"
+                  />
+                )}
               </Pressable>
             </View>
 
@@ -136,5 +144,10 @@ const styles = (colors: ColorScheme) =>
       fontSize: RFValue(14),
       lineHeight: RFValue(20),
       color: colors.slate[600],
+    },
+    text: {
+      fontSize: RFValue(14),
+      lineHeight: RFValue(20),
+      color: colors.slate[650],
     },
   });
