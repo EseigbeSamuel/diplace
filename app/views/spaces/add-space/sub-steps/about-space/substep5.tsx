@@ -105,7 +105,7 @@ const SpaceDescriptionSubstep: React.FC<SpaceDescriptionSubstepProps> = ({
                 })
               }
             >
-              <Text>Use our suggestion?</Text>
+              <Text style={styles.charCountText}>Use our suggestion?</Text>
             </Pressable>
             <Text style={styles.charCount}>
               Max {MAX_DESCRIPTION_LENGTH.toLocaleString()} characters
@@ -203,6 +203,10 @@ const createStyles = (colors: ColorScheme) =>
     charCount: {
       fontSize: RFValue(13),
       color: colors.slate[500],
+    },
+    charCountText: {
+      fontSize: RFValue(13),
+      color: colors.slate[650],
     },
     buttonContainer: {
       paddingVertical: RFValue(16),

@@ -1,4 +1,5 @@
 import AppButton from "@/components/button";
+import TextField from "@/components/textfield";
 import { useTheme } from "@/contexts/themeContext";
 import { ColorScheme } from "@/utils";
 import React, { useEffect, useState } from "react";
@@ -14,7 +15,6 @@ import {
   View,
 } from "react-native";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
-import { RFValue } from "react-native-responsive-fontsize";
 
 interface Bank {
   id: number;
@@ -52,7 +52,7 @@ const AddBankDetails = ({ onNext }: props) => {
   ];
 
   const filteredBanks = banks.filter((bank) =>
-    bank.name.toLowerCase().includes(searchQuery.toLowerCase())
+    bank.name.toLowerCase().includes(searchQuery.toLowerCase()),
   );
 
   // Auto-verify account when 10 digits are entered
@@ -156,47 +156,27 @@ const AddBankDetails = ({ onNext }: props) => {
             keyboardShouldPersistTaps="handled"
             contentContainerStyle={{ paddingBottom: 40 }}
           >
-            <View style={addBankStyles.formSection}>
+            <View>
               {/* Bank Name Selector */}
-              <Pressable
-                style={addBankStyles.selectorContainer}
-                onPress={() => setShowBankModal(true)}
-              >
-                <Text style={addBankStyles.selectorLabel}>Bank Name</Text>
-                {selectedBank && (
-                  <View style={addBankStyles.selectorValue}>
-                    <Text
-                      style={[
-                        addBankStyles.selectorText,
-                        !selectedBank && addBankStyles.placeholder,
-                      ]}
-                    >
-                      {selectedBank || "Select bank"}
-                    </Text>
-                    <Image
-                      source={require("@/assets/icons/chevron-right.png")}
-                    />
-                  </View>
-                )}
-              </Pressable>
+
+              <TextField
+                label="Bank Name"
+                value={selectedBank}
+                type="dropdown"
+                onDropdownPress={() => setShowBankModal(true)}
+                onChange={() => {}}
+              />
 
               {/* Account Number Input */}
               <View>
-                <View style={addBankStyles.inputContainer}>
-                  <Text style={addBankStyles.inputLabel}>Account Number</Text>
-                  {selectedBank && (
-                    <TextInput
-                      style={addBankStyles.textInput}
-                      value={accountNumber}
-                      onChangeText={setAccountNumber}
-                      placeholder="Enter account number"
-                      placeholderTextColor={colors.slate[450]}
-                      keyboardType="numeric"
-                      maxLength={10}
-                      editable={!!selectedBank}
-                    />
-                  )}
-                </View>
+                <TextField
+                  label="Account Number"
+                  value={accountNumber}
+                  onChange={(text) => setAccountNumber(text.toString())}
+                  keyboardType="numeric"
+                  maxLength={10}
+                  editable={!!selectedBank}
+                />
                 {isVerifying && (
                   <Text style={addBankStyles.verifyingContainer}>
                     <Text style={addBankStyles.verifyingText}>
@@ -208,16 +188,12 @@ const AddBankDetails = ({ onNext }: props) => {
 
                 {/* Verifying/Account Name Display */}
                 {accountNumber.length === 10 && !isVerifying && (
-                  <View style={addBankStyles.verificationSection}>
-                    <View style={addBankStyles.accountNameDisplay}>
-                      <Text style={addBankStyles.accountNameDisplayLabel}>
-                        Account Name
-                      </Text>
-                      <Text style={addBankStyles.accountNameDisplayValue}>
-                        {accountName}
-                      </Text>
-                    </View>
-                  </View>
+                  <TextField
+                    label="Account Name"
+                    value={accountName}
+                    onChange={(text) => setAccountName(text.toString())}
+                    editable={false}
+                  />
                 )}
               </View>
             </View>
@@ -323,6 +299,7 @@ const styles = (colors: ColorScheme) =>
     headIcon: {
       width: RFValue(60),
       height: RFValue(60),
+      tintColor: colors.slate[650],
     },
     title: {
       fontSize: RFValue(24),
@@ -364,13 +341,13 @@ const styles = (colors: ColorScheme) =>
     },
     accountNumberLabel: {
       fontSize: RFValue(11),
-      color: "rgba(255, 255, 255, 0.7)",
+      color: colors.slate[200],
       marginBottom: RFValue(4),
     },
     accountNumber: {
       fontSize: RFValue(20),
       fontWeight: "700",
-      color: "#FFFFFF",
+      color: colors.slate[100],
       letterSpacing: 1,
     },
     cardFooter: {
@@ -382,31 +359,29 @@ const styles = (colors: ColorScheme) =>
     },
     accountNameLabel: {
       fontSize: RFValue(11),
-      color: "rgba(255, 255, 255, 0.7)",
+      color: colors.slate[200],
       marginBottom: RFValue(4),
     },
     accountName: {
       fontSize: RFValue(14),
       fontWeight: "600",
-      color: "#FFFFFF",
+      color: colors.slate[100],
     },
     bankSection: {
       alignItems: "flex-end",
     },
     bankLabel: {
       fontSize: RFValue(11),
-      color: "rgba(255, 255, 255, 0.7)",
+      color: colors.slate[200],
       marginBottom: RFValue(4),
     },
     bankName: {
       fontSize: RFValue(12),
       fontWeight: "600",
-      color: "#FFFFFF",
+      color: colors.slate[100],
       textAlign: "right",
     },
-    formSection: {
-      gap: RFValue(16),
-    },
+
     selectorContainer: {
       paddingVertical: RFValue(16),
       backgroundColor: colors.slate[200],

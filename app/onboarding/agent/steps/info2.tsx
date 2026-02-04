@@ -195,6 +195,7 @@ const styles = (colors: ColorScheme) =>
     checklistIcon: {
       width: RFValue(20),
       height: RFValue(20),
+      tintColor: colors.slate[650],
     },
     checklistLabel: {
       flex: 1,

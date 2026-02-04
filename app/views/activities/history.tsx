@@ -1,12 +1,20 @@
 import HistoryCard from "@/components/HistoryCard";
+import { useTheme } from "@/contexts/themeContext";
 import React from "react";
 import { Text, View } from "react-native";
 
 const ActivityHistory = () => {
+  const { colors, isDarkMode } = useTheme();
+
   return (
     <View>
       <View className="py-4">
-        <Text className="font-semibold text-lg">August, 2025</Text>
+        <Text
+          style={{ color: colors.slate[650] }}
+          className="font-semibold text-lg"
+        >
+          August, 2025
+        </Text>
         <HistoryCard
           badgeType="successful"
           action="Scheduled"
@@ -16,7 +24,12 @@ const ActivityHistory = () => {
         />
       </View>
       <View>
-        <Text className="font-semibold text-lg">July, 2025</Text>
+        <Text
+          style={{ color: colors.slate[650] }}
+          className="font-semibold text-lg"
+        >
+          July, 2025
+        </Text>
         <HistoryCard
           badgeType="inprogress"
           action="Cancellation"

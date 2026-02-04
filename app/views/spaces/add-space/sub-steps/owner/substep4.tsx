@@ -13,6 +13,7 @@ import AppButton from "@/components/button";
 import { useTheme } from "@/contexts/themeContext";
 import { ColorScheme } from "@/utils";
 import { useSpaceStore } from "@/store/useSpace";
+import TextField from "@/components/textfield";
 
 interface LandlordDetailsFormProps {
   onNext: () => void;
@@ -26,6 +27,7 @@ const LandlordDetailsForm: React.FC<LandlordDetailsFormProps> = ({
   const { colors } = useTheme();
   const styles = createStyles(colors);
   const { setValue, setType, spaceForm } = useSpaceStore();
+  const [countryCode, setCountryCode] = useState("+234");
 
   const handleNext = () => {
     if (
@@ -59,17 +61,14 @@ const LandlordDetailsForm: React.FC<LandlordDetailsFormProps> = ({
 
         {/* Full Name Input */}
         <View style={styles.inputSection}>
-          <Text style={styles.inputLabel}>Full Name</Text>
-          <TextInput
-            style={styles.textInput}
-            placeholder=""
-            placeholderTextColor={colors.slate[500]}
+          <TextField
+            label="Full Name"
             value={spaceForm.value.ownerDetails?.fullName || ""}
-            onChangeText={(text) => {
+            onChange={(text) => {
               setValue({
                 ownerDetails: {
                   ...spaceForm.value.ownerDetails,
-                  fullName: text,
+                  fullName: text.toString(),
                 },
               });
             }}
@@ -78,37 +77,21 @@ const LandlordDetailsForm: React.FC<LandlordDetailsFormProps> = ({
 
         {/* Phone Number Input */}
         <View style={styles.inputSection}>
-          <Text style={styles.inputLabel}>Phone No.</Text>
-          <View style={styles.phoneInputContainer}>
-            <View style={styles.countryCodeSelector}>
-              <Image
-                source={require("@/assets/icons/nigeria.png")}
-                style={styles.flagIcon}
-              />
-              <Text style={styles.countryCodeText}>+234</Text>
-              <Image
-                source={require("@/assets/icons/chevrondown-bold.png")}
-                style={styles.chevronDownIcon}
-              />
-            </View>
-            <View style={styles.phoneNumberInput}>
-              <TextInput
-                style={styles.phoneInputField}
-                placeholder="Phone No."
-                placeholderTextColor={colors.slate[500]}
-                value={spaceForm.value.ownerDetails?.phoneNumber || ""}
-                onChangeText={(text) => {
-                  setValue({
-                    ownerDetails: {
-                      ...spaceForm.value.ownerDetails,
-                      phoneNumber: text,
-                    },
-                  });
-                }}
-                keyboardType="phone-pad"
-              />
-            </View>
-          </View>
+          <TextField
+            label="Phone No."
+            value={spaceForm.value.ownerDetails?.phoneNumber || ""}
+            onChange={(text) => {
+              setValue({
+                ownerDetails: {
+                  ...spaceForm.value.ownerDetails,
+                  phoneNumber: text.toString(),
+                },
+              });
+            }}
+            type="phone"
+            countryCode={countryCode}
+            onCountryCodeChange={setCountryCode}
+          />
         </View>
       </KeyboardAwareScrollView>
 

@@ -13,6 +13,7 @@ import SectionHeader from "@/components/sectionheader";
 import { useTheme } from "@/contexts/themeContext";
 import { ColorScheme } from "@/utils";
 import { useRouter } from "expo-router";
+import ViewHeader from "@/components/view-header";
 
 const YourReviews = () => {
   const { colors } = useTheme();
@@ -33,7 +34,7 @@ const YourReviews = () => {
       color: colors.error[300],
     },
     {
-      icon: require("@/assets/icons/success.png"),
+      icon: require("@/assets/icons/checkbox-circle-fill.png"),
       value: "245",
       label: "Completed\nBookings",
       color: colors.success[200],
@@ -51,6 +52,24 @@ const YourReviews = () => {
   const reviews = [
     {
       id: 1,
+      name: "Elizabeth Anniesamka",
+      verified: true,
+      date: "2 days ago",
+      avatar: "https://randomuser.me/api/portraits/men/1.jpg",
+      comment:
+        "This agent is very professional and down to earth. The images he uploads describes what I saw and I appreciate his openess.",
+    },
+    {
+      id: 2,
+      name: "Elizabeth Anniesamka",
+      verified: false,
+      date: "2 days ago",
+      avatar: "https://randomuser.me/api/portraits/men/1.jpg",
+      comment:
+        "This agent is very professional and down to earth. The images he uploads describes what I saw and I appreciate his openess.",
+    },
+    {
+      id: 3,
       name: "Elizabeth Anniesamka",
       verified: true,
       date: "2 days ago",
@@ -84,24 +103,20 @@ const YourReviews = () => {
 
   return (
     <SafeAreaViewContainer>
-      <SectionHeader title="Your Reviews" />
+      <ViewHeader title="Your Reviews" />
       <ScrollView showsVerticalScrollIndicator={false}>
         {/* Stats Section */}
         <View style={reviewStyles.statsContainer}>
           {stats.map((stat, index) => (
             <View key={index} style={reviewStyles.statCard}>
-              <View
-                style={[
-                  reviewStyles.statIconContainer,
-                  { backgroundColor: stat.color + "20" },
-                ]}
-              >
+              <View style={[reviewStyles.statIconContainer]}>
                 <Image
                   source={stat.icon}
                   style={[reviewStyles.statIcon, { tintColor: stat.color }]}
                 />
+                <Text style={reviewStyles.statValue}>{stat.value}</Text>
               </View>
-              <Text style={reviewStyles.statValue}>{stat.value}</Text>
+
               <Text style={reviewStyles.statLabel}>{stat.label}</Text>
             </View>
           ))}
@@ -195,28 +210,28 @@ const styles = (colors: ColorScheme) =>
     statsContainer: {
       flexDirection: "row",
       justifyContent: "space-between",
-      paddingHorizontal: RFValue(16),
-      paddingVertical: RFValue(20),
+      paddingVertical: RFValue(16),
       gap: RFValue(12),
+      backgroundColor: colors.slate[150],
+      borderRadius: RFValue(16),
     },
     statCard: {
       flex: 1,
       alignItems: "center",
     },
     statIconContainer: {
-      width: RFValue(40),
-      height: RFValue(40),
-      borderRadius: RFValue(20),
       alignItems: "center",
       justifyContent: "center",
-      marginBottom: RFValue(8),
+      display: "flex",
+      flexDirection: "row",
+      gap: RFValue(4),
     },
     statIcon: {
       width: RFValue(20),
       height: RFValue(20),
     },
     statValue: {
-      fontSize: RFValue(18),
+      fontSize: RFValue(16),
       fontWeight: "700",
       color: colors.slate[650],
       marginBottom: RFValue(4),
@@ -230,8 +245,6 @@ const styles = (colors: ColorScheme) =>
     section: {
       paddingHorizontal: RFValue(3),
       paddingVertical: RFValue(20),
-      borderTopWidth: 1,
-      borderTopColor: colors.slate[300],
     },
     sectionTitle: {
       fontSize: RFValue(18),
@@ -308,15 +321,18 @@ const styles = (colors: ColorScheme) =>
     },
     seeMoreText: {
       fontSize: RFValue(14),
-      color: colors.info[200],
+      color: colors.slate[650],
     },
     arrowIcon: {
       width: RFValue(16),
       height: RFValue(16),
-      tintColor: colors.info[200],
+      tintColor: colors.slate[650],
     },
     reviewCard: {
       marginBottom: RFValue(16),
+      borderBottomColor: colors.slate[300],
+      borderBottomWidth: 1,
+      paddingBottom: RFValue(16),
     },
     reviewHeader: {
       flexDirection: "row",

@@ -22,14 +22,8 @@ const filterTabs = ["All", "Unread", "Read", "Dates"];
 interface ChatItemProps {
   item: (typeof mockChats)[0];
   colors: ColorScheme;
+  isDarkMode: boolean;
 }
-
-// Notification Bell Icon Component
-const BellIcon = ({ color }: { color: string }) => (
-  <View style={[styles.bellIcon, { backgroundColor: color }]}>
-    <Image source={require("@/assets/icons/notification.png")} />
-  </View>
-);
 
 // Verified Badge Component
 const VerifiedBadge = () => (
@@ -38,8 +32,9 @@ const VerifiedBadge = () => (
   </View>
 );
 
-const ChatItem: React.FC<ChatItemProps> = ({ item, colors }) => {
+const ChatItem: React.FC<ChatItemProps> = ({ item, colors, isDarkMode }) => {
   const router = useRouter();
+
   return (
     <TouchableOpacity
       style={[styles.chatItem, { backgroundColor: colors.background }]}
@@ -107,7 +102,7 @@ const ChatItem: React.FC<ChatItemProps> = ({ item, colors }) => {
 };
 
 const ChatsPage: React.FC = () => {
-  const { colors } = useTheme();
+  const { colors, isDarkMode } = useTheme();
   const [searchQuery, setSearchQuery] = useState("");
   const [activeFilter, setActiveFilter] = useState("All");
 
@@ -123,7 +118,7 @@ const ChatsPage: React.FC = () => {
   });
 
   const renderChatItem = ({ item }: { item: (typeof mockChats)[0] }) => (
-    <ChatItem item={item} colors={colors} />
+    <ChatItem item={item} colors={colors} isDarkMode={isDarkMode} />
   );
 
   const renderFilterTab = (tab: string) => (
@@ -186,13 +181,6 @@ const ChatsPage: React.FC = () => {
         showsVerticalScrollIndicator={false}
         contentContainerStyle={styles.chatListContent}
       />
-
-      {/* Floating Action Button */}
-      <TouchableOpacity
-        style={[styles.fab, { backgroundColor: colors.slate[650] }]}
-      >
-        <Text style={styles.fabIcon}>+</Text>
-      </TouchableOpacity>
     </SafeAreaViewContainer>
   );
 };

@@ -14,6 +14,7 @@ import AppButton from "@/components/button";
 import { useTheme } from "@/contexts/themeContext";
 import { ColorScheme } from "@/utils";
 import { useRouter } from "expo-router";
+import ViewHeader from "@/components/view-header";
 
 interface BankCard {
   id: number;
@@ -48,7 +49,7 @@ const PaymentDetails = () => {
 
   return (
     <SafeAreaViewContainer>
-      <SectionHeader title="Payment Details" />
+      <ViewHeader title="Payment Details" />
       <ScrollView showsVerticalScrollIndicator={false}>
         <View style={paymentStyles.container}>
           {/* Bank Cards List */}
@@ -60,7 +61,7 @@ const PaymentDetails = () => {
                     <View style={paymentStyles.cardHeader}>
                       <View style={paymentStyles.bankIconContainer}>
                         <Image
-                          source={require("@/assets/icons/bank-fill.png")}
+                          source={require("@/assets/icons/bank emoji.png")}
                           style={paymentStyles.bankIcon}
                         />
                       </View>
@@ -131,8 +132,6 @@ const styles = (colors: ColorScheme) =>
   StyleSheet.create({
     container: {
       flex: 1,
-      paddingHorizontal: RFValue(3),
-      paddingTop: RFValue(20),
     },
     cardsContainer: {
       gap: RFValue(20),
@@ -156,27 +155,25 @@ const styles = (colors: ColorScheme) =>
       width: RFValue(48),
       height: RFValue(48),
       borderRadius: RFValue(12),
-      backgroundColor: "rgba(255, 255, 255, 0.15)",
       alignItems: "center",
       justifyContent: "center",
     },
     bankIcon: {
-      width: RFValue(24),
-      height: RFValue(24),
-      tintColor: "#FFFFFF",
+      width: RFValue(48),
+      height: RFValue(48),
     },
     accountNumberSection: {
       alignItems: "flex-end",
     },
     accountNumberLabel: {
       fontSize: RFValue(11),
-      color: "rgba(255, 255, 255, 0.7)",
+      color: colors.slate[300],
       marginBottom: RFValue(4),
     },
     accountNumber: {
       fontSize: RFValue(20),
       fontWeight: "700",
-      color: "#FFFFFF",
+      color: colors.slate[200],
       letterSpacing: 1,
     },
     cardFooter: {
@@ -188,26 +185,26 @@ const styles = (colors: ColorScheme) =>
     },
     accountNameLabel: {
       fontSize: RFValue(11),
-      color: "rgba(255, 255, 255, 0.7)",
+      color: colors.slate[300],
       marginBottom: RFValue(4),
     },
     accountName: {
       fontSize: RFValue(14),
       fontWeight: "600",
-      color: "#FFFFFF",
+      color: colors.slate[200],
     },
     bankSection: {
       alignItems: "flex-end",
     },
     bankLabel: {
       fontSize: RFValue(11),
-      color: "rgba(255, 255, 255, 0.7)",
+      color: colors.slate[300],
       marginBottom: RFValue(4),
     },
     bankName: {
       fontSize: RFValue(12),
       fontWeight: "600",
-      color: "#FFFFFF",
+      color: colors.slate[200],
     },
     removeButton: {
       flexDirection: "row",
@@ -241,8 +238,5 @@ const styles = (colors: ColorScheme) =>
       paddingHorizontal: RFValue(5),
       paddingVertical: RFValue(20),
       backgroundColor: colors.background,
-      borderTopWidth: 1,
-      width: "100%",
-      borderTopColor: colors.slate[300],
     },
   });

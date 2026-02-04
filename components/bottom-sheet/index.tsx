@@ -24,6 +24,7 @@ export const CustomBottomSheet = ({ bottomSheetProps, children }: Props) => {
   return (
     <BottomSheetModal
       {...bottomSheetProps}
+      handleStyle={style.handleContainer}
       handleIndicatorStyle={style.bottomSheetHandleIndicator}
       backdropComponent={(props) => (
         <BottomSheetBackdrop
@@ -52,6 +53,11 @@ const styles = (colors: ColorScheme) =>
       height: hp(0.75),
       marginTop: hp(1),
       zIndex: 1,
+    },
+    handleContainer: {
+      backgroundColor: colors.background,
+      borderTopLeftRadius: 12,
+      borderTopRightRadius: 12,
     },
     container: {
       flex: 1,

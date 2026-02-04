@@ -10,6 +10,7 @@ import Info from "./steps/info";
 import Info2 from "./steps/info2";
 import PhoneVerificationStep from "./steps/phone";
 import Selfie from "./steps/selfie";
+import SafeAreaViewContainer from "@/components/safeareaview";
 
 const Renter = () => {
   const { colors } = useTheme();
@@ -51,55 +52,40 @@ const Renter = () => {
 
   if (current === 3) {
     return (
-      <View style={{ flex: 1 }}>
+      <View style={{ position: "relative", flex: 1 }}>
         {" "}
-        <View className="w-[75%] justify-between px-3  top-16 z-50 fixed items-center flex-row">
-          <View>
-            <TouchableOpacity
-              onPress={handleBack}
-              className="p-4 bg-gray-100/50 rounded-full w-[50px] "
-            >
-              <Image
-                source={require("@/assets/icons/arrow-left-dark.png")}
-                className="w-6 h-6"
-                style={{ tintColor: "#ffffff" }}
-              />
-            </TouchableOpacity>
-          </View>
-          <Text className="text-xl text-white">Take a selfie</Text>
-        </View>
         <View style={{ flex: 1 }}>{renderStep()}</View>
       </View>
     );
   }
 
   return (
-    <View style={{ flex: 1, paddingHorizontal: 16, paddingTop: 10 }}>
+    <SafeAreaViewContainer>
       {current < 7 && (
         <View className="flex-row items-center justify-between w-full">
           <View>
             <TouchableOpacity
               onPress={handleBack}
-              className="p-4 bg-gray-100 rounded-full w-[50px] "
+              className="p-4 rounded-full w-[50px] "
+              style={{ backgroundColor: colors.slate[300] }}
             >
               <Image
                 source={require("@/assets/icons/arrow-left-dark.png")}
                 className="w-6 h-6"
+                style={{ tintColor: colors.slate[650] }}
               />
             </TouchableOpacity>
           </View>
-          <Text className="text-xl">Verify account</Text>
-          <Text
-            style={Styles.skip}
-            onPress={handleNext}
-            className="text-red-600"
-          >
+          <Text className="text-xl" style={{ color: colors.slate[650] }}>
+            Verify account
+          </Text>
+          <Text style={Styles.skip} onPress={handleNext}>
             Skip
           </Text>
         </View>
       )}
       <View style={{ flex: 1 }}>{renderStep()}</View>
-    </View>
+    </SafeAreaViewContainer>
   );
 };
 
@@ -109,5 +95,6 @@ const styles = (colors: ColorScheme) =>
     skip: {
       fontSize: RFValue(14),
       lineHeight: RFValue(20),
+      color: colors.error[200],
     },
   });

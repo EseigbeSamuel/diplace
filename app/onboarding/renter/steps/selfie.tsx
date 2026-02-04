@@ -20,6 +20,7 @@ const Selfie = ({ onNext }: props) => {
           <Image
             source={require("@/assets/icons/Camera - Iconly Pro.png")}
             className="size-14"
+            style={{ tintColor: colors.slate[650] }}
           />
         </View>
         <View>

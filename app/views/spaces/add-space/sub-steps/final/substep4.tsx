@@ -294,6 +294,7 @@ const createStyles = (colors: ColorScheme) =>
     deleteIcon: {
       width: RFValue(20),
       height: RFValue(20),
+      tintColor: colors.error[200],
     },
     addCustomButton: {
       flexDirection: "row",

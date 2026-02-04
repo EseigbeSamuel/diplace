@@ -16,6 +16,8 @@ import SafeAreaViewContainer from "@/components/safeareaview";
 import { useTheme } from "@/contexts/themeContext";
 import { ColorScheme } from "@/utils";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
+import TextField from "@/components/textfield";
+import { SimpleSelector } from "@/components/selector";
 
 type IdentityVerificationProps = {
   onNext: () => void;
@@ -48,7 +50,7 @@ const IdentityVerificationStep = ({ onNext }: IdentityVerificationProps) => {
 
   const getIDTypeLabel = (type: IDType) => {
     const idType = idTypes.find((item) => item.id === type);
-    return idType ? idType.label : "Select means of ID";
+    return idType ? idType.label : "";
   };
 
   const handleSelectIDType = (type: IDType) => {
@@ -122,39 +124,24 @@ const IdentityVerificationStep = ({ onNext }: IdentityVerificationProps) => {
             </View>
 
             {/* Select ID Type */}
-            <View style={Styles.inputContainer}>
-              <TouchableOpacity
-                style={Styles.selectorButton}
-                onPress={() => setShowIDTypeModal(true)}
-              >
-                <Text
-                  style={[
-                    Styles.selectorText,
-                    !selectedIDType && Styles.selectorPlaceholder,
-                  ]}
-                >
-                  {getIDTypeLabel(selectedIDType)}
-                </Text>
-                <Image
-                  source={require("@/assets/icons/chevron-right.png")}
-                  resizeMode="contain"
-                />
-              </TouchableOpacity>
-            </View>
+
+            <TextField
+              label="Select means of ID"
+              value={getIDTypeLabel(selectedIDType)}
+              onChange={() => {}}
+              onDropdownPress={() => setShowIDTypeModal(true)}
+              type="dropdown"
+            />
 
             {/* Document Number Input */}
             {selectedIDType && (
-              <View style={Styles.inputContainer}>
-                <TextInput
-                  style={Styles.textInput}
-                  placeholder="Document Number"
-                  placeholderTextColor={colors.slate[400]}
-                  value={documentNumber}
-                  onChangeText={handleDocumentNumberChange}
-                  keyboardType="numeric"
-                  maxLength={11}
-                />
-              </View>
+              <TextField
+                label="Document Number"
+                value={documentNumber}
+                onChange={(text) => handleDocumentNumberChange(text.toString())}
+                keyboardType="numeric"
+                maxLength={11}
+              />
             )}
 
             {/* Fetching Indicator */}
@@ -210,17 +197,18 @@ const IdentityVerificationStep = ({ onNext }: IdentityVerificationProps) => {
           </View>
 
           {/* Complete Button */}
-          <View style={Styles.buttonContainer}>
-            <AppButton
-              title="Complete"
-              onPress={handleComplete}
-              fullwidth
-              size="large"
-              disabled={!isComplete}
-            />
-          </View>
         </View>
       </KeyboardAwareScrollView>
+
+      <View style={Styles.buttonContainer}>
+        <AppButton
+          title="Complete"
+          onPress={handleComplete}
+          fullwidth
+          size="large"
+          disabled={!isComplete}
+        />
+      </View>
 
       {/* ID Type Selection Modal */}
       <Modal
@@ -249,25 +237,12 @@ const IdentityVerificationStep = ({ onNext }: IdentityVerificationProps) => {
 
             <View style={Styles.idTypeOptions}>
               {idTypes.map((type) => (
-                <TouchableOpacity
+                <SimpleSelector
                   key={type.id}
-                  style={Styles.idTypeOption}
-                  onPress={() => handleSelectIDType(type.id as IDType)}
-                >
-                  <View style={Styles.radioContainer}>
-                    <View
-                      style={[
-                        Styles.radioOuter,
-                        selectedIDType === type.id && Styles.radioOuterSelected,
-                      ]}
-                    >
-                      {selectedIDType === type.id && (
-                        <View style={Styles.radioInner} />
-                      )}
-                    </View>
-                  </View>
-                  <Text style={Styles.idTypeOptionText}>{type.label}</Text>
-                </TouchableOpacity>
+                  isChecked={selectedIDType === type.id}
+                  onChange={() => handleSelectIDType(type.id as IDType)}
+                  title={type.label}
+                />
               ))}
             </View>
 
@@ -378,7 +353,7 @@ const styles = (colors: ColorScheme) =>
       gap: RFValue(20),
       paddingVertical: RFValue(16),
       paddingHorizontal: RFValue(16),
-      backgroundColor: colors.slate[200],
+      backgroundColor: colors.slate[150],
       borderRadius: RFValue(12),
       borderWidth: 1,
       borderColor: colors.slate[300],
@@ -431,6 +406,8 @@ const styles = (colors: ColorScheme) =>
       lineHeight: RFValue(18),
     },
     buttonContainer: {
+      position: "fixed",
+      bottom: RFValue(16),
       marginTop: RFValue(32),
     },
     modalOverlay: {

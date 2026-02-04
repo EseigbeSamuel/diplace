@@ -13,6 +13,7 @@ import SafeAreaViewContainer from "@/components/safeareaview";
 import SectionHeader from "@/components/sectionheader";
 import { useTheme } from "@/contexts/themeContext";
 import { ColorScheme } from "@/utils";
+import ViewHeader from "@/components/view-header";
 
 const Support = () => {
   const { colors } = useTheme();
@@ -62,7 +63,7 @@ const Support = () => {
 
   return (
     <SafeAreaViewContainer>
-      <SectionHeader title="Support" />
+      <ViewHeader title="Support" />
       <ScrollView showsVerticalScrollIndicator={false}>
         <View style={supportStyles.container}>
           {/* Chat with DrPlace on WhatsApp */}
@@ -73,7 +74,7 @@ const Support = () => {
             <View style={supportStyles.menuItemLeft}>
               <View style={supportStyles.iconContainer}>
                 <Image
-                  source={require("@/assets/icons/Wallet - Iconly Pro-1.png")}
+                  source={require("@/assets/icons/whatsapp-icon.png")}
                   style={supportStyles.whatsappIcon}
                 />
               </View>
@@ -101,14 +102,14 @@ const Support = () => {
             <View style={supportStyles.menuItemLeft}>
               <View style={supportStyles.iconContainer}>
                 <Image
-                  source={require("@/assets/icons/chat.png")}
+                  source={require("@/assets/icons/help-chat-2.png")}
                   style={supportStyles.menuIcon}
                 />
               </View>
               <Text style={supportStyles.menuText}>FAQs</Text>
             </View>
             <Image
-              source={require("@/assets/icons/arrow-right-light.png")}
+              source={require("@/assets/icons/chevron-right.png")}
               style={supportStyles.chevronIcon}
             />
           </Pressable>
@@ -124,15 +125,12 @@ const styles = (colors: ColorScheme) =>
   StyleSheet.create({
     container: {
       paddingHorizontal: RFValue(3),
-      paddingTop: RFValue(20),
     },
     menuItem: {
       flexDirection: "row",
       alignItems: "center",
       justifyContent: "space-between",
-      paddingVertical: RFValue(16),
-      borderBottomWidth: 1,
-      borderBottomColor: colors.slate[300],
+      paddingVertical: RFValue(8),
     },
     menuItemLeft: {
       flexDirection: "row",
@@ -156,7 +154,6 @@ const styles = (colors: ColorScheme) =>
     whatsappIcon: {
       width: RFValue(22),
       height: RFValue(22),
-      tintColor: "#25D366", // WhatsApp green color
     },
     menuText: {
       fontSize: RFValue(15),
@@ -164,8 +161,6 @@ const styles = (colors: ColorScheme) =>
       flex: 1,
     },
     chevronIcon: {
-      width: RFValue(20),
-      height: RFValue(20),
-      tintColor: colors.slate[500],
+      tintColor: colors.slate[600],
     },
   });
