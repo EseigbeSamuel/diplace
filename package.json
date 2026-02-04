@@ -60,6 +60,7 @@
     "react-native-modal": "14.0.0-rc.1",
     "react-native-modal-datetime-picker": "^18.0.0",
     "react-native-reanimated": "~4.1.0",
+    "react-native-reanimated-carousel": "^4.0.3",
     "react-native-responsive-fontsize": "^0.5.1",
     "react-native-responsive-screen": "^1.4.2",
     "react-native-safe-area-context": "5.6.1",

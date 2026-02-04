@@ -20,7 +20,7 @@ import {
   View,
 } from "react-native";
 import { useSharedValue } from "react-native-reanimated";
-// import Carousel from "react-native-reanimated-carousel";
+import Carousel from "react-native-reanimated-carousel";
 import { RFValue } from "react-native-responsive-fontsize";
 
 const Discover = () => {
@@ -75,7 +75,7 @@ const Discover = () => {
           <Text style={homeStyles.title} className="font-semibold">
             Neighborhoods
           </Text>
-          {/* <View className="w-full">
+          <View className="w-full">
             <Carousel
               loop
               width={CARD_WIDTH}
@@ -127,7 +127,6 @@ const Discover = () => {
               )}
             />
 
-            
             <View className="flex-row justify-center items-center mt-2">
               {slider.map((_, index) => {
                 const isActive = activeIndex === index;
@@ -154,7 +153,7 @@ const Discover = () => {
                 );
               })}
             </View>
-          </View> */}
+          </View>
         </View>
 
         <View className="flex flex-col gap-3 my-5">
