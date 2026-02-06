@@ -6,13 +6,13 @@ import React from "react";
 import { Image, StyleSheet, Text, View } from "react-native";
 import { RFValue } from "react-native-responsive-fontsize";
 
-const OutgoingCall = () => {
+const IncomingCall = () => {
   const { colors, isDarkMode } = useTheme();
   const custom = styles(colors);
   return (
     <SafeAreaViewContainer>
       <SectionHeader title="Calling ibe" />
-      <View style={custom.container2} className="h-full w-full flex flex-col ">
+      <View className="h-[80%] w-full flex flex-col ">
         <View className="flex flex-col h-full w-full justify-center items-center">
           <View className="rounded-full size-[200px] ">
             <Image
@@ -26,25 +26,41 @@ const OutgoingCall = () => {
           </Text>
         </View>
 
-        <View className="flex-col flex justify-end ">
+        <View className="flex-col flex justify-end items-center w-full ">
           <View
-            style={custom.container}
-            className="py-2 px-4 gap-3 rounded-3xl flex-row flex items-center "
+            style={custom.container2}
+            className="py-3 px-5 gap-10 rounded-full flex-row flex justify-between items-center "
           >
-            <View className="rounded-full p-2 ">
-              <Image source={require("@/assets/icons/chat.png")} />
+            <View
+              style={{ backgroundColor: colors.slate[300] }}
+              className="rounded-full p-3 "
+            >
+              <Image
+                source={
+                  isDarkMode
+                    ? require("@/assets/icons/chat.png")
+                    : require("@/assets/icons/chat-dark.png")
+                }
+                className="size-6"
+              />
             </View>
             <View
-              style={{ backgroundColor: colors.success[300] }}
-              className="rounded-full p-2  "
+              style={{ backgroundColor: "#22C55E" }}
+              className="rounded-full p-3  "
             >
-              <Image source={require("@/assets/icons/calling.png")} />
-            </View>
-            <View className="rounded-full p-2 ">
               <Image
-                style={{ backgroundColor: colors.warning[300] }}
-                source={require("@/assets/icons/calling.png")}
-              />{" "}
+                source={require("@/assets/icons/call-up-light.png")}
+                className="size-6"
+              />
+            </View>
+            <View
+              style={{ backgroundColor: "#EF4444" }}
+              className="rounded-full p-3 "
+            >
+              <Image
+                source={require("@/assets/icons/Volume Up - Iconly Pro.png")}
+                className="size-6"
+              />
             </View>
           </View>
         </View>
@@ -53,13 +69,13 @@ const OutgoingCall = () => {
   );
 };
 
-export default OutgoingCall;
+export default IncomingCall;
 const styles = (colors: ColorScheme) =>
   StyleSheet.create({
     container: {
       backgroundColor: colors.background,
     },
-    container2: { backgroundColor: colors.slate[150] },
+    container2: { backgroundColor: colors.slate[200] },
     border: {
       borderColor: colors.slate[300],
     },
