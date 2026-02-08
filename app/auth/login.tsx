@@ -1,24 +1,30 @@
 import AppButton from "@/components/button";
 import SafeAreaViewContainer from "@/components/safeareaview";
-import TextField from "@/components/textfield";
 import { useTheme } from "@/contexts/themeContext";
-import { useUser } from "@/contexts/user-context";
-import { Link, useRouter } from "expo-router";
+import { useGetCurrentUser, useLogin } from "@/hooks";
+import { ColorScheme } from "@/utils";
+import { Link } from "expo-router";
 import React, { useState } from "react";
-import { Text, View } from "react-native";
+import { Image, StyleSheet, Text, View } from "react-native";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
+import { TextInput } from "react-native-paper";
 import { RFValue } from "react-native-responsive-fontsize";
 
 export default function Login() {
+  const [showPassword, setShowPassword] = useState(false);
   const { colors } = useTheme();
-  const { setUserType } = useUser();
-
-  const router = useRouter();
+  const styles = loginStyles(colors);
 
   const [formData, setFormData] = useState({
-    email: "",
+    username: "",
     password: "",
   });
+
+  const { loginMutation, loginMutationPending } = useLogin();
+  const { currentUser, currentUserError, isCurrentUserLoading } =
+    useGetCurrentUser();
+
+  console.log("isCurrentUserLoading", isCurrentUserLoading);
 
   return (
     <SafeAreaViewContainer className="justify-center flex-1 bg-white">
@@ -50,24 +56,68 @@ export default function Login() {
         </View>
 
         <View className="gap-4">
-          <TextField
+          <TextInput
+            mode="outlined"
             label="Email / Phone No."
-            value={formData.email}
-            onChange={(text) =>
-              setFormData({ ...formData, email: text.toString() })
+            value={formData.username}
+            onChangeText={(text) =>
+              setFormData({ ...formData, username: text.toString() })
             }
-            placeholder="Email / Phone No."
-            icon={require("../../assets/icons/mail-outline-light.png")}
+            keyboardType="email-address"
+            autoComplete="email"
+            textContentType="emailAddress"
+            autoCapitalize="none"
+            autoCorrect={false}
+            left={
+              <TextInput.Icon
+                icon={() => (
+                  <Image
+                    source={require("../../assets/icons/mail-outline-light.png")}
+                    style={{ width: 20, height: 20 }}
+                    resizeMode="contain"
+                  />
+                )}
+              />
+            }
+            outlineStyle={styles.outlineStyle}
+            style={styles.textInput}
           />
-          <TextField
+
+          <TextInput
+            mode="outlined"
             label="Password"
             value={formData.password}
-            onChange={(text) =>
+            onChangeText={(text) =>
               setFormData({ ...formData, password: text.toString() })
             }
-            placeholder="Password"
-            icon={require("../../assets/icons/password-lock.png")}
-            type="password"
+            secureTextEntry={!showPassword}
+            left={
+              <TextInput.Icon
+                icon={() => (
+                  <Image
+                    source={require("../../assets/icons/password-lock.png")}
+                    style={{ width: 20, height: 20 }}
+                    resizeMode="contain"
+                  />
+                )}
+              />
+            }
+            right={
+              <TextInput.Icon
+                accessibilityLabel="Show password"
+                accessibilityRole="button"
+                onPress={() => setShowPassword((prev) => !prev)}
+                icon={() => (
+                  <Image
+                    source={require("../../assets/icons/password-hide.png")}
+                    style={{ width: 20, height: 20 }}
+                    resizeMode="contain"
+                  />
+                )}
+              />
+            }
+            outlineStyle={styles.outlineStyle}
+            style={styles.textInput}
           />
           <View className="flex-row justify-end">
             <Link href="/auth/forgot-password" className="text-sm font-medium">
@@ -76,21 +126,18 @@ export default function Login() {
           </View>
           <AppButton
             onPress={() => {
-              if (formData.email.toLocaleLowerCase() === "emmanuel") {
-                router.replace("/onboarding/welcome");
-              } else if (formData.email.toLocaleLowerCase() === "owner") {
-                setUserType("owner");
-                router.replace("/(tabs)");
-              } else {
-                setUserType("tenant");
-                router.replace("/(tabs)");
-              }
+              loginMutation({
+                username: formData.username,
+                password: formData.password,
+              });
             }}
             title="Log in"
             fullwidth
             variant="primary"
             size="large"
-            disabled={!formData.email || !formData.password}
+            disabled={
+              !formData.username || !formData.password || loginMutationPending
+            }
           />
         </View>
 
@@ -128,3 +175,24 @@ export default function Login() {
     </SafeAreaViewContainer>
   );
 }
+
+const loginStyles = (colors: ColorScheme) =>
+  StyleSheet.create({
+    textInput: {
+      backgroundColor: colors.slate[150],
+      borderColor: colors.slate[650],
+    },
+    textInputLabel: {
+      color: colors.slate[650],
+    },
+    textInputPlaceholder: {
+      color: colors.slate[400],
+    },
+    textInputIcon: {
+      tintColor: colors.slate[650],
+    },
+    outlineStyle: {
+      borderRadius: 8,
+      borderColor: colors.slate[650],
+    },
+  });

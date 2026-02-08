@@ -1,22 +1,13 @@
-import React, { useState } from "react";
-import {
-  View,
-  Text,
-  StyleSheet,
-  TextInput,
-  ScrollView,
-  Pressable,
-  Image,
-  Modal,
-} from "react-native";
-import { RFValue } from "react-native-responsive-fontsize";
-import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import AppButton from "@/components/button";
 import { useTheme } from "@/contexts/themeContext";
-import { ColorScheme } from "@/utils";
-import AddBankDetails from "./substep3";
 import { useSpaceStore } from "@/store/useSpace";
 import { BankDetails } from "@/types/add-space-types";
+import { ColorScheme } from "@/utils";
+import React, { useState } from "react";
+import { Image, Modal, Pressable, StyleSheet, Text, View } from "react-native";
+import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
+import { RFValue } from "react-native-responsive-fontsize";
+import AddBankDetails from "./substep3";
 
 interface LandlordAccountInfoSubstepProps {
   onNext: () => void;
@@ -63,7 +54,7 @@ const LandlordAccountInfoSubstep: React.FC<LandlordAccountInfoSubstepProps> = ({
               <View style={styles.cardHeader}>
                 <View style={styles.bankIconContainer}>
                   <Image
-                    source={require("@/assets/icons/bank emoji.png")}
+                    source={require("@/assets/icons/bank-emoji.png")}
                     style={styles.bankIcon}
                   />
                 </View>

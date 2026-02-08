@@ -2,8 +2,9 @@ import AppButton from "@/components/button";
 import CarouselCard from "@/components/carousel-card";
 import SafeAreaViewContainer from "@/components/safeareaview";
 import { useTheme } from "@/contexts/themeContext";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useRouter } from "expo-router";
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { ImageSourcePropType, Text, View } from "react-native";
 import Carousel from "react-native-reanimated-carousel";
 import { RFValue } from "react-native-responsive-fontsize";
@@ -41,6 +42,24 @@ export default function GetStarted() {
 
   // Tracks current slide index
   const [currentIndex, setCurrentIndex] = useState(0);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    const checkWelcomeTour = async () => {
+      const hasSeenWelcomeTour = await AsyncStorage.getItem("welcome_tour");
+      if (hasSeenWelcomeTour) {
+        router.replace("/auth/login");
+      } else {
+        setIsLoading(false);
+      }
+    };
+
+    checkWelcomeTour();
+  }, [router]);
+
+  if (isLoading) {
+    return null;
+  }
 
   return (
     <SafeAreaViewContainer className="items-center justify-center gap-4">
@@ -120,7 +139,10 @@ export default function GetStarted() {
       <View className="w-[90%] mt-3">
         <AppButton
           title="Get Started"
-          onPress={() => router.replace("/auth/login")}
+          onPress={async () => {
+            await AsyncStorage.setItem("welcome_tour", "true");
+            router.replace("/auth/login");
+          }}
           fullwidth
           afterIcon={require("../assets/icons/arrow-right-light.png")}
         />

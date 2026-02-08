@@ -1,4 +1,10 @@
-import React, { useState, useEffect } from "react";
+import AppButton from "@/components/button";
+import SafeAreaViewContainer from "@/components/safeareaview";
+import TextField from "@/components/textfield";
+import { useTheme } from "@/contexts/themeContext";
+import { useSpaceStore } from "@/store/useSpace";
+import { ColorScheme } from "@/utils";
+import React, { useEffect, useState } from "react";
 import {
   ActivityIndicator,
   Image,
@@ -10,15 +16,8 @@ import {
   TextInput,
   View,
 } from "react-native";
-import { RFValue } from "react-native-responsive-fontsize";
-import SafeAreaViewContainer from "@/components/safeareaview";
-import AppButton from "@/components/button";
-import { useTheme } from "@/contexts/themeContext";
-import { ColorScheme } from "@/utils";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
-import { useRouter } from "expo-router";
-import { useSpaceStore } from "@/store/useSpace";
-import TextField from "@/components/textfield";
+import { RFValue } from "react-native-responsive-fontsize";
 
 interface Bank {
   id: number;
@@ -73,7 +72,7 @@ const AddBankDetails = ({
   ];
 
   const filteredBanks = banks.filter((bank) =>
-    bank.name.toLowerCase().includes(searchQuery.toLowerCase())
+    bank.name.toLowerCase().includes(searchQuery.toLowerCase()),
   );
 
   // Auto-verify account when 10 digits are entered
@@ -155,7 +154,7 @@ const AddBankDetails = ({
               <View style={addBankStyles.cardHeader}>
                 <View style={addBankStyles.bankIconContainer}>
                   <Image
-                    source={require("@/assets/icons/bank emoji.png")}
+                    source={require("@/assets/icons/bank-emoji.png")}
                     style={addBankStyles.bankIcon}
                   />
                 </View>
