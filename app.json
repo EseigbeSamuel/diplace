@@ -16,6 +16,15 @@
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
+      "permissions": [
+        "ACCESS_COARSE_LOCATION",
+        "ACCESS_FINE_LOCATION"
+      ],
+      "config": {
+        "googleMaps": {
+          "apiKey": "YOUR_GOOGLE_MAPS_API_KEY"
+        }
+      },
       "edgeToEdgeEnabled": true,
       "package": "com.nuelsbn.diplace"
     },
@@ -37,7 +46,14 @@
       ],
       "expo-font",
       "expo-web-browser",
-      "expo-maps"
+      "expo-maps",
+      [
+        "expo-location",
+        {
+          "locationAlwaysAndWhenInUsePermission": "Allow Di Place to access your location even when you are not using the app.",
+          "locationWhenInUsePermission": "Allow Di Place to access your location while you are using the app."
+        }
+      ]
     ],
     "experiments": {
       "typedRoutes": true

@@ -34,7 +34,8 @@ interface PlaceSuggestion {
   };
 }
 
-const GOOGLE_PLACES_API_KEY = "YOUR_GOOGLE_PLACES_API_KEY"; // Replace with your API key
+const GOOGLE_PLACES_API_KEY = process.env.EXPO_PUBLIC_GOOGLE_PLACES_API_KEY;
+const HAS_GOOGLE_KEY = !!GOOGLE_PLACES_API_KEY;
 
 const LocationPickerSubstep: React.FC<LocationPickerSubstepProps> = ({
   onNext,
@@ -68,6 +69,13 @@ const LocationPickerSubstep: React.FC<LocationPickerSubstepProps> = ({
 
   // Fetch place suggestions from Google Places API
   const fetchPlaceSuggestions = async (query: string) => {
+    if (!GOOGLE_PLACES_API_KEY) {
+      Alert.alert(
+        "Missing API key",
+        "Google Places API key is not set. Please configure EXPO_PUBLIC_GOOGLE_PLACES_API_KEY."
+      );
+      return;
+    }
     if (!query || query.length < 3) {
       setSuggestions([]);
       return;
@@ -111,6 +119,13 @@ const LocationPickerSubstep: React.FC<LocationPickerSubstepProps> = ({
 
   // Get place details from Google Places API
   const getPlaceDetails = async (placeId: string) => {
+    if (!GOOGLE_PLACES_API_KEY) {
+      Alert.alert(
+        "Missing API key",
+        "Google Places API key is not set. Please configure EXPO_PUBLIC_GOOGLE_PLACES_API_KEY."
+      );
+      return null;
+    }
     try {
       const response = await fetch(
         `https://maps.googleapis.com/maps/api/place/details/json?place_id=${placeId}&fields=address_components,geometry,formatted_address&key=${GOOGLE_PLACES_API_KEY}`
@@ -164,6 +179,13 @@ const LocationPickerSubstep: React.FC<LocationPickerSubstepProps> = ({
   };
 
   const handleSearchOpen = () => {
+    if (!HAS_GOOGLE_KEY) {
+      Alert.alert(
+        "Google Maps disabled",
+        "No Google API key configured. Please add EXPO_PUBLIC_GOOGLE_PLACES_API_KEY to enable search."
+      );
+      return;
+    }
     setSearchModalVisible(true);
   };
 
@@ -340,28 +362,36 @@ const LocationPickerSubstep: React.FC<LocationPickerSubstepProps> = ({
             {selectedLocation?.address || "Enter the address"}
           </Text>
         </Pressable>
-        <MapView
-          ref={mapRef}
-          style={styles.map}
-          initialRegion={{
-            latitude: region.latitude,
-            longitude: region.longitude,
-            latitudeDelta: region.latitudeDelta,
-            longitudeDelta: region.longitudeDelta,
-          }}
-          showsUserLocation
-          showsMyLocationButton={false}
-        >
-          {selectedLocation && (
-            <Marker
-              coordinate={{
-                latitude: selectedLocation.latitude,
-                longitude: selectedLocation.longitude,
-              }}
-              title={selectedLocation.address}
-            />
-          )}
-        </MapView>
+        {HAS_GOOGLE_KEY ? (
+          <MapView
+            ref={mapRef}
+            style={styles.map}
+            initialRegion={{
+              latitude: region.latitude,
+              longitude: region.longitude,
+              latitudeDelta: region.latitudeDelta,
+              longitudeDelta: region.longitudeDelta,
+            }}
+            showsUserLocation
+            showsMyLocationButton={false}
+          >
+            {selectedLocation && (
+              <Marker
+                coordinate={{
+                  latitude: selectedLocation.latitude,
+                  longitude: selectedLocation.longitude,
+                }}
+                title={selectedLocation.address}
+              />
+            )}
+          </MapView>
+        ) : (
+          <View style={styles.mapFallback}>
+            <Text style={styles.mapFallbackText}>
+              Map disabled. Add Google API key to enable.
+            </Text>
+          </View>
+        )}
 
         {/* Search Input Overlay */}
         <View style={styles.searchOverlay}>
@@ -578,24 +608,32 @@ const LocationPickerSubstep: React.FC<LocationPickerSubstepProps> = ({
             {/* Map Preview */}
             {tempLocationData && (
               <View style={styles.mapPreview}>
-                <MapView
-                  style={styles.mapPreviewMap}
-                  region={{
-                    latitude: tempLocationData.latitude,
-                    longitude: tempLocationData.longitude,
-                    latitudeDelta: 0.01,
-                    longitudeDelta: 0.01,
-                  }}
-                  scrollEnabled={false}
-                  zoomEnabled={false}
-                >
-                  <Marker
-                    coordinate={{
+                {HAS_GOOGLE_KEY ? (
+                  <MapView
+                    style={styles.mapPreviewMap}
+                    region={{
                       latitude: tempLocationData.latitude,
                       longitude: tempLocationData.longitude,
+                      latitudeDelta: 0.01,
+                      longitudeDelta: 0.01,
                     }}
-                  />
-                </MapView>
+                    scrollEnabled={false}
+                    zoomEnabled={false}
+                  >
+                    <Marker
+                      coordinate={{
+                        latitude: tempLocationData.latitude,
+                        longitude: tempLocationData.longitude,
+                      }}
+                    />
+                  </MapView>
+                ) : (
+                  <View style={styles.mapFallback}>
+                    <Text style={styles.mapFallbackText}>
+                      Map disabled. Add Google API key to enable.
+                    </Text>
+                  </View>
+                )}
               </View>
             )}
           </ScrollView>
@@ -627,6 +665,18 @@ const createStyles = (colors: ColorScheme) =>
     },
     map: {
       flex: 1,
+    },
+    mapFallback: {
+      flex: 1,
+      alignItems: "center",
+      justifyContent: "center",
+      backgroundColor: colors.slate[150],
+      paddingHorizontal: RFValue(16),
+    },
+    mapFallbackText: {
+      fontSize: RFValue(14),
+      color: colors.slate[600],
+      textAlign: "center",
     },
     searchOverlay: {
       position: "absolute",
