@@ -44,7 +44,7 @@ const Profile = () => {
             showArrow: true,
           },
           {
-            icon: require("@/assets/icons/bank emoji.png"),
+            icon: require("@/assets/icons/bank-emoji.png"),
             label: "Payment Details",
             onPress: () => {
               router.push("/views/profile/payment-details");
@@ -146,7 +146,7 @@ const Profile = () => {
             ),
           },
           {
-            icon: require("@/assets/icons/credit-card emoji.png"),
+            icon: require("@/assets/icons/credit-card.png"),
             label: "Card Details",
             onPress: () => {
               router.push("/views/profile/card-details");

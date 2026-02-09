@@ -5,10 +5,9 @@ import { useTheme } from "@/contexts/themeContext";
 import { useSpaceStore } from "@/store/useSpace";
 import { ColorScheme } from "@/utils";
 import { useRouter } from "expo-router";
-import React, { useState, useRef } from "react";
+import React, { useRef, useState } from "react";
 import {
   Dimensions,
-  FlatList,
   Image,
   Modal,
   Pressable,
@@ -73,7 +72,7 @@ const Placedetails = () => {
   }, 0);
 
   const formatReadableDate = (
-    dateString: string | Date | null | undefined
+    dateString: string | Date | null | undefined,
   ): string => {
     if (!dateString) return "";
     const date = new Date(dateString);
@@ -322,13 +321,13 @@ const Placedetails = () => {
               </Pressable>
             </View>
             <View className="flex flex-row gap-3">
-              <TouchableOpacity className="w-10 flex items-center justify-center h-10 rounded-full bg-gray-200">
+              <TouchableOpacity className="flex items-center justify-center w-10 h-10 bg-gray-200 rounded-full">
                 <Image
                   source={require("@/assets/icons/chat-active.png")}
                   className="w-5 h-5"
                 />
               </TouchableOpacity>
-              <TouchableOpacity className="w-10 flex items-center justify-center h-10 rounded-full bg-gray-200">
+              <TouchableOpacity className="flex items-center justify-center w-10 h-10 bg-gray-200 rounded-full">
                 <Image
                   source={require("@/assets/icons/calling.png")}
                   className="w-5 h-5"

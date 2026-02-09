@@ -2,6 +2,7 @@ import { CustomBottomSheet } from "@/components/bottom-sheet";
 import AppButton from "@/components/button";
 import { useCountdown } from "@/components/countdown";
 import SafeAreaViewContainer from "@/components/safeareaview";
+import SectionHeader from "@/components/sectionheader";
 import TextField from "@/components/textfield";
 import { useTheme } from "@/contexts/themeContext";
 import { ColorScheme } from "@/utils";
@@ -31,12 +32,12 @@ const payviaDB: payvia[] = [
   {
     id: "card",
     label: "Credit/Debit card",
-    icon: require("@/assets/icons/Bank Card - Iconly Pro.png"),
+    icon: require("@/assets/icons/credit-card.png"),
   },
   {
     id: "bank",
     label: "Bank transfer",
-    icon: require("@/assets/icons/bank emoji.png"),
+    icon: require("@/assets/icons/bank-emoji.png"),
   },
   {
     id: "ussd",
@@ -91,24 +92,8 @@ const InspectionPayment = () => {
         extraScrollHeight={20}
         enableAutomaticScroll={true}
       >
-        <View className="flex-col gap-10 h-full">
-          <View className="flex-row items-center">
-            <TouchableOpacity
-              onPress={handleBackPress}
-              className="p-4 bg-gray-100 rounded-full w-[50px] "
-            >
-              <Image
-                source={require("@/assets/icons/arrow-left-dark.png")}
-                className="w-6 h-6"
-              />
-            </TouchableOpacity>
-            <Text
-              style={custom.subTitle}
-              className=" text-center font-medium w-full "
-            >
-              Pay for inspection
-            </Text>
-          </View>
+        <View className="flex-col h-full gap-10">
+          <SectionHeader title="Pay for Inspection" />
 
           <View
             style={custom.back}
@@ -123,21 +108,21 @@ const InspectionPayment = () => {
             <View>
               <Image
                 source={require("@/assets/icons/money-bag.png")}
-                className="h-10 w-10"
+                className="w-10 h-10"
               />
             </View>
           </View>
 
           <View
             style={custom.tborder}
-            className="py-3 border-t mt-2 flex-col flex gap-5"
+            className="flex flex-col gap-5 py-3 mt-2 border-t"
           >
             <FlatList
               data={payviaDB}
               keyExtractor={(item) => item.id}
               ListHeaderComponent={
                 <>
-                  <Text style={custom.subTitle} className=" font-medium ">
+                  <Text style={custom.subTitle} className="font-medium ">
                     Pay Via
                   </Text>
                 </>
@@ -149,10 +134,10 @@ const InspectionPayment = () => {
                 return (
                   <TouchableOpacity
                     onPress={() => setSelectedPayVia(item.id)}
-                    className="w-full justify-between items-center flex-row"
+                    className="flex-row items-center justify-between w-full"
                   >
                     <View className="flex-row items-center gap-3">
-                      <Image source={item.icon} className="h-10 w-10" />
+                      <Image source={item.icon} className="w-10 h-10" />
 
                       <Text style={custom.text} className="capitalize">
                         {item.label}
@@ -161,7 +146,7 @@ const InspectionPayment = () => {
 
                     <View
                       style={isSelected ? custom.border2 : custom.border}
-                      className="h-5 w-5 rounded-full border-2 items-center justify-center mr-3"
+                      className="items-center justify-center w-5 h-5 mr-3 border-2 rounded-full"
                     >
                       {isSelected && (
                         <View
@@ -196,12 +181,9 @@ const InspectionPayment = () => {
             snapPoints,
           }}
         >
-          <View className="w-full flex-col gap-5">
+          <View className="flex-col w-full gap-5">
             <View>
-              <Text
-                style={custom.title}
-                className="font-semibold text-center  "
-              >
+              <Text style={custom.title} className="font-semibold text-center ">
                 Pay with card
               </Text>
               <Text style={custom.small} className="text-center">
@@ -245,7 +227,7 @@ const InspectionPayment = () => {
               </View>
             </View>
 
-            <View className="flex-row items-center w-full justify-between">
+            <View className="flex-row items-center justify-between w-full">
               <Text style={custom.text} className="">
                 Save card details
               </Text>
@@ -267,7 +249,7 @@ const InspectionPayment = () => {
               <AppButton
                 title="Confirm & Pay"
                 onPress={() => {
-                  router.replace("/views/inspection/paymentReceipt");
+                  router.replace("/views/inspection/payment-receipt");
                   openCard.current?.dismiss();
                 }}
                 size="large"
@@ -299,7 +281,7 @@ const InspectionPayment = () => {
 
             <View
               style={custom.back}
-              className="flex-col gap-3 p-5 rounded-3xl mt-3"
+              className="flex-col gap-3 p-5 mt-3 rounded-3xl"
             >
               <View>
                 <Text style={custom.small}>Account Name</Text>
@@ -337,12 +319,12 @@ const InspectionPayment = () => {
               <AppButton
                 title="I’ve sent the money (₦1000)"
                 onPress={() => {
-                  router.replace("/views/inspection/paymentReceipt");
+                  router.replace("/views/inspection/payment-receipt");
                   openBank.current?.dismiss();
                 }}
                 size="large"
               />
-              <Text style={custom.tiny} className="italic text-center mt-2">
+              <Text style={custom.tiny} className="mt-2 italic text-center">
                 🔐 Your payment is 100% secure. Funds are held safely until
                 inspection is confirmed.
               </Text>

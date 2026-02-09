@@ -1,21 +1,21 @@
+import AppButton from "@/components/button";
+import SafeAreaViewContainer from "@/components/safeareaview";
+import TextField from "@/components/textfield";
+import { useTheme } from "@/contexts/themeContext";
+import { ColorScheme } from "@/utils";
+import { useLocalSearchParams, useRouter } from "expo-router";
 import React, { useState } from "react";
 import {
   Image,
+  Modal,
   Pressable,
   ScrollView,
   StyleSheet,
+  Switch,
   Text,
   View,
-  Modal,
-  Switch,
 } from "react-native";
 import { RFValue } from "react-native-responsive-fontsize";
-import SafeAreaViewContainer from "@/components/safeareaview";
-import { useTheme } from "@/contexts/themeContext";
-import { ColorScheme } from "@/utils";
-import { useRouter, useLocalSearchParams } from "expo-router";
-import AppButton from "@/components/button";
-import TextField from "@/components/textfield";
 
 type PaymentMethod = "card" | "bank" | "ussd" | null;
 
@@ -76,8 +76,8 @@ const PaymentScreen = () => {
           {isInspection
             ? "Pay for inspection"
             : !isPartialPayment
-            ? "Pay for space"
-            : "Reserve space"}
+              ? "Pay for space"
+              : "Reserve space"}
         </Text>
         <View style={{ width: RFValue(20) }} />
       </View>
@@ -114,7 +114,7 @@ const PaymentScreen = () => {
             >
               <View style={styles.paymentMethodLeft}>
                 <Image
-                  source={require("@/assets/icons/credit-card emoji.png")}
+                  source={require("@/assets/icons/credit-card.png")}
                   style={styles.paymentMethodIcon}
                 />
                 <Text style={styles.paymentMethodText}>Credit/Debit card</Text>
@@ -143,7 +143,7 @@ const PaymentScreen = () => {
             >
               <View style={styles.paymentMethodLeft}>
                 <Image
-                  source={require("@/assets/icons/bank emoji.png")}
+                  source={require("@/assets/icons/bank-emoji.png")}
                   style={styles.paymentMethodIcon}
                 />
                 <Text style={styles.paymentMethodText}>Bank transfer</Text>
