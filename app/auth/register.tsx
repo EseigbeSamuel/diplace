@@ -1,23 +1,29 @@
 import AppButton from "@/components/button";
 import SafeAreaViewContainer from "@/components/safeareaview";
-import TextField from "@/components/textfield";
 import { useTheme } from "@/contexts/themeContext";
+import { useRegister } from "@/hooks";
+import { ColorScheme } from "@/utils";
 import { Link, useRouter } from "expo-router";
 import React, { useState } from "react";
-import { Text, View } from "react-native";
+import { Image, StyleSheet, Text, View } from "react-native";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
+import { TextInput } from "react-native-paper";
 import { RFValue } from "react-native-responsive-fontsize";
 
 export default function Register() {
-  const { colors } = useTheme();
-
-  const router = useRouter();
-
   const [formData, setFormData] = useState({
     email: "",
+    phone: "",
     password: "",
     confirmPassword: "",
   });
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const { colors } = useTheme();
+  const styles = registerStyles(colors);
+  const { registerMutation, registerMutationPending } = useRegister();
+
+  const router = useRouter();
 
   return (
     <SafeAreaViewContainer className="justify-center flex-1 bg-white">
@@ -42,47 +48,153 @@ export default function Register() {
           </Text>
         </View>
 
-        <View className="gap-2">
-          <TextField
-            label="Email / Phone No."
+        <View className="gap-4">
+          <TextInput
+            mode="outlined"
+            label="Email"
             value={formData.email}
-            onChange={(text) =>
+            onChangeText={(text) =>
               setFormData({ ...formData, email: text.toString() })
             }
-            placeholder="Email / Phone No."
-            icon={require("../../assets/icons/mail-outline-light.png")}
+            keyboardType="email-address"
+            autoComplete="email"
+            textContentType="emailAddress"
+            autoCapitalize="none"
+            autoCorrect={false}
+            left={
+              <TextInput.Icon
+                icon={() => (
+                  <Image
+                    source={require("../../assets/icons/mail-outline-light.png")}
+                    style={{ width: 20, height: 20 }}
+                    resizeMode="contain"
+                  />
+                )}
+              />
+            }
+            outlineStyle={styles.outlineStyle}
+            style={styles.textInput}
           />
-          <TextField
+          <TextInput
+            mode="outlined"
+            label="Phone No."
+            value={formData.phone}
+            onChangeText={(text) =>
+              setFormData({ ...formData, phone: text.toString() })
+            }
+            keyboardType="phone-pad"
+            autoComplete="tel"
+            textContentType="telephoneNumber"
+            autoCapitalize="none"
+            autoCorrect={false}
+            left={
+              <TextInput.Icon
+                icon={() => (
+                  <Image
+                    source={require("../../assets/icons/mail-outline-light.png")}
+                    style={{ width: 20, height: 20 }}
+                    resizeMode="contain"
+                  />
+                )}
+              />
+            }
+            outlineStyle={styles.outlineStyle}
+            style={styles.textInput}
+          />
+
+          <TextInput
+            mode="outlined"
             label="Password"
             value={formData.password}
-            onChange={(text) =>
+            onChangeText={(text) =>
               setFormData({ ...formData, password: text.toString() })
             }
-            placeholder="Password"
-            icon={require("../../assets/icons/password-lock.png")}
-            type="password"
-            subText="Must be at least 8 characters."
+            secureTextEntry={!showPassword}
+            left={
+              <TextInput.Icon
+                icon={() => (
+                  <Image
+                    source={require("../../assets/icons/password-lock.png")}
+                    style={{ width: 20, height: 20 }}
+                    resizeMode="contain"
+                  />
+                )}
+              />
+            }
+            right={
+              <TextInput.Icon
+                accessibilityLabel="Show password"
+                accessibilityRole="button"
+                onPress={() => setShowPassword((prev) => !prev)}
+                icon={() => (
+                  <Image
+                    source={require("../../assets/icons/password-hide.png")}
+                    style={{ width: 20, height: 20 }}
+                    resizeMode="contain"
+                  />
+                )}
+              />
+            }
+            outlineStyle={styles.outlineStyle}
+            style={styles.textInput}
           />
-          <TextField
+          <TextInput
+            mode="outlined"
             label="Confirm Password"
-            value={formData.password}
-            onChange={(text) =>
+            value={formData.confirmPassword}
+            onChangeText={(text) =>
               setFormData({ ...formData, confirmPassword: text.toString() })
             }
-            placeholder="Password"
-            icon={require("../../assets/icons/password-lock.png")}
-            type="password"
-            subText="Must be at least 8 characters."
+            secureTextEntry={!showConfirmPassword}
+            left={
+              <TextInput.Icon
+                icon={() => (
+                  <Image
+                    source={require("../../assets/icons/password-lock.png")}
+                    style={{ width: 20, height: 20 }}
+                    resizeMode="contain"
+                  />
+                )}
+              />
+            }
+            right={
+              <TextInput.Icon
+                accessibilityLabel="Show password"
+                accessibilityRole="button"
+                onPress={() => setShowConfirmPassword((prev) => !prev)}
+                icon={() => (
+                  <Image
+                    source={require("../../assets/icons/password-hide.png")}
+                    style={{ width: 20, height: 20 }}
+                    resizeMode="contain"
+                  />
+                )}
+              />
+            }
+            outlineStyle={styles.outlineStyle}
+            style={styles.textInput}
           />
 
           <AppButton
-            // onPress={() => router.navigate("/(tabs)")}
-            onPress={() => router.navigate("/onboarding/welcome")}
-            title="Log in"
+            onPress={() => {
+              registerMutation({
+                email: formData.email,
+                phone: formData.phone,
+                password: formData.password,
+                confirmPassword: formData.confirmPassword,
+              });
+            }}
+            title="Create Account"
             fullwidth
             variant="primary"
             size="large"
-            disabled={!formData.email || !formData.password}
+            disabled={
+              !formData.email ||
+              !formData.password ||
+              !formData.confirmPassword ||
+              !formData.phone ||
+              registerMutationPending
+            }
           />
         </View>
 
@@ -120,3 +232,24 @@ export default function Register() {
     </SafeAreaViewContainer>
   );
 }
+
+const registerStyles = (colors: ColorScheme) =>
+  StyleSheet.create({
+    textInput: {
+      backgroundColor: colors.slate[150],
+      borderColor: colors.slate[650],
+    },
+    textInputLabel: {
+      color: colors.slate[650],
+    },
+    textInputPlaceholder: {
+      color: colors.slate[400],
+    },
+    textInputIcon: {
+      tintColor: colors.slate[650],
+    },
+    outlineStyle: {
+      borderRadius: 8,
+      borderColor: colors.slate[650],
+    },
+  });

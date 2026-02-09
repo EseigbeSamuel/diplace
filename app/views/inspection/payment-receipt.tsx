@@ -4,7 +4,7 @@ import { useTheme } from "@/contexts/themeContext";
 import { ColorScheme } from "@/utils";
 import { useRouter } from "expo-router";
 import React from "react";
-import { Image, StyleSheet, Text, View } from "react-native";
+import { Image, ScrollView, StyleSheet, Text, View } from "react-native";
 import { RFValue } from "react-native-responsive-fontsize";
 
 const PaymentReceipt = () => {
@@ -14,15 +14,15 @@ const PaymentReceipt = () => {
 
   return (
     <SafeAreaViewContainer>
-      <View className="flex-col gap-5 h-[80%]">
+      <ScrollView showsVerticalScrollIndicator={false}>
         <View className="mb-5">
-          <Text style={custom.subTitle} className=" text-center font-medium ">
+          <Text style={custom.subTitle} className="font-medium text-center ">
             Payment Reciept
           </Text>
         </View>
 
-        <View style={custom.border} className="border rounded-3xl p-5">
-          <View className="w-full flex-col justify-center items-center py-7 px-5">
+        <View style={custom.border} className="p-5 border rounded-3xl">
+          <View className="flex-col items-center justify-center w-full px-5 py-7">
             <View className="bg-[#D1FAE5] border border-[#22C55E] rounded-full items-center justify-center size-14 ">
               <Image
                 source={require("@/assets/icons/badge-check-green.png")}
@@ -41,21 +41,21 @@ const PaymentReceipt = () => {
 
           <View
             style={custom.border}
-            className="py-7 px-5 border-dotted border-y flex-col gap-5 "
+            className="flex-col gap-5 px-5 border-dotted py-7 border-y "
           >
-            <View className="flex-row justify-between w-full items-center ">
+            <View className="flex-row items-center justify-between w-full ">
               <Text style={custom.small}>Reference number</Text>
               <Text style={custom.text} className="font-medium ">
                 0247001241746{" "}
               </Text>
             </View>
-            <View className="flex-row justify-between w-full items-center ">
+            <View className="flex-row items-center justify-between w-full ">
               <Text style={custom.small}>Date & time</Text>
               <Text style={custom.text} className="font-medium ">
                 05 Aug 2025, 10:34 AM{" "}
               </Text>
             </View>
-            <View className="flex-row justify-between w-full items-center ">
+            <View className="flex-row items-center justify-between w-full ">
               <Text style={custom.small}>Payment method</Text>
               <Text style={custom.text} className="font-medium ">
                 Bank transfer{" "}
@@ -63,14 +63,14 @@ const PaymentReceipt = () => {
             </View>
           </View>
 
-          <View className="flex-row items-center w-full justify-between px-5 py-5">
+          <View className="flex-row items-center justify-between w-full px-5 py-5">
             <Text style={custom.small}> Total Amount</Text>
-            <Text style={custom.subTitle} className=" font-semibold">
+            <Text style={custom.subTitle} className="font-semibold ">
               $1000
             </Text>
           </View>
 
-          <View className="flex-row items-center justify-center  gap-5">
+          <View className="flex-row items-center justify-center gap-5">
             <View className="flex-row items-center gap-5">
               {isDarkMode ? (
                 <Image
@@ -86,23 +86,20 @@ const PaymentReceipt = () => {
               <Text style={custom.smallDark}>Download</Text>
             </View>
             <View className="flex-row items-center gap-3">
-              {isDarkMode ? (
-                <Image
-                  source={require("@/assets/icons/share-solid.png")}
-                  className="size-10 "
-                />
-              ) : (
-                <Image
-                  source={require("@/assets/icons/share.png")}
-                  className="size-10"
-                />
-              )}
+              <Image
+                source={
+                  isDarkMode
+                    ? require("@/assets/icons/share-solid.png")
+                    : require("@/assets/icons/share.png")
+                }
+                className="size-10"
+              />
 
               <Text style={custom.smallDark}>Share</Text>
             </View>
           </View>
         </View>
-      </View>
+      </ScrollView>
       <View className="flex flex-col gap-3 py-4">
         <AppButton title="View Schedule" onPress={() => {}} size="large" />
         <AppButton

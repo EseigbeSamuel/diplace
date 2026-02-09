@@ -1,3 +1,9 @@
+import AppButton from "@/components/button";
+import SafeAreaViewContainer from "@/components/safeareaview";
+import ViewHeader from "@/components/view-header";
+import { useTheme } from "@/contexts/themeContext";
+import { ColorScheme } from "@/utils";
+import { useRouter } from "expo-router";
 import React from "react";
 import {
   Image,
@@ -8,13 +14,6 @@ import {
   View,
 } from "react-native";
 import { RFValue } from "react-native-responsive-fontsize";
-import SafeAreaViewContainer from "@/components/safeareaview";
-import SectionHeader from "@/components/sectionheader";
-import AppButton from "@/components/button";
-import { useTheme } from "@/contexts/themeContext";
-import { ColorScheme } from "@/utils";
-import { useRouter } from "expo-router";
-import ViewHeader from "@/components/view-header";
 
 interface BankCard {
   id: number;
@@ -61,7 +60,7 @@ const PaymentDetails = () => {
                     <View style={paymentStyles.cardHeader}>
                       <View style={paymentStyles.bankIconContainer}>
                         <Image
-                          source={require("@/assets/icons/bank emoji.png")}
+                          source={require("@/assets/icons/bank-emoji.png")}
                           style={paymentStyles.bankIcon}
                         />
                       </View>

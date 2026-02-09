@@ -1,24 +1,22 @@
+import AppButton from "@/components/button";
+import SafeAreaViewContainer from "@/components/safeareaview";
+import TextField from "@/components/textfield";
+import ViewHeader from "@/components/view-header";
+import { useTheme } from "@/contexts/themeContext";
+import { ColorScheme } from "@/utils";
+import { useRouter } from "expo-router";
 import React, { useState } from "react";
 import {
   Image,
+  Modal,
   Pressable,
   ScrollView,
   StyleSheet,
   Text,
-  TextInput,
-  View,
-  Modal,
   TouchableOpacity,
+  View,
 } from "react-native";
 import { RFValue } from "react-native-responsive-fontsize";
-import SafeAreaViewContainer from "@/components/safeareaview";
-import { useTheme } from "@/contexts/themeContext";
-import { ColorScheme } from "@/utils";
-import { useRouter } from "expo-router";
-import AppButton from "@/components/button";
-import TextField from "@/components/textfield";
-import ViewHeader from "@/components/view-header";
-import SectionHeader from "@/components/sectionheader";
 
 type Card = {
   id: string;
@@ -68,7 +66,7 @@ const CardDetailsScreen = () => {
     if (type === "mastercard") {
       return require("@/assets/icons/mastercard.png");
     }
-    return require("@/assets/icons/credit-card emoji.png");
+    return require("@/assets/icons/credit-card.png");
   };
 
   const formatCardNumber = (number: string) => {

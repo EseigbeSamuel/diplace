@@ -5,10 +5,9 @@ import { useTheme } from "@/contexts/themeContext";
 import { useSpaceStore } from "@/store/useSpace";
 import { ColorScheme } from "@/utils";
 import { useRouter } from "expo-router";
-import React, { useState, useRef } from "react";
+import React, { useRef, useState } from "react";
 import {
   Dimensions,
-  FlatList,
   Image,
   Modal,
   Pressable,
@@ -34,6 +33,7 @@ const timeslotDB: timeslot[] = [
 ];
 
 const { width } = Dimensions.get("window");
+const HAS_GOOGLE_KEY = !!process.env.EXPO_PUBLIC_GOOGLE_PLACES_API_KEY;
 
 const Placedetails = () => {
   const { colors, isDarkMode } = useTheme();
@@ -72,7 +72,7 @@ const Placedetails = () => {
   }, 0);
 
   const formatReadableDate = (
-    dateString: string | Date | null | undefined
+    dateString: string | Date | null | undefined,
   ): string => {
     if (!dateString) return "";
     const date = new Date(dateString);
@@ -321,13 +321,13 @@ const Placedetails = () => {
               </Pressable>
             </View>
             <View className="flex flex-row gap-3">
-              <TouchableOpacity className="w-10 flex items-center justify-center h-10 rounded-full bg-gray-200">
+              <TouchableOpacity className="flex items-center justify-center w-10 h-10 bg-gray-200 rounded-full">
                 <Image
                   source={require("@/assets/icons/chat-active.png")}
                   className="w-5 h-5"
                 />
               </TouchableOpacity>
-              <TouchableOpacity className="w-10 flex items-center justify-center h-10 rounded-full bg-gray-200">
+              <TouchableOpacity className="flex items-center justify-center w-10 h-10 bg-gray-200 rounded-full">
                 <Image
                   source={require("@/assets/icons/calling.png")}
                   className="w-5 h-5"
@@ -368,22 +368,30 @@ const Placedetails = () => {
             </Text>
 
             <View style={styles.mapContainer}>
-              <MapView
-                style={{ flex: 1 }}
-                initialRegion={{
-                  latitude: spaceForm.value.location?.latitude ?? 4.8156,
-                  longitude: spaceForm.value.location?.longitude ?? 7.0498,
-                  latitudeDelta: 0.01,
-                  longitudeDelta: 0.01,
-                }}
-              >
-                <Marker
-                  coordinate={{
+              {HAS_GOOGLE_KEY ? (
+                <MapView
+                  style={{ flex: 1 }}
+                  initialRegion={{
                     latitude: spaceForm.value.location?.latitude ?? 4.8156,
                     longitude: spaceForm.value.location?.longitude ?? 7.0498,
+                    latitudeDelta: 0.01,
+                    longitudeDelta: 0.01,
                   }}
-                />
-              </MapView>
+                >
+                  <Marker
+                    coordinate={{
+                      latitude: spaceForm.value.location?.latitude ?? 4.8156,
+                      longitude: spaceForm.value.location?.longitude ?? 7.0498,
+                    }}
+                  />
+                </MapView>
+              ) : (
+                <View style={styles.mapFallback}>
+                  <Text style={styles.mapFallbackText}>
+                    Map disabled. Add Google API key to enable.
+                  </Text>
+                </View>
+              )}
 
               <TouchableOpacity
                 style={styles.streetViewButton}
@@ -844,22 +852,30 @@ const Placedetails = () => {
           }}
         >
           <View style={styles.fullMapContainer}>
-            <MapView
-              style={{ flex: 1 }}
-              initialRegion={{
-                latitude: spaceForm.value.location?.latitude ?? 4.8156,
-                longitude: spaceForm.value.location?.longitude ?? 7.0498,
-                latitudeDelta: 0.01,
-                longitudeDelta: 0.01,
-              }}
-            >
-              <Marker
-                coordinate={{
+            {HAS_GOOGLE_KEY ? (
+              <MapView
+                style={{ flex: 1 }}
+                initialRegion={{
                   latitude: spaceForm.value.location?.latitude ?? 4.8156,
                   longitude: spaceForm.value.location?.longitude ?? 7.0498,
+                  latitudeDelta: 0.01,
+                  longitudeDelta: 0.01,
                 }}
-              />
-            </MapView>
+              >
+                <Marker
+                  coordinate={{
+                    latitude: spaceForm.value.location?.latitude ?? 4.8156,
+                    longitude: spaceForm.value.location?.longitude ?? 7.0498,
+                  }}
+                />
+              </MapView>
+            ) : (
+              <View style={styles.mapFallback}>
+                <Text style={styles.mapFallbackText}>
+                  Map disabled. Add Google API key to enable.
+                </Text>
+              </View>
+            )}
 
             <TouchableOpacity
               style={styles.fullStreetViewButton}
@@ -1103,6 +1119,18 @@ const createStyles = (colors: ColorScheme) =>
       borderRadius: RFValue(12),
       overflow: "hidden",
       position: "relative",
+    },
+    mapFallback: {
+      flex: 1,
+      alignItems: "center",
+      justifyContent: "center",
+      backgroundColor: colors.slate[150],
+      paddingHorizontal: RFValue(16),
+    },
+    mapFallbackText: {
+      fontSize: RFValue(14),
+      color: colors.slate[600],
+      textAlign: "center",
     },
     fullMapContainer: {
       width: "100%",
