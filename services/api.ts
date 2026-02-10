@@ -37,8 +37,8 @@ export const apiService = async <TResponse, TRequest = undefined>(
   const isFormData = payload instanceof FormData;
 
   const finalHeaders: Record<string, string> = {
-    ...headers,
     ...(isFormData ? {} : { "Content-Type": "application/json" }),
+    ...headers,
   };
 
   try {
@@ -52,8 +52,26 @@ export const apiService = async <TResponse, TRequest = undefined>(
       responseType,
     });
 
+    console.log("API Response:", response.data);
+
     return response.data;
   } catch (error: unknown) {
+    // Log full axios error context to help diagnose network issues
+    if (axios.isAxiosError(error)) {
+      console.log("error in service first", {
+        message: error.message,
+        code: error.code,
+        name: error.name,
+        url: error.config?.url,
+        baseURL: error.config?.baseURL,
+        method: error.config?.method,
+        timeout: error.config?.timeout,
+        responseStatus: error.response?.status,
+        responseData: error.response?.data,
+      });
+    } else {
+      console.log("error in service first", error);
+    }
     // eslint-disable-next-line import/no-named-as-default-member
     if (axios.isAxiosError(error)) {
       const message =

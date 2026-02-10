@@ -51,17 +51,21 @@ export const postRequest = async <TResponse, TRequest>({
   url,
   payload,
   protectedRoute = true,
+  headers,
 }: {
   url: string;
   payload: TRequest;
   protectedRoute?: boolean;
+  headers?: Record<string, string>;
 }): Promise<TResponse> => {
-  console.log("payload", payload);
+
   return await apiService<TResponse, TRequest>(
     url,
     "POST",
     payload,
     protectedRoute,
+    undefined,
+    headers,
   );
 };
 
