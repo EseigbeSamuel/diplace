@@ -63,7 +63,7 @@ export default function ForgotPassowrd() {
 
   const handleOtpKeyPress = (
     e: NativeSyntheticEvent<TextInputKeyPressEventData>,
-    idx: number,
+    idx: number
   ) => {
     if (
       e.nativeEvent.key === "Backspace" &&
@@ -98,7 +98,7 @@ export default function ForgotPassowrd() {
           </Text>
         </View>
 
-        <View className="gap-4" style={styles.container}>
+        <View className="gap-1" style={styles.container}>
           {otp.map((digit, idx) => (
             <Surface key={idx} style={styles.otpInputSurface} elevation={0}>
               <TextInput
@@ -168,8 +168,8 @@ const verifyOtpStyles = (colors: ColorScheme) =>
       backgroundColor: "#fff",
     },
     input: {
-      width: RFValue(50),
-      height: RFValue(56),
+      width: RFValue(40),
+      height: RFValue(46),
       borderRadius: RFValue(12),
       borderWidth: 1.5,
       borderColor: colors.slate[300],

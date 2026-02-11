@@ -19,14 +19,21 @@ export function useLogin() {
 
   const { mutate, isPending } = useMutation({
     mutationFn: ({ username, password }: LoginPayload) => {
-      const formData = new FormData();
-      formData.append("username", username);
-      formData.append("password", password);
+      const body = new URLSearchParams();
+      body.append("grant_type", "password");
+      body.append("username", username);
+      body.append("password", password);
+      body.append("scope", "");
+      body.append("client_id", "string");
+      body.append("client_secret", "string");
 
-      return postRequest<LoginResponse, FormData>({
+      return postRequest<LoginResponse, string>({
         url: "/auth/login",
-        payload: formData,
+        payload: body.toString(),
         protectedRoute: false,
+        headers: {
+          "Content-Type": "application/x-www-form-urlencoded",
+        },
       });
     },
 
@@ -60,7 +67,7 @@ export function useLogin() {
     },
 
     onError: (error) => {
-      console.log("login error", error);
+      // console.log("login error", error);
     },
   });
 
@@ -86,7 +93,7 @@ export function useRegister() {
     onSuccess: async (data) => {
       router.replace("/auth/verify-otp");
     },
-    onError: () => {},
+    onError: () => { },
   });
 
   return {

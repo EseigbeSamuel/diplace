@@ -11,6 +11,7 @@ export function useGetCurrentUser() {
         protectedRoute: true,
       });
     },
+    enabled: false
   });
 
   return {

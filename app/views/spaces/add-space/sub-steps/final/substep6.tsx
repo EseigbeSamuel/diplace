@@ -21,6 +21,7 @@ import { CustomBottomSheet } from "@/components/bottom-sheet";
 import { BottomSheetModal } from "@gorhom/bottom-sheet";
 
 const { width } = Dimensions.get("window");
+const HAS_GOOGLE_KEY = !!process.env.EXPO_PUBLIC_GOOGLE_PLACES_API_KEY;
 
 interface SpacePreviewScreenProps {
   onNext?: () => void;
@@ -243,22 +244,30 @@ const SpacePreviewScreen: React.FC<SpacePreviewScreenProps> = ({ onNext }) => {
 
           {/* Map Placeholder */}
           <View style={styles.mapContainer}>
-            <MapView
-              style={{ flex: 1 }}
-              initialRegion={{
-                latitude: spaceForm.value.location?.latitude ?? 4.8156,
-                longitude: spaceForm.value.location?.longitude ?? 7.0498,
-                latitudeDelta: 0.01,
-                longitudeDelta: 0.01,
-              }}
-            >
-              <Marker
-                coordinate={{
+            {HAS_GOOGLE_KEY ? (
+              <MapView
+                style={{ flex: 1 }}
+                initialRegion={{
                   latitude: spaceForm.value.location?.latitude ?? 4.8156,
                   longitude: spaceForm.value.location?.longitude ?? 7.0498,
+                  latitudeDelta: 0.01,
+                  longitudeDelta: 0.01,
                 }}
-              />
-            </MapView>
+              >
+                <Marker
+                  coordinate={{
+                    latitude: spaceForm.value.location?.latitude ?? 4.8156,
+                    longitude: spaceForm.value.location?.longitude ?? 7.0498,
+                  }}
+                />
+              </MapView>
+            ) : (
+              <View style={styles.mapFallback}>
+                <Text style={styles.mapFallbackText}>
+                  Map disabled. Add Google API key to enable.
+                </Text>
+              </View>
+            )}
 
             {/* Floating Street View button */}
             <TouchableOpacity
@@ -487,22 +496,30 @@ const SpacePreviewScreen: React.FC<SpacePreviewScreenProps> = ({ onNext }) => {
       >
         <View style={styles.fullMapContainer}>
           {/* The Map */}
-          <MapView
-            style={{ flex: 1 }}
-            initialRegion={{
-              latitude: spaceForm.value.location?.latitude ?? 4.8156,
-              longitude: spaceForm.value.location?.longitude ?? 7.0498,
-              latitudeDelta: 0.01,
-              longitudeDelta: 0.01,
-            }}
-          >
-            <Marker
-              coordinate={{
+          {HAS_GOOGLE_KEY ? (
+            <MapView
+              style={{ flex: 1 }}
+              initialRegion={{
                 latitude: spaceForm.value.location?.latitude ?? 4.8156,
                 longitude: spaceForm.value.location?.longitude ?? 7.0498,
+                latitudeDelta: 0.01,
+                longitudeDelta: 0.01,
               }}
-            />
-          </MapView>
+            >
+              <Marker
+                coordinate={{
+                  latitude: spaceForm.value.location?.latitude ?? 4.8156,
+                  longitude: spaceForm.value.location?.longitude ?? 7.0498,
+                }}
+              />
+            </MapView>
+          ) : (
+            <View style={styles.mapFallback}>
+              <Text style={styles.mapFallbackText}>
+                Map disabled. Add Google API key to enable.
+              </Text>
+            </View>
+          )}
 
           {/* Street View Button */}
           <TouchableOpacity
@@ -719,6 +736,18 @@ const createStyles = (colors: ColorScheme) =>
       borderRadius: RFValue(12),
       overflow: "hidden",
       position: "relative",
+    },
+    mapFallback: {
+      flex: 1,
+      alignItems: "center",
+      justifyContent: "center",
+      backgroundColor: colors.slate[150],
+      paddingHorizontal: RFValue(16),
+    },
+    mapFallbackText: {
+      fontSize: RFValue(14),
+      color: colors.slate[600],
+      textAlign: "center",
     },
     fullMapContainer: {
       width: "100%",

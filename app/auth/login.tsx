@@ -24,8 +24,6 @@ export default function Login() {
   const { currentUser, currentUserError, isCurrentUserLoading } =
     useGetCurrentUser();
 
-  console.log("isCurrentUserLoading", isCurrentUserLoading);
-
   return (
     <SafeAreaViewContainer className="justify-center flex-1 bg-white">
       <KeyboardAwareScrollView
