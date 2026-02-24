@@ -5,13 +5,17 @@ import AppButton from "@/components/button";
 import { useTheme } from "@/contexts/themeContext";
 import { ColorScheme } from "@/utils";
 import { useRouter } from "expo-router";
+import { useGetCurrentUser } from "@/hooks";
 
 const VerificationCompleteStep = () => {
+  const { currentUser } = useGetCurrentUser();
   const { colors } = useTheme();
   const Styles = styles(colors);
   const router = useRouter();
 
-  const verificationItems = [
+  const isAgent = currentUser?.user_type === "agent";
+
+  const baseItems = [
     {
       icon: require("@/assets/icons/Camera - Iconly Pro.png"),
       label: "Selfie",
@@ -28,6 +32,9 @@ const VerificationCompleteStep = () => {
       icon: require("@/assets/icons/identification 2.png"),
       label: "Identification Document",
     },
+  ];
+
+  const extraItems = [
     {
       icon: require("@/assets/icons/Profile - Iconly Pro.png"),
       label: "Personal Data",
@@ -37,6 +44,8 @@ const VerificationCompleteStep = () => {
       label: "Bank Details",
     },
   ];
+
+  const verificationItems = isAgent ? baseItems : [...baseItems, ...extraItems];
 
   const handleProceedToHome = () => {
     // Navigate to main app

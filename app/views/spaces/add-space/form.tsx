@@ -31,12 +31,13 @@ import ConfirmCostSubstep from "./sub-steps/final/substep5";
 import PublishNowSubstep from "./sub-steps/final/substep7";
 import OtherChargesSubstep from "./sub-steps/final/substep4";
 import ConfirmOwnerEventDetailsSubstep from "./sub-steps/owner/substep2t";
+import React from "react";
 
 const { width } = Dimensions.get("window");
 
 const AddSpaceForm: React.FC = () => {
   const router = useRouter();
-  const { spaceForm } = useSpaceStore();
+  const { clearForm, spaceForm } = useSpaceStore();
 
   const steps = [
     {
@@ -92,6 +93,7 @@ const AddSpaceForm: React.FC = () => {
 
   const handleComplete = () => {
     console.log("All steps completed!");
+    clearForm();
     router.push("/views/spaces/add-space/verifying");
   };
 

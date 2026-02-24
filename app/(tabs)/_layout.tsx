@@ -15,6 +15,8 @@ const TabLayout = () => {
   const { colors, isDarkMode } = useTheme();
   const { userType } = useUser();
 
+  console.log(userType);
+
   const addSpaceRef = useRef<BottomSheetModal>(null);
 
   const handleAddSpace = () => {
@@ -64,8 +66,8 @@ const TabLayout = () => {
                       <Pressable onPress={handleAddSpace}>
                         <View
                           style={{
-                            width: 48,
-                            height: 48,
+                            width: RFValue(30),
+                            height: RFValue(30),
                             borderRadius: 100,
                             justifyContent: "center",
                             alignItems: "center",
@@ -78,7 +80,7 @@ const TabLayout = () => {
                                 ? require("@/assets/icons/plus.png")
                                 : require("@/assets/icons/plus-white.png")
                             }
-                            style={{ width: 48, height: 48 }}
+                            style={{ width: RFValue(30), height: RFValue(30) }}
                             resizeMode="contain"
                           />
                         </View>

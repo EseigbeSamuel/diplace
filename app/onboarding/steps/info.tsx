@@ -1,6 +1,7 @@
 import AppButton from "@/components/button";
 import SafeAreaViewContainer from "@/components/safeareaview";
 import { useTheme } from "@/contexts/themeContext";
+import { useGetCurrentUser } from "@/hooks";
 import { ColorScheme } from "@/utils";
 import React from "react";
 import { Image, ScrollView, StyleSheet, Text, View } from "react-native";
@@ -11,6 +12,7 @@ type InfoProps = {
 };
 
 const VerifyAccountInfoStep = ({ onNext }: InfoProps) => {
+  const { currentUser } = useGetCurrentUser();
   const { colors } = useTheme();
   const Styles = styles(colors);
 
@@ -74,7 +76,12 @@ const VerifyAccountInfoStep = ({ onNext }: InfoProps) => {
             </View>
 
             {/* Identification Document */}
-            <View style={[Styles.listItem]}>
+            <View
+              style={[
+                Styles.listItem,
+                currentUser?.user_type === "agent" && Styles.lastListItem,
+              ]}
+            >
               <Image
                 source={require("@/assets/icons/identification 2.png")}
                 style={Styles.listIcon}
@@ -83,22 +90,26 @@ const VerifyAccountInfoStep = ({ onNext }: InfoProps) => {
               <Text style={Styles.listText}>Identification Document</Text>
             </View>
 
-            <View style={[Styles.listItem]}>
-              <Image
-                source={require("@/assets/icons/Profile - Iconly Pro.png")}
-                style={Styles.listIcon}
-                resizeMode="contain"
-              />
-              <Text style={Styles.listText}>Personal Data</Text>
-            </View>
-            <View style={[Styles.listItem, Styles.lastListItem]}>
-              <Image
-                source={require("@/assets/icons/bank-light.png")}
-                style={Styles.listIcon}
-                resizeMode="contain"
-              />
-              <Text style={Styles.listText}>Bank Details</Text>
-            </View>
+            {currentUser?.user_type === "agent" && (
+              <>
+                <View style={[Styles.listItem]}>
+                  <Image
+                    source={require("@/assets/icons/Profile - Iconly Pro.png")}
+                    style={Styles.listIcon}
+                    resizeMode="contain"
+                  />
+                  <Text style={Styles.listText}>Personal Data</Text>
+                </View>
+                <View style={[Styles.listItem, Styles.lastListItem]}>
+                  <Image
+                    source={require("@/assets/icons/bank-light.png")}
+                    style={Styles.listIcon}
+                    resizeMode="contain"
+                  />
+                  <Text style={Styles.listText}>Bank Details</Text>
+                </View>
+              </>
+            )}
           </View>
         </ScrollView>
       </View>

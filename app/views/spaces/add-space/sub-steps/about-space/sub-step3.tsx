@@ -17,6 +17,7 @@ import MapView, { Marker } from "react-native-maps";
 import * as Location from "expo-location";
 import AppButton from "@/components/button";
 import { useTheme } from "@/contexts/themeContext";
+import { useSpaceStore } from "@/store/useSpace";
 import { ColorScheme } from "@/utils";
 import { LocationData } from "@/types/add-space-types";
 
@@ -44,6 +45,7 @@ const LocationPickerSubstep: React.FC<LocationPickerSubstepProps> = ({
   const { colors } = useTheme();
   const styles = createStyles(colors);
   const mapRef = useRef<any>(null);
+  const { setValue, spaceForm } = useSpaceStore();
 
   const [searchModalVisible, setSearchModalVisible] = useState(false);
   const [confirmModalVisible, setConfirmModalVisible] = useState(false);
@@ -67,13 +69,21 @@ const LocationPickerSubstep: React.FC<LocationPickerSubstepProps> = ({
   // Debounce timer for search
   const searchTimeout = useRef<number | null>(null);
 
+  useEffect(() => {
+    if (spaceForm.value.location) {
+      setSelectedLocation(spaceForm.value.location);
+      setRegion((prev) => ({
+        ...prev,
+        latitude: spaceForm.value.location!.latitude,
+        longitude: spaceForm.value.location!.longitude,
+      }));
+    }
+  }, [spaceForm.value.location]);
+
   // Fetch place suggestions from Google Places API
   const fetchPlaceSuggestions = async (query: string) => {
     if (!GOOGLE_PLACES_API_KEY) {
-      Alert.alert(
-        "Missing API key",
-        "Google Places API key is not set. Please configure EXPO_PUBLIC_GOOGLE_PLACES_API_KEY."
-      );
+      setSuggestions([]);
       return;
     }
     if (!query || query.length < 3) {
@@ -120,10 +130,6 @@ const LocationPickerSubstep: React.FC<LocationPickerSubstepProps> = ({
   // Get place details from Google Places API
   const getPlaceDetails = async (placeId: string) => {
     if (!GOOGLE_PLACES_API_KEY) {
-      Alert.alert(
-        "Missing API key",
-        "Google Places API key is not set. Please configure EXPO_PUBLIC_GOOGLE_PLACES_API_KEY."
-      );
       return null;
     }
     try {
@@ -179,13 +185,6 @@ const LocationPickerSubstep: React.FC<LocationPickerSubstepProps> = ({
   };
 
   const handleSearchOpen = () => {
-    if (!HAS_GOOGLE_KEY) {
-      Alert.alert(
-        "Google Maps disabled",
-        "No Google API key configured. Please add EXPO_PUBLIC_GOOGLE_PLACES_API_KEY to enable search."
-      );
-      return;
-    }
     setSearchModalVisible(true);
   };
 
@@ -330,17 +329,17 @@ const LocationPickerSubstep: React.FC<LocationPickerSubstepProps> = ({
   const handleConfirmLocation = () => {
     if (tempLocationData) {
       setSelectedLocation(tempLocationData);
+      setValue({ location: tempLocationData });
       setConfirmModalVisible(false);
     }
   };
 
   const handleNext = () => {
-    // if (selectedLocation) {
-    //   onNext();
-    // } else {
-    //   Alert.alert("Location Required", "Please select a location to continue");
-    // }
-    onNext();
+    if (selectedLocation) {
+      onNext();
+    } else {
+      Alert.alert("Location Required", "Please select a location to continue");
+    }
   };
 
   return (
@@ -406,7 +405,7 @@ const LocationPickerSubstep: React.FC<LocationPickerSubstepProps> = ({
           onPress={handleNext}
           size="large"
           fullwidth={true}
-          // disabled={!selectedLocation}
+          disabled={!selectedLocation}
         />
       </View>
 
@@ -474,6 +473,15 @@ const LocationPickerSubstep: React.FC<LocationPickerSubstepProps> = ({
             <Text style={styles.liveLocationText}>Use live location</Text>
           </Pressable>
 
+          {!HAS_GOOGLE_KEY && (
+            <View style={styles.noResultsContainer}>
+              <Text style={styles.noResultsText}>
+                Search suggestions unavailable. You can still use live location
+                or enter a full address.
+              </Text>
+            </View>
+          )}
+
           {/* Use Address Entered Link */}
           {searchQuery.length > 0 && (
             <Pressable
@@ -524,7 +532,8 @@ const LocationPickerSubstep: React.FC<LocationPickerSubstepProps> = ({
 
             {!isLoadingSuggestions &&
               suggestions.length === 0 &&
-              searchQuery.length >= 3 && (
+              searchQuery.length >= 3 &&
+              HAS_GOOGLE_KEY && (
                 <View style={styles.noResultsContainer}>
                   <Text style={styles.noResultsText}>
                     No locations found. Try a different search term.

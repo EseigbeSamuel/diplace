@@ -50,10 +50,8 @@ export function useSetUserType() {
     onError: (error) => {
       console.log("error", error);
       if (error) {
-        if (currentUser?.user_type === "renter") {
-          router.replace("/onboarding/renter/renter");
-        } else if (currentUser?.user_type === "agent") {
-          router.replace("/onboarding/agent/agent");
+        if (currentUser?.user_type === "renter" || currentUser?.user_type === "agent") {
+          router.replace("/onboarding/steps");
         } else {
           router.replace("/auth/login");
         }

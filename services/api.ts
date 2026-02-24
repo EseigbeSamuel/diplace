@@ -2,6 +2,39 @@ import { checkTokenExpiry, clearAll, getFromLocalStore } from "@/lib";
 import axios, { AxiosResponse, Method } from "axios";
 import Toast from "react-native-toast-message";
 
+let lastToastMessage = "";
+let lastToastAt = 0;
+let hideToastTimer: ReturnType<typeof setTimeout> | null = null;
+
+const showApiToast = (text1: string, text2: string) => {
+  const now = Date.now();
+  // Prevent identical toasts from stacking in quick succession.
+  if (lastToastMessage === `${text1}:${text2}` && now - lastToastAt < 1500) {
+    return;
+  }
+
+  lastToastMessage = `${text1}:${text2}`;
+  lastToastAt = now;
+
+  Toast.hide();
+  Toast.show({
+    type: "error",
+    text1,
+    text2,
+    position: "top",
+    visibilityTime: 2500,
+    autoHide: true,
+  });
+
+  if (hideToastTimer) {
+    clearTimeout(hideToastTimer);
+  }
+  hideToastTimer = setTimeout(() => {
+    Toast.hide();
+    hideToastTimer = null;
+  }, 2800);
+};
+
 export const apiService = async <TResponse, TRequest = undefined>(
   url: string,
   method: Method,
@@ -16,16 +49,7 @@ export const apiService = async <TResponse, TRequest = undefined>(
 
   if (protectedRoute && token) {
     if (await checkTokenExpiry(token)) {
-      Toast.show({
-        type: "error",
-        text1: "Session Expired",
-        text2: "Please login again.",
-        position: "top",
-        visibilityTime: 2000,
-        autoHide: true,
-        swipeable: true,
-      });
-
+      showApiToast("Session Expired", "Please login again.");
       clearAll();
     }
 
@@ -81,19 +105,9 @@ export const apiService = async <TResponse, TRequest = undefined>(
         error.message ||
         "Something went wrong";
 
-      Toast.show({
-        type: "error",
-        text1: "Request Failed",
-        text2: message,
-      });
+      showApiToast("Request Failed", message);
     } else {
-      Toast.show({
-        type: "error",
-        text1: "Unexpected Error",
-        text2: "Something went wrong. Please try again.",
-        position: "top",
-        visibilityTime: 2000,
-      });
+      showApiToast("Unexpected Error", "Something went wrong. Please try again.");
       console.error("Unknown error:", error);
     }
 

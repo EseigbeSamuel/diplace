@@ -27,11 +27,11 @@ const PhoneVerificationStep = ({ onNext }: PhoneVerificationProps) => {
   const { colors } = useTheme();
   const styles = styleSheet(colors);
 
-  const [step, setStep] = useState<"input" | "verify">("input");
   const [phoneNumber, setPhoneNumber] = useState("");
   const [countryCode, setCountryCode] = useState("+234");
   const [otp, setOtp] = useState("");
   const [isResending, setIsResending] = useState(false);
+  const [goNextAfterDismiss, setGoNextAfterDismiss] = useState(false);
   const inputRefs = useRef<(TextInput | null)[]>([]);
   const verifyRef = useRef<BottomSheetModal>(null);
 
@@ -77,13 +77,20 @@ const PhoneVerificationStep = ({ onNext }: PhoneVerificationProps) => {
 
     // Simulate API verification
     if (otp.length === 5) {
-      verifyRef.current?.close();
-      onNext();
+      // Dismiss first, then move to next step in onDismiss to avoid stale sheet state.
+      setGoNextAfterDismiss(true);
+      verifyRef.current?.dismiss();
     } else {
       Alert.alert("Error", "Invalid OTP code. Please try again.");
       setOtp("");
       inputRefs.current[0]?.focus();
     }
+  };
+
+  const handleVerifySheetDismiss = () => {
+    if (!goNextAfterDismiss) return;
+    setGoNextAfterDismiss(false);
+    onNext();
   };
 
   const isOtpComplete = otp.length === 5;
@@ -141,6 +148,7 @@ const PhoneVerificationStep = ({ onNext }: PhoneVerificationProps) => {
           ref: verifyRef,
           snapPoints,
           index: 2,
+          onDismiss: handleVerifySheetDismiss,
           enableContentPanningGesture: true,
           enableHandlePanningGesture: true,
           enablePanDownToClose: true,

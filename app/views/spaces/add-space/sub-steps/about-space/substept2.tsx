@@ -27,10 +27,7 @@ const EventTypeSubstep: React.FC<PropertyTypeSubstepProps> = ({
   ];
 
   const handleNext = () => {
-    // Validate before moving forward
-    // if (selectedType) {
-    // onNext();
-    // }
+    if (!spaceForm.value.eventSpace) return;
     onNext();
   };
 
@@ -70,6 +67,7 @@ const EventTypeSubstep: React.FC<PropertyTypeSubstepProps> = ({
           onPress={handleNext}
           size="large"
           fullwidth={true}
+          disabled={!spaceForm.value.eventSpace}
         />
       </View>
     </View>

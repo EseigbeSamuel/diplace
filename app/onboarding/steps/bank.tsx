@@ -15,6 +15,7 @@ import {
   View,
 } from "react-native";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
+import { RFValue } from "react-native-responsive-fontsize";
 
 interface Bank {
   id: number;
@@ -52,7 +53,7 @@ const AddBankDetails = ({ onNext }: props) => {
   ];
 
   const filteredBanks = banks.filter((bank) =>
-    bank.name.toLowerCase().includes(searchQuery.toLowerCase()),
+    bank.name.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
   // Auto-verify account when 10 digits are entered

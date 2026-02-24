@@ -27,6 +27,8 @@ export function useLogin() {
       body.append("client_id", "string");
       body.append("client_secret", "string");
 
+      console.log(body)
+
       return postRequest<LoginResponse, string>({
         url: "/auth/login",
         payload: body.toString(),
@@ -43,27 +45,30 @@ export function useLogin() {
       // ✅ Save tokens first
       await saveToLocalStore("access_token", data.access_token);
       await saveToLocalStore("refresh_token", data.refresh_token);
+      router.replace("/(tabs)")
 
-      try {
-        // ✅ Fetch user immediately
-        const user = await queryClient.fetchQuery({
-          queryKey: ["current-user"],
-          queryFn: () =>
-            getRequest<CurrentUserResponse>({
-              url: "/users/me",
-              protectedRoute: true,
-            }),
-        });
+      // try {
+      //   // ✅ Fetch user immediately
+      //   const user = await queryClient.fetchQuery({
+      //     queryKey: ["current-user"],
+      //     queryFn: () =>
+      //       getRequest<CurrentUserResponse>({
+      //         url: "/users/me",
+      //         protectedRoute: true,
+      //       }),
+      //   });
 
-        // ✅ Navigation decision
-        if (!user?.verifications || user.verifications.length === 0) {
-          router.replace("/onboarding/welcome");
-        } else {
-          router.replace("/(tabs)");
-        }
-      } catch (error) {
-        console.log("Failed to fetch user after login", error);
-      }
+      //   // ✅ Navigation decision
+      //   if (!user?.verifications || user.verifications.length === 0) {
+      //     // router.replace("/onboarding/welcome");
+      //     router.replace("/(tabs)");
+      //   } else {
+      //     router.replace("/(tabs)");
+      //   }
+      // } catch (error) {
+      //   console.log("Failed to fetch user after login", error);
+      //   router.replace("/(tabs)");
+      // }
     },
 
     onError: (error) => {
