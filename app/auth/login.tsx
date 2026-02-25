@@ -3,7 +3,7 @@ import SafeAreaViewContainer from "@/components/safeareaview";
 import { useTheme } from "@/contexts/themeContext";
 import { useGetCurrentUser, useLogin } from "@/hooks";
 import { ColorScheme } from "@/utils";
-import { Link } from "expo-router";
+import { Link, useRouter } from "expo-router";
 import React, { useState } from "react";
 import { Image, StyleSheet, Text, View } from "react-native";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
@@ -13,6 +13,7 @@ import { RFValue } from "react-native-responsive-fontsize";
 export default function Login() {
   const [showPassword, setShowPassword] = useState(false);
   const { colors } = useTheme();
+  const router = useRouter();
   const styles = loginStyles(colors);
 
   const [formData, setFormData] = useState({
@@ -21,8 +22,6 @@ export default function Login() {
   });
 
   const { loginMutation, loginMutationPending } = useLogin();
-  const { currentUser, currentUserError, isCurrentUserLoading } =
-    useGetCurrentUser();
 
   return (
     <SafeAreaViewContainer className="justify-center flex-1 bg-white">

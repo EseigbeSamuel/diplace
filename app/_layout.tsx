@@ -1,3 +1,4 @@
+import React from "react";
 import { ThemeProvider } from "@/contexts/themeContext";
 import { UserProvider } from "@/contexts/user-context";
 import { BottomSheetModalProvider } from "@gorhom/bottom-sheet";
@@ -6,6 +7,7 @@ import { useFonts } from "expo-font";
 import { Stack } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
+import { SafeAreaProvider } from "react-native-safe-area-context";
 import "react-native-reanimated";
 import Toast from "react-native-toast-message";
 
@@ -27,21 +29,23 @@ export default function RootLayout() {
   if (!fontsLoaded) return null;
 
   return (
-    <QueryClientProvider client={queryClient}>
-      <ThemeProvider>
-        <GestureHandlerRootView className="flex-1">
-          <BottomSheetModalProvider>
-            <UserProvider>
-              <Stack screenOptions={{ headerShown: false }}>
-                <StatusBar style="dark" animated />
-                <Stack.Screen name="index" />
-                <Stack.Screen name="(tabs)" />
-              </Stack>
-              <Toast autoHide position="top" visibilityTime={2000} />
-            </UserProvider>
-          </BottomSheetModalProvider>
-        </GestureHandlerRootView>
-      </ThemeProvider>
-    </QueryClientProvider>
+    <SafeAreaProvider>
+      <QueryClientProvider client={queryClient}>
+        <ThemeProvider>
+          <GestureHandlerRootView className="flex-1">
+            <BottomSheetModalProvider>
+              <UserProvider>
+                <Stack screenOptions={{ headerShown: false }}>
+                  <StatusBar style="dark" animated />
+                  <Stack.Screen name="index" />
+                  <Stack.Screen name="(tabs)" />
+                </Stack>
+                <Toast autoHide position="top" visibilityTime={2000} />
+              </UserProvider>
+            </BottomSheetModalProvider>
+          </GestureHandlerRootView>
+        </ThemeProvider>
+      </QueryClientProvider>
+    </SafeAreaProvider>
   );
 }

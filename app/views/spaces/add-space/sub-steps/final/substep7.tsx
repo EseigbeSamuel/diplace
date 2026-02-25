@@ -9,7 +9,9 @@ import {
 } from "react-native";
 import { RFValue } from "react-native-responsive-fontsize";
 import AppButton from "@/components/button";
+import { useCreateProperty } from "@/hooks";
 import { useTheme } from "@/contexts/themeContext";
+import { useSpaceStore } from "@/store/useSpace";
 import { ColorScheme } from "@/utils";
 
 interface PublishNowSubstepProps {
@@ -24,6 +26,8 @@ const PublishNowSubstep: React.FC<PublishNowSubstepProps> = ({
   const { colors } = useTheme();
   const styles = createStyles(colors);
   const [agreedToTerms, setAgreedToTerms] = useState(false);
+  const { createPropertyMutation, createPropertyPending } = useCreateProperty();
+  const { spaceForm } = useSpaceStore();
 
   const steps = [
     {
@@ -56,11 +60,20 @@ const PublishNowSubstep: React.FC<PublishNowSubstepProps> = ({
     },
   ];
 
-  const handlePost = () => {
+  const handlePost = async () => {
     if (!agreedToTerms) {
       return;
     }
-    onNext();
+
+    try {
+      await createPropertyMutation({
+        type: spaceForm.type,
+        value: spaceForm.value,
+      });
+      onNext();
+    } catch (error) {
+      console.log("create property error", error);
+    }
   };
 
   return (
@@ -123,7 +136,7 @@ const PublishNowSubstep: React.FC<PublishNowSubstepProps> = ({
           onPress={handlePost}
           size="large"
           fullwidth={true}
-          disabled={!agreedToTerms}
+          disabled={!agreedToTerms || createPropertyPending}
         />
       </View>
     </View>

@@ -8,7 +8,7 @@ export const tabItems = (isDarkMode: boolean) => [
     inactiveIcon: isDarkMode
       ? require("../assets/icons/home-white.png")
       : require("../assets/icons/home.png"),
-    grantPermission: ["tenant", "owner"],
+    grantPermission: ["renter", "owner"],
   },
   {
     name: "discover",
@@ -19,7 +19,7 @@ export const tabItems = (isDarkMode: boolean) => [
     inactiveIcon: isDarkMode
       ? require("../assets/icons/discovery-white-inactive.png")
       : require("../assets/icons/discovery.png"),
-    grantPermission: ["tenant"],
+    grantPermission: ["renter"],
   },
   {
     name: "spaces",
@@ -48,7 +48,7 @@ export const tabItems = (isDarkMode: boolean) => [
     inactiveIcon: isDarkMode
       ? require("../assets/icons/chat-white-inactive.png")
       : require("../assets/icons/chat.png"),
-    grantPermission: ["tenant", "owner"],
+    grantPermission: ["renter", "owner"],
   },
   {
     name: "activity",
@@ -59,6 +59,6 @@ export const tabItems = (isDarkMode: boolean) => [
     inactiveIcon: isDarkMode
       ? require("../assets/icons/activity-light-inactive.png")
       : require("../assets/icons/activity.png"),
-    grantPermission: ["tenant", "owner"],
+    grantPermission: ["renter", "owner"],
   },
 ];

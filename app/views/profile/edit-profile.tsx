@@ -18,10 +18,12 @@ import { ColorScheme } from "@/utils";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import MediaPickerModal from "@/components/media-picker-modal";
 import { useUser } from "@/contexts/user-context";
+import { useGetCurrentUser } from "@/hooks";
 
 const EditProfile = () => {
   const { colors } = useTheme();
   const { userType } = useUser();
+  const { currentUser } = useGetCurrentUser();
   const editProfileStyles = styles(colors);
 
   // Form state
@@ -34,6 +36,14 @@ const EditProfile = () => {
     "15 Orukeri Street, Rumuibekwe, Port Harc..."
   );
   const [showMediaModal, setShowMediaModal] = useState(false);
+
+  const normalizeImageUrl = (url?: string) => {
+    if (!url) return null;
+    if (url.startsWith("http://") || url.startsWith("https://")) return url;
+    if (url.startsWith("/")) return `https://diplace.api.elsoft.ng${url}`;
+    return `https://diplace.api.elsoft.ng/${url}`;
+  };
+  const profileImageUrl = normalizeImageUrl(currentUser?.profile_picture);
 
   const handleSaveChanges = () => {
     // Handle save logic here
@@ -85,7 +95,11 @@ const EditProfile = () => {
           <View style={editProfileStyles.photoSection}>
             <View style={editProfileStyles.avatarContainer}>
               <Image
-                source={require("@/assets/images/sammy.jpg")}
+                source={
+                  profileImageUrl
+                    ? { uri: profileImageUrl }
+                    : require("@/assets/images/user.png")
+                }
                 style={editProfileStyles.avatar}
               />
               <Pressable

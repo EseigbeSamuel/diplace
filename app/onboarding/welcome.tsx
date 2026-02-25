@@ -1,5 +1,5 @@
 import AppButton from "@/components/button";
-import { SimpleSelector } from "@/components/selector";
+import Selector, { SimpleSelector } from "@/components/selector";
 import { useTheme } from "@/contexts/themeContext";
 import { useGetCurrentUser, useSetUserType } from "@/hooks";
 import { UserType } from "@/types";
@@ -9,7 +9,9 @@ import { useRouter } from "expo-router";
 import React, { useState } from "react";
 import {
   Dimensions,
+  Image,
   ImageBackground,
+  Pressable,
   StyleSheet,
   Text,
   View,
@@ -24,7 +26,6 @@ const GetStarted: React.FC = () => {
   const router = useRouter();
   const [selectedType, setSelectedType] = useState<UserType | null>(null);
   const { currentUser } = useGetCurrentUser();
-  console.log("currentUser", currentUser);
 
   const { setUserTypeMutation, setUserTypeMutationPending } = useSetUserType();
 
@@ -62,23 +63,59 @@ const GetStarted: React.FC = () => {
                 Let&apos;s help you tailor your experience.
               </Text>
               <Text style={styles.descriptionText}>
-                What will you use DRPlace for? Let&apos;s help you customize
+                What will you use DiPlace for? Let&apos;s help you customize
                 your experience to meet your goals.
               </Text>
             </View>
 
             {/* Selection Options */}
             <View style={styles.optionsContainer}>
-              <SimpleSelector
-                title="I am a Renter looking for a space"
-                isChecked={selectedType === "renter"}
-                onChange={() => setSelectedType("renter")}
-              />
-              <SimpleSelector
-                title="I am a space Agent / Manager / Owner"
-                isChecked={selectedType === "agent"}
-                onChange={() => setSelectedType("agent")}
-              />
+              <Pressable onPress={() => setSelectedType("renter")}>
+                <View
+                  className="p-4 flex-row w-full items-center gap-4 rounded-xl"
+                  style={
+                    selectedType === "renter"
+                      ? styles.borderDarkGray
+                      : styles.borderLightGray
+                  }
+                >
+                  <Image
+                    source={
+                      selectedType === "renter"
+                        ? require("@/assets/icons/checkbox-circle-fill.png")
+                        : require("@/assets/icons/checkbox-blank-circle-outline.png")
+                    }
+                    style={styles.checkbox}
+                    className="w-6 h-6"
+                  />
+                  <Text style={styles.subTitle}>
+                    I am a Renter looking for a space
+                  </Text>
+                </View>
+              </Pressable>
+              <Pressable onPress={() => setSelectedType("agent")}>
+                <View
+                  className="p-4 flex-row w-full items-center gap-4 rounded-xl"
+                  style={
+                    selectedType === "agent"
+                      ? styles.borderDarkGray
+                      : styles.borderLightGray
+                  }
+                >
+                  <Image
+                    source={
+                      selectedType === "agent"
+                        ? require("@/assets/icons/checkbox-circle-fill.png")
+                        : require("@/assets/icons/checkbox-blank-circle-outline.png")
+                    }
+                    style={styles.checkbox}
+                    className="w-6 h-6"
+                  />
+                  <Text style={styles.subTitle}>
+                    I am a space Agent / Manager / Owner
+                  </Text>
+                </View>
+              </Pressable>
             </View>
 
             {/* Get Started Button */}
@@ -183,6 +220,26 @@ const createStyles = (colors: ColorScheme) =>
     },
     buttonContainer: {
       marginTop: RFValue(8),
+    },
+    checkbox: {
+      tintColor: "#FFFFFF",
+    },
+    borderDarkGray: {
+      borderWidth: 1,
+      borderStyle: "solid",
+      borderColor: "#FFFFFF",
+      borderRadius: RFValue(12),
+    },
+    borderLightGray: {
+      borderWidth: 1,
+      borderStyle: "solid",
+      borderColor: "rgba(255, 255, 255, 0.2)",
+      borderRadius: RFValue(12),
+    },
+    subTitle: {
+      fontSize: RFValue(14),
+      lineHeight: RFValue(20),
+      color: "#FFFFFF",
     },
   });
 

@@ -35,8 +35,8 @@ export const removeFromLocalStore = async (key: string): Promise<void> => {
 
 export const clearAll = async (changeWindow: boolean = true): Promise<void> => {
   try {
-    await SecureStore.deleteItemAsync("access_token");
-    await SecureStore.deleteItemAsync("refresh_token");
+    await removeFromLocalStore("access_token");
+    await removeFromLocalStore("refresh_token");
 
     if (changeWindow) {
       router.replace("/auth/login");

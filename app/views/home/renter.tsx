@@ -1,3 +1,4 @@
+import React from "react";
 import AppButton from "@/components/button";
 import Filter from "@/components/filter";
 import { AppHeader } from "@/components/header";
@@ -15,8 +16,8 @@ import {
   Text,
   View,
 } from "react-native";
-
 import { RFValue } from "react-native-responsive-fontsize";
+
 export default function RenterHome() {
   const { colors, isDarkMode } = useTheme();
   const homeStyles = styles(colors);

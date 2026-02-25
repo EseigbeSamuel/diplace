@@ -121,13 +121,13 @@ const MediaUploadSubstep: React.FC<MediaUploadSubstepProps> = ({
   };
 
   const handleNext = () => {
-    // if (mediaItems.length === 0) {
-    //   Alert.alert(
-    //     "Upload Required",
-    //     "Please upload at least one photo or video"
-    //   );
-    //   return;
-    // }
+    if (!spaceForm.value.media || spaceForm.value.media.length === 0) {
+      Alert.alert(
+        "Upload Required",
+        "Please upload at least one photo or video",
+      );
+      return;
+    }
     onNext();
   };
 
@@ -232,6 +232,7 @@ const MediaUploadSubstep: React.FC<MediaUploadSubstepProps> = ({
           onPress={handleNext}
           size="large"
           fullwidth={true}
+          disabled={!spaceForm.value.media || spaceForm.value.media.length === 0}
         />
       </View>
 

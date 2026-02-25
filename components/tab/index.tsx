@@ -27,7 +27,7 @@ export const TabBarLabel = ({
     <Text
       className={cn("uppercase")}
       style={{
-        fontSize: RFValue(14),
+        fontSize: RFValue(12),
         marginTop: hp(1.2),
         color: colors.slate[650],
       }}
@@ -84,7 +84,7 @@ export const CustomTabIcon: React.FC<CustomTabIconProps> = ({
       Icon={
         <Image
           source={focused ? activeIcon : inactiveIcon}
-          style={{ width: hp("3.5%"), height: hp("3.5%") }}
+          style={{ width: RFValue(20), height: RFValue(20) }}
         />
       }
     />

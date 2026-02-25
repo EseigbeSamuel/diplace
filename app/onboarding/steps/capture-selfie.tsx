@@ -16,9 +16,10 @@ import { RFValue } from "react-native-responsive-fontsize";
 
 type SelfieProps = {
   onNext: () => void;
+  handleBack: () => void;
 };
 
-const SelfieVerificationStep = ({ onNext }: SelfieProps) => {
+const SelfieVerificationStep = ({ onNext, handleBack }: SelfieProps) => {
   const { colors } = useTheme();
   const Styles = styles(colors);
   const [hasPermission, requestPermission] = useCameraPermissions();
@@ -129,7 +130,7 @@ const SelfieVerificationStep = ({ onNext }: SelfieProps) => {
       <View className="w-[70%]  justify-between px-3  top-32 z-50 fixed items-center flex-row">
         <View>
           <TouchableOpacity
-            // onPress={handleBack}
+            onPress={handleBack}
             className="p-4 bg-gray-100/50 rounded-full w-[50px] "
           >
             <Image

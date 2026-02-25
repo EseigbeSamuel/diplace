@@ -3,10 +3,13 @@ import SafeAreaViewContainer from "@/components/safeareaview";
 import SectionHeader from "@/components/sectionheader";
 import { useTheme } from "@/contexts/themeContext";
 import { useUser } from "@/contexts/user-context";
+import { useGetCurrentUser } from "@/hooks";
+import { clearAll } from "@/lib";
 import { ColorScheme } from "@/utils";
 import { useRouter } from "expo-router";
 import React, { useState } from "react";
 import {
+  Alert,
   Image,
   Pressable,
   ScrollView,
@@ -20,9 +23,25 @@ import { RFValue } from "react-native-responsive-fontsize";
 const Profile = () => {
   const router = useRouter();
   const { userType } = useUser();
+  const { currentUser } = useGetCurrentUser();
   const { colors, isDarkMode, toggleTheme } = useTheme();
   const profileStyles = styles(colors);
   const [showMediaModal, setShowMediaModal] = useState(false);
+
+  const normalizeImageUrl = (url?: string) => {
+    if (!url) return null;
+    if (url.startsWith("http://") || url.startsWith("https://")) return url;
+    if (url.startsWith("/")) return `https://diplace.api.elsoft.ng${url}`;
+    return `https://diplace.api.elsoft.ng/${url}`;
+  };
+
+  const profileImageUrl = normalizeImageUrl(currentUser?.profile_picture);
+  const profileName =
+    currentUser?.full_name?.trim() ||
+    `${currentUser?.first_name || ""} ${currentUser?.last_name || ""}`.trim() ||
+    "User";
+  const profileEmail = currentUser?.email || "No email";
+  const profilePhone = currentUser?.phone_number || "No phone number";
 
   const menuItems =
     userType === "owner"
@@ -108,7 +127,14 @@ const Profile = () => {
             icon: require("@/assets/icons/logout.png"),
             label: "Log out",
             onPress: () => {
-              router.push("/auth/login");
+              Alert.alert("Logout", "Are you sure you want to log out", [
+                { text: "Cancel", style: "cancel" },
+                {
+                  text: "Log Out",
+                  onPress: () => clearAll(),
+                  style: "destructive",
+                },
+              ]);
             },
             isLogout: true,
           },
@@ -188,7 +214,14 @@ const Profile = () => {
             icon: require("@/assets/icons/logout.png"),
             label: "Log out",
             onPress: () => {
-              router.push("/auth/login");
+              Alert.alert("Logout", "Are you sure you want to log out", [
+                { text: "Cancel", style: "cancel" },
+                {
+                  text: "Log Out",
+                  onPress: () => clearAll(),
+                  style: "destructive",
+                },
+              ]);
             },
             isLogout: true,
           },
@@ -202,7 +235,11 @@ const Profile = () => {
         <View style={profileStyles.profileHeader}>
           <View style={profileStyles.avatarContainer}>
             <Image
-              source={require("@/assets/images/sammy.jpg")}
+              source={
+                profileImageUrl
+                  ? { uri: profileImageUrl }
+                  : require("@/assets/images/user.png")
+              }
               style={profileStyles.avatar}
             />
             <Pressable
@@ -218,7 +255,7 @@ const Profile = () => {
 
           <View style={profileStyles.profileInfo}>
             <View style={profileStyles.nameContainer}>
-              <Text style={profileStyles.name}>Ibe Alex</Text>
+              <Text style={profileStyles.name}>{profileName}</Text>
               <Image
                 source={require("@/assets/icons/badge-check-green.png")}
                 style={profileStyles.verifiedIcon}
@@ -230,7 +267,7 @@ const Profile = () => {
                 source={require("@/assets/icons/mail-outline-light.png")}
                 style={profileStyles.contactIcon}
               />
-              <Text style={profileStyles.contactText}>ibealex@gmail.com</Text>
+              <Text style={profileStyles.contactText}>{profileEmail}</Text>
             </View>
 
             <View style={profileStyles.contactRow}>
@@ -238,7 +275,7 @@ const Profile = () => {
                 source={require("@/assets/icons/calling.png")}
                 style={profileStyles.contactIcon}
               />
-              <Text style={profileStyles.contactText}>+234 812 721 9718</Text>
+              <Text style={profileStyles.contactText}>{profilePhone}</Text>
             </View>
           </View>
         </View>

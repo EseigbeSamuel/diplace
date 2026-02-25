@@ -1,58 +1,57 @@
-import React, { useState, useRef, useEffect } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import {
-  View,
-  Text,
-  StyleSheet,
-  Pressable,
+  ActivityIndicator,
+  Alert,
   Image,
   Modal,
+  Pressable,
+  StyleSheet,
+  Text,
   TextInput,
-  Alert,
-  ActivityIndicator,
+  View,
 } from "react-native";
 import { RFValue } from "react-native-responsive-fontsize";
 import { CameraView, useCameraPermissions } from "expo-camera";
 import { Audio, Video } from "expo-av";
-import * as FileSystem from "expo-file-system";
 import AppButton from "@/components/button";
 import { useTheme } from "@/contexts/themeContext";
-import { ColorScheme } from "@/utils";
-import { TourVideo } from "@/types/add-space-types";
 import { useSpaceStore } from "@/store/useSpace";
+import { TourVideo } from "@/types/add-space-types";
+import { ColorScheme } from "@/utils";
 
 interface VirtualTourSubstepProps {
   onNext: () => void;
   onPrev: () => void;
 }
 
+type StopAction = "next" | "finish";
+
+const MAX_RECORD_SECONDS = 60;
+
 const VirtualTourSubstep: React.FC<VirtualTourSubstepProps> = ({
   onNext,
-  onPrev,
 }) => {
   const { colors } = useTheme();
   const styles = createStyles(colors);
-  const { spaceForm, setValue } = useSpaceStore();
+  const { setValue, spaceForm } = useSpaceStore();
+  const [permission, requestPermission] = useCameraPermissions();
 
-  // States
+  const cameraRef = useRef<CameraView>(null);
+  const recordingPromiseRef = useRef<Promise<{ uri: string } | undefined> | null>(null);
+  const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const pendingActionRef = useRef<StopAction>("finish");
+
   const [showInstructions, setShowInstructions] = useState(true);
   const [showCamera, setShowCamera] = useState(false);
   const [showRoomNameModal, setShowRoomNameModal] = useState(false);
   const [showFinishModal, setShowFinishModal] = useState(false);
+  const [isPreparingCamera, setIsPreparingCamera] = useState(false);
   const [isRecording, setIsRecording] = useState(false);
-  const [recordingTime, setRecordingTime] = useState(60);
+  const [recordingTime, setRecordingTime] = useState(MAX_RECORD_SECONDS);
   const [roomName, setRoomName] = useState("");
   const [currentVideoUri, setCurrentVideoUri] = useState("");
-  // const [tours, setTours] = useState<TourVideo[]>([]);
-  const [isUploading, setIsUploading] = useState(false);
-  const [uploadProgress, setUploadProgress] = useState(0);
-
-  // Refs
-  const cameraRef = useRef<CameraView>(null);
-  const recordingRef = useRef<any>(null);
-  const timerRef = useRef<number | null>(null);
-
-  // Permissions
-  const [permission, requestPermission] = useCameraPermissions();
+  const [lastClipDuration, setLastClipDuration] = useState(0);
+  const [isFinalizingClip, setIsFinalizingClip] = useState(false);
 
   useEffect(() => {
     return () => {
@@ -62,25 +61,105 @@ const VirtualTourSubstep: React.FC<VirtualTourSubstepProps> = ({
     };
   }, []);
 
-  useEffect(() => {
-    if (showCamera) {
-      const timer = setTimeout(() => {
-        if (cameraRef.current) {
-          startRecording();
+  const clearTimer = () => {
+    if (timerRef.current) {
+      clearInterval(timerRef.current);
+      timerRef.current = null;
+    }
+  };
+
+  const addClipToTour = (name: string) => {
+    if (!currentVideoUri) {
+      Alert.alert("No Recording", "No recorded clip found.");
+      return false;
+    }
+
+    const clip: TourVideo = {
+      uri: currentVideoUri,
+      roomName: name.trim(),
+      duration: lastClipDuration,
+    };
+
+    setValue({ tour: [...(spaceForm.value.tour ?? []), clip] });
+    return true;
+  };
+
+  const startRecording = async () => {
+    if (!cameraRef.current || isRecording) return;
+
+    try {
+      setIsPreparingCamera(false);
+      setIsRecording(true);
+      setRecordingTime(MAX_RECORD_SECONDS);
+      setCurrentVideoUri("");
+      setLastClipDuration(0);
+      pendingActionRef.current = "finish";
+
+      clearTimer();
+      timerRef.current = setInterval(() => {
+        setRecordingTime((prev) => {
+          if (prev <= 1) {
+            clearTimer();
+            handleStopRecording("finish");
+            return 0;
+          }
+          return prev - 1;
+        });
+      }, 1000);
+
+      const recordingPromise = cameraRef.current.recordAsync({
+        maxDuration: MAX_RECORD_SECONDS,
+      });
+      recordingPromiseRef.current = recordingPromise;
+
+      const video = await recordingPromise;
+      const duration = MAX_RECORD_SECONDS - recordingTime;
+
+      if (video?.uri) {
+        setCurrentVideoUri(video.uri);
+        setLastClipDuration(duration > 0 ? duration : MAX_RECORD_SECONDS);
+      }
+    } catch (error) {
+      console.log("VirtualTour: record error", error);
+      Alert.alert("Recording Error", "Unable to record video. Please try again.");
+    } finally {
+      setIsRecording(false);
+      clearTimer();
+      setShowCamera(false);
+      setIsFinalizingClip(false);
+
+      if (!currentVideoUri && recordingPromiseRef.current) {
+        try {
+          const video = await recordingPromiseRef.current;
+          if (video?.uri) {
+            setCurrentVideoUri(video.uri);
+          }
+        } catch {
+          // ignore
         }
-      }, 300);
+      }
 
-      return () => clearTimeout(timer);
+      if (pendingActionRef.current === "next") {
+        setShowRoomNameModal(true);
+      } else {
+        setShowFinishModal(true);
+      }
     }
-  }, [showCamera]);
+  };
 
-  useEffect(() => {
-    if (showCamera) {
-      setTimeout(() => {
-        console.log("cameraRef:", cameraRef.current);
-      }, 500);
+  const handleStopRecording = async (action: StopAction) => {
+    if (!cameraRef.current || !isRecording || isFinalizingClip) return;
+
+    try {
+      setIsFinalizingClip(true);
+      pendingActionRef.current = action;
+      await cameraRef.current.stopRecording();
+    } catch (error) {
+      setIsFinalizingClip(false);
+      console.log("VirtualTour: stop error", error);
+      Alert.alert("Stop Error", "Unable to stop recording properly.");
     }
-  }, [showCamera]);
+  };
 
   const handleBeginTour = async () => {
     if (!permission?.granted) {
@@ -88,180 +167,97 @@ const VirtualTourSubstep: React.FC<VirtualTourSubstepProps> = ({
       if (!result.granted) {
         Alert.alert(
           "Permission Required",
-          "Camera permission is needed for virtual tour"
+          "Camera permission is required for virtual tour.",
         );
         return;
       }
     }
 
-    // Request audio permission
     const audioPermission = await Audio.requestPermissionsAsync();
     if (!audioPermission.granted) {
       Alert.alert(
         "Permission Required",
-        "Audio permission is needed for recording"
+        "Audio permission is required for recording.",
       );
       return;
     }
 
     setShowInstructions(false);
     setShowCamera(true);
-  };
-
-  const startRecording = async () => {
-    if (!cameraRef.current) {
-      console.log("Camera not ready yet");
-      return;
-    }
-
-    try {
-      setIsRecording(true);
-      setRecordingTime(60);
-
-      const recordingPromise = cameraRef.current.recordAsync({
-        maxDuration: 60,
-      });
-
-      // Save this promise so stopRecording can wait for it
-      recordingRef.current = recordingPromise;
-
-      // Timer
-      timerRef.current = setInterval(() => {
-        setRecordingTime((prev) => {
-          if (prev <= 1) {
-            if (isRecording) {
-              stopRecording();
-              setShowRoomNameModal(true);
-            }
-            stopRecording();
-            return 0;
-          }
-          return prev - 1;
-        });
-      }, 1000);
-
-      // WAIT FOR RESULT
-      // const video = await recordingPromise;
-
-      // console.log("DONE:", video);
-      // setCurrentVideoUri(video?.uri);
-      // setIsRecording(false);
-      // setShowCamera(false);
-      // setShowRoomNameModal(true);
-    } catch (e) {
-      console.log("Recording error:", e);
-    }
-  };
-
-  const stopRecording = async () => {
-    if (!cameraRef.current || !isRecording) {
-      console.log("No active recording to stop");
-      return;
-    }
-
-    try {
-      await cameraRef.current.stopRecording();
-      console.log("recording stopped");
-    } catch (e) {
-      console.log("Stop error:", e);
-    }
-
-    if (timerRef.current) clearInterval(timerRef.current);
-    setIsRecording(false);
+    setIsPreparingCamera(true);
   };
 
   const handleProceedToNextRoom = () => {
     if (!roomName.trim()) {
-      Alert.alert("Room Name Required", "Please enter a name for this room");
+      Alert.alert("Room Name Required", "Please provide a room name.");
       return;
     }
 
-    // Save tour
-    const newTour: TourVideo = {
-      uri: currentVideoUri,
-      roomName: roomName,
-      duration: 60 - recordingTime,
-    };
+    const added = addClipToTour(roomName);
+    if (!added) return;
 
-    setValue({ tour: [...(spaceForm.value.tour || []), newTour] });
     setRoomName("");
-    setShowRoomNameModal(false);
-
-    // Start recording next room
-    setShowCamera(true);
-    startRecording();
-  };
-
-  const handleRetake = () => {
-    setRoomName("");
+    setCurrentVideoUri("");
+    setLastClipDuration(0);
     setShowRoomNameModal(false);
     setShowCamera(true);
-    startRecording();
+    setIsPreparingCamera(true);
   };
 
-  const handleFinishTour = () => {
-    setShowRoomNameModal(false);
-    setShowFinishModal(true);
-  };
-
-  const handleUploadTour = async () => {
+  const handleUploadTour = () => {
     if (!roomName.trim()) {
-      Alert.alert("Room Name Required", "Please enter a name for this room");
+      Alert.alert("Room Name Required", "Please provide a room name.");
       return;
     }
 
-    setShowFinishModal(false);
-    setShowCamera(false);
+    const added = addClipToTour(roomName);
+    if (!added) return;
 
-    // Save final tour
-    const newTour: TourVideo = {
-      uri: currentVideoUri,
-      roomName: roomName,
-      duration: 60 - recordingTime,
-    };
-
-    const allTours = [...(spaceForm.value.tour ?? []), newTour];
-    setValue({ tour: allTours });
     setRoomName("");
+    setCurrentVideoUri("");
+    setShowFinishModal(false);
+  };
 
-    // Simulate upload
-    setIsUploading(true);
-    setUploadProgress(0);
-
-    const interval = setInterval(() => {
-      setUploadProgress((prev) => {
-        if (prev >= 100) {
-          clearInterval(interval);
-          setIsUploading(false);
-          return 100;
-        }
-        return prev + 10;
-      });
-    }, 300);
+  const handleRetakeCurrent = () => {
+    setRoomName("");
+    setCurrentVideoUri("");
+    setLastClipDuration(0);
+    setShowRoomNameModal(false);
+    setShowFinishModal(false);
+    setShowCamera(true);
+    setIsPreparingCamera(true);
   };
 
   const handleRetakeAll = () => {
     setValue({ tour: [] });
-    setShowFinishModal(false);
-    setShowInstructions(true);
-  };
-
-  const handleExitTour = () => {
+    setRoomName("");
+    setCurrentVideoUri("");
+    setLastClipDuration(0);
     setShowCamera(false);
-    setIsRecording(false);
-    if (timerRef.current) {
-      clearInterval(timerRef.current);
-    }
-    if (cameraRef.current && isRecording) {
-      cameraRef.current.stopRecording();
-    }
-    setValue({ tour: [] });
+    setShowFinishModal(false);
+    setShowRoomNameModal(false);
     setShowInstructions(true);
   };
 
-  const handleCancelUpload = () => {
-    setIsUploading(false);
-    setUploadProgress(0);
+  const handleExitTour = async () => {
+    clearTimer();
+    pendingActionRef.current = "finish";
+
+    if (cameraRef.current && isRecording) {
+      try {
+        await cameraRef.current.stopRecording();
+      } catch {
+        // ignore
+      }
+    }
+
+    setIsRecording(false);
+    setShowCamera(false);
+    setShowRoomNameModal(false);
+    setShowFinishModal(false);
+    setCurrentVideoUri("");
+    setRoomName("");
+    setLastClipDuration(0);
     setValue({ tour: [] });
     setShowInstructions(true);
   };
@@ -274,37 +270,27 @@ const VirtualTourSubstep: React.FC<VirtualTourSubstepProps> = ({
       .padStart(2, "0")}`;
   };
 
+  const hasTour = (spaceForm.value.tour ?? []).length > 0;
+
   return (
     <View style={styles.container}>
-      {/* Instructions Screen */}
-      {showInstructions && !isUploading && (
+      {showInstructions && (
         <View style={styles.instructionsContainer}>
           <Text style={styles.title}>
-            Please follow the instructions to take a 360° view.
+            Please follow the instructions to take a 360 view.
           </Text>
-
           <View style={styles.instructionsList}>
             <Text style={styles.instructionItem}>
-              1. Prepare the space — clean, well-lit, clutter-free.
+              1. Keep the space clean, bright, and clear.
             </Text>
             <Text style={styles.instructionItem}>
-              2. Use portrait mode at chest level.
+              2. Hold your phone steady at chest level.
             </Text>
             <Text style={styles.instructionItem}>
-              3. Start from the entrance, rotate slowly for 360° coverage.
+              3. Rotate slowly from one point to cover the room.
             </Text>
             <Text style={styles.instructionItem}>
-              4. Capture all rooms, including kitchens, bathrooms, any unique
-              features.
-            </Text>
-            <Text style={styles.instructionItem}>
-              5. Highlight key features (balcony, fittings, parking, etc.).
-            </Text>
-            <Text style={styles.instructionItem}>
-              6. Keep videos smooth, stable, and under 60 seconds per room.
-            </Text>
-            <Text style={styles.instructionItem}>
-              7. Review before uploading to ensure clarity and quality.
+              4. Record one room per clip (max 60 seconds).
             </Text>
           </View>
 
@@ -323,106 +309,49 @@ const VirtualTourSubstep: React.FC<VirtualTourSubstepProps> = ({
         </View>
       )}
 
-      {/* Upload Progress Screen */}
-      {isUploading && (
-        <View style={styles.uploadContainer}>
-          <Text style={styles.uploadTitle}>Take a virtual tour</Text>
-          <Text style={styles.uploadDescription}>
-            Simulate a virtual tour of this property to give renters a real life
-            feel of the place. Please follow the instructions to upload a
-            virtual tour.
-          </Text>
-
-          <View style={styles.uploadStatusContainer}>
-            <View>
-              <View style={styles.uploadStatusRow}>
-                <Text style={styles.uploadStatusText}>Virtual Tour</Text>
-              </View>
-              <View style={styles.uploadProgressContainer}>
-                <ActivityIndicator />
-                <Text style={styles.uploadProgressText}>Uploading</Text>
-              </View>
-            </View>
-            <Pressable style={styles.cancelButton} onPress={handleCancelUpload}>
-              <Image
-                source={require("@/assets/icons/X-close.png")}
-                style={styles.cancelIcon}
-              />
-              <Text style={styles.cancelButton}>Cancel</Text>
-            </Pressable>
-          </View>
-        </View>
-      )}
-
-      {/* Uploaded Success Screen */}
-      {spaceForm.value.tour &&
-        spaceForm.value.tour.length > 0 &&
-        !isUploading &&
+      {hasTour &&
         !showInstructions &&
-        !showCamera && (
+        !showCamera &&
+        !showFinishModal &&
+        !showRoomNameModal && (
           <View style={styles.uploadContainer}>
-            <Text style={styles.uploadTitle}>Take a virtual tour</Text>
+            <Text style={styles.uploadTitle}>Virtual tour ready</Text>
             <Text style={styles.uploadDescription}>
-              Simulate a virtual tour of this property to give renters a real
-              life feel of the place. Please follow the instructions to upload a
-              virtual tour.
+              {(spaceForm.value.tour ?? []).length} room clip(s) added.
             </Text>
 
             <View style={styles.uploadStatusContainer}>
-              <View>
-                <View style={styles.uploadStatusRow}>
-                  <Text style={styles.uploadStatusText}>Virtual Tour</Text>
-                </View>
-                <Pressable style={styles.previewButton}>
-                  <Image
-                    source={require("@/assets/icons/Video - Iconly Pro.png")}
-                    style={styles.previewIcon}
-                  />
-                  <Text style={styles.uploadText}>Uploaded</Text>
-                </Pressable>
-              </View>
-              <Pressable style={styles.previewButton}>
+              <View style={styles.uploadStatusRow}>
                 <Image
-                  source={require("@/assets/icons/play-outline.png")}
+                  source={require("@/assets/icons/Video - Iconly Pro.png")}
                   style={styles.previewIcon}
                 />
-                <Text style={styles.previewText}>Preview</Text>
-              </Pressable>
+                <Text style={styles.uploadText}>Uploaded locally</Text>
+              </View>
             </View>
 
             <View style={styles.bottomButtons}>
-              <AppButton
-                title="Next"
-                onPress={onNext}
-                size="large"
-                fullwidth={true}
-              />
+              <AppButton title="Next" onPress={onNext} size="large" fullwidth />
               <Pressable style={styles.retakeButton} onPress={handleRetakeAll}>
                 <Image
                   source={require("@/assets/icons/return.png")}
                   style={styles.retakeIcon}
                 />
-                <Text style={styles.retakeText}>Retake This?</Text>
+                <Text style={styles.retakeText}>Retake All</Text>
               </Pressable>
             </View>
           </View>
         )}
 
-      {/* Camera View Modal */}
       <Modal visible={showCamera} animationType="fade">
         <View style={styles.cameraContainer}>
           <CameraView
             ref={cameraRef}
-            style={{ flex: 1, width: "100%", height: "100%" }}
-            videoQuality="1080p"
+            style={styles.camera}
             facing="back"
+            videoQuality="1080p"
             onCameraReady={startRecording}
-            // enableZoomGesture
-            enableTorch={false}
-            // enableFocus={true}
-            // enableRecording={true}
           >
-            {/* Exit Button */}
             <Pressable style={styles.exitButton} onPress={handleExitTour}>
               <Image
                 source={require("@/assets/icons/close-contained.png")}
@@ -431,40 +360,35 @@ const VirtualTourSubstep: React.FC<VirtualTourSubstepProps> = ({
               <Text style={styles.exitText}>Exit tour</Text>
             </Pressable>
 
-            {/* Instructions Overlay */}
             <View style={styles.cameraOverlay}>
               <Text style={styles.cameraInstruction}>
-                Keep your camera steady and rotate slowly for 360° view.
+                Rotate slowly and keep your phone steady.
               </Text>
-
-              {/* Timer */}
               <View style={styles.timerContainer}>
                 <View style={styles.recordingDot} />
-                <Text style={styles.timerText}>
-                  {formatTime(recordingTime)}
-                </Text>
+                <Text style={styles.timerText}>{formatTime(recordingTime)}</Text>
               </View>
             </View>
 
-            {/* Bottom Buttons */}
+            {isPreparingCamera && (
+              <View style={styles.preparingOverlay}>
+                <ActivityIndicator color="#FFFFFF" />
+                <Text style={styles.preparingText}>Preparing camera...</Text>
+              </View>
+            )}
+
             <View style={styles.cameraBottomButtons}>
               <AppButton
                 title="Next Room"
-                onPress={() => {
-                  stopRecording();
-                  setTimeout(() => setShowRoomNameModal(true), 500);
-                }}
+                onPress={() => handleStopRecording("next")}
                 disabled={!isRecording}
                 afterIcon={require("@/assets/icons/chevron-right.png")}
                 variant="secondary"
               />
-
               <AppButton
                 title="Finish Tour"
-                onPress={() => {
-                  stopRecording();
-                  setTimeout(() => setShowFinishModal(true), 500);
-                }}
+                onPress={() => handleStopRecording("finish")}
+                disabled={!isRecording}
                 variant="primary"
               />
             </View>
@@ -472,41 +396,24 @@ const VirtualTourSubstep: React.FC<VirtualTourSubstepProps> = ({
         </View>
       </Modal>
 
-      {/* Room Name Modal */}
       <Modal visible={showRoomNameModal} transparent animationType="fade">
         <View style={styles.modalOverlay}>
           <View style={styles.cameraPreview}>
-            {currentVideoUri && (
+            {currentVideoUri ? (
               <Video
                 source={{ uri: currentVideoUri }}
                 style={styles.previewImage}
-                // resizeMode="cover"
                 shouldPlay={false}
                 isLooping
               />
+            ) : (
+              <View style={styles.noClipContainer}>
+                <Text style={styles.noClipText}>No clip captured.</Text>
+              </View>
             )}
 
-            {/* Overlay content */}
-            <View style={styles.cameraOverlay}>
-              <Text style={styles.cameraInstruction}>
-                Keep your camera steady and rotate slowly for 360° view.
-              </Text>
-
-              <View style={styles.timerContainer}>
-                <View style={styles.recordingDot} />
-                <Text style={styles.timerText}>
-                  {formatTime(60 - recordingTime)}
-                </Text>
-              </View>
-            </View>
-
-            {/* Room Name Card */}
             <View style={styles.roomNameCard}>
-              <Text style={styles.roomNameTitle}>What Is This Room?</Text>
-              <Text style={styles.roomNameDescription}>
-                Give this room a title for easy identification (e.g Sitting
-                room, bedroom, kitchen etc.)
-              </Text>
+              <Text style={styles.roomNameTitle}>What room is this?</Text>
               <TextInput
                 style={styles.roomNameInput}
                 placeholder="Room Name"
@@ -518,64 +425,36 @@ const VirtualTourSubstep: React.FC<VirtualTourSubstepProps> = ({
                 title="Proceed to Next Room"
                 onPress={handleProceedToNextRoom}
                 size="large"
-                fullwidth={true}
+                fullwidth
               />
-              <Pressable style={styles.retakeLink} onPress={handleRetake}>
-                <Text style={styles.retakeLinkText}>Retake This?</Text>
+              <Pressable style={styles.retakeLink} onPress={handleRetakeCurrent}>
+                <Text style={styles.retakeLinkText}>Retake This Clip</Text>
               </Pressable>
-            </View>
-
-            {/* Bottom Buttons */}
-            <View style={styles.previewBottomButtons}>
-              <AppButton
-                title="Next Room"
-                onPress={handleProceedToNextRoom}
-                afterIcon={require("@/assets/icons/chevron-right.png")}
-                variant="secondary"
-              />
-
-              <AppButton
-                title="Finish Tour"
-                onPress={handleFinishTour}
-                variant="primary"
-              />
             </View>
           </View>
         </View>
       </Modal>
 
-      {/* Finish Modal */}
       <Modal visible={showFinishModal} transparent animationType="fade">
         <View style={styles.modalOverlay}>
           <View style={styles.cameraPreview}>
-            {currentVideoUri && (
+            {currentVideoUri ? (
               <Video
                 source={{ uri: currentVideoUri }}
                 style={styles.previewImage}
-                // resizeMode="cover"
                 shouldPlay={false}
                 isLooping
               />
+            ) : (
+              <View style={styles.noClipContainer}>
+                <Text style={styles.noClipText}>No clip captured.</Text>
+              </View>
             )}
 
-            <View style={styles.cameraOverlay}>
-              <Text style={styles.cameraInstruction}>
-                Keep your camera steady and rotate slowly for 360° view.
-              </Text>
-
-              <View style={styles.timerContainer}>
-                <View style={styles.recordingDot} />
-                <Text style={styles.timerText}>
-                  {formatTime(60 - recordingTime)}
-                </Text>
-              </View>
-            </View>
-
             <View style={styles.roomNameCard}>
-              <Text style={styles.roomNameTitle}>Finish Tour?</Text>
+              <Text style={styles.roomNameTitle}>Finish Tour</Text>
               <Text style={styles.roomNameDescription}>
-                Give this room a title for easy identification (e.g Sitting
-                room, bedroom, kitchen etc.)
+                Name this last room before finishing.
               </Text>
               <TextInput
                 style={styles.roomNameInput}
@@ -585,29 +464,14 @@ const VirtualTourSubstep: React.FC<VirtualTourSubstepProps> = ({
                 onChangeText={setRoomName}
               />
               <AppButton
-                title="Upload Tour"
+                title="Save and Finish"
                 onPress={handleUploadTour}
                 size="large"
-                fullwidth={true}
+                fullwidth
               />
-              <Pressable style={styles.retakeLink} onPress={handleRetake}>
-                <Text style={styles.retakeLinkText}>Retake This?</Text>
+              <Pressable style={styles.retakeLink} onPress={handleRetakeCurrent}>
+                <Text style={styles.retakeLinkText}>Retake This Clip</Text>
               </Pressable>
-            </View>
-
-            <View style={styles.previewBottomButtons}>
-              <AppButton
-                title="Next Room"
-                onPress={handleProceedToNextRoom}
-                afterIcon={require("@/assets/icons/chevron-right.png")}
-                variant="secondary"
-              />
-
-              <AppButton
-                title="Finish Tour"
-                onPress={handleUploadTour}
-                variant="primary"
-              />
             </View>
           </View>
         </View>
@@ -630,21 +494,20 @@ const createStyles = (colors: ColorScheme) =>
       fontSize: RFValue(20),
       fontWeight: "600",
       color: colors.slate[650],
-      lineHeight: RFValue(28),
       marginBottom: RFValue(24),
     },
     instructionsList: {
-      flex: 1,
       gap: RFValue(16),
+      flex: 1,
     },
     instructionItem: {
       fontSize: RFValue(14),
       color: colors.slate[600],
-      lineHeight: RFValue(22),
+      lineHeight: RFValue(21),
     },
     buttonGroup: {
-      paddingVertical: RFValue(20),
       gap: RFValue(12),
+      paddingVertical: RFValue(16),
     },
     skipButton: {
       alignItems: "center",
@@ -655,12 +518,44 @@ const createStyles = (colors: ColorScheme) =>
       color: colors.slate[600],
       fontWeight: "500",
     },
+    uploadContainer: {
+      flex: 1,
+      paddingTop: RFValue(32),
+    },
+    uploadTitle: {
+      fontSize: RFValue(20),
+      fontWeight: "600",
+      color: colors.slate[650],
+      marginBottom: RFValue(12),
+    },
+    uploadDescription: {
+      fontSize: RFValue(14),
+      color: colors.slate[600],
+      marginBottom: RFValue(24),
+    },
+    uploadStatusContainer: {
+      padding: RFValue(16),
+      backgroundColor: colors.slate[200],
+      borderRadius: RFValue(12),
+    },
+    uploadStatusRow: {
+      flexDirection: "row",
+      alignItems: "center",
+      gap: RFValue(8),
+    },
+    uploadText: {
+      fontSize: RFValue(14),
+      color: colors.slate[650],
+      fontWeight: "500",
+    },
     cameraContainer: {
       flex: 1,
-      backgroundColor: "#000",
+      backgroundColor: "#000000",
     },
     camera: {
       flex: 1,
+      width: "100%",
+      height: "100%",
     },
     exitButton: {
       position: "absolute",
@@ -697,253 +592,126 @@ const createStyles = (colors: ColorScheme) =>
       fontSize: RFValue(14),
       color: "#FFFFFF",
       textAlign: "center",
-      textShadowColor: "rgba(0, 0, 0, 0.75)",
-      textShadowOffset: { width: 0, height: 1 },
-      textShadowRadius: 3,
     },
     timerContainer: {
       flexDirection: "row",
       alignItems: "center",
-      backgroundColor: "rgba(0, 0, 0, 0.6)",
-      paddingHorizontal: RFValue(16),
-      paddingVertical: RFValue(8),
+      backgroundColor: "rgba(0,0,0,0.6)",
+      paddingHorizontal: RFValue(12),
+      paddingVertical: RFValue(6),
       borderRadius: RFValue(20),
       gap: RFValue(8),
     },
     recordingDot: {
       width: RFValue(10),
       height: RFValue(10),
-      borderRadius: RFValue(5),
+      borderRadius: RFValue(6),
       backgroundColor: "#EF4444",
     },
     timerText: {
-      fontSize: RFValue(16),
+      fontSize: RFValue(15),
       color: "#FFFFFF",
       fontWeight: "600",
+    },
+    preparingOverlay: {
+      position: "absolute",
+      alignSelf: "center",
+      top: "45%",
+      alignItems: "center",
+      gap: RFValue(8),
+    },
+    preparingText: {
+      color: "#FFFFFF",
+      fontSize: RFValue(13),
     },
     cameraBottomButtons: {
       position: "absolute",
-      bottom: RFValue(40),
+      bottom: RFValue(32),
       left: RFValue(20),
       right: RFValue(20),
-      gap: RFValue(12),
-    },
-    nextRoomButton: {
-      flexDirection: "row",
-      alignItems: "center",
-      justifyContent: "center",
-      backgroundColor: "#FFFFFF",
-      paddingVertical: RFValue(16),
-      borderRadius: RFValue(12),
-      gap: RFValue(8),
-    },
-    nextRoomButtonAlt: {
-      flexDirection: "row",
-      alignItems: "center",
-      justifyContent: "center",
-      backgroundColor: "#FFFFFF",
-      paddingVertical: RFValue(16),
-      borderRadius: RFValue(12),
-      gap: RFValue(8),
-    },
-    nextRoomText: {
-      fontSize: RFValue(16),
-      color: colors.slate[650],
-      fontWeight: "600",
-    },
-    nextRoomArrow: {
-      width: RFValue(18),
-      height: RFValue(18),
-      tintColor: colors.slate[650],
-    },
-    finishTourButton: {
-      alignItems: "center",
-      justifyContent: "center",
-      backgroundColor: colors.slate[650],
-      paddingVertical: RFValue(16),
-      borderRadius: RFValue(12),
-    },
-    finishTourText: {
-      fontSize: RFValue(16),
-      color: "#FFFFFF",
-      fontWeight: "600",
+      gap: RFValue(10),
     },
     modalOverlay: {
       flex: 1,
-      backgroundColor: "rgba(0, 0, 0, 0.9)",
+      backgroundColor: "rgba(0,0,0,0.85)",
     },
     cameraPreview: {
       flex: 1,
-      position: "relative",
     },
     previewImage: {
       width: "100%",
       height: "100%",
     },
+    noClipContainer: {
+      flex: 1,
+      alignItems: "center",
+      justifyContent: "center",
+    },
+    noClipText: {
+      color: "#FFFFFF",
+      fontSize: RFValue(14),
+    },
     roomNameCard: {
       position: "absolute",
-      bottom: RFValue(200),
+      bottom: RFValue(48),
       left: RFValue(20),
       right: RFValue(20),
       backgroundColor: colors.background,
       borderRadius: RFValue(16),
-      padding: RFValue(20),
-      gap: RFValue(16),
+      padding: RFValue(16),
+      gap: RFValue(12),
     },
     roomNameTitle: {
-      fontSize: RFValue(20),
+      fontSize: RFValue(19),
       fontWeight: "700",
       color: colors.slate[650],
     },
     roomNameDescription: {
       fontSize: RFValue(13),
       color: colors.slate[600],
-      lineHeight: RFValue(18),
     },
     roomNameInput: {
-      paddingVertical: RFValue(14),
-      paddingHorizontal: RFValue(16),
-      backgroundColor: colors.background,
-      borderRadius: RFValue(12),
       borderWidth: 1,
       borderColor: colors.slate[300],
-      fontSize: RFValue(15),
+      borderRadius: RFValue(10),
+      paddingHorizontal: RFValue(12),
+      paddingVertical: RFValue(12),
       color: colors.slate[650],
     },
     retakeLink: {
       alignItems: "center",
-      paddingVertical: RFValue(8),
+      paddingVertical: RFValue(4),
     },
     retakeLinkText: {
-      fontSize: RFValue(15),
-      color: colors.slate[600],
-      fontWeight: "500",
-    },
-    previewBottomButtons: {
-      position: "absolute",
-      bottom: RFValue(40),
-      left: RFValue(20),
-      right: RFValue(20),
-      gap: RFValue(12),
-    },
-    uploadContainer: {
-      flex: 1,
-      paddingTop: RFValue(32),
-    },
-    uploadTitle: {
-      fontSize: RFValue(20),
-      fontWeight: "600",
-      color: colors.slate[650],
-      marginBottom: RFValue(12),
-    },
-    uploadDescription: {
       fontSize: RFValue(14),
       color: colors.slate[600],
-      lineHeight: RFValue(20),
-      marginBottom: RFValue(32),
-    },
-    uploadStatusContainer: {
-      padding: RFValue(16),
-      backgroundColor: colors.slate[200],
-      borderRadius: RFValue(12),
-      flexDirection: "row",
-      alignItems: "center",
-      justifyContent: "space-between",
-    },
-    uploadStatusRow: {
-      flexDirection: "row",
-      alignItems: "center",
-      gap: RFValue(12),
-      marginBottom: RFValue(4),
-    },
-    uploadIcon: {
-      width: RFValue(20),
-      height: RFValue(20),
-      tintColor: colors.slate[650],
-    },
-    uploadStatusText: {
-      fontSize: RFValue(15),
-      fontWeight: "600",
-      color: colors.slate[650],
-    },
-    uploadProgressContainer: {
-      flexDirection: "row",
-      alignItems: "center",
-      justifyContent: "space-between",
-      marginBottom: RFValue(8),
-    },
-    uploadProgressText: {
-      fontSize: RFValue(13),
-      paddingLeft: 2,
-      color: colors.slate[600],
-    },
-    cancelIcon: {
-      width: RFValue(18),
-      height: RFValue(18),
-      tintColor: colors.error[200],
-    },
-    progressBar: {
-      height: RFValue(6),
-      backgroundColor: colors.slate[200],
-      borderRadius: RFValue(3),
-      overflow: "hidden",
-    },
-    progressFill: {
-      height: "100%",
-      backgroundColor: colors.info[200],
-      borderRadius: RFValue(3),
-    },
-    cancelButton: {
-      flexDirection: "row",
-      alignItems: "center",
-      gap: RFValue(2),
-      color: colors.error[200],
-    },
-    previewButton: {
-      flexDirection: "row",
-      alignItems: "center",
-      gap: RFValue(6),
-    },
-    previewIcon: {
-      width: RFValue(16),
-      height: RFValue(16),
-      tintColor: colors.slate[650],
-    },
-    previewText: {
-      fontSize: RFValue(14),
-      color: colors.slate[650],
-      fontWeight: "500",
-    },
-    uploadText: {
-      fontSize: RFValue(14),
-      color: colors.slate[550],
       fontWeight: "500",
     },
     bottomButtons: {
-      position: "absolute",
-      bottom: 0,
-      left: 0,
-      right: 0,
-      padding: RFValue(16),
-      backgroundColor: colors.background,
+      marginTop: RFValue(20),
       gap: RFValue(12),
     },
     retakeButton: {
       flexDirection: "row",
       alignItems: "center",
       justifyContent: "center",
-      paddingVertical: RFValue(12),
       gap: RFValue(8),
+      paddingVertical: RFValue(10),
     },
     retakeIcon: {
-      width: RFValue(18),
-      height: RFValue(18),
+      width: RFValue(16),
+      height: RFValue(16),
       tintColor: colors.slate[600],
     },
     retakeText: {
-      fontSize: RFValue(15),
+      fontSize: RFValue(14),
       color: colors.slate[600],
       fontWeight: "500",
+    },
+    previewIcon: {
+      width: RFValue(16),
+      height: RFValue(16),
+      tintColor: colors.slate[650],
     },
   });
 

@@ -48,7 +48,7 @@ export default function GetStarted() {
     const checkWelcomeTour = async () => {
       const hasSeenWelcomeTour = await AsyncStorage.getItem("welcome_tour");
       if (hasSeenWelcomeTour) {
-        router.replace("/auth/login");
+        router.replace("/(tabs)");
       } else {
         setIsLoading(false);
       }

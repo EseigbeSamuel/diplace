@@ -1,7 +1,9 @@
 // src/components/common/Header.tsx
+import { useGetCurrentUser } from "@/hooks";
 import { useTheme } from "@/contexts/themeContext";
 import { ColorScheme } from "@/utils";
 import { useRouter } from "expo-router";
+import React from "react";
 import { Image, Pressable, StyleSheet, Text, View } from "react-native";
 import { RFValue } from "react-native-responsive-fontsize";
 
@@ -11,8 +13,18 @@ interface HeaderProps {
 
 export const AppHeader = (props: HeaderProps) => {
   const { colors, isDarkMode } = useTheme();
+  const { currentUser } = useGetCurrentUser();
   const headerStyles = styles(colors);
   const router = useRouter();
+
+  const normalizeImageUrl = (url?: string) => {
+    if (!url) return null;
+    if (url.startsWith("http://") || url.startsWith("https://")) return url;
+    if (url.startsWith("/")) return `https://diplace.api.elsoft.ng${url}`;
+    return `https://diplace.api.elsoft.ng/${url}`;
+  };
+
+  const profileImageUrl = normalizeImageUrl(currentUser?.profile_picture);
 
   return (
     <View style={headerStyles.container} className="flex-row justify-between">
@@ -47,7 +59,14 @@ export const AppHeader = (props: HeaderProps) => {
           className="h-[48px] w-[48px] rounded-full"
           style={{ backgroundColor: colors.slate[150] }}
         >
-          <Image source={require("@/assets/images/user.png")} />
+          <Image
+            source={
+              profileImageUrl
+                ? { uri: profileImageUrl }
+                : require("@/assets/images/user.png")
+            }
+            className="h-[48px] w-[48px] rounded-full"
+          />
         </Pressable>
       </View>
     </View>

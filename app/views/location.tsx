@@ -1,10 +1,11 @@
 import React from "react";
-import { SafeAreaView, Text } from "react-native";
+import SafeAreaViewContainer from "@/components/safeareaview";
+import { Text } from "react-native";
 
 export default function Location() {
   return (
-    <SafeAreaView>
+    <SafeAreaViewContainer>
       <Text>location</Text>
-    </SafeAreaView>
+    </SafeAreaViewContainer>
   );
 }
