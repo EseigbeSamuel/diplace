@@ -1,14 +1,14 @@
-import SafeAreaViewContainer from "@/components/safeareaview";
-import { Text, View } from "react-native";
+// import SafeAreaViewContainer from "@/components/safeareaview";
+// import { Text, View } from "react-native";
 
-const Call = () => {
-  return (
-    <SafeAreaViewContainer>
-      <View>
-        <Text></Text>
-      </View>
-    </SafeAreaViewContainer>
-  );
-};
+// const Call = () => {
+//   return (
+//     <SafeAreaViewContainer>
+//       <View>
+//         <Text> hello</Text>
+//       </View>
+//     </SafeAreaViewContainer>
+//   );
+// };
 
-export default Call;
+// export default Call;
