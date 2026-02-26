@@ -8,7 +8,7 @@ import { useTheme } from "@/contexts/themeContext";
 import { ColorScheme } from "@/utils";
 import { BottomSheetModal, TouchableOpacity } from "@gorhom/bottom-sheet";
 import { useNavigation, useRouter } from "expo-router";
-import { useMemo, useRef, useState } from "react";
+import React, { useMemo, useRef, useState } from "react";
 
 import {
   FlatList,

@@ -3,13 +3,12 @@ import { AppHeader } from "@/components/header";
 import SafeAreaViewContainer from "@/components/safeareaview";
 import { promoData, RecentEarningsDB } from "@/constants/ownerHome";
 import { useTheme } from "@/contexts/themeContext";
-import { useTransactionHistory } from "@/hooks/transaction";
 import { ColorScheme } from "@/utils";
 import { BottomSheetModal } from "@gorhom/bottom-sheet";
 import { LinearGradient } from "expo-linear-gradient";
 import { router } from "expo-router";
 import { ArrowUpRight, ChevronDown, MapPin } from "lucide-react-native";
-import { useMemo, useRef, useState } from "react";
+import React, { useMemo, useRef, useState } from "react";
 import {
   Dimensions,
   FlatList,
@@ -43,14 +42,14 @@ export default function OwnersHome() {
 
   const snapPoints = useMemo(() => ["25%", "50%", "75%", "90%"], []);
 
-  const [filters, setFilters] = useState({
-    skip: 0,
-    limit: 20,
-    status: undefined,
-  });
+  // const [filters, setFilters] = useState({
+  //   skip: 0,
+  //   limit: 20,
+  //   status: undefined,
+  // });
 
-  const { data, isLoading, isError, error, refetch, isFetching } =
-    useTransactionHistory(filters);
+  // const { data, isLoading, isError, error, refetch, isFetching } =
+  //   useTransactionHistory(filters);
 
   return (
     <SafeAreaViewContainer className="flex-col gap-5">
