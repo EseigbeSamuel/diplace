@@ -50,12 +50,12 @@ export type CostFrequency =
 
 export interface InspectionUser {
   public_id: string;
-  status: "pending";
-  email: "string";
-  first_name: "string";
-  last_name: "string";
-  phone_number: "string";
-  profile_picture: "string";
+  status: Status;
+  email: string;
+  first_name: string;
+  last_name: string;
+  phone_number: string;
+  profile_picture: string;
 }
 export interface InspectionMedia {
   file_url: string;
@@ -87,8 +87,8 @@ export interface InspectionProperty {
   date_created: string;
   date_modified: string;
   status: Status;
-  title: "string";
-  description: "string";
+  title: string;
+  description: string;
   property_type: PropertyType;
   listing_type: ListingType;
   price: number;
@@ -119,4 +119,18 @@ export interface CreateInspectionResponse {
   verified_at: string | null;
   address: InspectionAddress;
   lister: InspectionUser;
+}
+export interface InspectionQueryParams {
+  q?: string;
+  skip?: number;
+  limit?: number;
+  sort_by?: string;
+  sort_order?: "asc" | "desc";
+  status?: string;
+}
+export interface InspectionHistoryResponse {
+  data: CreateInspectionResponse[];
+  total: number;
+  skip: number;
+  limit: number;
 }

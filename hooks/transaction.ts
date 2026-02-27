@@ -1,4 +1,4 @@
-import { getRequest } from "@/services";
+import { getRequestWithParams } from "@/services";
 import {
   TransactionHistoryResponse,
   TransactionQueryParams,
@@ -9,7 +9,7 @@ export const useTransactionHistory = (params: TransactionQueryParams = {}) => {
   const { data, isLoading, error, refetch, isFetching } = useQuery({
     queryKey: ["transactions", "me", params],
     queryFn: async () => {
-      return await getRequest<TransactionHistoryResponse>({
+      return await getRequestWithParams<TransactionHistoryResponse>({
         url: "/bookings/transactions/me",
         params: {
           skip: params.skip ?? 0,
