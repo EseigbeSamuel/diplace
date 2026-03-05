@@ -21,6 +21,10 @@ const HouseCard = ({
   badgeType,
   duration,
   type,
+  showBookmark = false,
+  isBookmarked,
+  onToggleBookmark,
+  bookmarkDisabled = false,
   onPress,
 }: {
   imageSource: ImageSourcePropType;
@@ -30,14 +34,25 @@ const HouseCard = ({
   badgeType?: string;
   duration: string;
   type?: "featured" | "nearby";
+  showBookmark?: boolean;
+  isBookmarked?: boolean;
+  onToggleBookmark?: () => void;
+  bookmarkDisabled?: boolean;
   onPress?: ((event: GestureResponderEvent) => void) | null | undefined;
 }) => {
   const { colors, isDarkMode } = useTheme();
   const homeStyles = styles(colors);
-  const [isBookmarked, setIsBookmarked] = useState(false);
+  const [internalBookmarked, setInternalBookmarked] = useState(false);
+  const bookmarked =
+    typeof isBookmarked === "boolean" ? isBookmarked : internalBookmarked;
 
   const handleBookmarkPress = () => {
-    setIsBookmarked(!isBookmarked);
+    if (bookmarkDisabled) return;
+    if (onToggleBookmark) {
+      onToggleBookmark();
+      return;
+    }
+    setInternalBookmarked((prev) => !prev);
   };
 
   const renderBadge = () => {
@@ -138,52 +153,65 @@ const HouseCard = ({
             }}
           />
         </View>
-        <View className="flex flex-row justify-between pt-2">
-          <Text style={homeStyles.title}>{title}</Text>
-          <TouchableOpacity onPress={handleBookmarkPress}>
-            <Image
-              source={
-                isBookmarked
-                  ? require("@/assets/icons/bookmark-light-active.png")
-                  : isDarkMode
-                  ? require("@/assets/icons/bookmark-inactive-white.png")
-                  : require("@/assets/icons/bookmark-inactive.png")
-              }
-              style={{ height: RFValue(19), width: RFValue(14.94) }}
-            />
-          </TouchableOpacity>
-        </View>
-        <View className="flex flex-row items-center gap-0.5">
-          <Image
-            source={
-              isDarkMode
-                ? require("@/assets/icons/location-white.png")
-                : require("@/assets/icons/location-black.png")
-            }
-            className="w-4 h-4"
-          />
-          <Text style={homeStyles.subTitlegray}>{location}</Text>
-        </View>
-        <View className="flex flex-row items-center justify-between gap-2">
-          <Text
-            style={{
-              fontSize: RFValue(18),
-              fontFamily: "InstrumentSansSemiBold",
-              color: colors.slate[650],
-            }}
-            className="font-semibold"
-          >
-            {price}
-            <Text
-              style={[
-                homeStyles.subTitlegray,
-                { fontFamily: "InstrumentSansRegular" },
-              ]}
-            >
-              /{duration}
-            </Text>
-          </Text>
-          {renderBadge()}
+        <View className="flex flex-row justify-between items-start gap-3 px-1 pt-2">
+          <View className="flex-1">
+            <View className="flex flex-row items-start justify-between gap-3">
+              <Text style={homeStyles.title}>{title}</Text>
+              {showBookmark ? (
+                <TouchableOpacity
+                  onPress={handleBookmarkPress}
+                  disabled={bookmarkDisabled}
+                  hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+                  className="pt-0.5"
+                >
+                  <Image
+                    source={
+                      bookmarked
+                        ? require("@/assets/icons/bookmark-light-active.png")
+                        : isDarkMode
+                          ? require("@/assets/icons/bookmark-inactive-white.png")
+                          : require("@/assets/icons/bookmark-inactive.png")
+                    }
+                    style={{ height: RFValue(22), width: RFValue(17) }}
+                  />
+                </TouchableOpacity>
+              ) : null}
+            </View>
+            <View className="flex flex-row items-center gap-1 pt-1">
+              {/* <Image
+                source={
+                  isDarkMode
+                    ? require("@/assets/icons/location-white.png")
+                    : require("@/assets/icons/location-black.png")
+                }
+                className="w-4 h-4"
+              /> */}
+              <Text style={homeStyles.subTitlegray}>{location}</Text>
+            </View>
+            {badgeType !== "pending" && badgeType !== "inDrafts" && (
+              <View className="flex flex-row items-center justify-between gap-2">
+                <Text
+                  style={{
+                    fontSize: RFValue(18),
+                    fontFamily: "InstrumentSansSemiBold",
+                    color: colors.slate[650],
+                  }}
+                  className="font-semibold"
+                >
+                  {price}
+                  <Text
+                    style={[
+                      homeStyles.subTitlegray,
+                      { fontFamily: "InstrumentSansRegular" },
+                    ]}
+                  >
+                    /{duration}
+                  </Text>
+                </Text>
+              </View>
+            )}
+          </View>
+          <View className="pt-1">{renderBadge()}</View>
         </View>
       </View>
     </Pressable>
@@ -202,8 +230,10 @@ const styles = (colors: ColorScheme) =>
     title: {
       fontSize: RFValue(16),
       color: colors.slate[650],
+      flex: 1,
+      paddingRight: RFValue(6),
+      fontWeight: "600",
       lineHeight: RFValue(24),
-      fontFamily: "InstrumentSansRegular",
     },
     subTitle: {
       fontSize: RFValue(14),
@@ -218,5 +248,7 @@ const styles = (colors: ColorScheme) =>
       fontSize: RFValue(14),
       lineHeight: RFValue(20),
       color: colors.slate[600],
+      flexWrap: "wrap",
+      width: "100%",
     },
   });

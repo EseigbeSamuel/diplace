@@ -4,32 +4,6 @@ import { useMutation } from "@tanstack/react-query";
 import { router } from "expo-router";
 import { useGetCurrentUser } from "./user";
 
-const data = {
-  address: null,
-  admin: null,
-  agent: null,
-  agent_type: null,
-  date_created: "2026-02-07T15:27:56.831259Z",
-  date_modified: "2026-02-08T21:06:58.773434Z",
-  email: "vepawaw446@hopesx.com",
-  first_name: null,
-  full_name: null,
-  is_active: true,
-  last_name: null,
-  owner: null,
-  phone_number: "0813846424084",
-  profile_picture: null,
-  public_id: "3844a242-b91f-4c5e-ae9e-bb6c3cd4610e",
-  renter: {
-    public_id: "052c8346-5353-4eb5-bb0e-f887defb6d45",
-    status: "pending",
-    user_id: "3844a242-b91f-4c5e-ae9e-bb6c3cd4610e",
-  },
-  status: "active",
-  user_type: "renter",
-  verifications: [],
-};
-
 export function useSetUserType() {
   const { currentUser } = useGetCurrentUser();
 
@@ -45,17 +19,27 @@ export function useSetUserType() {
       return response;
     },
     onSuccess: async (data) => {
-      console.log("data", data);
+      console.log("set user type success", data);
+      router.replace("/onboarding/steps");
     },
-    onError: (error) => {
-      console.log("error", error);
-      if (error) {
-        if (currentUser?.user_type === "renter" || currentUser?.user_type === "agent") {
-          router.replace("/onboarding/steps");
-        } else {
-          router.replace("/auth/login");
-        }
+    onError: (error: any) => {
+      const status = error?.response?.status;
+      const detail = error?.response?.data?.detail;
+
+      console.log("set user type error", { status, detail });
+
+      if (status === 400 && detail === "User type already set.") {
+        router.replace("/onboarding/steps");
+        return;
       }
+
+      if (status === 401 || status === 403) {
+        router.replace("/auth/login");
+        return;
+      }
+
+      // Non-auth failures should not kick user out; keep onboarding flow.
+      router.replace("/onboarding/steps");
     },
   });
 

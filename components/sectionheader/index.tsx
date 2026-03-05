@@ -58,17 +58,17 @@ const SectionHeader = ({
       >
         {title}
       </Text>
-      <TouchableOpacity
-        onPress={onRightIconPress}
-        className="items-center justify-center w-12 h-12 rounded-full"
-        style={Styles.container}
-      >
-        {rightIconSource ? (
-          <Image source={rightIconSource} className="w-6 h-6" />
-        ) : (
-          rightIconView
-        )}
-      </TouchableOpacity>
+      {rightIconView ? (
+        <View>{rightIconView}</View>
+      ) : (
+        <TouchableOpacity
+          onPress={onRightIconPress}
+          className="items-center justify-center w-12 h-12 rounded-full"
+          style={Styles.container}
+        >
+          {rightIconSource ? <Image source={rightIconSource} className="w-6 h-6" /> : null}
+        </TouchableOpacity>
+      )}
     </View>
   );
 };

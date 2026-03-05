@@ -1,11 +1,8 @@
 import React, { useState } from "react";
 import {
-  Image,
-  Pressable,
   ScrollView,
   StyleSheet,
   Text,
-  TextInput,
   View,
 } from "react-native";
 import { RFValue } from "react-native-responsive-fontsize";
@@ -16,6 +13,7 @@ import { useTheme } from "@/contexts/themeContext";
 import { ColorScheme } from "@/utils";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import TextField from "@/components/textfield";
+import { useChangePassword } from "@/hooks";
 
 const ChangePassword = () => {
   const { colors } = useTheme();
@@ -24,20 +22,39 @@ const ChangePassword = () => {
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
-  const [showCurrentPassword, setShowCurrentPassword] = useState(false);
-  const [showNewPassword, setShowNewPassword] = useState(false);
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [validationError, setValidationError] = useState("");
+  const { changePasswordMutation, changePasswordMutationPending } =
+    useChangePassword();
 
-  const isNewPasswordValid = newPassword.length >= 8;
+  const isNewPasswordValid =
+    /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$/.test(newPassword);
   const doPasswordsMatch =
     newPassword === confirmPassword && confirmPassword.length > 0;
-  const isFormValid = currentPassword && isNewPasswordValid && doPasswordsMatch;
+  const isFormValid =
+    !!currentPassword &&
+    !!newPassword &&
+    !!confirmPassword &&
+    isNewPasswordValid &&
+    doPasswordsMatch;
 
   const handleSaveChanges = () => {
-    if (isFormValid) {
-      // Handle password change logic
-      console.log("Saving new password...");
+    if (!isNewPasswordValid) {
+      setValidationError(
+        "Password must be at least 8 characters with uppercase, lowercase, and number."
+      );
+      return;
     }
+
+    if (!doPasswordsMatch) {
+      setValidationError("Confirm password must match new password.");
+      return;
+    }
+
+    setValidationError("");
+    changePasswordMutation({
+      old_password: currentPassword,
+      new_password: newPassword,
+    });
   };
 
   return (
@@ -66,7 +83,10 @@ const ChangePassword = () => {
                 type="password"
                 label="Current Password"
                 value={currentPassword}
-                onChange={(value) => setCurrentPassword(value.toString())}
+                onChange={(value) => {
+                  setCurrentPassword(value.toString());
+                  if (validationError) setValidationError("");
+                }}
                 icon={require("@/assets/icons/Lock.png")}
               />
 
@@ -76,9 +96,12 @@ const ChangePassword = () => {
                 type="password"
                 label="New Password"
                 value={newPassword}
-                onChange={(value) => setNewPassword(value.toString())}
+                onChange={(value) => {
+                  setNewPassword(value.toString());
+                  if (validationError) setValidationError("");
+                }}
                 icon={require("@/assets/icons/Lock.png")}
-                subText="Must be at least 8 characters"
+                subText="Must be 8+ chars with uppercase, lowercase and number"
               />
 
               {/* Confirm New Password */}
@@ -87,10 +110,16 @@ const ChangePassword = () => {
                 type="password"
                 label="Confirm New Password"
                 value={confirmPassword}
-                onChange={(value) => setConfirmPassword(value.toString())}
+                onChange={(value) => {
+                  setConfirmPassword(value.toString());
+                  if (validationError) setValidationError("");
+                }}
                 icon={require("@/assets/icons/Lock.png")}
                 subText="Must match with the new password"
               />
+              {!!validationError && (
+                <Text style={passwordStyles.errorText}>{validationError}</Text>
+              )}
             </View>
           </KeyboardAwareScrollView>
         </View>
@@ -99,11 +128,13 @@ const ChangePassword = () => {
       {/* Save Button - Fixed at bottom */}
       <View style={passwordStyles.buttonContainer}>
         <AppButton
-          title="Save changes"
+          title={
+            changePasswordMutationPending ? "Saving changes..." : "Save changes"
+          }
           onPress={handleSaveChanges}
           size="large"
           variant="primary"
-          disabled={!isFormValid}
+          disabled={!isFormValid || changePasswordMutationPending}
           fullwidth={true}
         />
       </View>
@@ -168,6 +199,12 @@ const styles = (colors: ColorScheme) =>
       fontSize: RFValue(13),
       color: colors.slate[500],
       paddingLeft: RFValue(4),
+    },
+    errorText: {
+      fontSize: RFValue(13),
+      color: "#EF4444",
+      paddingLeft: RFValue(4),
+      marginTop: RFValue(4),
     },
     buttonContainer: {
       paddingVertical: RFValue(20),

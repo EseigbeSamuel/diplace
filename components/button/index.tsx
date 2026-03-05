@@ -12,7 +12,7 @@ import { RFValue } from "react-native-responsive-fontsize";
 
 type ButtonProps = {
   title: string;
-  variant?: "primary" | "secondary" | "tertiary";
+  variant?: "primary" | "secondary" | "tertiary" | "danger";
   onPress: () => void;
   size?: "large" | "medium" | "small";
   fullwidth?: boolean;
@@ -82,7 +82,7 @@ export default function AppButton(props: ButtonProps) {
 type StylesProps = {
   colors: ColorScheme;
   disabled: boolean;
-  variant: "primary" | "secondary" | "tertiary";
+  variant: "primary" | "secondary" | "tertiary" | "danger";
   size: "large" | "medium" | "small";
 };
 
@@ -96,6 +96,8 @@ const styles = (props: StylesProps) => {
           ? `${disabled ? colors.slate[550] : colors.slate[650]}`
           : variant === "secondary"
           ? `${disabled ? colors.slate[150] : colors.slate[250]}`
+          : variant === "danger"
+          ? `${disabled ? colors.error[100] : colors.error[200]}`
           : "transparent",
       paddingVertical: size === "large" ? 16 : size === "medium" ? 12 : 10,
       borderWidth: variant === "tertiary" ? 1 : 0,
@@ -112,6 +114,8 @@ const styles = (props: StylesProps) => {
           ? `${disabled ? colors.slate[150] : colors.slate[100]}`
           : variant === "secondary"
           ? `${disabled ? colors.slate[450] : colors.slate[650]}`
+          : variant === "danger"
+          ? `${disabled ? colors.slate[350] : colors.slate[100]}`
           : colors.slate[650],
       fontSize: size === "small" ? RFValue(14) : RFValue(16),
       fontFamily: "InstrumentSansMedium",

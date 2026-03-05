@@ -1,14 +1,7 @@
 import { useTheme } from "@/contexts/themeContext";
 import { ColorScheme } from "@/utils";
 import React from "react";
-import {
-  Platform,
-  Pressable,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
-} from "react-native";
+import { Pressable, StyleSheet, Text, View } from "react-native";
 
 interface NumericFieldProps {
   value: number;
@@ -42,7 +35,7 @@ const NumericField: React.FC<NumericFieldProps> = ({
 
   return (
     <View
-      className="flex-row items-center justify-between p-2 rounded-xl w-[100px]"
+      className="flex-row items-center justify-between rounded-xl"
       style={[!shadowed ? Styles.borderDarkGray : Styles.shadowed]}
     >
       <Text className="text-xl font-bold" style={Styles.textBlack}>
@@ -50,17 +43,25 @@ const NumericField: React.FC<NumericFieldProps> = ({
       </Text>
 
       <View className="flex-col">
-        <Pressable onPress={handleIncrement} className=" mb-1">
+        <Pressable
+          onPress={handleIncrement}
+          hitSlop={8}
+          style={Styles.stepperButton}
+        >
           <Text className="text-xl font-bold" style={Styles.textBlack}>
-            ˄
+            +
           </Text>
         </Pressable>
 
-        <TouchableOpacity onPress={handleDecrement}>
+        <Pressable
+          onPress={handleDecrement}
+          hitSlop={8}
+          style={Styles.stepperButton}
+        >
           <Text className="text-xl font-bold" style={Styles.textBlack}>
-            ˅
+            -
           </Text>
-        </TouchableOpacity>
+        </Pressable>
       </View>
     </View>
   );
@@ -74,26 +75,32 @@ const styles = (colors: ColorScheme) =>
       color: colors.slate[650],
     },
     borderDarkGray: {
+      width: 104,
+      minHeight: 54,
+      borderRadius: 12,
       borderWidth: 1,
       borderStyle: "solid",
       borderColor: colors.slate[450],
       backgroundColor: colors.slate[150],
+      paddingHorizontal: 10,
+      paddingVertical: 6,
+      alignItems: "center",
     },
     shadowed: {
-      paddingHorizontal: 12,
+      width: 104,
+      minHeight: 54,
+      borderRadius: 12,
+      paddingHorizontal: 10,
+      paddingVertical: 6,
       backgroundColor: colors.background,
-
-      ...Platform.select({
-        ios: {
-          shadowColor: colors.slate[650],
-          shadowOffset: { width: 0, height: 6 },
-          shadowOpacity: 0.12,
-          shadowRadius: 8,
-        },
-        android: {
-          borderBottomWidth: 1,
-          borderBottomColor: "rgba(0,0,0,0.15)",
-        },
-      }),
+      borderBottomWidth: 1,
+      borderBottomColor: "rgba(0,0,0,0.15)",
+      alignItems: "center",
+    },
+    stepperButton: {
+      minWidth: 28,
+      minHeight: 22,
+      alignItems: "center",
+      justifyContent: "center",
     },
   });

@@ -126,7 +126,7 @@ const EditProfile = () => {
 
           {/* Personal Information Section */}
           <View style={editProfileStyles.section}>
-            {userType === "owner" && (
+            {userType === "agent" && (
               <Text style={editProfileStyles.sectionTitle}>
                 Personal Information
               </Text>
@@ -152,7 +152,7 @@ const EditProfile = () => {
             </View>
 
             {/* Business Name Input */}
-            {userType === "owner" && (
+            {userType === "agent" && (
               <View style={editProfileStyles.inputContainer}>
                 <View style={editProfileStyles.inputIconContainer}>
                   <Image
@@ -220,7 +220,7 @@ const EditProfile = () => {
           </View>
 
           {/* Location Section */}
-          {userType === "owner" && (
+          {userType === "agent" && (
             <View style={editProfileStyles.section}>
               <Text style={editProfileStyles.sectionTitle}>Location</Text>
 

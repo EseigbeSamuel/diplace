@@ -31,6 +31,7 @@ const MediaUploadSubstep: React.FC<MediaUploadSubstepProps> = ({
   const styles = createStyles(colors);
   const { setValue, setType, spaceForm } = useSpaceStore();
   const [showMediaPicker, setShowMediaPicker] = useState(false);
+  const media = spaceForm.value.media ?? [];
 
   const requestPermissions = async () => {
     const { status: cameraStatus } =
@@ -71,7 +72,7 @@ const MediaUploadSubstep: React.FC<MediaUploadSubstepProps> = ({
         type: asset.type === "video" ? "video" : "image",
         id: Math.random().toString(36).substring(7),
       }));
-      setValue({ media: [...(spaceForm.value.media || []), ...newMedia] });
+      setValue({ media: [...media, ...newMedia] });
     }
   };
 
@@ -90,7 +91,7 @@ const MediaUploadSubstep: React.FC<MediaUploadSubstepProps> = ({
         type: "image",
         id: Math.random().toString(36).substring(7),
       };
-      setValue({ media: [...(spaceForm.value.media || []), newMedia] });
+      setValue({ media: [...media, newMedia] });
     }
   };
 
@@ -108,20 +109,18 @@ const MediaUploadSubstep: React.FC<MediaUploadSubstepProps> = ({
         type: "video",
         id: Math.random().toString(36).substring(7),
       };
-      setValue({ media: [...(spaceForm.value.media || []), newMedia] });
+      setValue({ media: [...media, newMedia] });
     }
   };
 
   const removeMedia = (id: string) => {
     setValue({
-      media: Array.isArray(spaceForm.value.media)
-        ? spaceForm.value.media.filter((item) => item.id !== id)
-        : [],
+      media: media.filter((item) => item.id !== id),
     });
   };
 
   const handleNext = () => {
-    if (!spaceForm.value.media || spaceForm.value.media.length === 0) {
+    if (media.length === 0) {
       Alert.alert(
         "Upload Required",
         "Please upload at least one photo or video",
@@ -141,8 +140,7 @@ const MediaUploadSubstep: React.FC<MediaUploadSubstepProps> = ({
         <Text style={styles.title}>Upload photos and videos of the space.</Text>
 
         {/* Gallery Section */}
-        {Array.isArray(spaceForm.value.media) &&
-          spaceForm.value.media.length < 1 && (
+        {media.length < 1 && (
             <Pressable
               style={styles.gallerySection}
               onPress={handleOpenMediaPicker}
@@ -172,11 +170,10 @@ const MediaUploadSubstep: React.FC<MediaUploadSubstepProps> = ({
           )}
 
         {/* Uploaded Media Count and Upload Button */}
-        {Array.isArray(spaceForm.value.media) &&
-          spaceForm.value.media.length > 0 && (
+        {media.length > 0 && (
             <View style={styles.uploadedHeader}>
               <Text style={styles.uploadedCount}>
-                {spaceForm.value.media.length} files uploaded
+                {media.length} files uploaded
               </Text>
               <Pressable
                 style={styles.uploadMoreButton}
@@ -192,11 +189,9 @@ const MediaUploadSubstep: React.FC<MediaUploadSubstepProps> = ({
           )}
 
         {/* Media Grid */}
-        {Array.isArray(spaceForm.value.media) &&
-          spaceForm.value.media.length > 0 && (
+        {media.length > 0 && (
             <View style={styles.mediaGrid}>
-              {Array.isArray(spaceForm.value.media) &&
-                spaceForm.value.media.map((item) => (
+              {media.map((item) => (
                   <View key={item.id} style={styles.mediaItem}>
                     <Image
                       source={{ uri: item.uri }}
@@ -232,7 +227,7 @@ const MediaUploadSubstep: React.FC<MediaUploadSubstepProps> = ({
           onPress={handleNext}
           size="large"
           fullwidth={true}
-          disabled={!spaceForm.value.media || spaceForm.value.media.length === 0}
+          disabled={media.length === 0}
         />
       </View>
 

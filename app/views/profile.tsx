@@ -44,7 +44,7 @@ const Profile = () => {
   const profilePhone = currentUser?.phone_number || "No phone number";
 
   const menuItems =
-    userType === "owner"
+    userType === "agent"
       ? [
           {
             icon: require("@/assets/icons/user-icon.png"),
@@ -284,12 +284,12 @@ const Profile = () => {
         <Pressable style={profileStyles.upgradeBanner}>
           <View style={profileStyles.upgradeContent}>
             <Text style={profileStyles.upgradeTitle}>
-              {userType === "owner"
+              {userType === "agent"
                 ? "Upgrade to Featured Agent"
                 : "Earn as a Space Manager / Agent"}
             </Text>
             <Text style={profileStyles.upgradeDescription}>
-              {userType === "owner"
+              {userType === "agent"
                 ? "Boost your visibility and attract more renters faster. Featured Agents earn more with priority listings."
                 : "Become an agent or space manager, list properties and earn commissions"}
             </Text>

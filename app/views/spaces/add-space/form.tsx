@@ -5,7 +5,7 @@ import Step1Overview from "./steps/step1";
 import Step2Overview from "./steps/step2";
 import Step3Overview from "./steps/step3";
 import Step4Overview from "./steps/step4";
-import { useRouter } from "expo-router";
+import { useLocalSearchParams, useRouter } from "expo-router";
 import StepperWithHeader from "@/components/steps/stepper-header";
 import PropertyTypeSubstep from "./sub-steps/about-space/sub-step1";
 import EventTypeSubstep from "./sub-steps/about-space/substept2";
@@ -32,12 +32,158 @@ import PublishNowSubstep from "./sub-steps/final/substep7";
 import OtherChargesSubstep from "./sub-steps/final/substep4";
 import ConfirmOwnerEventDetailsSubstep from "./sub-steps/owner/substep2t";
 import React from "react";
+import { ActivityIndicator, Text, View } from "react-native";
+import { PropertyDetailsResponse } from "@/types";
+import { SpaceType } from "@/types/add-space-types";
+import { useTheme } from "@/contexts/themeContext";
+import AppButton from "@/components/button";
+import { useQueryClient } from "@tanstack/react-query";
 
 const { width } = Dimensions.get("window");
 
 const AddSpaceForm: React.FC = () => {
   const router = useRouter();
-  const { clearForm, spaceForm } = useSpaceStore();
+  const { property_id } = useLocalSearchParams<{ property_id?: string }>();
+  const editingPropertyId = Array.isArray(property_id) ? property_id[0] : property_id;
+  const {
+    clearForm,
+    setType,
+    setValue,
+    setEditingDraft,
+    setEditContext,
+    editingDraft,
+    spaceForm,
+  } = useSpaceStore();
+  const hydratedPropertyIdRef = React.useRef<string | null>(null);
+  const { colors } = useTheme();
+  const queryClient = useQueryClient();
+  const cachedDraft = React.useMemo(() => {
+    if (!editingPropertyId) return null;
+
+    const queries = queryClient.getQueriesData<{
+      pages?: Array<{ items?: PropertyDetailsResponse[] }>;
+    }>({
+      queryKey: ["properties"],
+    });
+
+    for (const [, data] of queries) {
+      const pages = data?.pages ?? [];
+      for (const page of pages) {
+        const found = page.items?.find((item) => item.public_id === editingPropertyId);
+        if (found) return found;
+      }
+    }
+
+    return null;
+  }, [editingPropertyId, queryClient]);
+  // NOTE: TEMPORARY SWITCH
+  // GET /properties/{property_id} is returning backend errors for now.
+  // We hydrate edit form from the property payload already returned by GET /properties/.
+  // Revert path: re-enable useGetPropertyDetails(property_id) and replace `editingDraft` below.
+  const propertyDetails = editingDraft ?? cachedDraft;
+  // No async fetch in fallback mode, so this should never stay in loading state.
+  const isPropertyDetailsLoading = false;
+  const propertyDetailsError = !!editingPropertyId && !propertyDetails;
+
+  const mapPropertyTypeToSpaceType = (
+    propertyType: PropertyDetailsResponse["property_type"],
+  ): SpaceType => {
+    if (propertyType === "apartment") return "apartment";
+    if (propertyType === "shop") return "shop";
+    if (propertyType === "office") return "office";
+    if (propertyType === "event_centre" || propertyType === "hall") return "event";
+    return "apartment";
+  };
+
+  React.useEffect(() => {
+    if (!editingPropertyId || !propertyDetails) return;
+    if (hydratedPropertyIdRef.current === editingPropertyId) return;
+
+    const mappedType = mapPropertyTypeToSpaceType(propertyDetails.property_type);
+    const mappedMedia = (propertyDetails.media ?? []).map((item, index) => ({
+      id: item.public_id || `${index}`,
+      uri: item.file_url,
+      type: item.file_type === "video" ? "video" : "image",
+    }));
+
+    const charges = [
+      {
+        id: "1",
+        title: "Platform fee",
+        description: "DiPlace service charge.",
+        value: `NGN ${propertyDetails.fees?.platform_fee ?? 0}`,
+        editable: false,
+      },
+      {
+        id: "2",
+        title: "Agent fee",
+        description: "Your rental commission.",
+        value: `${propertyDetails.fees?.agency_fee_percent ?? 0}%`,
+        editable: true,
+      },
+      {
+        id: "3",
+        title: "Caution fee",
+        description: "Refundable deposit.",
+        value: `NGN ${propertyDetails.fees?.caution_fee ?? 0}`,
+        editable: true,
+      },
+      {
+        id: "4",
+        title: "Service charge",
+        description: "Legal fee charge.",
+        value: `NGN ${propertyDetails.fees?.legal_fee_percent ?? 0}`,
+        editable: true,
+      },
+    ];
+
+    clearForm();
+    setType(mappedType);
+    setEditContext({
+      propertyId: propertyDetails.public_id,
+      addressId: propertyDetails.address.public_id,
+    });
+    setValue({
+      units: 1,
+      description: {
+        title: propertyDetails.title,
+        description: propertyDetails.description,
+      },
+      amenities: propertyDetails.amenities ?? [],
+      media: mappedMedia,
+      location: {
+        address: propertyDetails.address?.street ?? "",
+        city: propertyDetails.address?.city ?? "",
+        state: propertyDetails.address?.state ?? "",
+        postalCode: propertyDetails.address?.zip_code ?? "",
+        country: propertyDetails.address?.country ?? "",
+        latitude: propertyDetails.address?.latitude ?? 0,
+        longitude: propertyDetails.address?.longitude ?? 0,
+      },
+      rentalCost: {
+        rentalCost: String(propertyDetails.price ?? ""),
+        rentDuration: propertyDetails.cost_frequency?.replace(/_/g, " ") ?? "",
+      },
+      otherCharges: charges,
+    });
+
+    hydratedPropertyIdRef.current = editingPropertyId;
+    setEditingDraft(null);
+  }, [
+    editingPropertyId,
+    propertyDetails,
+    clearForm,
+    setType,
+    setValue,
+    setEditingDraft,
+    setEditContext,
+  ]);
+
+  React.useEffect(() => {
+    if (!editingPropertyId) {
+      setEditContext(null);
+    }
+  }, [editingPropertyId, setEditContext]);
 
   const steps = [
     {
@@ -97,7 +243,38 @@ const AddSpaceForm: React.FC = () => {
     router.push("/views/spaces/add-space/verifying");
   };
 
-  return <StepperWithHeader steps={steps} onComplete={handleComplete} />;
+  if (editingPropertyId && isPropertyDetailsLoading) {
+    return (
+      <View style={formStyles.loadingContainer}>
+        <ActivityIndicator size="large" color={colors.slate[650]} />
+        <Text style={[formStyles.loadingText, { color: colors.slate[650] }]}>
+          Loading Draft...
+        </Text>
+      </View>
+    );
+  }
+
+  if (editingPropertyId && propertyDetailsError) {
+    return (
+      <View style={formStyles.loadingContainer}>
+        <Text style={[formStyles.loadingText, { color: colors.slate[650] }]}>
+          Failed to load draft data.
+        </Text>
+        <View style={{ width: RFValue(140), marginTop: RFValue(8) }}>
+          <AppButton title="Go Back" onPress={() => router.back()} />
+        </View>
+      </View>
+    );
+  }
+
+  return (
+    <StepperWithHeader
+      steps={steps}
+      onComplete={handleComplete}
+      initialStepIndex={0}
+      initialSubstepIndex={editingPropertyId ? 1 : 0}
+    />
+  );
 };
 
 export default AddSpaceForm;
@@ -207,3 +384,19 @@ export const createStyles = (colors: ColorScheme) =>
       flex: 1,
     },
   });
+
+const formStyles = StyleSheet.create({
+  loadingContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    paddingHorizontal: RFValue(20),
+    gap: RFValue(12),
+  },
+  loadingText: {
+    fontSize: RFValue(20),
+    lineHeight: RFValue(26),
+    fontFamily: "InstrumentSansSemiBold",
+    textAlign: "center",
+  },
+});

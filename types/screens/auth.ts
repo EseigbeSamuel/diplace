@@ -41,3 +41,8 @@ export interface VerifyOtpPayload {
 export interface VerifyOtpResponse {
   message: string;
 }
+
+export interface ChangePasswordPayload {
+  old_password: string;
+  new_password: string;
+}

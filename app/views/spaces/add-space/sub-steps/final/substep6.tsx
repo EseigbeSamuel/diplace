@@ -15,6 +15,7 @@ import AppButton from "@/components/button";
 import { useTheme } from "@/contexts/themeContext";
 import { ColorScheme } from "@/utils";
 import { useSpaceStore } from "@/store/useSpace";
+import { useGetCurrentUser } from "@/hooks";
 import { useRouter } from "expo-router";
 import MapView, { Marker } from "react-native-maps";
 import { CustomBottomSheet } from "@/components/bottom-sheet";
@@ -25,12 +26,17 @@ const HAS_GOOGLE_KEY = !!process.env.EXPO_PUBLIC_GOOGLE_PLACES_API_KEY;
 
 interface SpacePreviewScreenProps {
   onNext?: () => void;
+  mode?: "create" | "owner_preview";
 }
 
-const SpacePreviewScreen: React.FC<SpacePreviewScreenProps> = ({ onNext }) => {
+const SpacePreviewScreen: React.FC<SpacePreviewScreenProps> = ({
+  onNext,
+  mode = "create",
+}) => {
   const { colors } = useTheme();
   const styles = createStyles(colors);
   const { spaceForm } = useSpaceStore();
+  const { currentUser } = useGetCurrentUser();
   const router = useRouter();
   const [enlargeMapVisible, setEnlargeMapVisible] = useState(false);
   const [showLocationSheet, setShowLocationSheet] = useState(false);
@@ -62,6 +68,13 @@ const SpacePreviewScreen: React.FC<SpacePreviewScreenProps> = ({ onNext }) => {
     const amount = Number(item.value.toString().replace(/[^0-9]/g, "")) || 0;
     return sum + amount;
   }, 0);
+  const formatCurrency = (amount?: number | string) => {
+    const numeric =
+      typeof amount === "number"
+        ? amount
+        : Number((amount || "0").toString().replace(/[^0-9]/g, ""));
+    return `₦${numeric.toLocaleString("en-NG")}`;
+  };
 
   const handleBack = () => {
     router.back();
@@ -72,6 +85,7 @@ const SpacePreviewScreen: React.FC<SpacePreviewScreenProps> = ({ onNext }) => {
       onNext();
     }
   };
+  const showCompleteButton = mode === "create";
 
   // "apartment" | "event" | "shop" | "office"
 
@@ -92,6 +106,22 @@ const SpacePreviewScreen: React.FC<SpacePreviewScreenProps> = ({ onNext }) => {
 
   const toProperCase = (t?: string | null) =>
     t ? t.charAt(0).toUpperCase() + t.slice(1).toLowerCase() : "";
+  const isOwnSpace = spaceForm.value.owner === "myself";
+  const currentUserName =
+    currentUser?.full_name?.trim() ||
+    `${currentUser?.first_name || ""} ${currentUser?.last_name || ""}`.trim();
+  const previewContact = {
+    name:
+      (isOwnSpace ? currentUserName : spaceForm.value.ownerDetails?.fullName) ||
+      "N/A",
+    phone:
+      (isOwnSpace
+        ? currentUser?.phone_number
+        : spaceForm.value.ownerDetails?.phoneNumber) || "N/A",
+    account: isOwnSpace
+      ? spaceForm.value.accountDetails
+      : spaceForm.value.ownerAccountDetails,
+  };
 
   return (
     <View>
@@ -158,7 +188,7 @@ const SpacePreviewScreen: React.FC<SpacePreviewScreenProps> = ({ onNext }) => {
           </View>
 
           <Text style={styles.priceText}>
-            ₦{spaceForm.value.rentalCost?.rentalCost}
+            {formatCurrency(spaceForm.value.rentalCost?.rentalCost)}
             <Text style={styles.priceUnit}>
               /{spaceForm.value.rentalCost?.rentDuration}
             </Text>
@@ -359,7 +389,7 @@ const SpacePreviewScreen: React.FC<SpacePreviewScreenProps> = ({ onNext }) => {
 
           <View style={styles.landlordInfo}>
             <Text style={styles.landlordName}>
-              {spaceForm.value.ownerDetails?.fullName || "Grace Alex"}
+              {previewContact.name}
             </Text>
 
             <TouchableOpacity style={styles.landlordRow}>
@@ -369,7 +399,7 @@ const SpacePreviewScreen: React.FC<SpacePreviewScreenProps> = ({ onNext }) => {
                 resizeMode="contain"
               />
               <Text style={styles.landlordText}>
-                {spaceForm.value.ownerDetails?.phoneNumber}
+                {previewContact.phone}
               </Text>
             </TouchableOpacity>
 
@@ -380,9 +410,9 @@ const SpacePreviewScreen: React.FC<SpacePreviewScreenProps> = ({ onNext }) => {
                 resizeMode="contain"
               />
               <Text style={styles.landlordText}>
-                {spaceForm.value.ownerAccountDetails?.accountName} |{" "}
-                {spaceForm.value.ownerAccountDetails?.accountNumber} |{" "}
-                {spaceForm.value.ownerAccountDetails?.bank}
+                {previewContact.account?.accountName || "N/A"} |{" "}
+                {previewContact.account?.accountNumber || "N/A"} |{" "}
+                {previewContact.account?.bank || "N/A"}
               </Text>
             </TouchableOpacity>
           </View>
@@ -428,7 +458,7 @@ const SpacePreviewScreen: React.FC<SpacePreviewScreenProps> = ({ onNext }) => {
                     resizeMode="contain"
                   />
                   <Text style={styles.inspectionFeeAmount}>
-                    {spaceForm.value.inspectionFee}
+                    {formatCurrency(spaceForm.value.inspectionFee || 0)}
                   </Text>
                 </View>
               </View>
@@ -463,26 +493,28 @@ const SpacePreviewScreen: React.FC<SpacePreviewScreenProps> = ({ onNext }) => {
             {costBreakdown.map((item, index) => (
               <View key={index} style={styles.costRow}>
                 <Text style={styles.costLabel}>{item.title}</Text>
-                <Text style={styles.costAmount}>{item.value}</Text>
+                <Text style={styles.costAmount}>{formatCurrency(item.value)}</Text>
               </View>
             ))}
 
             <View style={styles.totalRow}>
               <Text style={styles.totalLabel}>Total Payable</Text>
-              <Text style={styles.totalAmount}>{totalPackage}</Text>
+              <Text style={styles.totalAmount}>{formatCurrency(totalPackage)}</Text>
             </View>
           </View>
         </View>
 
         {/* Complete Button */}
-        <View style={styles.completeButtonContainer}>
-          <AppButton
-            title="Looks Good!"
-            onPress={handleComplete}
-            size="large"
-            fullwidth={true}
-          />
-        </View>
+        {showCompleteButton && (
+          <View style={styles.completeButtonContainer}>
+            <AppButton
+              title="Looks Good!"
+              onPress={handleComplete}
+              size="large"
+              fullwidth={true}
+            />
+          </View>
+        )}
       </ScrollView>
 
       {/* ENLARGED MAP MODAL */}
@@ -1102,3 +1134,4 @@ const createStyles = (colors: ColorScheme) =>
   });
 
 export default SpacePreviewScreen;
+

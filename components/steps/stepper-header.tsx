@@ -22,14 +22,18 @@ interface Step {
 interface StepperWithHeaderProps {
   steps: Step[];
   onComplete?: () => void;
+  initialStepIndex?: number;
+  initialSubstepIndex?: number;
 }
 
 const StepperWithHeader: React.FC<StepperWithHeaderProps> = ({
   steps,
   onComplete,
+  initialStepIndex = 0,
+  initialSubstepIndex = 0,
 }) => {
-  const [currentStepIndex, setCurrentStepIndex] = useState(0);
-  const [currentSubstepIndex, setCurrentSubstepIndex] = useState(0);
+  const [currentStepIndex, setCurrentStepIndex] = useState(initialStepIndex);
+  const [currentSubstepIndex, setCurrentSubstepIndex] = useState(initialSubstepIndex);
   const navigation = useNavigation();
   const { colors } = useTheme();
 

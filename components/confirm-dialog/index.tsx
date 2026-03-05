@@ -11,6 +11,11 @@ type ConfirmDialogProps = {
   onCancel: () => void;
   message: string;
   title: string;
+  confirmText?: string;
+  cancelText?: string;
+  confirmVariant?: "primary" | "secondary" | "tertiary" | "danger";
+  confirmDisabled?: boolean;
+  cancelDisabled?: boolean;
 };
 
 const ConfirmDialog: React.FC<ConfirmDialogProps> = ({
@@ -19,6 +24,11 @@ const ConfirmDialog: React.FC<ConfirmDialogProps> = ({
   onCancel,
   message,
   title,
+  confirmText = "Yes",
+  cancelText = "No",
+  confirmVariant = "primary",
+  confirmDisabled = false,
+  cancelDisabled = false,
 }) => {
   const { colors } = useTheme();
   const Styles = styles(colors);
@@ -26,23 +36,27 @@ const ConfirmDialog: React.FC<ConfirmDialogProps> = ({
   return (
     <Modal visible={visible} transparent animationType="fade">
       <View className="flex-1 items-center justify-center bg-black/50">
-        <View className="rounded-2xl px-6 py-5 w-80" style={Styles.container}>
-          <Text
-            className="text-lg font-semibold text-center"
-            style={Styles.title}
-          >
-            {title}
-          </Text>
-          <Text className="text-neutral-300 text-sm text-center mt-2">
-            {message}
-          </Text>
-          <View className="py-2 mt-6 gap-2 border-t border-gray-400"></View>
-          <View className="flex-row justify-between gap-2">
-            <View className="w-[50%]">
-              <AppButton title="No" variant="secondary" onPress={onCancel} />
+        <View style={Styles.container}>
+          <Text style={Styles.title}>{title}</Text>
+          <Text style={Styles.message}>{message}</Text>
+          <View style={Styles.divider} />
+
+          <View style={Styles.buttonRow}>
+            <View style={Styles.buttonWrap}>
+              <AppButton
+                title={cancelText}
+                variant="secondary"
+                onPress={onCancel}
+                disabled={cancelDisabled}
+              />
             </View>
-            <View className="w-[50%]">
-              <AppButton title="Yes" onPress={onConfirm} />
+            <View style={Styles.buttonWrap}>
+              <AppButton
+                title={confirmText}
+                variant={confirmVariant}
+                onPress={onConfirm}
+                disabled={confirmDisabled}
+              />
             </View>
           </View>
         </View>
@@ -55,12 +69,39 @@ export default ConfirmDialog;
 const styles = (colors: ColorScheme) =>
   StyleSheet.create({
     container: {
+      width: "86%",
+      maxWidth: RFValue(300),
+      borderRadius: RFValue(16),
+      paddingHorizontal: RFValue(20),
+      paddingVertical: RFValue(20),
       backgroundColor: colors.background,
     },
-
     title: {
       fontSize: RFValue(20),
       lineHeight: RFValue(24),
+      fontFamily: "InstrumentSansSemiBold",
       color: colors.slate[650],
+      textAlign: "center",
+    },
+    message: {
+      marginTop: RFValue(8),
+      fontSize: RFValue(14),
+      lineHeight: RFValue(20),
+      color: colors.slate[600],
+      textAlign: "center",
+    },
+    divider: {
+      marginTop: RFValue(18),
+      marginBottom: RFValue(10),
+      borderTopWidth: 1,
+      borderTopColor: colors.slate[300],
+    },
+    buttonRow: {
+      flexDirection: "row",
+      gap: RFValue(8),
+      justifyContent: "center",
+    },
+    buttonWrap: {
+      width: "48%",
     },
   });

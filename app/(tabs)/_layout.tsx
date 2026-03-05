@@ -57,6 +57,16 @@ const TabLayout = () => {
           <Tabs.Screen
             key={item.name}
             name={item.name}
+            listeners={
+              item.name === "add"
+                ? {
+                    tabPress: (e) => {
+                      e.preventDefault();
+                      handleAddSpace();
+                    },
+                  }
+                : undefined
+            }
             options={{
               href: item.grantPermission.includes(userType) ? undefined : null,
               ...(item.name === "add"
