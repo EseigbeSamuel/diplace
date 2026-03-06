@@ -20,9 +20,17 @@ const EventCapacitySubstep: React.FC<CapacitySubstepProps> = ({
   const { colors } = useTheme();
   const { setValue, spaceForm } = useSpaceStore();
   const styles = createStyles(colors);
+  const [roomSizeError, setRoomSizeError] = useState("");
+  const roomSize = spaceForm.value.capacity?.roomSize || "";
+  const roomSizeRegex = /^\d+\s*ft\s*x\s*\d+\s*ft$/i;
+  const isRoomSizeValid = roomSizeRegex.test(roomSize.trim());
 
   const handleNext = () => {
-    // Validate if needed
+    if (!isRoomSizeValid) {
+      setRoomSizeError("Use this format: 30ft x 40ft");
+      return;
+    }
+
     onNext();
   };
 
@@ -77,18 +85,20 @@ const EventCapacitySubstep: React.FC<CapacitySubstepProps> = ({
                 style={styles.textInput}
                 placeholder="30ft x 40ft"
                 placeholderTextColor={colors.slate[500]}
-                onChangeText={(text) =>
+                onChangeText={(text) => {
+                  if (roomSizeError) setRoomSizeError("");
                   setValue({
                     capacity: {
                       ...spaceForm.value.capacity,
                       roomSize: text,
                     },
-                  })
-                }
-                value={spaceForm.value.capacity?.roomSize || ""}
+                  });
+                }}
+                value={roomSize}
               />
             </View>
           </View>
+          {!!roomSizeError && <Text style={styles.errorText}>{roomSizeError}</Text>}
 
           {/* Changing Room */}
           <View style={styles.fieldRow}>
@@ -141,6 +151,7 @@ const EventCapacitySubstep: React.FC<CapacitySubstepProps> = ({
           disabled={
             !spaceForm.value.capacity?.caps ||
             !spaceForm.value.capacity?.roomSize ||
+            !isRoomSizeValid ||
             spaceForm.value.capacity?.changingRooms === 0 ||
             spaceForm.value.capacity?.bathrooms === 0
           }
@@ -199,6 +210,11 @@ const createStyles = (colors: ColorScheme) =>
       fontSize: RFValue(15),
       color: colors.slate[650],
       textAlign: "center",
+    },
+    errorText: {
+      fontSize: RFValue(12),
+      color: colors.error[300],
+      marginTop: RFValue(-12),
     },
     buttonContainer: {
       paddingHorizontal: RFValue(4),

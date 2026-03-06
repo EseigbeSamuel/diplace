@@ -1,15 +1,29 @@
 import { SpaceValue } from "@/store/useSpace";
-import { postRequest } from "@/services";
+import { deleteRequest, getRequest, postRequest, putRequest } from "@/services";
 import {
+  BookmarkItem,
   CostFrequency,
   CreatePropertyPayload,
   CreatePropertyResponse,
+  ListPropertiesParams,
+  ListPropertiesResponse,
+  ListBookmarksResponse,
+  ListPropertyReviewsResponse,
+  PropertyDetailsResponse,
+  PropertyListItem,
   PropertyFeesPayload,
   PropertyMediaPayload,
+  ToggleBookmarkResponse,
+  UpdatePropertyPayload,
   UploadFilesResponse,
 } from "@/types";
 import { MediaItem, SpaceType } from "@/types/add-space-types";
-import { useMutation } from "@tanstack/react-query";
+import {
+  useInfiniteQuery,
+  useMutation,
+  useQuery,
+  useQueryClient,
+} from "@tanstack/react-query";
 import Toast from "react-native-toast-message";
 
 const PROPERTY_TYPE_MAP: Record<Exclude<SpaceType, null>, CreatePropertyPayload["property_type"]> = {
@@ -33,6 +47,9 @@ const COST_FREQUENCY_MAP: Record<string, CostFrequency> = {
   "per weekend": "per_weekend",
   outright: "outright",
 };
+
+const FAKE_PROPERTY_MEDIA_URL =
+  "https://images.unsplash.com/photo-1560185007-cde436f6a4d0?auto=format&fit=crop&w=1200&q=80";
 
 const parseNumber = (value?: string): number => {
   if (!value) return 0;
@@ -219,7 +236,8 @@ const buildCreatePayload = async (
     throw new Error("Cost frequency is required.");
   }
 
-  const uploadedMedia = await uploadMedia(value.media ?? []);
+  // const uploadedMedia = await uploadMedia(value.media ?? []);
+  // TEMP: uploads endpoint is unstable, so media uses a static public fallback URL.
   const uploadedRentalAgreement = await uploadRentalAgreement(
     value.rentalAgreement,
   );
@@ -237,7 +255,12 @@ const buildCreatePayload = async (
     cost_frequency: costFrequency,
     fees: extractFees(value.otherCharges),
     amenities: value.amenities ?? [],
-    media: uploadedMedia,
+    // media: uploadedMedia,
+    media: (value.media ?? []).map((item, index) => ({
+      file_url: FAKE_PROPERTY_MEDIA_URL,
+      file_type: item.type === "video" ? "video" : "image",
+      description: `temp-media-${index + 1}`,
+    })),
     address: {
       street: value.location.address,
       city: value.location.city,
@@ -260,12 +283,69 @@ const buildCreatePayload = async (
     },
     rental_agreement: uploadedRentalAgreement
       ? {
-          file_url: uploadedRentalAgreement,
-          name: value.rentalAgreement?.name ?? null,
-          size: value.rentalAgreement?.size ?? null,
-        }
+        file_url: uploadedRentalAgreement,
+        name: value.rentalAgreement?.name ?? null,
+        size: value.rentalAgreement?.size ?? null,
+      }
       : null,
     virtual_tour: uploadedTours,
+    metadata: {
+      max_rent_payout: parseNumber(value.rentalCost?.maxRentPayout),
+      other_charges: value.otherCharges ?? [],
+    },
+  };
+};
+
+const buildUpdatePayload = async ({
+  type,
+  value,
+  addressId,
+}: {
+  type: SpaceType;
+  value: SpaceValue;
+  addressId: string;
+}): Promise<UpdatePropertyPayload> => {
+  if (!type) {
+    throw new Error("Property type is required.");
+  }
+
+  if (!value.description?.title || !value.description?.description) {
+    throw new Error("Property title and description are required.");
+  }
+
+  const costFrequency = COST_FREQUENCY_MAP[value.rentalCost?.rentDuration?.toLowerCase() || ""];
+  if (!costFrequency) {
+    throw new Error("Cost frequency is required.");
+  }
+
+  return {
+    title: value.description.title,
+    description: value.description.description,
+    property_type: PROPERTY_TYPE_MAP[type],
+    listing_type: "normal",
+    price: parseNumber(value.rentalCost?.rentalCost),
+    cost_frequency: costFrequency,
+    fees: extractFees(value.otherCharges),
+    amenities: value.amenities ?? [],
+    // media: await uploadMedia(value.media ?? []),
+    // TEMP: uploads endpoint is unstable, so media uses a static public fallback URL.
+    media: (value.media ?? []).map((item, index) => ({
+      file_url: FAKE_PROPERTY_MEDIA_URL,
+      file_type: item.type === "video" ? "video" : "image",
+      description: `temp-media-${index + 1}`,
+    })),
+    address_id: addressId,
+    owner_mode: value.owner ?? null,
+    owner_details: value.ownerDetails ?? null,
+    owner_account_details: value.ownerAccountDetails ?? null,
+    account_details: value.accountDetails ?? null,
+    units: value.units ?? 0,
+    event_space: value.eventSpace ?? null,
+    capacity: value.capacity ?? null,
+    inspection: {
+      fee: value.inspectionFee ?? 0,
+      time_slots: (value.inspectionTimeSlots ?? []).filter((slot) => slot.selected),
+    },
     metadata: {
       max_rent_payout: parseNumber(value.rentalCost?.maxRentPayout),
       other_charges: value.otherCharges ?? [],
@@ -328,5 +408,293 @@ export function useCreateProperty() {
   return {
     createPropertyMutation: mutateAsync,
     createPropertyPending: isPending,
+  };
+}
+
+export function useUpdateProperty() {
+  const { mutateAsync, isPending } = useMutation({
+    mutationFn: async ({
+      propertyId,
+      addressId,
+      type,
+      value,
+    }: {
+      propertyId: string;
+      addressId: string;
+      type: SpaceType;
+      value: SpaceValue;
+    }) => {
+      console.log("UpdateProperty: input form values", {
+        propertyId,
+        addressId,
+        type,
+        value,
+      });
+
+      let payload: UpdatePropertyPayload | undefined;
+      try {
+        payload = await buildUpdatePayload({ type, value, addressId });
+        console.log("UpdateProperty: payload", payload);
+
+        const response = await putRequest<CreatePropertyResponse, UpdatePropertyPayload>({
+          url: `/properties/${propertyId}`,
+          payload,
+          protectedRoute: true,
+        });
+
+        console.log("UpdateProperty: response", response);
+        return response;
+      } catch (error) {
+        console.log("UpdateProperty: attempted payload before failure", payload);
+        throw error;
+      }
+    },
+    onSuccess: () => {
+      Toast.show({
+        type: "success",
+        text1: "Success",
+        text2: "Property updated successfully.",
+      });
+    },
+    onError: (error, variables) => {
+      console.log("UpdateProperty: error", error);
+      console.log("UpdateProperty: failed input variables", variables);
+      const message =
+        error instanceof Error ? error.message : "Unable to update property.";
+      Toast.show({
+        type: "error",
+        text1: "Update Property Failed",
+        text2: message,
+      });
+    },
+  });
+
+  return {
+    updatePropertyMutation: mutateAsync,
+    updatePropertyPending: isPending,
+  };
+}
+
+const normalizeListParams = (
+  params?: ListPropertiesParams,
+): Record<string, string | number | boolean> => {
+  if (!params) return {};
+
+  return Object.entries(params).reduce<Record<string, string | number | boolean>>(
+    (acc, [key, value]) => {
+      if (value === undefined || value === null || value === "") return acc;
+      acc[key] = value as string | number | boolean;
+      return acc;
+    },
+    {},
+  );
+};
+
+export function useListProperties({
+  params,
+  pageSize = 20,
+  enabled = true,
+}: {
+  params?: ListPropertiesParams;
+  pageSize?: number;
+  enabled?: boolean;
+}) {
+  const query = useInfiniteQuery({
+    queryKey: ["properties", params, pageSize],
+    initialPageParam: 0,
+    enabled,
+    queryFn: async ({ pageParam }) => {
+      const queryParams = normalizeListParams({
+        ...params,
+        skip: Number(pageParam) || 0,
+        limit: pageSize,
+      });
+
+      return await getRequest<ListPropertiesResponse>({
+        url: "/properties/",
+        params: queryParams,
+        protectedRoute: true,
+      });
+    },
+    getNextPageParam: (lastPage) => {
+      const nextSkip = lastPage.pagination.skip + lastPage.pagination.limit;
+      return nextSkip < lastPage.pagination.total_items ? nextSkip : undefined;
+    },
+  });
+
+  const properties: PropertyListItem[] =
+    query.data?.pages.flatMap((page) => page.items) ?? [];
+
+  return {
+    properties,
+    totalItems: query.data?.pages[0]?.pagination.total_items ?? 0,
+    isPropertiesLoading: query.isLoading,
+    isPropertiesFetching: query.isFetching,
+    isPropertiesFetchingNextPage: query.isFetchingNextPage,
+    hasMoreProperties: query.hasNextPage,
+    propertiesError: query.error,
+    fetchMoreProperties: query.fetchNextPage,
+    refetchProperties: query.refetch,
+  };
+}
+
+export function useGetPropertyDetails({
+  propertyId,
+  enabled = true,
+}: {
+  propertyId?: string;
+  enabled?: boolean;
+}) {
+  const query = useQuery({
+    queryKey: ["property-details", propertyId],
+    enabled: enabled && !!propertyId,
+    queryFn: async () => {
+      return await getRequest<PropertyDetailsResponse>({
+        url: `/properties/${propertyId}`,
+        protectedRoute: true,
+      });
+    },
+  });
+
+  return {
+    propertyDetails: query.data,
+    isPropertyDetailsLoading: query.isLoading,
+    propertyDetailsError: query.error,
+    refetchPropertyDetails: query.refetch,
+  };
+}
+
+export function useDeleteProperty() {
+  const queryClient = useQueryClient();
+  const { mutateAsync, isPending } = useMutation({
+    mutationFn: async ({ propertyId }: { propertyId: string }) => {
+      return await deleteRequest<void>({
+        url: `/properties/${propertyId}`,
+        protectedRoute: true,
+      });
+    },
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey: ["properties"] });
+      Toast.show({
+        type: "success",
+        text1: "Success",
+        text2: "Property removed successfully.",
+      });
+    },
+    onError: (error) => {
+      console.log("DeleteProperty: error", error);
+      const message =
+        error instanceof Error ? error.message : "Unable to delete property.";
+      Toast.show({
+        type: "error",
+        text1: "Delete Property Failed",
+        text2: message,
+      });
+    },
+  });
+
+  return {
+    deletePropertyMutation: mutateAsync,
+    deletePropertyPending: isPending,
+  };
+}
+
+export function useMyBookmarks({
+  enabled = true,
+  limit = 100,
+}: {
+  enabled?: boolean;
+  limit?: number;
+} = {}) {
+  const query = useQuery({
+    queryKey: ["my-bookmarks", limit],
+    enabled,
+    queryFn: async () => {
+      return await getRequest<ListBookmarksResponse>({
+        url: "/interaction/me/bookmarks",
+        params: {
+          skip: 0,
+          limit,
+          sort_by: "date_created",
+          sort_order: "desc",
+        },
+        protectedRoute: true,
+      });
+    },
+  });
+
+  const bookmarks: BookmarkItem[] = query.data?.items ?? [];
+  const bookmarkedPropertyIds = bookmarks.map((item) => item.property.public_id);
+
+  return {
+    bookmarks,
+    bookmarkedPropertyIds,
+    isBookmarksLoading: query.isLoading,
+    isBookmarksFetching: query.isFetching,
+    bookmarksError: query.error,
+    refetchBookmarks: query.refetch,
+  };
+}
+
+export function useTogglePropertyBookmark() {
+  const queryClient = useQueryClient();
+  const { mutateAsync, isPending } = useMutation({
+    mutationFn: async ({ propertyId }: { propertyId: string }) => {
+      return await postRequest<ToggleBookmarkResponse, Record<string, never>>({
+        url: `/interaction/${propertyId}/bookmark`,
+        payload: {},
+        protectedRoute: true,
+      });
+    },
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey: ["my-bookmarks"] });
+    },
+    onError: (error) => {
+      const message =
+        error instanceof Error ? error.message : "Unable to update bookmark.";
+      Toast.show({
+        type: "error",
+        text1: "Bookmark Failed",
+        text2: message,
+      });
+    },
+  });
+
+  return {
+    togglePropertyBookmarkMutation: mutateAsync,
+    togglePropertyBookmarkPending: isPending,
+  };
+}
+
+export function useListPropertyReviews({
+  propertyId,
+  enabled = true,
+}: {
+  propertyId?: string;
+  enabled?: boolean;
+}) {
+  const query = useQuery({
+    queryKey: ["property-reviews", propertyId],
+    enabled: enabled && !!propertyId,
+    queryFn: async () => {
+      return await getRequest<ListPropertyReviewsResponse>({
+        url: `/property-reviews/${propertyId}/reviews`,
+        params: {
+          skip: 0,
+          limit: 100,
+          sort_by: "date_created",
+          sort_order: "desc",
+        },
+        protectedRoute: true,
+      });
+    },
+  });
+
+  return {
+    propertyReviews: query.data?.items ?? [],
+    propertyReviewsTotal: query.data?.pagination.total_items ?? 0,
+    isPropertyReviewsLoading: query.isLoading,
+    propertyReviewsError: query.error,
+    refetchPropertyReviews: query.refetch,
   };
 }

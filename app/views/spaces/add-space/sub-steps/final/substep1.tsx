@@ -31,7 +31,9 @@ const InspectionFeeSubstep: React.FC<InspectionFeeSubstepProps> = ({
 
   const handleFeeChange = (text: string) => {
     const numericValue = text.replace(/[^0-9]/g, "");
-    setValue({ inspectionFee: numericValue ? parseInt(numericValue) : 0 });
+    const parsed = numericValue ? parseInt(numericValue, 10) : 0;
+    const capped = Math.min(parsed, 3000);
+    setValue({ inspectionFee: capped });
   };
 
   const formatCurrency = (value: number) => {
@@ -91,6 +93,7 @@ const InspectionFeeSubstep: React.FC<InspectionFeeSubstepProps> = ({
           onPress={handleNext}
           size="large"
           fullwidth={true}
+          disabled={(spaceForm.value.inspectionFee || 0) > 3000}
         />
       </View>
     </View>
@@ -166,3 +169,4 @@ const createStyles = (colors: ColorScheme) =>
   });
 
 export default InspectionFeeSubstep;
+

@@ -8,7 +8,7 @@ export const tabItems = (isDarkMode: boolean) => [
     inactiveIcon: isDarkMode
       ? require("../assets/icons/home-white.png")
       : require("../assets/icons/home.png"),
-    grantPermission: ["renter", "owner"],
+    grantPermission: ["renter", "agent"],
   },
   {
     name: "discover",
@@ -30,14 +30,14 @@ export const tabItems = (isDarkMode: boolean) => [
     inactiveIcon: isDarkMode
       ? require("../assets/icons/spaces-white-inactive.png")
       : require("../assets/icons/spaces.png"),
-    grantPermission: ["owner"],
+    grantPermission: ["agent"],
   },
   {
     name: "add",
     label: "Add",
     activeIcon: require("../assets/icons/plus-rounded.png"),
     inactiveIcon: require("../assets/icons/plus-rounded.png"),
-    grantPermission: ["owner"],
+    grantPermission: ["agent"],
   },
   {
     name: "chats",
@@ -48,7 +48,7 @@ export const tabItems = (isDarkMode: boolean) => [
     inactiveIcon: isDarkMode
       ? require("../assets/icons/chat-white-inactive.png")
       : require("../assets/icons/chat.png"),
-    grantPermission: ["renter", "owner"],
+    grantPermission: ["renter", "agent"],
   },
   {
     name: "activity",
@@ -59,6 +59,6 @@ export const tabItems = (isDarkMode: boolean) => [
     inactiveIcon: isDarkMode
       ? require("../assets/icons/activity-light-inactive.png")
       : require("../assets/icons/activity.png"),
-    grantPermission: ["renter", "owner"],
+    grantPermission: ["renter", "agent"],
   },
 ];

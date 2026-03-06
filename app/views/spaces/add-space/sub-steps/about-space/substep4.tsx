@@ -20,9 +20,17 @@ const CapacitySubstep: React.FC<CapacitySubstepProps> = ({
   const { colors } = useTheme();
   const { setValue, spaceForm } = useSpaceStore();
   const styles = createStyles(colors);
+  const [roomSizeError, setRoomSizeError] = useState("");
+  const roomSize = spaceForm.value.capacity?.roomSize || "";
+  const roomSizeRegex = /^\d+\s*ft\s*x\s*\d+\s*ft$/i;
+  const isRoomSizeValid = roomSizeRegex.test(roomSize.trim());
 
   const handleNext = () => {
-    // Validate if needed
+    if (!isRoomSizeValid) {
+      setRoomSizeError("Use this format: 12ft x 12ft");
+      return;
+    }
+
     onNext();
   };
 
@@ -99,20 +107,22 @@ const CapacitySubstep: React.FC<CapacitySubstepProps> = ({
             <View style={styles.inputContainer}>
               <TextInput
                 style={styles.textInput}
-                placeholder="12ft x 2ft"
+                placeholder="12ft x 12ft"
                 placeholderTextColor={colors.slate[500]}
-                onChangeText={(text) =>
+                onChangeText={(text) => {
+                  if (roomSizeError) setRoomSizeError("");
                   setValue({
                     capacity: {
                       ...spaceForm.value.capacity,
                       roomSize: text,
                     },
-                  })
-                }
-                value={spaceForm.value.capacity?.roomSize || ""}
+                  });
+                }}
+                value={roomSize}
               />
             </View>
           </View>
+          {!!roomSizeError && <Text style={styles.errorText}>{roomSizeError}</Text>}
         </View>
       </KeyboardAwareScrollView>
 
@@ -127,7 +137,8 @@ const CapacitySubstep: React.FC<CapacitySubstepProps> = ({
             spaceForm.value.capacity?.rooms === 0 ||
             spaceForm.value.capacity?.bathrooms === 0 ||
             spaceForm.value.capacity?.kitchens === 0 ||
-            !spaceForm.value.capacity?.roomSize
+            !spaceForm.value.capacity?.roomSize ||
+            !isRoomSizeValid
           }
         />
       </View>
@@ -183,6 +194,11 @@ const createStyles = (colors: ColorScheme) =>
       fontSize: RFValue(15),
       color: colors.slate[650],
       textAlign: "center",
+    },
+    errorText: {
+      fontSize: RFValue(12),
+      color: colors.error[300],
+      marginTop: RFValue(-12),
     },
     buttonContainer: {
       paddingHorizontal: RFValue(4),

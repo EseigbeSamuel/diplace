@@ -5,6 +5,7 @@ import { useRef, useState } from "react";
 import { StyleSheet, View } from "react-native";
 import ActiveActivity from "../views/activities/active";
 import ActivityHistory from "../views/activities/history";
+import React from "react";
 
 const Activity = () => {
   const [activeTab, setActiveTab] = useState("active");

@@ -2,10 +2,11 @@ import AppButton from "@/components/button";
 import SafeAreaViewContainer from "@/components/safeareaview";
 import SectionHeader from "@/components/sectionheader";
 import { useTheme } from "@/contexts/themeContext";
+import { useListPropertyReviews } from "@/hooks";
 import { useSpaceStore } from "@/store/useSpace";
 import { ColorScheme } from "@/utils";
 import { useRouter } from "expo-router";
-import React, { useRef, useState } from "react";
+import React, { useMemo, useRef, useState } from "react";
 import {
   Dimensions,
   Image,
@@ -37,7 +38,7 @@ const HAS_GOOGLE_KEY = !!process.env.EXPO_PUBLIC_GOOGLE_PLACES_API_KEY;
 
 const Placedetails = () => {
   const { colors, isDarkMode } = useTheme();
-  const { spaceForm } = useSpaceStore();
+  const { spaceForm, selectedPropertyDetails } = useSpaceStore();
   const styles = createStyles(colors);
 
   const [selectedTime, setSelectedTime] = useState<{
@@ -55,16 +56,146 @@ const Placedetails = () => {
 
   const router = useRouter();
   const galleryScrollRef = useRef<ScrollView>(null);
+  const property = selectedPropertyDetails;
+  const { propertyReviewsTotal } = useListPropertyReviews({
+    propertyId: property?.public_id,
+    enabled: !!property?.public_id,
+  });
 
-  const costBreakdown = [
-    {
-      id: "0",
-      title: `Space rent (${spaceForm.value.rentalCost?.rentDuration})`,
-      description: "",
-      value: spaceForm.value.rentalCost?.rentalCost || "",
-      editable: true,
-    },
-  ].concat(spaceForm.value.otherCharges || []);
+  const fallbackGallery = [
+    require("@/assets/images/SpacesNearbyImage1.png"),
+    require("@/assets/images/SpacesNearbyImage2.png"),
+    require("@/assets/images/featuredSpaceImage1.png"),
+    require("@/assets/images/SpacesNearbyImage1.png"),
+    require("@/assets/images/SpacesNearbyImage2.png"),
+  ];
+
+  const galleryData = useMemo(() => {
+    if (property?.media?.length) {
+      return property.media.map((item) => ({ uri: item.file_url }));
+    }
+    if (spaceForm.value.media && spaceForm.value.media.length > 0) {
+      return spaceForm.value.media.map((item) => ({ uri: item.uri }));
+    }
+    return fallbackGallery;
+  }, [property, spaceForm.value.media]);
+
+  const displayAddress =
+    [
+      property?.address?.street,
+      property?.address?.city,
+      property?.address?.state,
+      property?.address?.country,
+    ]
+      .filter(Boolean)
+      .join(", ") ||
+    spaceForm.value?.location?.address ||
+    "Road 2, Tony Estate, Rumuewhere, Port Harcourt";
+
+  const displayLatitude =
+    property?.address?.latitude ?? spaceForm.value.location?.latitude ?? 4.8156;
+  const displayLongitude =
+    property?.address?.longitude ?? spaceForm.value.location?.longitude ?? 7.0498;
+
+  const displayTitle =
+    property?.title ||
+    spaceForm.value.description?.title ||
+    "2 Bedroom in-suite apartment";
+  const displayPrice =
+    property?.price ?? spaceForm.value.rentalCost?.rentalCost ?? "60000";
+  const displayDuration =
+    property?.cost_frequency?.replace(/^per_/, "").replace(/_/g, " ") ||
+    spaceForm.value.rentalCost?.rentDuration ||
+    "annum";
+
+  const listedByName =
+    [property?.lister?.first_name, property?.lister?.last_name]
+      .filter(Boolean)
+      .join(" ") || "User";
+  const listedByAvatar = property?.lister?.profile_picture || null;
+  const postedAtLabel = (() => {
+    if (!property?.date_created) return "Posted recently";
+    const now = Date.now();
+    const then = new Date(property.date_created).getTime();
+    const diffMs = Math.max(0, now - then);
+    const dayMs = 24 * 60 * 60 * 1000;
+    const days = Math.floor(diffMs / dayMs);
+
+    if (days < 1) return "Posted today";
+    if (days < 30) return `Posted ${days} day${days === 1 ? "" : "s"} ago`;
+    const months = Math.floor(days / 30);
+    if (months < 12) {
+      return `Posted ${months} month${months === 1 ? "" : "s"} ago`;
+    }
+    const years = Math.floor(months / 12);
+    return `Posted ${years} year${years === 1 ? "" : "s"} ago`;
+  })();
+
+  const aboutText =
+    property?.description ||
+    "Atraz Palace is a premium 500 capacity event space perfect for weddings, conferences, parties, and special occasions. With elegant interiors, ample parking, and flexible seating arrangements, it offers a seamless experience for both hosts and guests. The hall is fully air-conditioned, generator-powered, and located in a secure, accessible area.";
+
+  const amenities =
+    property?.amenities?.length
+      ? property.amenities
+      : [
+          "Full Air Conditioning coverage",
+          "Standby Generator",
+          "Stage platform",
+          "Changing rooms",
+          "Sound system & DJ setup",
+          "About 500 Chairs & 300 Tables",
+          "Spot lighting fixtures",
+          "Restrooms",
+        ];
+
+  const costBreakdown = property
+    ? [
+        {
+          id: "0",
+          title: `Space rent (${displayDuration})`,
+          description: "",
+          value: `NGN ${new Intl.NumberFormat("en-NG").format(property.price || 0)}`,
+          editable: false,
+        },
+        {
+          id: "1",
+          title: "Platform fee",
+          description: "",
+          value: `NGN ${new Intl.NumberFormat("en-NG").format(property.fees?.platform_fee || 0)}`,
+          editable: false,
+        },
+        {
+          id: "2",
+          title: "Agency fee",
+          description: "",
+          value: `${property.fees?.agency_fee_percent || 0}%`,
+          editable: false,
+        },
+        {
+          id: "3",
+          title: "Caution fee",
+          description: "",
+          value: `NGN ${new Intl.NumberFormat("en-NG").format(property.fees?.caution_fee || 0)}`,
+          editable: false,
+        },
+        {
+          id: "4",
+          title: "Legal fee",
+          description: "",
+          value: `${property.fees?.legal_fee_percent || 0}%`,
+          editable: false,
+        },
+      ]
+    : [
+        {
+          id: "0",
+          title: `Space rent (${spaceForm.value.rentalCost?.rentDuration})`,
+          description: "",
+          value: spaceForm.value.rentalCost?.rentalCost || "",
+          editable: true,
+        },
+      ].concat(spaceForm.value.otherCharges || []);
 
   const totalPackage = costBreakdown.reduce((sum, item) => {
     const amount = Number(item.value.toString().replace(/[^0-9]/g, "")) || 0;
@@ -101,31 +232,6 @@ const Placedetails = () => {
     }
   };
 
-  const spaceData = {
-    location: {
-      address: "Road 2, Tony Estate, Rumuewhere, Port Harcourt",
-      coordinates: { latitude: 4.8156, longitude: 7.0498 },
-    },
-    gallery: [
-      require("@/assets/images/SpacesNearbyImage1.png"),
-      require("@/assets/images/SpacesNearbyImage2.png"),
-      require("@/assets/images/featuredSpaceImage1.png"),
-      require("@/assets/images/SpacesNearbyImage1.png"),
-      require("@/assets/images/SpacesNearbyImage2.png"),
-    ],
-  };
-
-  const amenities = [
-    "Full Air Conditioning coverage",
-    "Standby Generator",
-    "Stage platform",
-    "Changing rooms",
-    "Sound system & DJ setup",
-    "About 500 Chairs & 300 Tables",
-    "Spot lighting fixtures",
-    "Restrooms",
-  ];
-
   const handleScroll = (event: any) => {
     const contentOffsetX = event.nativeEvent.contentOffset.x;
     const index = Math.round(contentOffsetX / width);
@@ -153,11 +259,7 @@ const Placedetails = () => {
               />
             ) : (
               <View>
-                <Image
-                  source={spaceData.gallery[0]}
-                  style={styles.mainImage}
-                  resizeMode="cover"
-                />
+                <Image source={galleryData[0]} style={styles.mainImage} resizeMode="cover" />
                 <View style={styles.actionButtons}>
                   <TouchableOpacity
                     style={styles.actionButton}
@@ -174,8 +276,8 @@ const Placedetails = () => {
                       router.push({
                         pathname: "/views/streetview",
                         params: {
-                          lat: spaceForm.value.location?.latitude,
-                          lng: spaceForm.value.location?.longitude,
+                          lat: displayLatitude,
+                          lng: displayLongitude,
                         },
                       })
                     }
@@ -200,13 +302,8 @@ const Placedetails = () => {
           {/* Property Info Card */}
           <View style={styles.propertyCard}>
             <View style={styles.propertyTitleRow}>
-              <Text style={styles.propertyTitle}>
-                {spaceForm.value.description?.title ||
-                  "2 Bedroom in-suite apartment"}
-              </Text>
-              <Text style={styles.priceText}>
-                ₦{spaceForm.value.rentalCost?.rentalCost || "60000"}
-              </Text>
+              <Text style={styles.propertyTitle}>{displayTitle}</Text>
+              <Text style={styles.priceText}>₦{displayPrice}</Text>
             </View>
 
             <View style={styles.locationRow}>
@@ -215,15 +312,10 @@ const Placedetails = () => {
                 style={styles.locationIcon}
                 resizeMode="contain"
               />
-              <Text style={styles.addressText}>
-                {spaceForm.value?.location?.address ||
-                  "Road 2, Tony Estate, Rumuewhere, Port Harcourt"}
-              </Text>
+              <Text style={styles.addressText}>{displayAddress}</Text>
             </View>
 
-            <Text style={styles.priceUnit}>
-              /{spaceForm.value.rentalCost?.rentDuration || "annum"}
-            </Text>
+            <Text style={styles.priceUnit}>/{displayDuration}</Text>
 
             <View className="px-3 py-2 border-t border-b border-gray-300">
               <Text
@@ -294,31 +386,56 @@ const Placedetails = () => {
           >
             <Text style={styles.sectionTitle}>Listed by</Text>
             <Text style={{ color: colors.slate[500] }} className="">
-              Posted 2days ago
+              {postedAtLabel}
             </Text>
           </View>
           <View className="flex flex-row gap-2 py-3 border-b border-gray-300">
-            <View
-              style={{ height: RFValue(48), width: RFValue(48) }}
-              className="bg-gray-300 rounded-full"
-            ></View>
+            <View style={{ height: RFValue(48), width: RFValue(48) }} className="rounded-full overflow-hidden bg-gray-300">
+              <Image
+                source={
+                  listedByAvatar
+                    ? { uri: listedByAvatar }
+                    : require("@/assets/images/user.png")
+                }
+                style={{ height: "100%", width: "100%" }}
+                resizeMode="cover"
+              />
+            </View>
             <View className="w-[50%]">
               <Text
                 style={{ color: colors.slate[650], fontSize: RFValue(16) }}
                 className="font-medium"
               >
-                Ibe Alex{" "}
-                <Image
-                  source={require("@/assets/icons/badge-check-green.png")}
-                />
+                {listedByName}{" "}
+                {property?.is_verified ? (
+                  <Image
+                    source={require("@/assets/icons/badge-check-green.png")}
+                  />
+                ) : null}
               </Text>
               <Pressable
                 className="flex flex-row gap-2"
-                onPress={() => router.push("/views/reviews/reviews")}
+                onPress={() =>
+                  router.push({
+                    pathname: "/views/reviews/reviews",
+                    params: {
+                      property_id: property?.public_id,
+                      lister_id: property?.lister?.public_id,
+                    },
+                  })
+                }
               >
                 <Text style={{ color: colors.slate[650] }}>⭐ 4.5 </Text>
-                <Text style={{ color: colors.info[200] }}>(15 reviews)</Text>
+                <Text style={{ color: colors.info[200] }}>
+                  ({propertyReviewsTotal}{" "}
+                  {propertyReviewsTotal === 1 ? "review" : "reviews"})
+                </Text>
               </Pressable>
+              {propertyReviewsTotal === 0 ? (
+                <Text style={{ color: colors.slate[500], fontSize: RFValue(12) }}>
+                  No reviews yet
+                </Text>
+              ) : null}
             </View>
             <View className="flex flex-row gap-3">
               <TouchableOpacity className="flex items-center justify-center w-10 h-10 bg-gray-200 rounded-full">
@@ -339,14 +456,7 @@ const Placedetails = () => {
           {/* About Section */}
           <View style={styles.section}>
             <Text style={styles.sectionTitle}>About this space</Text>
-            <Text style={styles.aboutText}>
-              Atraz Palace is a premium 500 capacity event space perfect for
-              weddings, conferences, parties, and special occasions. With
-              elegant interiors, ample parking, and flexible seating
-              arrangements, it offers a seamless experience for both hosts and
-              guests. The hall is fully air-conditioned, generator-powered, and
-              located in a secure, accessible area.
-            </Text>
+            <Text style={styles.aboutText}>{aboutText}</Text>
           </View>
 
           {/* Amenities Section */}
@@ -363,25 +473,23 @@ const Placedetails = () => {
           {/* Location Section */}
           <View style={styles.section}>
             <Text style={styles.sectionTitle}>Location</Text>
-            <Text style={styles.locationAddress}>
-              {spaceData.location.address}
-            </Text>
+            <Text style={styles.locationAddress}>{displayAddress}</Text>
 
             <View style={styles.mapContainer}>
               {HAS_GOOGLE_KEY ? (
                 <MapView
                   style={{ flex: 1 }}
                   initialRegion={{
-                    latitude: spaceForm.value.location?.latitude ?? 4.8156,
-                    longitude: spaceForm.value.location?.longitude ?? 7.0498,
+                    latitude: displayLatitude,
+                    longitude: displayLongitude,
                     latitudeDelta: 0.01,
                     longitudeDelta: 0.01,
                   }}
                 >
                   <Marker
                     coordinate={{
-                      latitude: spaceForm.value.location?.latitude ?? 4.8156,
-                      longitude: spaceForm.value.location?.longitude ?? 7.0498,
+                      latitude: displayLatitude,
+                      longitude: displayLongitude,
                     }}
                   />
                 </MapView>
@@ -399,8 +507,8 @@ const Placedetails = () => {
                   router.push({
                     pathname: "/views/streetview",
                     params: {
-                      lat: spaceForm.value.location?.latitude,
-                      lng: spaceForm.value.location?.longitude,
+                      lat: displayLatitude,
+                      lng: displayLongitude,
                     },
                   })
                 }
@@ -443,7 +551,7 @@ const Placedetails = () => {
 
               <View style={styles.totalRow}>
                 <Text style={styles.totalLabel}>Total Payable</Text>
-                <Text style={styles.totalAmount}>{totalPackage}</Text>
+                <Text style={styles.totalAmount}>₦{totalPackage}</Text>
               </View>
             </View>
             <Pressable className="flex flex-row items-center gap-3 py-4">
@@ -492,7 +600,7 @@ const Placedetails = () => {
                 <View style={styles.galleryTitleContainer}>
                   <Text style={styles.galleryModalTitle}>Gallery</Text>
                   <Text style={styles.galleryPhotoCount}>
-                    {spaceData.gallery.length} Photos
+                    {galleryData.length} Photos
                   </Text>
                 </View>
                 <View style={styles.galleryHeaderIcons}>
@@ -521,7 +629,7 @@ const Placedetails = () => {
                 scrollEventThrottle={16}
                 style={styles.gallerySlider}
               >
-                {spaceData.gallery.map((image, index) => (
+                {galleryData.map((image, index) => (
                   <Image
                     key={index}
                     source={image}
@@ -533,7 +641,7 @@ const Placedetails = () => {
 
               {/* Dots Indicator */}
               <View style={styles.dotsContainer}>
-                {spaceData.gallery.map((_, index) => (
+                {galleryData.map((_, index) => (
                   <View
                     key={index}
                     style={[
@@ -551,7 +659,7 @@ const Placedetails = () => {
                   showsHorizontalScrollIndicator={false}
                   contentContainerStyle={styles.thumbnailsScroll}
                 >
-                  {spaceData.gallery.map((image, index) => (
+                  {galleryData.map((image, index) => (
                     <TouchableOpacity
                       key={index}
                       onPress={() => {
@@ -856,16 +964,16 @@ const Placedetails = () => {
               <MapView
                 style={{ flex: 1 }}
                 initialRegion={{
-                  latitude: spaceForm.value.location?.latitude ?? 4.8156,
-                  longitude: spaceForm.value.location?.longitude ?? 7.0498,
+                  latitude: displayLatitude,
+                  longitude: displayLongitude,
                   latitudeDelta: 0.01,
                   longitudeDelta: 0.01,
                 }}
               >
                 <Marker
                   coordinate={{
-                    latitude: spaceForm.value.location?.latitude ?? 4.8156,
-                    longitude: spaceForm.value.location?.longitude ?? 7.0498,
+                    latitude: displayLatitude,
+                    longitude: displayLongitude,
                   }}
                 />
               </MapView>
@@ -883,8 +991,8 @@ const Placedetails = () => {
                 router.push({
                   pathname: "/views/streetview",
                   params: {
-                    lat: spaceForm.value.location?.latitude,
-                    lng: spaceForm.value.location?.longitude,
+                    lat: displayLatitude,
+                    lng: displayLongitude,
                   },
                 })
               }
@@ -919,8 +1027,7 @@ const Placedetails = () => {
                   <View style={styles.bottomSheetContent}>
                     <Text style={styles.bottomSheetTitle}>Location</Text>
                     <Text style={styles.bottomSheetAddress}>
-                      {spaceForm.value?.location?.address ||
-                        "Road 2, Tony Estate, Rumuewhere, Port Harcourt"}
+                      {displayAddress}
                     </Text>
                   </View>
                 </Pressable>

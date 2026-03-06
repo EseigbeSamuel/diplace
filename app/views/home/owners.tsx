@@ -3,6 +3,7 @@ import { AppHeader } from "@/components/header";
 import SafeAreaViewContainer from "@/components/safeareaview";
 import { promoData, RecentEarningsDB } from "@/constants/ownerHome";
 import { useTheme } from "@/contexts/themeContext";
+import { useGetCurrentUser, useListProperties } from "@/hooks";
 import { ColorScheme } from "@/utils";
 import { BottomSheetModal } from "@gorhom/bottom-sheet";
 import { LinearGradient } from "expo-linear-gradient";
@@ -23,16 +24,49 @@ import { useSharedValue } from "react-native-reanimated";
 import Carousel from "react-native-reanimated-carousel";
 import { RFValue } from "react-native-responsive-fontsize";
 import AddSpaceBottomSheet from "../spaces/components/AddSpacesBottomContainer";
+import React from "react";
+import MyEarnings from "../profile/my-earnings";
 
 export default function OwnersHome() {
   const { colors, isDarkMode } = useTheme();
   const custom = styles(colors);
+  const { currentUser, isCurrentUserLoading } = useGetCurrentUser();
+  const { properties, isPropertiesLoading } = useListProperties({
+    params: {
+      lister_id: currentUser?.public_id,
+      sort_by: "date_created",
+      sort_order: "desc",
+    },
+    enabled: !!currentUser,
+  });
   const addSpaceRef = useRef<BottomSheetModal>(null);
   const [hidden, setHidden] = useState(false);
   const [activeIndex, setActiveIndex] = useState(0);
 
   const { width } = Dimensions.get("window");
   const CARD_WIDTH = width * 0.88;
+  const isOverviewLoading = isCurrentUserLoading || isPropertiesLoading;
+  const totalSpaces = properties.length;
+  const availableSpaces = properties.filter(
+    (item) => item.status === "available",
+  ).length;
+  const bookedSpaces = properties.filter(
+    (item) => item.status === "booked",
+  ).length;
+  const reservedSpaces = bookedSpaces;
+  const progressWidth = totalSpaces
+    ? `${Math.min(100, Math.round((availableSpaces / totalSpaces) * 100))}%`
+    : "0%";
+  const latestProperty = properties[0];
+  const latestPropertyTitle = latestProperty?.title || "No space listed yet";
+  const latestPropertyAddress =
+    [
+      latestProperty?.address?.street,
+      latestProperty?.address?.city,
+      latestProperty?.address?.state,
+    ]
+      .filter(Boolean)
+      .join(", ") || "Add a space to see availability details.";
 
   const anim = useSharedValue(0);
 
@@ -106,13 +140,17 @@ export default function OwnersHome() {
                     />
                     <View className="absolute bottom-4 left-4 right-4">
                       <Text className="text-white text-lg font-semibold">
-                        Atraz Palace Hall
+                        {isOverviewLoading
+                          ? "Loading property..."
+                          : latestPropertyTitle}
                       </Text>
 
                       <View className="flex-row items-center mt-1">
                         <MapPin size={16} color="#fff" />
                         <Text className="text-white ml-1 text-sm">
-                          10 Onukem Street, Eneka, Port Harcourt
+                          {isOverviewLoading
+                            ? "Loading location..."
+                            : latestPropertyAddress}
                         </Text>
                       </View>
                     </View>
@@ -157,7 +195,6 @@ export default function OwnersHome() {
                       ) : (
                         <Image
                           source={require("@/assets/icons/arrow-right-up-light.png")}
-                          className="size-7"
                         />
                       )}
                     </View>
@@ -167,13 +204,10 @@ export default function OwnersHome() {
                       style={custom.border}
                       className="flex-row justify-center items-center rounded-full p-3 border"
                     >
-                      <Image
-                        source={require("@/assets/icons/paper.png")}
-                        className="size-7"
-                      />
+                      <Image source={require("@/assets/icons/paper.png")} />
                     </View>
                     <Text style={custom.big} className="font-semibold">
-                      12
+                      {isOverviewLoading ? "..." : totalSpaces}
                     </Text>
                   </View>
 
@@ -181,9 +215,12 @@ export default function OwnersHome() {
                     <View className="flex-row items-center gap-1">
                       <Image
                         source={require("@/assets/icons/blue-unlock.png")}
-                        className="size-7"
                       />
-                      <Text style={custom.small}>6 Available spaces</Text>
+                      <Text style={custom.small}>
+                        {isOverviewLoading
+                          ? "Loading..."
+                          : `${availableSpaces} Available spaces`}
+                      </Text>
                     </View>
                     <View
                       style={{ backgroundColor: colors.slate[250] }}
@@ -191,7 +228,8 @@ export default function OwnersHome() {
                     >
                       <View
                         style={{ backgroundColor: colors.info[200] }}
-                        className="w-[80%] rounded-full h-3"
+                        className="rounded-full h-3"
+                        width={progressWidth}
                       ></View>
                     </View>
                   </View>
@@ -208,7 +246,7 @@ export default function OwnersHome() {
                     <View>
                       <Text style={custom.small}>Booked Space</Text>
                       <Text style={custom.subTitle} className=" font-semibold">
-                        4
+                        {isOverviewLoading ? "..." : bookedSpaces}
                       </Text>
                     </View>
                   </View>
@@ -221,7 +259,7 @@ export default function OwnersHome() {
                     <View>
                       <Text style={custom.small}>Reserved Space</Text>
                       <Text style={custom.subTitle} className=" font-semibold">
-                        2
+                        {isOverviewLoading ? "..." : reservedSpaces}
                       </Text>
                     </View>
                   </View>
@@ -310,137 +348,11 @@ export default function OwnersHome() {
             </View>
 
             {/* Earning card */}
-            <View className="bg-[#111] rounded-2xl h-[150px] p-5 w-full relative overflow-hidden">
-              <View className="absolute top-0 left-0 right-0 bottom-0 opacity-20">
-                <View className="absolute w-[200%] h-10 bg-gray-700 rotate-[-25deg] top-6 left-[-50%]" />
-                <View className="absolute w-[200%] h-10 bg-gray-800 rotate-[-25deg] top-12 left-[-40%]" />
-              </View>
-
-              <View className="relative top-5 flex-col items-center justify-center">
-                <Text className="text-gray-300 text-center mb-1">
-                  Your Earnings
-                </Text>
-
-                <View className="flex-row justify-center items-center gap-2">
-                  <Text className="text-white text-3xl font-bold">
-                    {hidden ? "*********" : "₦500,000.00"}
-                  </Text>
-
-                  <TouchableOpacity onPress={() => setHidden(!hidden)}>
-                    {hidden ? (
-                      <Image
-                        source={require("@/assets/icons/eye-open-light.png")}
-                      />
-                    ) : (
-                      <Image
-                        source={require("@/assets/icons/eye-closed-light.png")}
-                      />
-                    )}
-                  </TouchableOpacity>
-                </View>
-
-                <View className="flex-row justify-center items-center mt-3">
-                  <Text className="text-green-500 font-semibold mr-1">
-                    +3.5%
-                  </Text>
-                  <Text className="text-gray-200 mr-1">All time</Text>
-                  <ChevronDown size={16} color="white" />
-                </View>
-              </View>
-            </View>
 
             {/* Recent Earnings Header */}
-            <View className="flex-row justify-between items-center w-full">
-              <Text style={custom.subTitle} className=" font-medium">
-                Recent Earnings
-              </Text>
-              <Pressable className="flex-row gap-2">
-                <Text style={custom.smallDrak}>see more</Text>
-                {isDarkMode ? (
-                  <Image
-                    source={require("@/assets/icons/arrow-right-light.png")}
-                    className="w-[20px] h-[20px]"
-                  />
-                ) : (
-                  <Image
-                    source={require("@/assets/icons/arrow-right-dark.png")}
-                    className="w-[20px] h-[20px]"
-                  />
-                )}
-              </Pressable>
-            </View>
+            <MyEarnings noHeader />
           </View>
         }
-        renderItem={({ item }) => (
-          <View
-            style={custom.border}
-            className="w-full py-5 justify-between items-center flex-row border-b capitalize"
-          >
-            <View className="flex-row items-center gap-3">
-              <View
-                style={custom.container2}
-                className="rounded-full p-3 items-center justify-center flex-row"
-              >
-                {item.type === "booking" ? (
-                  isDarkMode ? (
-                    <Image
-                      source={require("@/assets/icons/badge-check-outline-light.png")}
-                      className="size-5"
-                    />
-                  ) : (
-                    <Image
-                      source={require("@/assets/icons/checkbox-circle-fill.png")}
-                      className="size-5"
-                    />
-                  )
-                ) : item.type === "reservation" ? (
-                  isDarkMode ? (
-                    <Image
-                      source={require("@/assets/icons/lock-light.png")}
-                      className="size-5"
-                    />
-                  ) : (
-                    <Image
-                      source={require("@/assets/icons/Lock.png")}
-                      className="size-5"
-                    />
-                  )
-                ) : item.type === "inspection" ? (
-                  isDarkMode ? (
-                    <Image
-                      source={require("@/assets/icons/calender-light.png")}
-                      className="size-5"
-                    />
-                  ) : (
-                    <Image
-                      source={require("@/assets/icons/calender-dark.png")}
-                      className="size-5"
-                    />
-                  )
-                ) : isDarkMode ? (
-                  <Image
-                    source={require("@/assets/icons/badge-check-outline-light.png")}
-                    className="size-5"
-                  />
-                ) : (
-                  <Image
-                    source={require("@/assets/icons/checkbox-circle-fill.png")}
-                    className="size-5"
-                  />
-                )}
-              </View>
-              <View>
-                <Text style={custom.text} className="font-medium">
-                  {item.name || "Unknown"}
-                </Text>
-                <Text style={custom.small}>{item.date || "N/A"}</Text>
-              </View>
-            </View>
-            <Text style={custom.subTitle} className="font-semibold">
-              +${item.amount || "₦0"}
-            </Text>
-          </View>
-        )}
       />
 
       <CustomBottomSheet

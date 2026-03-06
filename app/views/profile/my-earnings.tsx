@@ -23,7 +23,7 @@ interface Transaction {
   amount: number;
 }
 
-const MyEarnings = () => {
+const MyEarnings = ({ noHeader = false }) => {
   const { colors, isDarkMode } = useTheme();
   const router = useRouter();
   const earningsStyles = styles(colors);
@@ -66,6 +66,8 @@ const MyEarnings = () => {
     },
   ];
 
+  const Wrapper = noHeader ? View : SafeAreaViewContainer;
+
   const getTransactionIcon = (type: string) => {
     switch (type) {
       case "reservation":
@@ -90,8 +92,8 @@ const MyEarnings = () => {
   };
 
   return (
-    <SafeAreaViewContainer>
-      <ViewHeader title="My Earnings" />
+    <Wrapper>
+      {noHeader ? null : <ViewHeader title="My Earnings" />}
       <ScrollView showsVerticalScrollIndicator={false}>
         {/* Earnings Card */}
         <View style={earningsStyles.earningsCard}>
@@ -162,7 +164,7 @@ const MyEarnings = () => {
           </View>
         </View>
       </ScrollView>
-    </SafeAreaViewContainer>
+    </Wrapper>
   );
 };
 
@@ -171,7 +173,6 @@ export default MyEarnings;
 const styles = (colors: ColorScheme) =>
   StyleSheet.create({
     earningsCard: {
-      marginHorizontal: RFValue(3),
       marginBottom: RFValue(24),
       backgroundColor: colors.slate[650],
       borderRadius: RFValue(16),

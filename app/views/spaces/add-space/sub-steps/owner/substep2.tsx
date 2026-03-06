@@ -16,6 +16,7 @@ import { ColorScheme } from "@/utils";
 import AddBankDetails from "./substep3";
 import { useSpaceStore } from "@/store/useSpace";
 import { BankDetails } from "@/types/add-space-types";
+import { useGetCurrentUser } from "@/hooks";
 
 interface ConfirmDetailsSubstepProps {
   onNext: () => void;
@@ -28,16 +29,26 @@ const ConfirmDetailsSubstep: React.FC<ConfirmDetailsSubstepProps> = ({
 }) => {
   const { colors } = useTheme();
   const { spaceForm, setValue } = useSpaceStore();
+  const { currentUser } = useGetCurrentUser();
   const styles = createStyles(colors);
 
   const [showBankModal, setShowBankModal] = useState(false);
 
-  // Mock data
+  const fullName = currentUser?.full_name?.trim();
+  const [firstName = "", surname = "", middleName = ""] =
+    fullName && fullName.length > 0
+      ? fullName.split(/\s+/)
+      : [
+          currentUser?.first_name || "",
+          currentUser?.last_name || "",
+          "",
+        ];
+
   const personalInfo = {
-    surname: "ALEX",
-    firstName: "IBE",
-    middleName: "BASSEY-EKONG",
-    phoneNumber: "08102934980",
+    surname: surname || currentUser?.last_name || "N/A",
+    firstName: firstName || currentUser?.first_name || "N/A",
+    middleName: middleName || "-",
+    phoneNumber: currentUser?.phone_number || "N/A",
   };
 
   const handleEditBankDetails = () => {

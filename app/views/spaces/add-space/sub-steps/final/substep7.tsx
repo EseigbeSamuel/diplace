@@ -9,7 +9,7 @@ import {
 } from "react-native";
 import { RFValue } from "react-native-responsive-fontsize";
 import AppButton from "@/components/button";
-import { useCreateProperty } from "@/hooks";
+import { useCreateProperty, useUpdateProperty } from "@/hooks";
 import { useTheme } from "@/contexts/themeContext";
 import { useSpaceStore } from "@/store/useSpace";
 import { ColorScheme } from "@/utils";
@@ -27,7 +27,9 @@ const PublishNowSubstep: React.FC<PublishNowSubstepProps> = ({
   const styles = createStyles(colors);
   const [agreedToTerms, setAgreedToTerms] = useState(false);
   const { createPropertyMutation, createPropertyPending } = useCreateProperty();
-  const { spaceForm } = useSpaceStore();
+  const { updatePropertyMutation, updatePropertyPending } = useUpdateProperty();
+  const { spaceForm, editContext } = useSpaceStore();
+  const isEditMode = !!editContext?.propertyId;
 
   const steps = [
     {
@@ -66,10 +68,19 @@ const PublishNowSubstep: React.FC<PublishNowSubstepProps> = ({
     }
 
     try {
-      await createPropertyMutation({
-        type: spaceForm.type,
-        value: spaceForm.value,
-      });
+      if (isEditMode) {
+        await updatePropertyMutation({
+          propertyId: editContext.propertyId,
+          addressId: editContext.addressId,
+          type: spaceForm.type,
+          value: spaceForm.value,
+        });
+      } else {
+        await createPropertyMutation({
+          type: spaceForm.type,
+          value: spaceForm.value,
+        });
+      }
       onNext();
     } catch (error) {
       console.log("create property error", error);
@@ -132,11 +143,13 @@ const PublishNowSubstep: React.FC<PublishNowSubstepProps> = ({
       {/* Post Button */}
       <View style={styles.buttonContainer}>
         <AppButton
-          title="Post"
+          title={isEditMode ? "Update" : "Post"}
           onPress={handlePost}
           size="large"
           fullwidth={true}
-          disabled={!agreedToTerms || createPropertyPending}
+          disabled={
+            !agreedToTerms || createPropertyPending || updatePropertyPending
+          }
         />
       </View>
     </View>

@@ -16,6 +16,7 @@ import { ColorScheme } from "@/utils";
 import AddBankDetails from "./substep3";
 import { useSpaceStore } from "@/store/useSpace";
 import { BankDetails } from "@/types/add-space-types";
+import { useGetCurrentUser } from "@/hooks";
 
 interface ConfirmOwnerEventDetailsSubstepProps {
   onNext: () => void;
@@ -27,15 +28,29 @@ const ConfirmOwnerEventDetailsSubstep: React.FC<
 > = ({ onNext, onPrev }) => {
   const { colors } = useTheme();
   const { spaceForm, setValue } = useSpaceStore();
+  const { currentUser } = useGetCurrentUser();
   const styles = createStyles(colors);
 
   const [showBankModal, setShowBankModal] = useState(false);
 
-  // Mock data
+  const address = currentUser?.address
+    ? [
+        currentUser.address.street,
+        currentUser.address.city,
+        currentUser.address.state,
+        currentUser.address.country,
+      ]
+        .filter(Boolean)
+        .join(", ")
+    : "";
+
   const personalInfo = {
-    businessName: "ATRAZ PALACE LIMITED",
-    Location: "10 Tombia str, G.R.A Phase II, Port Harcourt, Rivers",
-    phoneNumber: "08102934980",
+    businessName:
+      currentUser?.full_name?.trim() ||
+      `${currentUser?.first_name || ""} ${currentUser?.last_name || ""}`.trim() ||
+      "N/A",
+    Location: address || "N/A",
+    phoneNumber: currentUser?.phone_number || "N/A",
   };
 
   const handleEditBankDetails = () => {

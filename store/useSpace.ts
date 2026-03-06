@@ -13,6 +13,7 @@ import {
     SpaceType,
     TourVideo
 } from "@/types/add-space-types";
+import { PropertyListItem } from "@/types";
 
 import { create } from "zustand";
 
@@ -43,9 +44,20 @@ type PostSpaceState = {
         type: SpaceType;
         value: SpaceValue;
     };
+    editingDraft: PropertyListItem | null;
+    previewProperty: PropertyListItem | null;
+    selectedPropertyDetails: PropertyListItem | null;
+    editContext: {
+        propertyId: string;
+        addressId: string;
+    } | null;
 
     setType: (type: SpaceType) => void;
     setValue: (data: Partial<SpaceValue>) => void;
+    setEditingDraft: (draft: PropertyListItem | null) => void;
+    setPreviewProperty: (property: PropertyListItem | null) => void;
+    setSelectedPropertyDetails: (property: PropertyListItem | null) => void;
+    setEditContext: (context: { propertyId: string; addressId: string } | null) => void;
     clearForm: () => void;
 };
 
@@ -111,6 +123,10 @@ export const useSpaceStore = create<PostSpaceState>((set) => ({
             ]
         }
     },
+    editingDraft: null,
+    previewProperty: null,
+    selectedPropertyDetails: null,
+    editContext: null,
 
     setType: (type) =>
         set((state) => {
@@ -176,11 +192,37 @@ export const useSpaceStore = create<PostSpaceState>((set) => ({
             }
         })),
 
+    setEditingDraft: (draft) =>
+        set({
+            editingDraft: draft
+        }),
+
+    setPreviewProperty: (property) =>
+        set({
+            previewProperty: property
+        }),
+
+    setSelectedPropertyDetails: (property) =>
+        set({
+            selectedPropertyDetails: property
+        }),
+
+    setEditContext: (context) =>
+        set({
+            editContext: context
+        }),
+
     clearForm: () =>
         set({
             spaceForm: {
                 type: null,
-                value: {}
-            }
+                value: {
+                    media: []
+                }
+            },
+            editingDraft: null,
+            previewProperty: null,
+            selectedPropertyDetails: null,
+            editContext: null
         })
 }));

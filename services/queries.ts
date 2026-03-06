@@ -86,6 +86,23 @@ export const patchRequest = async <TResponse, TRequest>({
   );
 };
 
+export const putRequest = async <TResponse, TRequest>({
+  url,
+  payload,
+  protectedRoute = true,
+}: {
+  url: string;
+  payload: TRequest;
+  protectedRoute?: boolean;
+}): Promise<TResponse> => {
+  return await apiService<TResponse, TRequest>(
+    url,
+    "PUT",
+    payload,
+    protectedRoute,
+  );
+};
+
 export const deleteRequest = async <TResponse>({
   url,
   protectedRoute = true,

@@ -1,6 +1,7 @@
 import { saveToLocalStore } from "@/lib";
 import { getRequest, postRequest } from "@/services";
 import {
+  ChangePasswordPayload,
   CurrentUserResponse,
   LoginPayload,
   LoginResponse,
@@ -47,28 +48,28 @@ export function useLogin() {
       await saveToLocalStore("refresh_token", data.refresh_token);
       router.replace("/(tabs)")
 
-      // try {
-      //   // ✅ Fetch user immediately
-      //   const user = await queryClient.fetchQuery({
-      //     queryKey: ["current-user"],
-      //     queryFn: () =>
-      //       getRequest<CurrentUserResponse>({
-      //         url: "/users/me",
-      //         protectedRoute: true,
-      //       }),
-      //   });
+      try {
+        // ✅ Fetch user immediately
+        const user = await queryClient.fetchQuery({
+          queryKey: ["current-user"],
+          queryFn: () =>
+            getRequest<CurrentUserResponse>({
+              url: "/users/me",
+              protectedRoute: true,
+            }),
+        });
 
-      //   // ✅ Navigation decision
-      //   if (!user?.verifications || user.verifications.length === 0) {
-      //     // router.replace("/onboarding/welcome");
-      //     router.replace("/(tabs)");
-      //   } else {
-      //     router.replace("/(tabs)");
-      //   }
-      // } catch (error) {
-      //   console.log("Failed to fetch user after login", error);
-      //   router.replace("/(tabs)");
-      // }
+        // ✅ Navigation decision
+        if (!user?.verifications || user.verifications.length === 0) {
+          // router.replace("/onboarding/welcome");
+          router.replace("/(tabs)");
+        } else {
+          router.replace("/(tabs)");
+        }
+      } catch (error) {
+        console.log("Failed to fetch user after login", error);
+        router.replace("/(tabs)");
+      }
     },
 
     onError: (error) => {
@@ -136,5 +137,33 @@ export function useVerifyOtp() {
   return {
     verifyOtpMutation: mutate,
     verifyOtpMutationPending: isPending,
+  };
+}
+
+export function useChangePassword() {
+  const router = useRouter();
+
+  const { mutate, isPending } = useMutation({
+    mutationFn: async (payload: ChangePasswordPayload) => {
+      return await postRequest<string, ChangePasswordPayload>({
+        url: "/password/change",
+        payload,
+        protectedRoute: true,
+      });
+    },
+    onSuccess: async (data) => {
+      Toast.show({
+        type: "success",
+        text1: "Success",
+        text2: typeof data === "string" ? data : "Password changed successfully.",
+      });
+      router.back();
+    },
+    onError: () => { },
+  });
+
+  return {
+    changePasswordMutation: mutate,
+    changePasswordMutationPending: isPending,
   };
 }
