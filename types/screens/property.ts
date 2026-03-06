@@ -197,6 +197,28 @@ export interface ToggleBookmarkResponse {
   };
 }
 
+export interface PropertyReviewItem {
+  public_id: string;
+  date_created: string;
+  date_modified: string;
+  status: PropertyStatus;
+  reviewer_id: string;
+  rating: number;
+  comment: string;
+  reviewer: PropertyListUser;
+  property_id: string;
+}
+
+export interface ListPropertyReviewsResponse {
+  pagination: {
+    total_items: number;
+    limit: number;
+    skip: number;
+    total_pages: number;
+  };
+  items: PropertyReviewItem[];
+}
+
 export interface ListPropertiesParams {
   start_date?: string;
   end_date?: string;

@@ -2,6 +2,7 @@ import AppButton from "@/components/button";
 import SafeAreaViewContainer from "@/components/safeareaview";
 import SectionHeader from "@/components/sectionheader";
 import { useTheme } from "@/contexts/themeContext";
+import { useListPropertyReviews } from "@/hooks";
 import { useSpaceStore } from "@/store/useSpace";
 import { ColorScheme } from "@/utils";
 import { useRouter } from "expo-router";
@@ -56,6 +57,10 @@ const Placedetails = () => {
   const router = useRouter();
   const galleryScrollRef = useRef<ScrollView>(null);
   const property = selectedPropertyDetails;
+  const { propertyReviewsTotal } = useListPropertyReviews({
+    propertyId: property?.public_id,
+    enabled: !!property?.public_id,
+  });
 
   const fallbackGallery = [
     require("@/assets/images/SpacesNearbyImage1.png"),
@@ -106,7 +111,25 @@ const Placedetails = () => {
   const listedByName =
     [property?.lister?.first_name, property?.lister?.last_name]
       .filter(Boolean)
-      .join(" ") || "Ibe Alex";
+      .join(" ") || "User";
+  const listedByAvatar = property?.lister?.profile_picture || null;
+  const postedAtLabel = (() => {
+    if (!property?.date_created) return "Posted recently";
+    const now = Date.now();
+    const then = new Date(property.date_created).getTime();
+    const diffMs = Math.max(0, now - then);
+    const dayMs = 24 * 60 * 60 * 1000;
+    const days = Math.floor(diffMs / dayMs);
+
+    if (days < 1) return "Posted today";
+    if (days < 30) return `Posted ${days} day${days === 1 ? "" : "s"} ago`;
+    const months = Math.floor(days / 30);
+    if (months < 12) {
+      return `Posted ${months} month${months === 1 ? "" : "s"} ago`;
+    }
+    const years = Math.floor(months / 12);
+    return `Posted ${years} year${years === 1 ? "" : "s"} ago`;
+  })();
 
   const aboutText =
     property?.description ||
@@ -363,31 +386,56 @@ const Placedetails = () => {
           >
             <Text style={styles.sectionTitle}>Listed by</Text>
             <Text style={{ color: colors.slate[500] }} className="">
-              Posted 2days ago
+              {postedAtLabel}
             </Text>
           </View>
           <View className="flex flex-row gap-2 py-3 border-b border-gray-300">
-            <View
-              style={{ height: RFValue(48), width: RFValue(48) }}
-              className="bg-gray-300 rounded-full"
-            ></View>
+            <View style={{ height: RFValue(48), width: RFValue(48) }} className="rounded-full overflow-hidden bg-gray-300">
+              <Image
+                source={
+                  listedByAvatar
+                    ? { uri: listedByAvatar }
+                    : require("@/assets/images/user.png")
+                }
+                style={{ height: "100%", width: "100%" }}
+                resizeMode="cover"
+              />
+            </View>
             <View className="w-[50%]">
               <Text
                 style={{ color: colors.slate[650], fontSize: RFValue(16) }}
                 className="font-medium"
               >
                 {listedByName}{" "}
-                <Image
-                  source={require("@/assets/icons/badge-check-green.png")}
-                />
+                {property?.is_verified ? (
+                  <Image
+                    source={require("@/assets/icons/badge-check-green.png")}
+                  />
+                ) : null}
               </Text>
               <Pressable
                 className="flex flex-row gap-2"
-                onPress={() => router.push("/views/reviews/reviews")}
+                onPress={() =>
+                  router.push({
+                    pathname: "/views/reviews/reviews",
+                    params: {
+                      property_id: property?.public_id,
+                      lister_id: property?.lister?.public_id,
+                    },
+                  })
+                }
               >
                 <Text style={{ color: colors.slate[650] }}>⭐ 4.5 </Text>
-                <Text style={{ color: colors.info[200] }}>(15 reviews)</Text>
+                <Text style={{ color: colors.info[200] }}>
+                  ({propertyReviewsTotal}{" "}
+                  {propertyReviewsTotal === 1 ? "review" : "reviews"})
+                </Text>
               </Pressable>
+              {propertyReviewsTotal === 0 ? (
+                <Text style={{ color: colors.slate[500], fontSize: RFValue(12) }}>
+                  No reviews yet
+                </Text>
+              ) : null}
             </View>
             <View className="flex flex-row gap-3">
               <TouchableOpacity className="flex items-center justify-center w-10 h-10 bg-gray-200 rounded-full">

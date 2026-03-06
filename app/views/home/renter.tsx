@@ -6,7 +6,11 @@ import HouseCard from "@/components/housecard";
 import SafeAreaViewContainer from "@/components/safeareaview";
 import { Tabs } from "@/constants/home";
 import { useTheme } from "@/contexts/themeContext";
-import { useListProperties, useMyBookmarks, useTogglePropertyBookmark } from "@/hooks";
+import {
+  useListProperties,
+  useMyBookmarks,
+  useTogglePropertyBookmark,
+} from "@/hooks";
 import { useSpaceStore } from "@/store/useSpace";
 import { PropertyListItem } from "@/types";
 import { ColorScheme } from "@/utils";
@@ -131,10 +135,15 @@ export default function RenterHome() {
 
     const mappedType = tabMap[activeTab];
     if (!mappedType) return availableProperties;
-    return availableProperties.filter((item) => item.property_type === mappedType);
+    return availableProperties.filter(
+      (item) => item.property_type === mappedType,
+    );
   }, [availableProperties, activeTab]);
 
-  const nearbyCards = useMemo(() => mapToCardData(nearbySource), [nearbySource]);
+  const nearbyCards = useMemo(
+    () => mapToCardData(nearbySource),
+    [nearbySource],
+  );
   const nearbyCardsPreview = useMemo(
     () => nearbyCards.slice(0, 10),
     [nearbyCards],
@@ -207,7 +216,9 @@ export default function RenterHome() {
                 className="flex-row items-center gap-2"
               >
                 <Image source={require("@/assets/icons/location.png")} />
-                <Text style={homeStyles.subTitle}>14 Amadi Str, Rumuewhera</Text>
+                <Text style={homeStyles.subTitle}>
+                  14 Amadi Str, Rumuewhera
+                </Text>
                 <Image source={require("@/assets/icons/angle.png")} />
               </Pressable>
             </View>
@@ -245,7 +256,7 @@ export default function RenterHome() {
           <>
             <View className="pt-[38px] pb-4 flex-row justify-between">
               <Text style={homeStyles.title} className="font-semibold">
-                Featured Space
+                Featured Space 🔥
               </Text>
               <Pressable
                 onPress={() =>
@@ -297,7 +308,7 @@ export default function RenterHome() {
             />
 
             <Text style={homeStyles.title} className="pt-8 pb-4 font-semibold">
-              Spaces Nearby
+              Spaces Nearby 📍
             </Text>
 
             {(showAllNearby ? nearbyCards : nearbyCardsPreview).map((item) => (
@@ -325,7 +336,7 @@ export default function RenterHome() {
 
             <View className="pt-2 pb-4 flex-row justify-between">
               <Text style={homeStyles.title} className="font-semibold">
-                Recently Added
+                Recently Added 🆕
               </Text>
               <Pressable
                 onPress={() =>
@@ -370,7 +381,7 @@ export default function RenterHome() {
             />
 
             <Text style={homeStyles.title} className="pt-8 pb-4 font-semibold">
-              Recommended
+              Recommended 👍
             </Text>
           </>
         }
