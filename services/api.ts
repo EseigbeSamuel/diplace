@@ -1,10 +1,8 @@
-import { checkTokenExpiry, clearAll, getFromLocalStore } from "@/lib";
+import { checkTokenExpiry, clearAll, getFromLocalStore, hideToast, showToast } from "@/lib";
 import axios, { AxiosResponse, Method } from "axios";
-import Toast from "react-native-toast-message";
 
 let lastToastMessage = "";
 let lastToastAt = 0;
-let hideToastTimer: ReturnType<typeof setTimeout> | null = null;
 
 const showApiToast = (text1: string, text2: string) => {
   const now = Date.now();
@@ -16,23 +14,12 @@ const showApiToast = (text1: string, text2: string) => {
   lastToastMessage = `${text1}:${text2}`;
   lastToastAt = now;
 
-  Toast.hide();
-  Toast.show({
+  hideToast();
+  showToast({
     type: "error",
     text1,
     text2,
-    position: "top",
-    visibilityTime: 2500,
-    autoHide: true,
   });
-
-  if (hideToastTimer) {
-    clearTimeout(hideToastTimer);
-  }
-  hideToastTimer = setTimeout(() => {
-    Toast.hide();
-    hideToastTimer = null;
-  }, 2800);
 };
 
 export const apiService = async <TResponse, TRequest = undefined>(
@@ -44,8 +31,11 @@ export const apiService = async <TResponse, TRequest = undefined>(
   headers: Record<string, string> = {},
   baseURL: string = "https://diplace.api.elsoft.ng/api/v1",
   responseType: "json" | "blob" = "json",
+  notifyOnError?: boolean,
 ): Promise<TResponse> => {
   const token = await getFromLocalStore("access_token");
+  const shouldNotify =
+    notifyOnError ?? String(method).toUpperCase() !== "GET";
 
   if (protectedRoute && token) {
     if (await checkTokenExpiry(token)) {
@@ -97,18 +87,20 @@ export const apiService = async <TResponse, TRequest = undefined>(
       console.log("error in service first", error);
     }
     // eslint-disable-next-line import/no-named-as-default-member
-    if (axios.isAxiosError(error)) {
-      const message =
-        error.response?.data?.detail ||
-        error.response?.data?.message ||
-        error.response?.data?.error ||
-        error.message ||
-        "Something went wrong";
+    if (shouldNotify) {
+      if (axios.isAxiosError(error)) {
+        const message =
+          error.response?.data?.detail ||
+          error.response?.data?.message ||
+          error.response?.data?.error ||
+          error.message ||
+          "Something went wrong";
 
-      showApiToast("Request Failed", message);
-    } else {
-      showApiToast("Unexpected Error", "Something went wrong. Please try again.");
-      console.error("Unknown error:", error);
+        showApiToast("Request Failed", message);
+      } else {
+        showApiToast("Unexpected Error", "Something went wrong. Please try again.");
+        console.error("Unknown error:", error);
+      }
     }
 
     throw error;

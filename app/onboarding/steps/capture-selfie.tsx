@@ -1,10 +1,12 @@
 import AppButton from "@/components/button";
 import SafeAreaViewContainer from "@/components/safeareaview";
 import { useTheme } from "@/contexts/themeContext";
+import { useInitiateVerification } from "@/hooks";
 import { ColorScheme } from "@/utils";
 import { CameraView, useCameraPermissions } from "expo-camera";
 import React, { useRef, useState } from "react";
 import {
+  ActivityIndicator,
   Alert,
   Image,
   StyleSheet,
@@ -26,6 +28,8 @@ const SelfieVerificationStep = ({ onNext, handleBack }: SelfieProps) => {
   const [capturedPhoto, setCapturedPhoto] = useState<string | null>(null);
   const [cameraReady, setCameraReady] = useState(false);
   const cameraRef = useRef<CameraView>(null);
+  const { initiateVerificationMutation, initiateVerificationPending } =
+    useInitiateVerification();
 
   // Request camera permission
   const requestCameraPermission = async () => {
@@ -55,9 +59,12 @@ const SelfieVerificationStep = ({ onNext, handleBack }: SelfieProps) => {
   };
 
   // Handle continue
-  const handleContinue = () => {
+  const handleContinue = async () => {
     if (capturedPhoto) {
-      // Save the photo URI to your store/state if needed
+      await initiateVerificationMutation({
+        verification_type: "face",
+        value: "selfie",
+      });
       onNext();
     }
   };
@@ -107,7 +114,11 @@ const SelfieVerificationStep = ({ onNext, handleBack }: SelfieProps) => {
 
         <View style={Styles.buttonContainer}>
           <View style={Styles.buttonRow}>
-            <TouchableOpacity style={Styles.retakeButton} onPress={retakePhoto}>
+            <TouchableOpacity
+              style={Styles.retakeButton}
+              onPress={retakePhoto}
+              disabled={initiateVerificationPending}
+            >
               <Text style={Styles.retakeText}>Retake</Text>
             </TouchableOpacity>
 
@@ -116,9 +127,16 @@ const SelfieVerificationStep = ({ onNext, handleBack }: SelfieProps) => {
                 title="Continue"
                 onPress={handleContinue}
                 size="large"
+                disabled={initiateVerificationPending}
               />
             </View>
           </View>
+          {initiateVerificationPending && (
+            <View style={Styles.pendingOverlay}>
+              <ActivityIndicator color="#FFFFFF" />
+              <Text style={Styles.pendingText}>Starting verification...</Text>
+            </View>
+          )}
         </View>
       </View>
     );
@@ -321,5 +339,21 @@ const styles = (colors: ColorScheme) =>
       fontWeight: "600",
       color: "#FFFFFF",
       textAlign: "center",
+    },
+    pendingOverlay: {
+      position: "absolute",
+      top: 0,
+      left: 0,
+      right: 0,
+      bottom: 0,
+      alignItems: "center",
+      justifyContent: "center",
+      gap: RFValue(8),
+      backgroundColor: "rgba(0, 0, 0, 0.4)",
+    },
+    pendingText: {
+      color: "#FFFFFF",
+      fontSize: RFValue(14),
+      fontWeight: "600",
     },
   });

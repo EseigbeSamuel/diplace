@@ -65,12 +65,16 @@ export default function Login() {
             textContentType="emailAddress"
             autoCapitalize="none"
             autoCorrect={false}
+            textColor={colors.slate[650]}
+            placeholderTextColor={colors.slate[450]}
+            outlineColor={colors.slate[300]}
+            activeOutlineColor={colors.slate[650]}
             left={
               <TextInput.Icon
                 icon={() => (
                   <Image
                     source={require("../../assets/icons/mail-outline-light.png")}
-                    style={{ width: 20, height: 20 }}
+                    style={{ width: 20, height: 20, tintColor: colors.slate[650] }}
                     resizeMode="contain"
                   />
                 )}
@@ -88,12 +92,16 @@ export default function Login() {
               setFormData({ ...formData, password: text.toString() })
             }
             secureTextEntry={!showPassword}
+            textColor={colors.slate[650]}
+            placeholderTextColor={colors.slate[450]}
+            outlineColor={colors.slate[300]}
+            activeOutlineColor={colors.slate[650]}
             left={
               <TextInput.Icon
                 icon={() => (
                   <Image
                     source={require("../../assets/icons/password-lock.png")}
-                    style={{ width: 20, height: 20 }}
+                    style={{ width: 20, height: 20, tintColor: colors.slate[650] }}
                     resizeMode="contain"
                   />
                 )}
@@ -107,7 +115,7 @@ export default function Login() {
                 icon={() => (
                   <Image
                     source={require("../../assets/icons/password-hide.png")}
-                    style={{ width: 20, height: 20 }}
+                    style={{ width: 20, height: 20, tintColor: colors.slate[650] }}
                     resizeMode="contain"
                   />
                 )}
@@ -117,7 +125,11 @@ export default function Login() {
             style={styles.textInput}
           />
           <View className="flex-row justify-end">
-            <Link href="/auth/forgot-password" className="text-sm font-medium">
+            <Link
+              href="/auth/forgot-password"
+              className="text-sm font-medium"
+              style={{ color: colors.info[200] }}
+            >
               Forgot Password?
             </Link>
           </View>
@@ -139,7 +151,12 @@ export default function Login() {
         </View>
 
         <View className="flex-row justify-center mt-8">
-          <Text className="text-sm font-medium">Or continue with</Text>
+          <Text
+            className="text-sm font-medium"
+            style={{ color: colors.slate[600] }}
+          >
+            Or continue with
+          </Text>
         </View>
 
         <View className="justify-center gap-4 mt-4">
@@ -161,9 +178,12 @@ export default function Login() {
           />
         </View>
         <View className="flex-row justify-center mt-8">
-          <Text className="text-base font-medium">
+          <Text
+            className="text-base font-medium"
+            style={{ color: colors.slate[600] }}
+          >
             Don&apos;t have an account?{" "}
-            <Link href="/auth/register" className="text-[#3B82F6]">
+            <Link href="/auth/register" style={{ color: colors.info[200] }}>
               Create Account
             </Link>
           </Text>

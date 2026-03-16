@@ -22,8 +22,13 @@ export const UserProvider = ({ children }: UserProviderProps) => {
   useEffect(() => {
     if (currentUser?.user_type) {
       setUserType(currentUser.user_type);
+      return;
     }
-  }, [currentUser]);
+
+    if (!isCurrentUserLoading) {
+      setUserType("renter");
+    }
+  }, [currentUser, isCurrentUserLoading]);
 
   // Handle redirect properly inside useEffect
   useEffect(() => {

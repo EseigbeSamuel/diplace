@@ -46,7 +46,6 @@ type PostSpaceState = {
     };
     editingDraft: PropertyListItem | null;
     previewProperty: PropertyListItem | null;
-    selectedPropertyDetails: PropertyListItem | null;
     editContext: {
         propertyId: string;
         addressId: string;
@@ -56,7 +55,6 @@ type PostSpaceState = {
     setValue: (data: Partial<SpaceValue>) => void;
     setEditingDraft: (draft: PropertyListItem | null) => void;
     setPreviewProperty: (property: PropertyListItem | null) => void;
-    setSelectedPropertyDetails: (property: PropertyListItem | null) => void;
     setEditContext: (context: { propertyId: string; addressId: string } | null) => void;
     clearForm: () => void;
 };
@@ -125,7 +123,6 @@ export const useSpaceStore = create<PostSpaceState>((set) => ({
     },
     editingDraft: null,
     previewProperty: null,
-    selectedPropertyDetails: null,
     editContext: null,
 
     setType: (type) =>
@@ -202,11 +199,6 @@ export const useSpaceStore = create<PostSpaceState>((set) => ({
             previewProperty: property
         }),
 
-    setSelectedPropertyDetails: (property) =>
-        set({
-            selectedPropertyDetails: property
-        }),
-
     setEditContext: (context) =>
         set({
             editContext: context
@@ -222,7 +214,6 @@ export const useSpaceStore = create<PostSpaceState>((set) => ({
             },
             editingDraft: null,
             previewProperty: null,
-            selectedPropertyDetails: null,
             editContext: null
         })
 }));

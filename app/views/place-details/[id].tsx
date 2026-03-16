@@ -2,12 +2,13 @@ import AppButton from "@/components/button";
 import SafeAreaViewContainer from "@/components/safeareaview";
 import SectionHeader from "@/components/sectionheader";
 import { useTheme } from "@/contexts/themeContext";
-import { useListPropertyReviews } from "@/hooks";
+import { useGetPropertyDetails, useListPropertyReviews } from "@/hooks";
 import { useSpaceStore } from "@/store/useSpace";
 import { ColorScheme } from "@/utils";
-import { useRouter } from "expo-router";
+import { useLocalSearchParams, useRouter } from "expo-router";
 import React, { useMemo, useRef, useState } from "react";
 import {
+  ActivityIndicator,
   Dimensions,
   Image,
   Modal,
@@ -38,8 +39,10 @@ const HAS_GOOGLE_KEY = !!process.env.EXPO_PUBLIC_GOOGLE_PLACES_API_KEY;
 
 const Placedetails = () => {
   const { colors, isDarkMode } = useTheme();
-  const { spaceForm, selectedPropertyDetails } = useSpaceStore();
+  const { spaceForm } = useSpaceStore();
   const styles = createStyles(colors);
+  const { id } = useLocalSearchParams<{ id?: string }>();
+  const propertyId = Array.isArray(id) ? id[0] : id;
 
   const [selectedTime, setSelectedTime] = useState<{
     id: string;
@@ -56,10 +59,17 @@ const Placedetails = () => {
 
   const router = useRouter();
   const galleryScrollRef = useRef<ScrollView>(null);
-  const property = selectedPropertyDetails;
+  const {
+    propertyDetails: property,
+    isPropertyDetailsLoading,
+    propertyDetailsError,
+  } = useGetPropertyDetails({
+    propertyId,
+    enabled: !!propertyId,
+  });
   const { propertyReviewsTotal } = useListPropertyReviews({
-    propertyId: property?.public_id,
-    enabled: !!property?.public_id,
+    propertyId: propertyId,
+    enabled: !!propertyId,
   });
 
   const fallbackGallery = [
@@ -237,6 +247,30 @@ const Placedetails = () => {
     const index = Math.round(contentOffsetX / width);
     setCurrentImageIndex(index);
   };
+
+  if (propertyId && isPropertyDetailsLoading) {
+    return (
+      <View style={styles.loadingContainer}>
+        <ActivityIndicator size="large" color={colors.slate[650]} />
+        <Text style={[styles.loadingText, { color: colors.slate[650] }]}>
+          Loading property...
+        </Text>
+      </View>
+    );
+  }
+
+  if (propertyId && (propertyDetailsError || !property)) {
+    return (
+      <View style={styles.loadingContainer}>
+        <Text style={[styles.loadingText, { color: colors.slate[650] }]}>
+          Failed to load property details.
+        </Text>
+        <View style={{ width: RFValue(140), marginTop: RFValue(8) }}>
+          <AppButton title="Go Back" onPress={() => router.back()} />
+        </View>
+      </View>
+    );
+  }
 
   return (
     <View style={styles.mainContainer}>
@@ -1660,5 +1694,18 @@ const createStyles = (colors: ColorScheme) =>
       flex: 1,
       fontSize: RFValue(14),
       color: colors.slate[650],
+    },
+    loadingContainer: {
+      flex: 1,
+      alignItems: "center",
+      justifyContent: "center",
+      paddingHorizontal: RFValue(20),
+      backgroundColor: colors.background,
+    },
+    loadingText: {
+      marginTop: RFValue(12),
+      fontSize: RFValue(14),
+      fontWeight: "600",
+      textAlign: "center",
     },
   });

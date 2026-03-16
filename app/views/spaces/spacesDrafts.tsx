@@ -5,7 +5,7 @@ import Filter from "@/components/filter";
 import HouseCard from "@/components/housecard";
 import HouseCardTile from "@/components/houseCardTile";
 import { useTheme } from "@/contexts/themeContext";
-import { useDeleteProperty, useGetCurrentUser, useListProperties } from "@/hooks";
+import { useDeleteProperty, useListMyDrafts } from "@/hooks";
 import { useSpaceStore } from "@/store/useSpace";
 import { PropertyListItem } from "@/types";
 import { ColorScheme } from "@/utils";
@@ -20,8 +20,6 @@ const SpacesDrafts = ({ layout }: { layout: "tiles" | "box" }) => {
   const homeStyles = styles(colors);
   const { setEditingDraft } = useSpaceStore();
   const { deletePropertyMutation, deletePropertyPending } = useDeleteProperty();
-  const { currentUser, isCurrentUserLoading, currentUserError, refetchCurrentUser } =
-    useGetCurrentUser();
   const {
     properties,
     isPropertiesLoading,
@@ -31,14 +29,13 @@ const SpacesDrafts = ({ layout }: { layout: "tiles" | "box" }) => {
     propertiesError,
     fetchMoreProperties,
     refetchProperties,
-  } = useListProperties({
+  } = useListMyDrafts({
     params: {
-      lister_id: currentUser?.public_id,
-      status: "pending",
+      status: "draft",
       sort_by: "date_created",
       sort_order: "desc",
     },
-    enabled: !!currentUser && !currentUserError,
+    enabled: true,
   });
   const addSpaceRef = useRef<BottomSheetModal>(null);
   const [selectedSpace, setSelectedSpace] = React.useState<PropertyCardItem | null>(null);
@@ -103,7 +100,7 @@ const SpacesDrafts = ({ layout }: { layout: "tiles" | "box" }) => {
           ]
             .filter(Boolean)
             .join(", ") || "Unknown location",
-        badgeType: "pending",
+        badgeType: "inDrafts",
         price: formatCurrency(item.price),
         duration: formatCostFrequency(item.cost_frequency),
         raw: item,
@@ -112,7 +109,6 @@ const SpacesDrafts = ({ layout }: { layout: "tiles" | "box" }) => {
   );
 
   const handleRefresh = () => {
-    refetchCurrentUser();
     refetchProperties();
   };
 
@@ -121,7 +117,7 @@ const SpacesDrafts = ({ layout }: { layout: "tiles" | "box" }) => {
     fetchMoreProperties();
   };
 
-  if (isCurrentUserLoading || isPropertiesLoading) {
+  if (isPropertiesLoading) {
     return (
       <View style={homeStyles.centerState}>
         <ActivityIndicator size="large" color={colors.slate[650]} />
@@ -130,7 +126,7 @@ const SpacesDrafts = ({ layout }: { layout: "tiles" | "box" }) => {
     );
   }
 
-  if (currentUserError || propertiesError) {
+  if (propertiesError) {
     return (
       <View style={homeStyles.centerState}>
         <Text style={homeStyles.centerStateText}>Unable to load spaces.</Text>
