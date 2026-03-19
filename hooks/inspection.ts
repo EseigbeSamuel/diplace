@@ -1,4 +1,3 @@
-// hooks/inspection/useCreateInspection.ts
 import { getRequestWithParams, postRequest } from "@/services";
 import {
   CreateInspectionResponse,
@@ -27,7 +26,6 @@ export const useCreateInspection = () => {
       });
     },
     onSuccess: (data) => {
-      // Invalidate relevant queries
       queryClient.invalidateQueries({ queryKey: ["inspections"] });
       queryClient.invalidateQueries({
         queryKey: ["property-inspections", data.property.public_id],

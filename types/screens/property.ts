@@ -260,3 +260,90 @@ export interface UpdatePropertyPayload {
   metadata?: Record<string, unknown>;
   [key: string]: unknown;
 }
+export interface PropertyDraftItem {
+  public_id: string;
+  date_created: string;
+  date_modified: string;
+  status: string;
+  title: string;
+  description: string;
+  property_type: string;
+  listing_type: ListingType;
+  price: number;
+  cost_frequency: CostFrequency;
+  fees: PropertyFeesPayload;
+  amenities: string[];
+  media: PropertyMediaPayload[];
+  address: {
+    street: string;
+    city: string;
+    state: string;
+    zip_code: string;
+    country: string;
+    latitude: number;
+    longitude: number;
+  };
+  owner_mode: string | null;
+  owner_details: Record<string, unknown> | null;
+  owner_account_details: Record<string, unknown> | null;
+  account_details: Record<string, unknown> | null;
+  units: number;
+  event_space: string | null;
+  capacity: Record<string, unknown> | null;
+  inspection: {
+    fee: number;
+    time_slots: Array<{
+      date: string;
+      time_slot: string;
+      selected: boolean;
+    }>;
+  };
+  rental_agreement: {
+    file_url: string;
+    name: string | null;
+    size: number | null;
+  } | null;
+  virtual_tour: Array<{
+    file_url: string;
+    room_name: string;
+    duration: number;
+  }>;
+  metadata: {
+    max_rent_payout: number;
+    other_charges: Array<{
+      id: string;
+      title: string;
+      description: string;
+      value: string;
+      editable: boolean;
+    }>;
+  };
+}
+
+export interface ListPropertyDraftsResponse {
+  items: PropertyDraftItem[];
+  pagination: {
+    total_items: number;
+    skip: number;
+    limit: number;
+  };
+}
+
+export interface GetPropertyDraftResponse extends PropertyDraftItem {}
+
+export interface SavePropertyDraftPayload extends CreatePropertyPayload {
+  title: string;
+  description: string;
+  property_type: PropertyType;
+  listing_type: ListingType;
+  price: number;
+  cost_frequency: CostFrequency;
+  fees: PropertyFeesPayload;
+  amenities: string[];
+  media: PropertyMediaPayload[];
+  address: PropertyAddressPayload;
+  metadata?: Record<string, unknown>;
+  [key: string]: unknown;
+}
+
+export interface SavePropertyDraftResponse extends PropertyDraftItem {}
