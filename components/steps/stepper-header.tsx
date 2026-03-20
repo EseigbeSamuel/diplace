@@ -24,6 +24,7 @@ interface StepperWithHeaderProps {
   onComplete?: () => void;
   initialStepIndex?: number;
   initialSubstepIndex?: number;
+  onSaveAndEditLater?: () => Promise<void> | void;
 }
 
 const StepperWithHeader: React.FC<StepperWithHeaderProps> = ({
@@ -31,6 +32,7 @@ const StepperWithHeader: React.FC<StepperWithHeaderProps> = ({
   onComplete,
   initialStepIndex = 0,
   initialSubstepIndex = 0,
+  onSaveAndEditLater,
 }) => {
   const [currentStepIndex, setCurrentStepIndex] = useState(initialStepIndex);
   const [currentSubstepIndex, setCurrentSubstepIndex] = useState(initialSubstepIndex);
@@ -84,14 +86,14 @@ const StepperWithHeader: React.FC<StepperWithHeaderProps> = ({
   };
 
   const handleSaveAndEditLater = () => {
-    // navigation.navigate(screen: "/"); // Adjust 'Home' to your actual home screen route name
+    onSaveAndEditLater?.();
   };
 
   const CurrentSubstep = steps[currentStepIndex].substeps[currentSubstepIndex];
 
   const rightIconView = (
     <AppButton
-      title="Save & Edit"
+      title="Save as Draft"
       variant="tertiary"
       onPress={handleSaveAndEditLater}
     />

@@ -7,7 +7,6 @@ import {
   useMyBookmarks,
   useTogglePropertyBookmark,
 } from "@/hooks";
-import { useSpaceStore } from "@/store/useSpace";
 import { PropertyListItem } from "@/types";
 import { router, useLocalSearchParams } from "expo-router";
 import { ActivityIndicator, FlatList, Text, View } from "react-native";
@@ -19,7 +18,6 @@ import AppButton from "@/components/button";
 
 const Apartments = () => {
   const { colors } = useTheme();
-  const { setSelectedPropertyDetails } = useSpaceStore();
   const custom = styles(colors);
   const params = useLocalSearchParams<{
     section?: string;
@@ -90,7 +88,6 @@ const Apartments = () => {
     () =>
       sectionProperties.map((item) => ({
         id: item.public_id,
-        raw: item,
         imageSource: item.media?.[0]?.file_url
           ? { uri: item.media[0].file_url }
           : require("@/assets/images/featuredSpaceImage1.png"),
@@ -183,7 +180,6 @@ const Apartments = () => {
               bookmarkDisabled={!!bookmarkPendingIds[item.id]}
               onToggleBookmark={() => handleToggleBookmark(item.id)}
               onPress={() => {
-                setSelectedPropertyDetails(item.raw);
                 router.push({
                   pathname: "/views/place-details/[id]",
                   params: { id: item.id },

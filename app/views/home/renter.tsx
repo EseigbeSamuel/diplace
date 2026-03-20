@@ -11,7 +11,6 @@ import {
   useMyBookmarks,
   useTogglePropertyBookmark,
 } from "@/hooks";
-import { useSpaceStore } from "@/store/useSpace";
 import { PropertyListItem } from "@/types";
 import { ColorScheme } from "@/utils";
 import { router } from "expo-router";
@@ -34,13 +33,11 @@ type PropertyCardItem = {
   price: string;
   badgeType?: string;
   duration: string;
-  raw: PropertyListItem;
 };
 
 export default function RenterHome() {
   const { colors, isDarkMode } = useTheme();
   const homeStyles = styles(colors);
-  const { setSelectedPropertyDetails } = useSpaceStore();
   const [activeTab, setActiveTab] = useState("All");
   const [showAllNearby, setShowAllNearby] = useState(false);
   const [bookmarkOverrides, setBookmarkOverrides] = useState<
@@ -100,7 +97,6 @@ export default function RenterHome() {
       price: formatCurrency(item.price),
       badgeType: mapBadgeType(item),
       duration: formatCostFrequency(item.cost_frequency),
-      raw: item,
     }));
 
   const availableProperties = useMemo(
@@ -164,7 +160,6 @@ export default function RenterHome() {
   }, [activeTab]);
 
   const handleOpenProperty = (property: PropertyCardItem) => {
-    setSelectedPropertyDetails(property.raw);
     router.push({
       pathname: "/views/place-details/[id]",
       params: { id: property.id },

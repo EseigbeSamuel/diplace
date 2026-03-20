@@ -1,4 +1,4 @@
-import { saveToLocalStore } from "@/lib";
+import { clearAll, saveToLocalStore, showToast } from "@/lib";
 import { getRequest, postRequest } from "@/services";
 import {
   ChangePasswordPayload,
@@ -12,7 +12,22 @@ import {
 } from "@/types";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "expo-router";
-import Toast from "react-native-toast-message";
+
+type VerificationType = "phone" | "email" | "nin" | "bvn" | "face";
+
+type InitiateVerificationPayload = {
+  verification_type: VerificationType;
+  value?: string | null;
+};
+
+type InitiateVerificationResponse = {
+  public_id: string;
+  status: string;
+  verification_type: VerificationType;
+  detail?: string | null;
+  data_to_confirm?: Record<string, unknown> | null;
+  face_verification_params?: Record<string, unknown> | null;
+};
 
 export function useLogin() {
   const queryClient = useQueryClient();
@@ -61,8 +76,8 @@ export function useLogin() {
 
         // ✅ Navigation decision
         if (!user?.verifications || user.verifications.length === 0) {
-          // router.replace("/onboarding/welcome");
-          router.replace("/(tabs)");
+          router.replace("/onboarding/welcome");
+          // router.replace("/(tabs)");
         } else {
           router.replace("/(tabs)");
         }
@@ -122,7 +137,7 @@ export function useVerifyOtp() {
     },
     onSuccess: async (data) => {
       console.log("data", data);
-      Toast.show({
+      showToast({
         type: "success",
         text1: "Success",
         text2: "Email verified successfully, redirecting to login...",
@@ -152,7 +167,7 @@ export function useChangePassword() {
       });
     },
     onSuccess: async (data) => {
-      Toast.show({
+      showToast({
         type: "success",
         text1: "Success",
         text2: typeof data === "string" ? data : "Password changed successfully.",
@@ -165,5 +180,66 @@ export function useChangePassword() {
   return {
     changePasswordMutation: mutate,
     changePasswordMutationPending: isPending,
+  };
+}
+
+export function useInitiateVerification() {
+  const { mutateAsync, isPending } = useMutation({
+    mutationFn: async (payload: InitiateVerificationPayload) => {
+      return await postRequest<
+        InitiateVerificationResponse,
+        InitiateVerificationPayload
+      >({
+        url: "/verifications/initiate",
+        payload,
+        protectedRoute: true,
+      });
+    },
+    onError: (error) => {
+      const message =
+        error instanceof Error
+          ? error.message
+          : "Unable to start verification.";
+      showToast({
+        type: "error",
+        text1: "Verification Failed",
+        text2: message,
+      });
+    },
+  });
+
+  return {
+    initiateVerificationMutation: mutateAsync,
+    initiateVerificationPending: isPending,
+  };
+}
+
+export function useLogout() {
+  const queryClient = useQueryClient();
+  const router = useRouter();
+
+  const { mutateAsync, isPending } = useMutation({
+    mutationFn: async () => {
+      return await postRequest<string, Record<string, never>>({
+        url: "/auth/logout",
+        payload: {},
+        protectedRoute: true,
+      });
+    },
+    onSuccess: async () => {
+      await clearAll();
+      queryClient.clear();
+      router.replace("/auth/login");
+    },
+    onError: async () => {
+      await clearAll();
+      queryClient.clear();
+      router.replace("/auth/login");
+    },
+  });
+
+  return {
+    logoutMutation: mutateAsync,
+    logoutMutationPending: isPending,
   };
 }

@@ -73,6 +73,10 @@ export interface CreatePropertyPayload {
   [key: string]: unknown;
 }
 
+export type CreatePropertyDraftPayload = Partial<CreatePropertyPayload> & {
+  [key: string]: unknown;
+};
+
 export interface CreatePropertyResponse {
   public_id: string;
   status: string;
@@ -99,6 +103,10 @@ export interface CreatePropertyResponse {
 export type UploadFilesResponse = string[];
 
 export type PropertyStatus =
+  | "draft"
+  | "sold"
+  | "rented"
+  | "archived"
   | "pending"
   | "approved"
   | "rejected"

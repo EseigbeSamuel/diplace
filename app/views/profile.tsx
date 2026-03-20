@@ -3,8 +3,7 @@ import SafeAreaViewContainer from "@/components/safeareaview";
 import SectionHeader from "@/components/sectionheader";
 import { useTheme } from "@/contexts/themeContext";
 import { useUser } from "@/contexts/user-context";
-import { useGetCurrentUser } from "@/hooks";
-import { clearAll } from "@/lib";
+import { useGetCurrentUser, useLogout } from "@/hooks";
 import { ColorScheme } from "@/utils";
 import { useRouter } from "expo-router";
 import React, { useState } from "react";
@@ -22,8 +21,9 @@ import { RFValue } from "react-native-responsive-fontsize";
 
 const Profile = () => {
   const router = useRouter();
-  const { userType } = useUser();
+  const { userType, setUserType } = useUser();
   const { currentUser } = useGetCurrentUser();
+  const { logoutMutation, logoutMutationPending } = useLogout();
   const { colors, isDarkMode, toggleTheme } = useTheme();
   const profileStyles = styles(colors);
   const [showMediaModal, setShowMediaModal] = useState(false);
@@ -131,7 +131,11 @@ const Profile = () => {
                 { text: "Cancel", style: "cancel" },
                 {
                   text: "Log Out",
-                  onPress: () => clearAll(),
+                  onPress: async () => {
+                    if (logoutMutationPending) return;
+                    await logoutMutation();
+                    setUserType("renter");
+                  },
                   style: "destructive",
                 },
               ]);
@@ -218,7 +222,11 @@ const Profile = () => {
                 { text: "Cancel", style: "cancel" },
                 {
                   text: "Log Out",
-                  onPress: () => clearAll(),
+                  onPress: async () => {
+                    if (logoutMutationPending) return;
+                    await logoutMutation();
+                    setUserType("renter");
+                  },
                   style: "destructive",
                 },
               ]);

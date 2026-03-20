@@ -1,8 +1,9 @@
+import { showToast } from "@/lib";
 import { deleteRequest, getRequest, postRequest, putRequest } from "@/services";
 import { SpaceValue } from "@/store/useSpace";
 import {
-  BookmarkItem,
   CostFrequency,
+  CreatePropertyDraftPayload,
   CreatePropertyPayload,
   CreatePropertyResponse,
   GetPropertyDraftResponse,
@@ -20,7 +21,6 @@ import {
   SavePropertyDraftResponse,
   ToggleBookmarkResponse,
   UpdatePropertyPayload,
-  UploadFilesResponse,
 } from "@/types";
 import { MediaItem, SpaceType } from "@/types/add-space-types";
 import {
@@ -29,7 +29,6 @@ import {
   useQuery,
   useQueryClient,
 } from "@tanstack/react-query";
-import Toast from "react-native-toast-message";
 
 const PROPERTY_TYPE_MAP: Record<
   Exclude<SpaceType, null>,
@@ -231,30 +230,38 @@ const uploadTours = async (
   }));
 };
 
-const buildCreatePayload = async (
-  type: SpaceType,
-  value: SpaceValue,
-): Promise<CreatePropertyPayload> => {
-  if (!type) {
+const buildPropertyPayload = async ({
+  type,
+  value,
+  draft = false,
+}: {
+  type: SpaceType;
+  value: SpaceValue;
+  draft?: boolean;
+}): Promise<CreatePropertyPayload | CreatePropertyDraftPayload> => {
+  if (!draft && !type) {
     throw new Error("Property type is required.");
   }
 
-  if (!value.description?.title || !value.description?.description) {
+  if (
+    !draft &&
+    (!value.description?.title || !value.description?.description)
+  ) {
     throw new Error("Property title and description are required.");
   }
 
-  if (!value.location) {
+  if (!draft && !value.location) {
     throw new Error("Property location is required.");
   }
 
-  if (!value.media?.length) {
+  if (!draft && !value.media?.length) {
     throw new Error("At least one property media file is required.");
   }
 
   const costFrequency =
     COST_FREQUENCY_MAP[value.rentalCost?.rentDuration?.toLowerCase() || ""];
 
-  if (!costFrequency) {
+  if (!draft && !costFrequency) {
     throw new Error("Cost frequency is required.");
   }
 
@@ -268,13 +275,15 @@ const buildCreatePayload = async (
     (slot) => slot.selected,
   );
 
-  return {
-    title: value.description.title,
-    description: value.description.description,
-    property_type: PROPERTY_TYPE_MAP[type],
+  const payload: CreatePropertyDraftPayload = {
+    ...(value.description?.title ? { title: value.description.title } : {}),
+    ...(value.description?.description
+      ? { description: value.description.description }
+      : {}),
+    ...(type ? { property_type: PROPERTY_TYPE_MAP[type] } : {}),
     listing_type: "normal",
     price: parseNumber(value.rentalCost?.rentalCost),
-    cost_frequency: costFrequency,
+    ...(costFrequency ? { cost_frequency: costFrequency } : {}),
     fees: extractFees(value.otherCharges),
     amenities: value.amenities ?? [],
     // media: uploadedMedia,
@@ -283,15 +292,19 @@ const buildCreatePayload = async (
       file_type: item.type === "video" ? "video" : "image",
       description: `temp-media-${index + 1}`,
     })),
-    address: {
-      street: value.location.address,
-      city: value.location.city,
-      state: value.location.state,
-      zip_code: value.location.postalCode,
-      country: value.location.country,
-      latitude: value.location.latitude,
-      longitude: value.location.longitude,
-    },
+    ...(value.location
+      ? {
+          address: {
+            street: value.location.address,
+            city: value.location.city,
+            state: value.location.state,
+            zip_code: value.location.postalCode,
+            country: value.location.country,
+            latitude: value.location.latitude,
+            longitude: value.location.longitude,
+          },
+        }
+      : {}),
     owner_mode: value.owner ?? null,
     owner_details: value.ownerDetails ?? null,
     owner_account_details: value.ownerAccountDetails ?? null,
@@ -316,6 +329,30 @@ const buildCreatePayload = async (
       other_charges: value.otherCharges ?? [],
     },
   };
+
+  return payload as CreatePropertyPayload | CreatePropertyDraftPayload;
+};
+
+const buildCreatePayload = async (
+  type: SpaceType,
+  value: SpaceValue,
+): Promise<CreatePropertyPayload> => {
+  return (await buildPropertyPayload({
+    type,
+    value,
+    draft: false,
+  })) as CreatePropertyPayload;
+};
+
+const buildDraftPayload = async (
+  type: SpaceType,
+  value: SpaceValue,
+): Promise<CreatePropertyDraftPayload> => {
+  return (await buildPropertyPayload({
+    type,
+    value,
+    draft: true,
+  })) as CreatePropertyDraftPayload;
 };
 
 const buildUpdatePayload = async ({
@@ -379,6 +416,7 @@ const buildUpdatePayload = async ({
 };
 
 export function useCreateProperty() {
+  const queryClient = useQueryClient();
   const { mutateAsync, isPending } = useMutation({
     mutationFn: async ({
       type,
@@ -413,8 +451,9 @@ export function useCreateProperty() {
         throw error;
       }
     },
-    onSuccess: () => {
-      Toast.show({
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey: ["properties"] });
+      showToast({
         type: "success",
         text1: "Success",
         text2: "Property created successfully.",
@@ -425,7 +464,7 @@ export function useCreateProperty() {
       console.log("CreateProperty: failed input variables", variables);
       const message =
         error instanceof Error ? error.message : "Unable to create property.";
-      Toast.show({
+      showToast({
         type: "error",
         text1: "Create Property Failed",
         text2: message,
@@ -439,7 +478,68 @@ export function useCreateProperty() {
   };
 }
 
+export function useCreatePropertyDraft() {
+  const queryClient = useQueryClient();
+  const { mutateAsync, isPending } = useMutation({
+    mutationFn: async ({
+      type,
+      value,
+    }: {
+      type: SpaceType;
+      value: SpaceValue;
+    }) => {
+      console.log("CreateDraft: input form values", { type, value });
+      let payload: CreatePropertyDraftPayload | undefined;
+
+      try {
+        payload = await buildDraftPayload(type, value);
+        console.log("CreateDraft: payload", payload);
+
+        const response = await postRequest<
+          CreatePropertyResponse,
+          CreatePropertyDraftPayload
+        >({
+          url: "/properties/drafts",
+          payload,
+          protectedRoute: true,
+        });
+
+        console.log("CreateDraft: response", response);
+        return response;
+      } catch (error) {
+        console.log("CreateDraft: attempted payload before failure", payload);
+        throw error;
+      }
+    },
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey: ["properties"] });
+      showToast({
+        type: "success",
+        text1: "Success",
+        text2: "Draft saved successfully.",
+      });
+    },
+    onError: (error, variables) => {
+      console.log("CreateDraft: error", error);
+      console.log("CreateDraft: failed input variables", variables);
+      const message =
+        error instanceof Error ? error.message : "Unable to save draft.";
+      showToast({
+        type: "error",
+        text1: "Save Draft Failed",
+        text2: message,
+      });
+    },
+  });
+
+  return {
+    createPropertyDraftMutation: mutateAsync,
+    createPropertyDraftPending: isPending,
+  };
+}
+
 export function useUpdateProperty() {
+  const queryClient = useQueryClient();
   const { mutateAsync, isPending } = useMutation({
     mutationFn: async ({
       propertyId,
@@ -483,8 +583,12 @@ export function useUpdateProperty() {
         throw error;
       }
     },
-    onSuccess: () => {
-      Toast.show({
+    onSuccess: async (response) => {
+      await queryClient.invalidateQueries({ queryKey: ["properties"] });
+      await queryClient.invalidateQueries({
+        queryKey: ["property-details", response.public_id],
+      });
+      showToast({
         type: "success",
         text1: "Success",
         text2: "Property updated successfully.",
@@ -495,7 +599,7 @@ export function useUpdateProperty() {
       console.log("UpdateProperty: failed input variables", variables);
       const message =
         error instanceof Error ? error.message : "Unable to update property.";
-      Toast.show({
+      showToast({
         type: "error",
         text1: "Update Property Failed",
         text2: message,
@@ -571,6 +675,54 @@ export function useListProperties({
   };
 }
 
+export function useListMyDrafts({
+  params,
+  pageSize = 20,
+  enabled = true,
+}: {
+  params?: ListPropertiesParams;
+  pageSize?: number;
+  enabled?: boolean;
+}) {
+  const query = useInfiniteQuery({
+    queryKey: ["my-drafts", params, pageSize],
+    initialPageParam: 0,
+    enabled,
+    queryFn: async ({ pageParam }) => {
+      const queryParams = normalizeListParams({
+        ...params,
+        skip: Number(pageParam) || 0,
+        limit: pageSize,
+      });
+
+      return await getRequest<ListPropertiesResponse>({
+        url: "/properties/me/drafts",
+        params: queryParams,
+        protectedRoute: true,
+      });
+    },
+    getNextPageParam: (lastPage) => {
+      const nextSkip = lastPage.pagination.skip + lastPage.pagination.limit;
+      return nextSkip < lastPage.pagination.total_items ? nextSkip : undefined;
+    },
+  });
+
+  const properties: PropertyListItem[] =
+    query.data?.pages.flatMap((page) => page.items) ?? [];
+
+  return {
+    properties,
+    totalItems: query.data?.pages[0]?.pagination.total_items ?? 0,
+    isPropertiesLoading: query.isLoading,
+    isPropertiesFetching: query.isFetching,
+    isPropertiesFetchingNextPage: query.isFetchingNextPage,
+    hasMoreProperties: query.hasNextPage,
+    propertiesError: query.error,
+    fetchMoreProperties: query.fetchNextPage,
+    refetchProperties: query.refetch,
+  };
+}
+
 export function useGetPropertyDetails({
   propertyId,
   enabled = true,
@@ -608,7 +760,7 @@ export function useDeleteProperty() {
     },
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: ["properties"] });
-      Toast.show({
+      showToast({
         type: "success",
         text1: "Success",
         text2: "Property removed successfully.",
@@ -618,7 +770,7 @@ export function useDeleteProperty() {
       console.log("DeleteProperty: error", error);
       const message =
         error instanceof Error ? error.message : "Unable to delete property.";
-      Toast.show({
+      showToast({
         type: "error",
         text1: "Delete Property Failed",
         text2: message,

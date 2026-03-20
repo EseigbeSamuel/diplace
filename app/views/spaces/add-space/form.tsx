@@ -36,8 +36,8 @@ import { ActivityIndicator, Text, View } from "react-native";
 import { PropertyDetailsResponse } from "@/types";
 import { SpaceType } from "@/types/add-space-types";
 import { useTheme } from "@/contexts/themeContext";
+import { useCreatePropertyDraft, useGetPropertyDetails } from "@/hooks";
 import AppButton from "@/components/button";
-import { useQueryClient } from "@tanstack/react-query";
 
 const { width } = Dimensions.get("window");
 
@@ -51,39 +51,19 @@ const AddSpaceForm: React.FC = () => {
     setValue,
     setEditingDraft,
     setEditContext,
-    editingDraft,
     spaceForm,
   } = useSpaceStore();
   const hydratedPropertyIdRef = React.useRef<string | null>(null);
   const { colors } = useTheme();
-  const queryClient = useQueryClient();
-  const cachedDraft = React.useMemo(() => {
-    if (!editingPropertyId) return null;
-
-    const queries = queryClient.getQueriesData<{
-      pages?: Array<{ items?: PropertyDetailsResponse[] }>;
-    }>({
-      queryKey: ["properties"],
-    });
-
-    for (const [, data] of queries) {
-      const pages = data?.pages ?? [];
-      for (const page of pages) {
-        const found = page.items?.find((item) => item.public_id === editingPropertyId);
-        if (found) return found;
-      }
-    }
-
-    return null;
-  }, [editingPropertyId, queryClient]);
-  // NOTE: TEMPORARY SWITCH
-  // GET /properties/{property_id} is returning backend errors for now.
-  // We hydrate edit form from the property payload already returned by GET /properties/.
-  // Revert path: re-enable useGetPropertyDetails(property_id) and replace `editingDraft` below.
-  const propertyDetails = editingDraft ?? cachedDraft;
-  // No async fetch in fallback mode, so this should never stay in loading state.
-  const isPropertyDetailsLoading = false;
-  const propertyDetailsError = !!editingPropertyId && !propertyDetails;
+  const { createPropertyDraftMutation } = useCreatePropertyDraft();
+  const {
+    propertyDetails,
+    isPropertyDetailsLoading,
+    propertyDetailsError,
+  } = useGetPropertyDetails({
+    propertyId: editingPropertyId,
+    enabled: !!editingPropertyId,
+  });
 
   const mapPropertyTypeToSpaceType = (
     propertyType: PropertyDetailsResponse["property_type"],
@@ -103,7 +83,7 @@ const AddSpaceForm: React.FC = () => {
     const mappedMedia = (propertyDetails.media ?? []).map((item, index) => ({
       id: item.public_id || `${index}`,
       uri: item.file_url,
-      type: item.file_type === "video" ? "video" : "image",
+      type: item.file_type === "video" ? ("video" as const) : ("image" as const),
     }));
 
     const charges = [
@@ -243,6 +223,15 @@ const AddSpaceForm: React.FC = () => {
     router.push("/views/spaces/add-space/verifying");
   };
 
+  const handleSaveAndEditLater = async () => {
+    await createPropertyDraftMutation({
+      type: spaceForm.type,
+      value: spaceForm.value,
+    });
+    clearForm();
+    router.back();
+  };
+
   if (editingPropertyId && isPropertyDetailsLoading) {
     return (
       <View style={formStyles.loadingContainer}>
@@ -273,6 +262,7 @@ const AddSpaceForm: React.FC = () => {
       onComplete={handleComplete}
       initialStepIndex={0}
       initialSubstepIndex={editingPropertyId ? 1 : 0}
+      onSaveAndEditLater={handleSaveAndEditLater}
     />
   );
 };
