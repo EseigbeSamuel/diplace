@@ -7,7 +7,6 @@ import {
   CreatePropertyPayload,
   CreatePropertyResponse,
   GetPropertyDraftResponse,
-  ListBookmarksResponse,
   ListPropertiesParams,
   ListPropertiesResponse,
   ListPropertyDraftsResponse,
@@ -21,6 +20,7 @@ import {
   SavePropertyDraftResponse,
   ToggleBookmarkResponse,
   UpdatePropertyPayload,
+  UploadFilesResponse,
 } from "@/types";
 import { MediaItem, SpaceType } from "@/types/add-space-types";
 import {
@@ -784,45 +784,6 @@ export function useDeleteProperty() {
   };
 }
 
-export function useMyBookmarks({
-  enabled = true,
-  limit = 100,
-}: {
-  enabled?: boolean;
-  limit?: number;
-} = {}) {
-  const query = useQuery({
-    queryKey: ["my-bookmarks", limit],
-    enabled,
-    queryFn: async () => {
-      return await getRequest<ListBookmarksResponse>({
-        url: "/interaction/me/bookmarks",
-        params: {
-          skip: 0,
-          limit,
-          sort_by: "date_created",
-          sort_order: "desc",
-        },
-        protectedRoute: true,
-      });
-    },
-  });
-
-  const bookmarks: BookmarkItem[] = query.data?.items ?? [];
-  const bookmarkedPropertyIds = bookmarks.map(
-    (item) => item.property.public_id,
-  );
-
-  return {
-    bookmarks,
-    bookmarkedPropertyIds,
-    isBookmarksLoading: query.isLoading,
-    isBookmarksFetching: query.isFetching,
-    bookmarksError: query.error,
-    refetchBookmarks: query.refetch,
-  };
-}
-
 export function useTogglePropertyBookmark() {
   const queryClient = useQueryClient();
   const { mutateAsync, isPending } = useMutation({
@@ -839,7 +800,7 @@ export function useTogglePropertyBookmark() {
     onError: (error) => {
       const message =
         error instanceof Error ? error.message : "Unable to update bookmark.";
-      Toast.show({
+      showToast({
         type: "error",
         text1: "Bookmark Failed",
         text2: message,
@@ -979,16 +940,14 @@ export function useSavePropertyDraft() {
       try {
         payload = await buildCreatePayload(type, value);
         console.log("SavePropertyDraft: payload", payload);
-
-        const response = await postRequest;
-        (SavePropertyDraftResponse,
-          SavePropertyDraftPayload >
-            {
-              url: "/properties/drafts",
-              payload,
-              protectedRoute: true,
-            });
-
+        const response = await postRequest<
+          SavePropertyDraftResponse,
+          SavePropertyDraftPayload
+        >({
+          url: "/properties/drafts",
+          payload,
+          protectedRoute: true,
+        });
         console.log("SavePropertyDraft: response", response);
         return response;
       } catch (error) {
@@ -1001,7 +960,7 @@ export function useSavePropertyDraft() {
     },
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: ["property-drafts"] });
-      Toast.show({
+      showToast({
         type: "success",
         text1: "Success",
         text2: "Draft saved successfully.",
@@ -1012,7 +971,7 @@ export function useSavePropertyDraft() {
       console.log("SavePropertyDraft: failed input variables", variables);
       const message =
         error instanceof Error ? error.message : "Unable to save draft.";
-      Toast.show({
+      showToast({
         type: "error",
         text1: "Save Draft Failed",
         text2: message,
@@ -1074,7 +1033,7 @@ export function useUpdatePropertyDraft() {
     },
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: ["property-drafts"] });
-      Toast.show({
+      showToast({
         type: "success",
         text1: "Success",
         text2: "Draft updated successfully.",
@@ -1085,7 +1044,7 @@ export function useUpdatePropertyDraft() {
       console.log("UpdatePropertyDraft: failed input variables", variables);
       const message =
         error instanceof Error ? error.message : "Unable to update draft.";
-      Toast.show({
+      showToast({
         type: "error",
         text1: "Update Draft Failed",
         text2: message,
@@ -1111,7 +1070,7 @@ export function useDeletePropertyDraft() {
     },
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: ["property-drafts"] });
-      Toast.show({
+      showToast({
         type: "success",
         text1: "Success",
         text2: "Draft deleted successfully.",
@@ -1121,7 +1080,7 @@ export function useDeletePropertyDraft() {
       console.log("DeletePropertyDraft: error", error);
       const message =
         error instanceof Error ? error.message : "Unable to delete draft.";
-      Toast.show({
+      showToast({
         type: "error",
         text1: "Delete Draft Failed",
         text2: message,
@@ -1149,7 +1108,7 @@ export function usePublishPropertyDraft() {
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: ["property-drafts"] });
       await queryClient.invalidateQueries({ queryKey: ["properties"] });
-      Toast.show({
+      showToast({
         type: "success",
         text1: "Success",
         text2: "Draft published successfully.",
@@ -1159,7 +1118,7 @@ export function usePublishPropertyDraft() {
       console.log("PublishPropertyDraft: error", error);
       const message =
         error instanceof Error ? error.message : "Unable to publish draft.";
-      Toast.show({
+      showToast({
         type: "error",
         text1: "Publish Draft Failed",
         text2: message,
