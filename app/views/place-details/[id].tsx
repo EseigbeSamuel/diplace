@@ -1,3 +1,4 @@
+import { CustomBottomSheet } from "@/components/bottom-sheet";
 import AppButton from "@/components/button";
 import SafeAreaViewContainer from "@/components/safeareaview";
 import SectionHeader from "@/components/sectionheader";
@@ -5,6 +6,7 @@ import { useTheme } from "@/contexts/themeContext";
 import { useGetPropertyDetails, useListPropertyReviews } from "@/hooks";
 import { useSpaceStore } from "@/store/useSpace";
 import { ColorScheme } from "@/utils";
+import { BottomSheetModal } from "@gorhom/bottom-sheet";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import React, { useMemo, useRef, useState } from "react";
 import {
@@ -22,6 +24,7 @@ import {
 import { Calendar } from "react-native-calendars";
 import MapView, { Marker } from "react-native-maps";
 import { RFValue } from "react-native-responsive-fontsize";
+import ReportBottomSheet from "../report/report";
 
 type timeslot = {
   id: string;
@@ -105,7 +108,9 @@ const Placedetails = () => {
   const displayLatitude =
     property?.address?.latitude ?? spaceForm.value.location?.latitude ?? 4.8156;
   const displayLongitude =
-    property?.address?.longitude ?? spaceForm.value.location?.longitude ?? 7.0498;
+    property?.address?.longitude ??
+    spaceForm.value.location?.longitude ??
+    7.0498;
 
   const displayTitle =
     property?.title ||
@@ -145,19 +150,18 @@ const Placedetails = () => {
     property?.description ||
     "Atraz Palace is a premium 500 capacity event space perfect for weddings, conferences, parties, and special occasions. With elegant interiors, ample parking, and flexible seating arrangements, it offers a seamless experience for both hosts and guests. The hall is fully air-conditioned, generator-powered, and located in a secure, accessible area.";
 
-  const amenities =
-    property?.amenities?.length
-      ? property.amenities
-      : [
-          "Full Air Conditioning coverage",
-          "Standby Generator",
-          "Stage platform",
-          "Changing rooms",
-          "Sound system & DJ setup",
-          "About 500 Chairs & 300 Tables",
-          "Spot lighting fixtures",
-          "Restrooms",
-        ];
+  const amenities = property?.amenities?.length
+    ? property.amenities
+    : [
+        "Full Air Conditioning coverage",
+        "Standby Generator",
+        "Stage platform",
+        "Changing rooms",
+        "Sound system & DJ setup",
+        "About 500 Chairs & 300 Tables",
+        "Spot lighting fixtures",
+        "Restrooms",
+      ];
 
   const costBreakdown = property
     ? [
@@ -272,6 +276,22 @@ const Placedetails = () => {
     );
   }
 
+  // Report state
+  const [selectedReport, setSelectedReport] = useState<string | null>(null);
+
+  const handleSubmitReport = () => {
+    // Handle report submission
+    console.log("Report submitted:", selectedReport);
+    setSelectedReport(null);
+  };
+  const reportRef = useRef<BottomSheetModal>(null);
+
+  const handleReport = () => {
+    reportRef.current?.present();
+  };
+
+  const snapPoints = useMemo(() => ["25%", "50%", "75%", "90%"], []);
+
   return (
     <View style={styles.mainContainer}>
       <SectionHeader
@@ -293,7 +313,11 @@ const Placedetails = () => {
               />
             ) : (
               <View>
-                <Image source={galleryData[0]} style={styles.mainImage} resizeMode="cover" />
+                <Image
+                  source={galleryData[0]}
+                  style={styles.mainImage}
+                  resizeMode="cover"
+                />
                 <View style={styles.actionButtons}>
                   <TouchableOpacity
                     style={styles.actionButton}
@@ -424,7 +448,10 @@ const Placedetails = () => {
             </Text>
           </View>
           <View className="flex flex-row gap-2 py-3 border-b border-gray-300">
-            <View style={{ height: RFValue(48), width: RFValue(48) }} className="rounded-full overflow-hidden bg-gray-300">
+            <View
+              style={{ height: RFValue(48), width: RFValue(48) }}
+              className="rounded-full overflow-hidden bg-gray-300"
+            >
               <Image
                 source={
                   listedByAvatar
@@ -466,7 +493,9 @@ const Placedetails = () => {
                 </Text>
               </Pressable>
               {propertyReviewsTotal === 0 ? (
-                <Text style={{ color: colors.slate[500], fontSize: RFValue(12) }}>
+                <Text
+                  style={{ color: colors.slate[500], fontSize: RFValue(12) }}
+                >
                   No reviews yet
                 </Text>
               ) : null}
@@ -588,7 +617,10 @@ const Placedetails = () => {
                 <Text style={styles.totalAmount}>₦{totalPackage}</Text>
               </View>
             </View>
-            <Pressable className="flex flex-row items-center gap-3 py-4">
+            <Pressable
+              onPress={handleReport}
+              className="flex flex-row items-center gap-3 py-4"
+            >
               <Image
                 source={require("@/assets/icons/flag-red.png")}
                 className="w-6 h-6"
@@ -1069,6 +1101,24 @@ const Placedetails = () => {
             )}
           </View>
         </Modal>
+
+        {/* report modal */}
+        <CustomBottomSheet
+          bottomSheetProps={{
+            ref: reportRef,
+            snapPoints,
+            index: 2,
+            enableContentPanningGesture: true,
+            enableHandlePanningGesture: true,
+            enablePanDownToClose: true,
+          }}
+        >
+          <ReportBottomSheet
+            type="property"
+            onSubmit={handleSubmitReport}
+            onCancel={() => reportRef.current?.close()}
+          />
+        </CustomBottomSheet>
       </View>
     </View>
   );
