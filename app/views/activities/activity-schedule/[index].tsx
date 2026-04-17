@@ -119,6 +119,7 @@ const ActivitySchedule = () => {
               style={{
                 fontFamily: "InstrumentSansRegular",
                 fontStyle: "italic",
+                color: colors.slate[600],
               }}
               className="py-6 italic text-center text-gray-400"
             >

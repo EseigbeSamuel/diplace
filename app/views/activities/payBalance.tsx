@@ -30,7 +30,7 @@ const PayBalance = () => {
         </View>
 
         <ScrollView showsVerticalScrollIndicator={false}>
-          <View>
+          <View style={homeStyles.borderB} className="py-4 my-4 border-t">
             <Text className="py-4" style={homeStyles.title}>
               Property Info
             </Text>
@@ -41,7 +41,7 @@ const PayBalance = () => {
                   className="w-[76px] h-[76px] rounded-lg"
                 />
               </View>
-              <View>
+              <View className="flex flex-col gap-2">
                 <Text style={homeStyles.title}>Atraz Palace Event Hall</Text>
                 <Text style={homeStyles.gray}>GRA Phase II, Port Harcourt</Text>
                 <Text style={homeStyles.title}>
@@ -51,30 +51,38 @@ const PayBalance = () => {
               </View>
             </View>
           </View>
-          <View className="py-4 my-4 border-t border-b border-gray-300">
+
+          <View style={homeStyles.borderB} className="py-4 my-4 border-t">
             <Text style={homeStyles.title} className="pb-4">
               Cost Breakdown
             </Text>
             <View>
               <View className="flex flex-row justify-between py-2">
                 <Text style={homeStyles.titleGray}>Rent (3 days)</Text>
-                <Text className="text-lg font-semibold">₦1,200,000.00</Text>
+                <Text style={homeStyles.text} className="text-lg font-semibold">
+                  ₦1,200,000.00
+                </Text>
               </View>
               <View className="flex flex-row justify-between py-2">
                 <Text style={homeStyles.titleGray}>
                   Caution fee (refundable)
                 </Text>
-                <Text className="text-lg font-semibold">₦50,000.00</Text>
+                <Text style={homeStyles.text} className="text-lg font-semibold">
+                  ₦50,000.00
+                </Text>
               </View>
               <View className="flex flex-row justify-between py-2">
                 <Text style={homeStyles.titleGray}>
                   DiPlace Platform fee (0.5%)
                 </Text>
-                <Text className="text-lg font-semibold">₦6,000.00</Text>
+                <Text style={homeStyles.text} className="text-lg font-semibold">
+                  ₦6,000.00
+                </Text>
               </View>
             </View>
           </View>
-          <View className="py-4 border-b border-gray-300">
+
+          <View style={homeStyles.borderB} className="py-4 border-t ">
             <View className="flex flex-row justify-between">
               <Text className="" style={homeStyles.subTitle}>
                 Total Amount
@@ -92,7 +100,10 @@ const PayBalance = () => {
               </Text>
             </View>
           </View>
-          <View className="flex flex-row justify-between py-4 border-b border-gray-300">
+          <View
+            style={homeStyles.borderB}
+            className="flex flex-row justify-between py-4 border-t"
+          >
             <Text className="" style={homeStyles.subTitle}>
               Balance Due
             </Text>
@@ -100,9 +111,12 @@ const PayBalance = () => {
               ₦1,004,800.00
             </Text>
           </View>
-          <View className="py-4 border-b border-gray-300 ">
+          <View style={homeStyles.borderB} className="py-4 border-t ">
             <Text style={homeStyles.title}>Renter’s Information</Text>
-            <View className="bg-[#F9F9FB] rounded-xl p-4 mt-4">
+            <View
+              style={{ backgroundColor: colors.slate[150] }}
+              className=" rounded-xl p-4 mt-4"
+            >
               <Text style={homeStyles.title}>Rhema Generation Inc.</Text>
               <Text style={homeStyles.subTitlegray}>Event Planner</Text>
               <Text style={homeStyles.subTitlegray}>
@@ -110,13 +124,16 @@ const PayBalance = () => {
               </Text>
             </View>
           </View>
-          <View className="py-4 border-b border-gray-300 ">
+          <View style={homeStyles.borderB} className="py-4 border-t">
             <Text style={homeStyles.title}>Event Details</Text>
-            <View className="bg-[#F9F9FB] rounded-xl p-4 mt-4 flex flex-col gap-1">
+            <View
+              style={{ backgroundColor: colors.slate[150] }}
+              className=" rounded-xl p-4 mt-4 flex flex-col gap-1"
+            >
               <View>
                 <Text style={homeStyles.title}>Wedding & Engagement</Text>
               </View>
-              <View className="flex flex-row gap-1">
+              <View className="flex flex-row gap-2">
                 <Image
                   source={
                     isDarkMode
@@ -126,15 +143,17 @@ const PayBalance = () => {
                   className="w-5 h-5"
                 />
                 <Text style={homeStyles.subTitlegray}>Event Date:</Text>
-                <Text>Thu. 17 Aug, - Sat. 19 Aug, 2025</Text>
+                <Text style={homeStyles.text}>
+                  Thu. 17 Aug, - Sat. 19 Aug, 2025
+                </Text>
               </View>
-              <View className="flex flex-row gap-1">
+              <View className="flex flex-row gap-2">
                 <Image
-                  source={require("@/assets/icons/Time.png")}
+                  source={require("@/assets/icons/clock.png")}
                   className="w-5 h-5"
                 />
                 <Text style={homeStyles.subTitlegray}>Estimated Duration:</Text>
-                <Text>8 hours</Text>
+                <Text style={homeStyles.text}>8 hours</Text>
               </View>
             </View>
           </View>
@@ -157,6 +176,7 @@ const styles = (colors: ColorScheme) =>
     title: {
       fontSize: RFValue(18),
       lineHeight: RFValue(24),
+      color: colors.slate[650],
     },
     titleGray: {
       fontSize: RFValue(16),
@@ -166,11 +186,20 @@ const styles = (colors: ColorScheme) =>
     subTitle: {
       fontSize: RFValue(16),
       lineHeight: RFValue(20),
+      color: colors.slate[650],
     },
     subTitlegray: {
       fontSize: RFValue(16),
       lineHeight: RFValue(20),
       color: colors.slate[600],
+    },
+    text: {
+      fontSize: RFValue(14),
+      lineHeight: RFValue(20),
+      color: colors.slate[650],
+    },
+    borderB: {
+      borderTopColor: colors.slate[300],
     },
     gray: {
       color: colors.slate[600],
