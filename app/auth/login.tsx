@@ -1,7 +1,7 @@
 import AppButton from "@/components/button";
 import SafeAreaViewContainer from "@/components/safeareaview";
 import { useTheme } from "@/contexts/themeContext";
-import { useGetCurrentUser, useLogin } from "@/hooks";
+import { useLogin } from "@/hooks";
 import { ColorScheme } from "@/utils";
 import { Link, useRouter } from "expo-router";
 import React, { useState } from "react";

@@ -1,27 +1,28 @@
+import { CustomBottomSheet } from "@/components/bottom-sheet";
 import AppButton from "@/components/button";
 import SafeAreaViewContainer from "@/components/safeareaview";
-import { SimpleSelector } from "@/components/selector";
 import { mockMessages } from "@/constants/mockMessages";
 import { useTheme } from "@/contexts/themeContext";
 import { ColorScheme } from "@/utils";
+import { BottomSheetModal } from "@gorhom/bottom-sheet";
 import { useRouter } from "expo-router";
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import {
   Dimensions,
   FlatList,
   Image,
   KeyboardAvoidingView,
+  Modal,
   Platform,
   Pressable,
-  SafeAreaView,
   StatusBar,
   StyleSheet,
   Text,
   TextInput,
   TouchableOpacity,
   View,
-  Modal,
 } from "react-native";
+import ReportBottomSheet from "../report/report";
 
 const { width: screenWidth } = Dimensions.get("window");
 
@@ -352,6 +353,13 @@ const ChatPage = () => {
     setShowReportModal(false);
     setSelectedReport(null);
   };
+  const reportRef = useRef<BottomSheetModal>(null);
+
+  const handleReport = () => {
+    reportRef.current?.present();
+  };
+
+  const snapPoints = useMemo(() => ["25%", "50%", "75%", "90%"], []);
 
   const renderMessage = ({ item }: { item: Message }) => (
     <MessageItem item={item} colors={colors} messages={messages} />
@@ -607,7 +615,7 @@ const ChatPage = () => {
               style={styles.menuItem}
               onPress={() => {
                 setShowMenu(false);
-                setShowReportModal(true);
+                reportRef.current?.present();
               }}
             >
               <Image
@@ -683,7 +691,7 @@ const ChatPage = () => {
       </Modal>
 
       {/* Report Modal */}
-      <Modal
+      {/* <Modal
         visible={showReportModal}
         transparent
         animationType="slide"
@@ -709,7 +717,7 @@ const ChatPage = () => {
               Let us know what the case is with the agent/space manager.
             </Text>
 
-            {/* Report Reasons */}
+            {/* Report Reasons 
             <View style={styles.reportList}>
               {reportReasons.map((reason, index) => (
                 <SimpleSelector
@@ -721,12 +729,29 @@ const ChatPage = () => {
               ))}
             </View>
 
-            {/* Submit Button */}
+            {/* Submit Button 
 
             <AppButton title="Submit" onPress={handleSubmitReport} />
           </Pressable>
         </Pressable>
-      </Modal>
+      </Modal> */}
+
+      <CustomBottomSheet
+        bottomSheetProps={{
+          ref: reportRef,
+          snapPoints,
+          index: 2,
+          enableContentPanningGesture: true,
+          enableHandlePanningGesture: true,
+          enablePanDownToClose: true,
+        }}
+      >
+        <ReportBottomSheet
+          type="lister"
+          onSubmit={handleSubmitReport}
+          onCancel={() => reportRef.current?.close()}
+        />
+      </CustomBottomSheet>
     </SafeAreaViewContainer>
   );
 };

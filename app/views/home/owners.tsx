@@ -8,8 +8,8 @@ import { ColorScheme } from "@/utils";
 import { BottomSheetModal } from "@gorhom/bottom-sheet";
 import { LinearGradient } from "expo-linear-gradient";
 import { router } from "expo-router";
-import { ArrowUpRight, ChevronDown, MapPin } from "lucide-react-native";
-import { useMemo, useRef, useState } from "react";
+import { ArrowUpRight, MapPin } from "lucide-react-native";
+import React, { useMemo, useRef, useState } from "react";
 import {
   Dimensions,
   FlatList,
@@ -23,9 +23,8 @@ import {
 import { useSharedValue } from "react-native-reanimated";
 import Carousel from "react-native-reanimated-carousel";
 import { RFValue } from "react-native-responsive-fontsize";
-import AddSpaceBottomSheet from "../spaces/components/AddSpacesBottomContainer";
-import React from "react";
 import MyEarnings from "../profile/my-earnings";
+import AddSpaceBottomSheet from "../spaces/components/AddSpacesBottomContainer";
 
 export default function OwnersHome() {
   const { colors, isDarkMode } = useTheme();
@@ -75,6 +74,15 @@ export default function OwnersHome() {
   };
 
   const snapPoints = useMemo(() => ["25%", "50%", "75%", "90%"], []);
+
+  // const [filters, setFilters] = useState({
+  //   skip: 0,
+  //   limit: 20,
+  //   status: undefined,
+  // });
+
+  // const { data, isLoading, isError, error, refetch, isFetching } =
+  //   useTransactionHistory(filters);
 
   return (
     <SafeAreaViewContainer className="flex-col gap-5">

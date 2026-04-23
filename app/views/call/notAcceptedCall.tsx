@@ -22,7 +22,7 @@ const IncomingCall = () => {
           </View>
           <Text style={custom.text}>Ibe Alex</Text>
           <Text style={[custom.small, { fontFamily: "InstrumentSansItalic" }]}>
-            Calling
+            Not Answerd
           </Text>
         </View>
 
@@ -33,7 +33,7 @@ const IncomingCall = () => {
           >
             <View
               style={{ backgroundColor: colors.slate[300] }}
-              className="rounded-full p-3 "
+              className="rounded-full p-3 flex-row items-center gap-2 "
             >
               <Image
                 source={
@@ -43,17 +43,23 @@ const IncomingCall = () => {
                 }
                 className="size-6"
               />
+              <Text style={custom.text} className="font-medium">
+                Chat
+              </Text>
             </View>
             <View
               style={{ backgroundColor: "#22C55E" }}
-              className="rounded-full p-3  "
+              className="rounded-full p-3 flex-row items-center gap-2 "
             >
               <Image
                 source={require("@/assets/icons/call-up-light.png")}
                 className="size-6"
               />
+              <Text style={custom.text} className="font-medium ">
+                Redial
+              </Text>
             </View>
-            <View
+            {/* <View
               style={{ backgroundColor: "#EF4444" }}
               className="rounded-full p-3 "
             >
@@ -61,7 +67,7 @@ const IncomingCall = () => {
                 source={require("@/assets/icons/call-down-light.png")}
                 className="size-6"
               />
-            </View>
+            </View> */}
           </View>
         </View>
       </View>
