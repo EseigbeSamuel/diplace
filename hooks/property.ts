@@ -46,9 +46,6 @@ const COST_FREQUENCY_MAP: Record<string, CostFrequency> = {
   outright: "outright",
 };
 
-const FAKE_PROPERTY_MEDIA_URL =
-  "https://images.unsplash.com/photo-1560185007-cde436f6a4d0?auto=format&fit=crop&w=1200&q=80";
-
 const parseNumber = (value?: string): number => {
   if (!value) return 0;
   const parsed = Number(value.replace(/[^0-9.]/g, ""));
@@ -183,8 +180,7 @@ const buildPropertyPayload = async ({
     throw new Error("Cost frequency is required.");
   }
 
-  // const uploadedMedia = await uploadMedia(value.media ?? []);
-  // TEMP: uploads endpoint is unstable, so media uses a static public fallback URL.
+  const uploadedMedia = await uploadMedia(value.media ?? []);
   const uploadedRentalAgreement = await uploadRentalAgreement(
     value.rentalAgreement,
   );
@@ -204,24 +200,19 @@ const buildPropertyPayload = async ({
     ...(costFrequency ? { cost_frequency: costFrequency } : {}),
     fees: extractFees(value.otherCharges),
     amenities: value.amenities ?? [],
-    // media: uploadedMedia,
-    media: (value.media ?? []).map((item, index) => ({
-      file_url: FAKE_PROPERTY_MEDIA_URL,
-      file_type: item.type === "video" ? "video" : "image",
-      description: `temp-media-${index + 1}`,
-    })),
+    media: uploadedMedia,
     ...(value.location
       ? {
-          address: {
-            street: value.location.address,
-            city: value.location.city,
-            state: value.location.state,
-            zip_code: value.location.postalCode,
-            country: value.location.country,
-            latitude: value.location.latitude,
-            longitude: value.location.longitude,
-          },
-        }
+        address: {
+          street: value.location.address,
+          city: value.location.city,
+          state: value.location.state,
+          zip_code: value.location.postalCode,
+          country: value.location.country,
+          latitude: value.location.latitude,
+          longitude: value.location.longitude,
+        },
+      }
       : {}),
     owner_mode: value.owner ?? null,
     owner_details: value.ownerDetails ?? null,
@@ -304,13 +295,7 @@ const buildUpdatePayload = async ({
     cost_frequency: costFrequency,
     fees: extractFees(value.otherCharges),
     amenities: value.amenities ?? [],
-    // media: await uploadMedia(value.media ?? []),
-    // TEMP: uploads endpoint is unstable, so media uses a static public fallback URL.
-    media: (value.media ?? []).map((item, index) => ({
-      file_url: FAKE_PROPERTY_MEDIA_URL,
-      file_type: item.type === "video" ? "video" : "image",
-      description: `temp-media-${index + 1}`,
-    })),
+    media: await uploadMedia(value.media ?? []),
     address_id: addressId,
     owner_mode: value.owner ?? null,
     owner_details: value.ownerDetails ?? null,
@@ -340,12 +325,10 @@ export function useCreateProperty() {
       type: SpaceType;
       value: SpaceValue;
     }) => {
-      console.log("CreateProperty: input form values", { type, value });
       let payload: CreatePropertyPayload | undefined;
 
       try {
         payload = await buildCreatePayload(type, value);
-        console.log("CreateProperty: payload", payload);
 
         const response = await postRequest<
           CreatePropertyResponse,
@@ -353,13 +336,12 @@ export function useCreateProperty() {
         >({
           url: "/properties/",
           payload,
-          protectedRoute: true,
+
         });
 
-        console.log("CreateProperty: response", response);
         return response;
       } catch (error) {
-        console.log("CreateProperty: attempted payload before failure", payload);
+
         throw error;
       }
     },
@@ -372,8 +354,6 @@ export function useCreateProperty() {
       });
     },
     onError: (error, variables) => {
-      console.log("CreateProperty: error", error);
-      console.log("CreateProperty: failed input variables", variables);
       const message =
         error instanceof Error ? error.message : "Unable to create property.";
       showToast({
@@ -400,12 +380,11 @@ export function useCreatePropertyDraft() {
       type: SpaceType;
       value: SpaceValue;
     }) => {
-      console.log("CreateDraft: input form values", { type, value });
       let payload: CreatePropertyDraftPayload | undefined;
 
       try {
         payload = await buildDraftPayload(type, value);
-        console.log("CreateDraft: payload", payload);
+
 
         const response = await postRequest<
           CreatePropertyResponse,
@@ -413,13 +392,12 @@ export function useCreatePropertyDraft() {
         >({
           url: "/properties/drafts",
           payload,
-          protectedRoute: true,
+
         });
 
-        console.log("CreateDraft: response", response);
         return response;
       } catch (error) {
-        console.log("CreateDraft: attempted payload before failure", payload);
+
         throw error;
       }
     },
@@ -432,8 +410,6 @@ export function useCreatePropertyDraft() {
       });
     },
     onError: (error, variables) => {
-      console.log("CreateDraft: error", error);
-      console.log("CreateDraft: failed input variables", variables);
       const message =
         error instanceof Error ? error.message : "Unable to save draft.";
       showToast({
@@ -464,28 +440,23 @@ export function useUpdateProperty() {
       type: SpaceType;
       value: SpaceValue;
     }) => {
-      console.log("UpdateProperty: input form values", {
-        propertyId,
-        addressId,
-        type,
-        value,
-      });
+
 
       let payload: UpdatePropertyPayload | undefined;
       try {
         payload = await buildUpdatePayload({ type, value, addressId });
-        console.log("UpdateProperty: payload", payload);
+
 
         const response = await putRequest<CreatePropertyResponse, UpdatePropertyPayload>({
           url: `/properties/${propertyId}`,
           payload,
-          protectedRoute: true,
+
         });
 
-        console.log("UpdateProperty: response", response);
+
         return response;
       } catch (error) {
-        console.log("UpdateProperty: attempted payload before failure", payload);
+
         throw error;
       }
     },
@@ -501,8 +472,6 @@ export function useUpdateProperty() {
       });
     },
     onError: (error, variables) => {
-      console.log("UpdateProperty: error", error);
-      console.log("UpdateProperty: failed input variables", variables);
       const message =
         error instanceof Error ? error.message : "Unable to update property.";
       showToast({
@@ -557,7 +526,7 @@ export function useListProperties({
       return await getRequest<ListPropertiesResponse>({
         url: "/properties/",
         params: queryParams,
-        protectedRoute: true,
+
       });
     },
     getNextPageParam: (lastPage) => {
@@ -605,7 +574,7 @@ export function useListMyDrafts({
       return await getRequest<ListPropertiesResponse>({
         url: "/properties/me/drafts",
         params: queryParams,
-        protectedRoute: true,
+
       });
     },
     getNextPageParam: (lastPage) => {
@@ -643,7 +612,7 @@ export function useGetPropertyDetails({
     queryFn: async () => {
       return await getRequest<PropertyDetailsResponse>({
         url: `/properties/${propertyId}`,
-        protectedRoute: true,
+
       });
     },
   });
@@ -662,7 +631,7 @@ export function useDeleteProperty() {
     mutationFn: async ({ propertyId }: { propertyId: string }) => {
       return await deleteRequest<void>({
         url: `/properties/${propertyId}`,
-        protectedRoute: true,
+
       });
     },
     onSuccess: async () => {
@@ -674,7 +643,7 @@ export function useDeleteProperty() {
       });
     },
     onError: (error) => {
-      console.log("DeleteProperty: error", error);
+
       const message =
         error instanceof Error ? error.message : "Unable to delete property.";
       showToast({
