@@ -1,30 +1,39 @@
+import { showToast } from "@/lib";
+import { deleteRequest, getRequest, postRequest, putRequest } from "@/services";
 import { SpaceValue } from "@/store/useSpace";
-import {
-  deleteRequest,
-  getMimeFromExt,
-  getRequest,
-  postRequest,
-  putRequest,
-  uploadAssets,
-} from "@/services";
 import {
   CostFrequency,
   CreatePropertyDraftPayload,
   CreatePropertyPayload,
   CreatePropertyResponse,
+  GetPropertyDraftResponse,
   ListPropertiesParams,
   ListPropertiesResponse,
+  ListPropertyDraftsResponse,
+  ListPropertyReviewsResponse,
   PropertyDetailsResponse,
-  PropertyListItem,
+  PropertyDraftItem,
   PropertyFeesPayload,
+  PropertyListItem,
   PropertyMediaPayload,
+  SavePropertyDraftPayload,
+  SavePropertyDraftResponse,
+  ToggleBookmarkResponse,
   UpdatePropertyPayload,
+  UploadFilesResponse,
 } from "@/types";
 import { MediaItem, SpaceType } from "@/types/add-space-types";
-import { useInfiniteQuery, useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { showToast } from "@/lib";
+import {
+  useInfiniteQuery,
+  useMutation,
+  useQuery,
+  useQueryClient,
+} from "@tanstack/react-query";
 
-const PROPERTY_TYPE_MAP: Record<Exclude<SpaceType, null>, CreatePropertyPayload["property_type"]> = {
+const PROPERTY_TYPE_MAP: Record<
+  Exclude<SpaceType, null>,
+  CreatePropertyPayload["property_type"]
+> = {
   apartment: "apartment",
   event: "event_centre",
   office: "office",
@@ -52,7 +61,32 @@ const parseNumber = (value?: string): number => {
   return Number.isFinite(parsed) ? parsed : 0;
 };
 
-const extractFees = (charges: SpaceValue["otherCharges"]): PropertyFeesPayload => {
+const getExtFromUri = (uri: string): string => {
+  const cleanUri = uri.split("?")[0] || "";
+  const lastDot = cleanUri.lastIndexOf(".");
+  if (lastDot === -1) return "";
+  return cleanUri.slice(lastDot + 1).toLowerCase();
+};
+
+const getMimeFromExt = (ext: string, fallback: string): string => {
+  const map: Record<string, string> = {
+    jpg: "image/jpeg",
+    jpeg: "image/jpeg",
+    png: "image/png",
+    webp: "image/webp",
+    heic: "image/heic",
+    heif: "image/heif",
+    mp4: "video/mp4",
+    mov: "video/quicktime",
+    m4v: "video/x-m4v",
+    pdf: "application/pdf",
+  };
+  return map[ext] || fallback;
+};
+
+const extractFees = (
+  charges: SpaceValue["otherCharges"],
+): PropertyFeesPayload => {
   const fees: PropertyFeesPayload = {
     caution_fee: 0,
     agency_fee_percent: 0,
@@ -65,7 +99,8 @@ const extractFees = (charges: SpaceValue["otherCharges"]): PropertyFeesPayload =
     const amount = parseNumber(charge.value);
 
     if (key.includes("caution")) fees.caution_fee = amount;
-    if (key.includes("agent") || key.includes("agency")) fees.agency_fee_percent = amount;
+    if (key.includes("agent") || key.includes("agency"))
+      fees.agency_fee_percent = amount;
     if (key.includes("legal")) fees.legal_fee_percent = amount;
     if (key.includes("platform")) fees.platform_fee = amount;
   });
@@ -73,22 +108,65 @@ const extractFees = (charges: SpaceValue["otherCharges"]): PropertyFeesPayload =
   return fees;
 };
 
-const getExtFromUri = (uri: string): string => {
-  const cleanUri = uri.split("?")[0] || "";
-  const lastDot = cleanUri.lastIndexOf(".");
-  if (lastDot === -1) return "";
-  return cleanUri.slice(lastDot + 1).toLowerCase();
+type UploadAsset = {
+  uri: string;
+  type: string;
+  name?: string;
 };
 
-const uploadMedia = async (media: MediaItem[]): Promise<PropertyMediaPayload[]> => {
+const buildUploadFormData = (assets: UploadAsset[]) => {
+  const formData = new FormData();
+
+  assets.forEach((item, index) => {
+    const ext =
+      getExtFromUri(item.uri) ||
+      (item.type.startsWith("video") ? "mp4" : "jpg");
+    const mime = item.type || getMimeFromExt(ext, "application/octet-stream");
+    const name = item.name || `upload-${index}.${ext}`;
+
+    formData.append("files", {
+      uri: item.uri,
+      name,
+      type: mime,
+    } as never);
+  });
+
+  return formData;
+};
+
+const uploadAssets = async (
+  assets: UploadAsset[],
+  label: string,
+): Promise<string[]> => {
+  if (!assets.length) return [];
+
+  console.log(`CreateProperty: ${label} upload input`, assets);
+
+  const uploadResponse = await postRequest<UploadFilesResponse, FormData>({
+    url: "/uploads/",
+    payload: buildUploadFormData(assets),
+    protectedRoute: true,
+  });
+
+  console.log(`CreateProperty: ${label} upload response URLs`, uploadResponse);
+  return uploadResponse;
+};
+
+const uploadMedia = async (
+  media: MediaItem[],
+): Promise<PropertyMediaPayload[]> => {
   if (!media.length) return [];
 
   const uploadResponse = await uploadAssets(
     media.map((item, index) => {
-      const ext = getExtFromUri(item.uri) || (item.type === "video" ? "mp4" : "jpg");
+      const ext =
+        getExtFromUri(item.uri) || (item.type === "video" ? "mp4" : "jpg");
       return {
         uri: item.uri,
-        type: getMimeFromExt(ext, item.type === "video" ? "video/mp4" : "image/jpeg"),
+        type: getMimeFromExt(
+          ext,
+          item.type === "video" ? "video/mp4" : "image/jpeg",
+        ),
         name: `property-media-${index}.${ext}`,
       };
     }),
@@ -124,7 +202,9 @@ const uploadRentalAgreement = async (
 
 const uploadTours = async (
   tours: SpaceValue["tour"],
-): Promise<Array<{ file_url: string; room_name: string; duration: number }>> => {
+): Promise<
+  Array<{ file_url: string; room_name: string; duration: number }>
+> => {
   const preparedTours = (tours ?? []).filter((tour) => !!tour.uri);
   if (!preparedTours.length) return [];
 
@@ -160,7 +240,10 @@ const buildPropertyPayload = async ({
     throw new Error("Property type is required.");
   }
 
-  if (!draft && (!value.description?.title || !value.description?.description)) {
+  if (
+    !draft &&
+    (!value.description?.title || !value.description?.description)
+  ) {
     throw new Error("Property title and description are required.");
   }
 
@@ -172,9 +255,8 @@ const buildPropertyPayload = async ({
     throw new Error("At least one property media file is required.");
   }
 
-  const costFrequency = COST_FREQUENCY_MAP[
-    value.rentalCost?.rentDuration?.toLowerCase() || ""
-  ];
+  const costFrequency =
+    COST_FREQUENCY_MAP[value.rentalCost?.rentDuration?.toLowerCase() || ""];
 
   if (!draft && !costFrequency) {
     throw new Error("Cost frequency is required.");
@@ -281,7 +363,8 @@ const buildUpdatePayload = async ({
     throw new Error("Property title and description are required.");
   }
 
-  const costFrequency = COST_FREQUENCY_MAP[value.rentalCost?.rentDuration?.toLowerCase() || ""];
+  const costFrequency =
+    COST_FREQUENCY_MAP[value.rentalCost?.rentDuration?.toLowerCase() || ""];
   if (!costFrequency) {
     throw new Error("Cost frequency is required.");
   }
@@ -306,7 +389,9 @@ const buildUpdatePayload = async ({
     capacity: value.capacity ?? null,
     inspection: {
       fee: value.inspectionFee ?? 0,
-      time_slots: (value.inspectionTimeSlots ?? []).filter((slot) => slot.selected),
+      time_slots: (value.inspectionTimeSlots ?? []).filter(
+        (slot) => slot.selected,
+      ),
     },
     metadata: {
       max_rent_payout: parseNumber(value.rentalCost?.maxRentPayout),
@@ -341,7 +426,10 @@ export function useCreateProperty() {
 
         return response;
       } catch (error) {
-
+        console.log(
+          "CreateProperty: attempted payload before failure",
+          payload,
+        );
         throw error;
       }
     },
@@ -447,7 +535,10 @@ export function useUpdateProperty() {
         payload = await buildUpdatePayload({ type, value, addressId });
 
 
-        const response = await putRequest<CreatePropertyResponse, UpdatePropertyPayload>({
+        const response = await putRequest<
+          CreatePropertyResponse,
+          UpdatePropertyPayload
+        >({
           url: `/properties/${propertyId}`,
           payload,
 
@@ -456,7 +547,10 @@ export function useUpdateProperty() {
 
         return response;
       } catch (error) {
-
+        console.log(
+          "UpdateProperty: attempted payload before failure",
+          payload,
+        );
         throw error;
       }
     },
@@ -493,14 +587,13 @@ const normalizeListParams = (
 ): Record<string, string | number | boolean> => {
   if (!params) return {};
 
-  return Object.entries(params).reduce<Record<string, string | number | boolean>>(
-    (acc, [key, value]) => {
-      if (value === undefined || value === null || value === "") return acc;
-      acc[key] = value as string | number | boolean;
-      return acc;
-    },
-    {},
-  );
+  return Object.entries(params).reduce<
+    Record<string, string | number | boolean>
+  >((acc, [key, value]) => {
+    if (value === undefined || value === null || value === "") return acc;
+    acc[key] = value as string | number | boolean;
+    return acc;
+  }, {});
 };
 
 export function useListProperties({
@@ -657,5 +750,353 @@ export function useDeleteProperty() {
   return {
     deletePropertyMutation: mutateAsync,
     deletePropertyPending: isPending,
+  };
+}
+
+export function useTogglePropertyBookmark() {
+  const queryClient = useQueryClient();
+  const { mutateAsync, isPending } = useMutation({
+    mutationFn: async ({ propertyId }: { propertyId: string }) => {
+      return await postRequest<ToggleBookmarkResponse, Record<string, never>>({
+        url: `/interaction/${propertyId}/bookmark`,
+        payload: {},
+        protectedRoute: true,
+      });
+    },
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey: ["my-bookmarks"] });
+    },
+    onError: (error) => {
+      const message =
+        error instanceof Error ? error.message : "Unable to update bookmark.";
+      showToast({
+        type: "error",
+        text1: "Bookmark Failed",
+        text2: message,
+      });
+    },
+  });
+
+  return {
+    togglePropertyBookmarkMutation: mutateAsync,
+    togglePropertyBookmarkPending: isPending,
+  };
+}
+
+export function useListPropertyReviews({
+  propertyId,
+  enabled = true,
+}: {
+  propertyId?: string;
+  enabled?: boolean;
+}) {
+  const query = useQuery({
+    queryKey: ["property-reviews", propertyId],
+    enabled: enabled && !!propertyId,
+    queryFn: async () => {
+      return await getRequest<ListPropertyReviewsResponse>({
+        url: `/property-reviews/${propertyId}/reviews`,
+        params: {
+          skip: 0,
+          limit: 100,
+          sort_by: "date_created",
+          sort_order: "desc",
+        },
+        protectedRoute: true,
+      });
+    },
+  });
+
+  return {
+    propertyReviews: query.data?.items ?? [],
+    propertyReviewsTotal: query.data?.pagination.total_items ?? 0,
+    isPropertyReviewsLoading: query.isLoading,
+    propertyReviewsError: query.error,
+    refetchPropertyReviews: query.refetch,
+  };
+}
+
+// Add to your property.ts file:
+
+export function useListPropertyDrafts({
+  params,
+  pageSize = 20,
+  enabled = true,
+}: {
+  params?: ListPropertiesParams;
+  pageSize?: number;
+  enabled?: boolean;
+}) {
+  const query = useInfiniteQuery({
+    queryKey: ["property-drafts", params, pageSize],
+    initialPageParam: 0,
+    enabled,
+    queryFn: async ({ pageParam }) => {
+      const queryParams = normalizeListParams({
+        ...params,
+        skip: Number(pageParam) || 0,
+        limit: pageSize,
+      });
+
+      return await getRequest<ListPropertyDraftsResponse>({
+        url: "/properties/drafts",
+        params: queryParams,
+        protectedRoute: true,
+      });
+    },
+    getNextPageParam: (lastPage) => {
+      const nextSkip = lastPage.pagination.skip + lastPage.pagination.limit;
+      return nextSkip < lastPage.pagination.total_items ? nextSkip : undefined;
+    },
+  });
+
+  const drafts: PropertyDraftItem[] =
+    query.data?.pages.flatMap((page) => page.items) ?? [];
+
+  return {
+    drafts,
+    totalDrafts: query.data?.pages[0]?.pagination.total_items ?? 0,
+    isDraftsLoading: query.isLoading,
+    isDraftsFetching: query.isFetching,
+    isDraftsFetchingNextPage: query.isFetchingNextPage,
+    hasMoreDrafts: query.hasNextPage,
+    draftsError: query.error,
+    fetchMoreDrafts: query.fetchNextPage,
+    refetchDrafts: query.refetch,
+  };
+}
+
+export function useGetPropertyDraft({
+  draftId,
+  enabled = true,
+}: {
+  draftId?: string;
+  enabled?: boolean;
+}) {
+  const query = useQuery({
+    queryKey: ["property-draft", draftId],
+    enabled: enabled && !!draftId,
+    queryFn: async () => {
+      return await getRequest<GetPropertyDraftResponse>({
+        url: `/properties/drafts/${draftId}`,
+        protectedRoute: true,
+      });
+    },
+  });
+
+  return {
+    draft: query.data,
+    isDraftLoading: query.isLoading,
+    draftError: query.error,
+    refetchDraft: query.refetch,
+  };
+}
+
+export function useSavePropertyDraft() {
+  const queryClient = useQueryClient();
+
+  const { mutateAsync, isPending } = useMutation({
+    mutationFn: async ({
+      type,
+      value,
+    }: {
+      type: SpaceType;
+      value: SpaceValue;
+    }) => {
+      console.log("SavePropertyDraft: input form values", { type, value });
+      let payload: SavePropertyDraftPayload | undefined;
+
+      try {
+        payload = await buildCreatePayload(type, value);
+        console.log("SavePropertyDraft: payload", payload);
+        const response = await postRequest<
+          SavePropertyDraftResponse,
+          SavePropertyDraftPayload
+        >({
+          url: "/properties/drafts",
+          payload,
+          protectedRoute: true,
+        });
+        console.log("SavePropertyDraft: response", response);
+        return response;
+      } catch (error) {
+        console.log(
+          "SavePropertyDraft: attempted payload before failure",
+          payload,
+        );
+        throw error;
+      }
+    },
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey: ["property-drafts"] });
+      showToast({
+        type: "success",
+        text1: "Success",
+        text2: "Draft saved successfully.",
+      });
+    },
+    onError: (error, variables) => {
+      console.log("SavePropertyDraft: error", error);
+      console.log("SavePropertyDraft: failed input variables", variables);
+      const message =
+        error instanceof Error ? error.message : "Unable to save draft.";
+      showToast({
+        type: "error",
+        text1: "Save Draft Failed",
+        text2: message,
+      });
+    },
+  });
+
+  return {
+    savePropertyDraftMutation: mutateAsync,
+    savePropertyDraftPending: isPending,
+  };
+}
+
+export function useUpdatePropertyDraft() {
+  const queryClient = useQueryClient();
+
+  const { mutateAsync, isPending } = useMutation({
+    mutationFn: async ({
+      draftId,
+      addressId,
+      type,
+      value,
+    }: {
+      draftId: string;
+      addressId: string;
+      type: SpaceType;
+      value: SpaceValue;
+    }) => {
+      console.log("UpdatePropertyDraft: input form values", {
+        draftId,
+        addressId,
+        type,
+        value,
+      });
+
+      let payload: UpdatePropertyPayload | undefined;
+      try {
+        payload = await buildUpdatePayload({ type, value, addressId });
+        console.log("UpdatePropertyDraft: payload", payload);
+
+        const response = await putRequest<
+          SavePropertyDraftResponse,
+          UpdatePropertyPayload
+        >({
+          url: `/properties/drafts/${draftId}`,
+          payload,
+          protectedRoute: true,
+        });
+
+        console.log("UpdatePropertyDraft: response", response);
+        return response;
+      } catch (error) {
+        console.log(
+          "UpdatePropertyDraft: attempted payload before failure",
+          payload,
+        );
+        throw error;
+      }
+    },
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey: ["property-drafts"] });
+      showToast({
+        type: "success",
+        text1: "Success",
+        text2: "Draft updated successfully.",
+      });
+    },
+    onError: (error, variables) => {
+      console.log("UpdatePropertyDraft: error", error);
+      console.log("UpdatePropertyDraft: failed input variables", variables);
+      const message =
+        error instanceof Error ? error.message : "Unable to update draft.";
+      showToast({
+        type: "error",
+        text1: "Update Draft Failed",
+        text2: message,
+      });
+    },
+  });
+
+  return {
+    updatePropertyDraftMutation: mutateAsync,
+    updatePropertyDraftPending: isPending,
+  };
+}
+
+export function useDeletePropertyDraft() {
+  const queryClient = useQueryClient();
+
+  const { mutateAsync, isPending } = useMutation({
+    mutationFn: async ({ draftId }: { draftId: string }) => {
+      return await deleteRequest<void>({
+        url: `/properties/drafts/${draftId}`,
+        protectedRoute: true,
+      });
+    },
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey: ["property-drafts"] });
+      showToast({
+        type: "success",
+        text1: "Success",
+        text2: "Draft deleted successfully.",
+      });
+    },
+    onError: (error) => {
+      console.log("DeletePropertyDraft: error", error);
+      const message =
+        error instanceof Error ? error.message : "Unable to delete draft.";
+      showToast({
+        type: "error",
+        text1: "Delete Draft Failed",
+        text2: message,
+      });
+    },
+  });
+
+  return {
+    deletePropertyDraftMutation: mutateAsync,
+    deletePropertyDraftPending: isPending,
+  };
+}
+
+export function usePublishPropertyDraft() {
+  const queryClient = useQueryClient();
+
+  const { mutateAsync, isPending } = useMutation({
+    mutationFn: async ({ draftId }: { draftId: string }) => {
+      return await postRequest<CreatePropertyResponse, Record<string, never>>({
+        url: `/properties/drafts/${draftId}/publish`,
+        payload: {},
+        protectedRoute: true,
+      });
+    },
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey: ["property-drafts"] });
+      await queryClient.invalidateQueries({ queryKey: ["properties"] });
+      showToast({
+        type: "success",
+        text1: "Success",
+        text2: "Draft published successfully.",
+      });
+    },
+    onError: (error) => {
+      console.log("PublishPropertyDraft: error", error);
+      const message =
+        error instanceof Error ? error.message : "Unable to publish draft.";
+      showToast({
+        type: "error",
+        text1: "Publish Draft Failed",
+        text2: message,
+      });
+    },
+  });
+
+  return {
+    publishPropertyDraftMutation: mutateAsync,
+    publishPropertyDraftPending: isPending,
   };
 }

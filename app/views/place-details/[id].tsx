@@ -1,4 +1,3 @@
-import { CustomBottomSheet } from "@/components/bottom-sheet";
 import AppButton from "@/components/button";
 import SafeAreaViewContainer from "@/components/safeareaview";
 import SectionHeader from "@/components/sectionheader";
@@ -6,7 +5,6 @@ import { useTheme } from "@/contexts/themeContext";
 import { useGetPropertyDetails, useListPropertyReviews } from "@/hooks";
 import { useSpaceStore } from "@/store/useSpace";
 import { ColorScheme } from "@/utils";
-import { BottomSheetModal } from "@gorhom/bottom-sheet";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import React, { useMemo, useRef, useState } from "react";
 import {
@@ -24,7 +22,6 @@ import {
 import { Calendar } from "react-native-calendars";
 import MapView, { Marker } from "react-native-maps";
 import { RFValue } from "react-native-responsive-fontsize";
-import ReportBottomSheet from "../report/report";
 
 type timeslot = {
   id: string;
@@ -275,22 +272,6 @@ const Placedetails = () => {
       </View>
     );
   }
-
-  // Report state
-  const [selectedReport, setSelectedReport] = useState<string | null>(null);
-
-  const handleSubmitReport = () => {
-    // Handle report submission
-    console.log("Report submitted:", selectedReport);
-    setSelectedReport(null);
-  };
-  const reportRef = useRef<BottomSheetModal>(null);
-
-  const handleReport = () => {
-    reportRef.current?.present();
-  };
-
-  const snapPoints = useMemo(() => ["25%", "50%", "75%", "90%"], []);
 
   return (
     <View style={styles.mainContainer}>
@@ -617,10 +598,7 @@ const Placedetails = () => {
                 <Text style={styles.totalAmount}>₦{totalPackage}</Text>
               </View>
             </View>
-            <Pressable
-              onPress={handleReport}
-              className="flex flex-row items-center gap-3 py-4"
-            >
+            <Pressable className="flex flex-row items-center gap-3 py-4">
               <Image
                 source={require("@/assets/icons/flag-red.png")}
                 className="w-6 h-6"
@@ -1101,24 +1079,6 @@ const Placedetails = () => {
             )}
           </View>
         </Modal>
-
-        {/* report modal */}
-        <CustomBottomSheet
-          bottomSheetProps={{
-            ref: reportRef,
-            snapPoints,
-            index: 2,
-            enableContentPanningGesture: true,
-            enableHandlePanningGesture: true,
-            enablePanDownToClose: true,
-          }}
-        >
-          <ReportBottomSheet
-            type="property"
-            onSubmit={handleSubmitReport}
-            onCancel={() => reportRef.current?.close()}
-          />
-        </CustomBottomSheet>
       </View>
     </View>
   );

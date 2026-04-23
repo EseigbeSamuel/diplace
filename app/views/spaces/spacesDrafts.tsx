@@ -12,7 +12,14 @@ import { ColorScheme } from "@/utils";
 import { BottomSheetModal } from "@gorhom/bottom-sheet";
 import { router } from "expo-router";
 import React, { useMemo, useRef } from "react";
-import { ActivityIndicator, FlatList, Image, StyleSheet, Text, View } from "react-native";
+import {
+  ActivityIndicator,
+  FlatList,
+  Image,
+  StyleSheet,
+  Text,
+  View,
+} from "react-native";
 import { RFValue } from "react-native-responsive-fontsize";
 
 const SpacesDrafts = ({ layout }: { layout: "tiles" | "box" }) => {
@@ -38,7 +45,8 @@ const SpacesDrafts = ({ layout }: { layout: "tiles" | "box" }) => {
     enabled: true,
   });
   const addSpaceRef = useRef<BottomSheetModal>(null);
-  const [selectedSpace, setSelectedSpace] = React.useState<PropertyCardItem | null>(null);
+  const [selectedSpace, setSelectedSpace] =
+    React.useState<PropertyCardItem | null>(null);
   const [isRemoveDialogVisible, setRemoveDialogVisible] = React.useState(false);
   const snapPoints = useMemo(() => ["25%", "50%", "75%", "90%"], []);
 
@@ -81,7 +89,8 @@ const SpacesDrafts = ({ layout }: { layout: "tiles" | "box" }) => {
   const formatCurrency = (amount: number) =>
     `NGN ${new Intl.NumberFormat("en-NG").format(amount || 0)}`;
 
-  const formatCostFrequency = (value: string) => value.replace(/^per_/, "").replace(/_/g, " ");
+  const formatCostFrequency = (value: string) =>
+    value.replace(/^per_/, "").replace(/_/g, " ");
 
   const cardData = useMemo<PropertyCardItem[]>(
     () =>
