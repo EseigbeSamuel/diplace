@@ -15,7 +15,10 @@ const ActivitySchedule = () => {
     // Add your custom action here
   };
   return (
-    <View className="relative flex-1 p-2">
+    <View
+      style={{ backgroundColor: colors.background }}
+      className="relative flex-1 p-2"
+    >
       <View className="absolute z-20 w-full top-6">
         <SectionHeader
           rightIconSource={require("@/assets/icons/more-2-line.png")} // Example right icon
