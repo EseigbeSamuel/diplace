@@ -12,6 +12,7 @@ import {
 } from "@/types";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "expo-router";
+import axios from "axios";
 
 type VerificationType = "phone" | "email" | "nin" | "bvn" | "face";
 
@@ -88,7 +89,18 @@ export function useLogin() {
     },
 
     onError: (error) => {
-      // console.log("login error", error);
+      const message = axios.isAxiosError(error)
+        ? error.response?.data?.detail ||
+          error.response?.data?.message ||
+          error.message ||
+          "Login failed. Please check your credentials."
+        : "Login failed. Please check your credentials.";
+
+      showToast({
+        type: "error",
+        text1: "Login Failed",
+        text2: String(message),
+      });
     },
   });
 

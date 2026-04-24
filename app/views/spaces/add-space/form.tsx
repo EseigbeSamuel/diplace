@@ -36,8 +36,13 @@ import { ActivityIndicator, Text, View } from "react-native";
 import { PropertyDetailsResponse } from "@/types";
 import { SpaceType } from "@/types/add-space-types";
 import { useTheme } from "@/contexts/themeContext";
-import { useCreatePropertyDraft, useGetPropertyDetails } from "@/hooks";
+import {
+  useCreatePropertyDraft,
+  useGetPropertyDetails,
+  useUpdateProperty,
+} from "@/hooks";
 import AppButton from "@/components/button";
+import { showToast } from "@/lib";
 
 const { width } = Dimensions.get("window");
 
@@ -49,13 +54,16 @@ const AddSpaceForm: React.FC = () => {
     clearForm,
     setType,
     setValue,
+    editingDraft,
     setEditingDraft,
     setEditContext,
+    editContext,
     spaceForm,
   } = useSpaceStore();
   const hydratedPropertyIdRef = React.useRef<string | null>(null);
   const { colors } = useTheme();
   const { createPropertyDraftMutation } = useCreatePropertyDraft();
+  const { updatePropertyMutation } = useUpdateProperty();
   const {
     propertyDetails,
     isPropertyDetailsLoading,
@@ -78,6 +86,7 @@ const AddSpaceForm: React.FC = () => {
   React.useEffect(() => {
     if (!editingPropertyId || !propertyDetails) return;
     if (hydratedPropertyIdRef.current === editingPropertyId) return;
+    const incomingDraftContext = editingDraft;
 
     const mappedType = mapPropertyTypeToSpaceType(propertyDetails.property_type);
     const mappedMedia = (propertyDetails.media ?? []).map((item, index) => ({
@@ -118,6 +127,7 @@ const AddSpaceForm: React.FC = () => {
     ];
 
     clearForm();
+    setEditingDraft(incomingDraftContext);
     setType(mappedType);
     setEditContext({
       propertyId: propertyDetails.public_id,
@@ -148,14 +158,14 @@ const AddSpaceForm: React.FC = () => {
     });
 
     hydratedPropertyIdRef.current = editingPropertyId;
-    setEditingDraft(null);
   }, [
     editingPropertyId,
     propertyDetails,
+    editingDraft,
     clearForm,
+    setEditingDraft,
     setType,
     setValue,
-    setEditingDraft,
     setEditContext,
   ]);
 
@@ -224,12 +234,31 @@ const AddSpaceForm: React.FC = () => {
   };
 
   const handleSaveAndEditLater = async () => {
-    await createPropertyDraftMutation({
-      type: spaceForm.type,
-      value: spaceForm.value,
-    });
+    if (editingPropertyId) {
+      if (!editContext?.propertyId || !editContext?.addressId) {
+        showToast({
+          type: "error",
+          text1: "Update Failed",
+          text2: "Missing property context. Re-open this space and try again.",
+        });
+        return;
+      }
+
+      await updatePropertyMutation({
+        propertyId: editContext.propertyId,
+        addressId: editContext.addressId,
+        type: spaceForm.type,
+        value: spaceForm.value,
+      });
+    } else {
+      await createPropertyDraftMutation({
+        type: spaceForm.type,
+        value: spaceForm.value,
+      });
+    }
+
     clearForm();
-    router.back();
+    router.replace("/(tabs)/spaces");
   };
 
   if (editingPropertyId && isPropertyDetailsLoading) {
@@ -263,6 +292,7 @@ const AddSpaceForm: React.FC = () => {
       initialStepIndex={0}
       initialSubstepIndex={editingPropertyId ? 1 : 0}
       onSaveAndEditLater={handleSaveAndEditLater}
+      rightActionTitle={editingPropertyId ? "Save & Exit" : "Save as Draft"}
     />
   );
 };

@@ -61,7 +61,7 @@ const SpacesDrafts = ({ layout }: { layout: "tiles" | "box" }) => {
     setEditingDraft(selectedSpace.raw);
     router.push({
       pathname: "/views/spaces/add-space/form",
-      params: { property_id: selectedSpace.id },
+      params: { property_id: selectedSpace.id, source: "draft" },
     });
   };
 
@@ -74,16 +74,16 @@ const SpacesDrafts = ({ layout }: { layout: "tiles" | "box" }) => {
     setRemoveDialogVisible(false);
   };
 
-  const handleRemoveConfirm = () => {
+  const handleRemoveConfirm = async () => {
     if (!selectedSpace?.id || deletePropertyPending) return;
-    deletePropertyMutation({ propertyId: selectedSpace.id })
-      .then(() => {
-        setRemoveDialogVisible(false);
-        setSelectedSpace(null);
-      })
-      .catch(() => {
-        // Toast handled in mutation onError
-      });
+    try {
+      await deletePropertyMutation({ propertyId: selectedSpace.id });
+      await refetchProperties();
+      setRemoveDialogVisible(false);
+      setSelectedSpace(null);
+    } catch {
+      // Toast handled in mutation onError
+    }
   };
 
   const formatCurrency = (amount: number) =>
@@ -99,7 +99,7 @@ const SpacesDrafts = ({ layout }: { layout: "tiles" | "box" }) => {
         imageSource: item.media?.[0]?.file_url
           ? { uri: item.media[0].file_url }
           : require("@/assets/images/featuredSpaceImage1.png"),
-        title: item.title,
+        title: item.title || "Untitled draft",
         location:
           [
             item.address?.street,
@@ -180,7 +180,9 @@ const SpacesDrafts = ({ layout }: { layout: "tiles" | "box" }) => {
           )
         }
         showsVerticalScrollIndicator={false}
+        key={`drafts-${layout}-${cardData.length}`}
         keyExtractor={(item) => item.id}
+        extraData={cardData}
         contentContainerStyle={{ gap: 16 }}
         onEndReached={handleLoadMore}
         onEndReachedThreshold={0.4}

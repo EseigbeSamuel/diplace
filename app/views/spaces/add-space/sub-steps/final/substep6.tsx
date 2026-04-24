@@ -17,6 +17,7 @@ import { ColorScheme } from "@/utils";
 import { useSpaceStore } from "@/store/useSpace";
 import { useGetCurrentUser } from "@/hooks";
 import { useRouter } from "expo-router";
+import { showToast } from "@/lib";
 import MapView, { Marker } from "react-native-maps";
 import { CustomBottomSheet } from "@/components/bottom-sheet";
 import { BottomSheetModal } from "@gorhom/bottom-sheet";
@@ -81,6 +82,30 @@ const SpacePreviewScreen: React.FC<SpacePreviewScreenProps> = ({
   };
 
   const handleComplete = () => {
+    const hasLocation =
+      !!spaceForm.value.location?.address?.trim() &&
+      typeof spaceForm.value.location?.latitude === "number" &&
+      typeof spaceForm.value.location?.longitude === "number";
+    const hasMedia = (spaceForm.value.media ?? []).length > 0;
+
+    if (!hasLocation) {
+      showToast({
+        type: "error",
+        text1: "Location required",
+        text2: "Add and confirm a location before continuing.",
+      });
+      return;
+    }
+
+    if (!hasMedia) {
+      showToast({
+        type: "error",
+        text1: "Media required",
+        text2: "Upload at least one media file before continuing.",
+      });
+      return;
+    }
+
     if (onNext) {
       onNext();
     }

@@ -4,7 +4,12 @@ import ConfirmDialog from "@/components/confirm-dialog";
 import Filter from "@/components/filter";
 import HouseCard from "@/components/housecard";
 import HouseCardTile from "@/components/houseCardTile";
-import { useDeleteProperty, useGetCurrentUser, useListProperties } from "@/hooks";
+import {
+  useDeleteProperty,
+  useGetCurrentUser,
+  useListProperties,
+  useUpdatePropertyStatus,
+} from "@/hooks";
 import { SimpleSelector } from "@/components/selector";
 import { useTheme } from "@/contexts/themeContext";
 import { useSpaceStore } from "@/store/useSpace";
@@ -20,7 +25,7 @@ import { RFValue } from "react-native-responsive-fontsize";
 const SpacesPosted = ({ layout }: { layout: "tiles" | "box" }) => {
   const { colors } = useTheme();
   const homeStyles = styles(colors);
-  const { setPreviewProperty } = useSpaceStore();
+  const { setPreviewProperty, setEditingDraft } = useSpaceStore();
   const { currentUser, isCurrentUserLoading, currentUserError, refetchCurrentUser } =
     useGetCurrentUser();
   const {
@@ -41,34 +46,50 @@ const SpacesPosted = ({ layout }: { layout: "tiles" | "box" }) => {
     enabled: !!currentUser && !currentUserError,
   });
   const { deletePropertyMutation, deletePropertyPending } = useDeleteProperty();
+  const { updatePropertyStatusMutation, updatePropertyStatusPending } =
+    useUpdatePropertyStatus();
   const viewSpaceref = useRef<BottomSheetModal>(null);
   const viewUpdateStatus = useRef<BottomSheetModal>(null);
   const [isRemoveDialogVisible, setRemoveDialogVisible] = useState(false);
-  const [isStatusDialogVisible, setStatusDialogVisible] = useState(false);
   const [selectedStatus, setSelectedStatus] = useState<
-    "available" | "reserved" | "rented"
-  >("available");
-  const [openStatusAfterPrimaryDismiss, setOpenStatusAfterPrimaryDismiss] =
-    useState(false);
+    "active" | "pending" | "rented" | "sold" | "inactive" | "archived"
+  >("active");
   const [selectedSpace, setSelectedSpace] = useState<PropertyCardItem | null>(null);
-  const snapPoints = useMemo(() => ["25%", "50%", "75%", "90%"], []);
+  const snapPoints = useMemo(() => ["62%"], []);
+  const statusSnapPoints = useMemo(() => ["56%"], []);
+  const prettyStatus = (status?: string) =>
+    (status || "active").charAt(0).toUpperCase() + (status || "active").slice(1);
+  const mapPropertyStatusToSelector = (
+    status?: string,
+  ): "active" | "pending" | "rented" | "sold" | "inactive" | "archived" => {
+    const raw = status?.toLowerCase?.() || "";
+    if (raw === "pending") return "pending";
+    if (raw === "rented") return "rented";
+    if (raw === "sold") return "sold";
+    if (raw === "inactive") return "inactive";
+    if (raw === "archived") return "archived";
+    return "active";
+  };
 
   const handleViewSpace = (space: PropertyCardItem) => {
     setSelectedSpace(space);
     viewSpaceref.current?.present();
   };
   const handleViewUpdateStatus = () => {
-    setOpenStatusAfterPrimaryDismiss(true);
+    setSelectedStatus(mapPropertyStatusToSelector(selectedSpace?.raw?.status));
     viewSpaceref.current?.dismiss();
-  };
-  const handlePrimarySheetDismiss = () => {
-    if (!openStatusAfterPrimaryDismiss) return;
-    setOpenStatusAfterPrimaryDismiss(false);
-    viewUpdateStatus.current?.present();
+    setTimeout(() => {
+      viewUpdateStatus.current?.present();
+    }, 180);
   };
   const handleEditSpace = () => {
+    if (!selectedSpace?.id) return;
     viewSpaceref.current?.dismiss();
-    router.push("/views/spaces/edit-space");
+    setEditingDraft(null);
+    router.push({
+      pathname: "/views/spaces/add-space/form",
+      params: { property_id: selectedSpace.id, source: "posted" },
+    });
   };
 
   const handlePreviewSpace = () => {
@@ -90,15 +111,6 @@ const SpacesPosted = ({ layout }: { layout: "tiles" | "box" }) => {
     setRemoveDialogVisible(true);
   };
 
-  const handleStatusConfirm = () => {
-    viewUpdateStatus.current?.dismiss();
-    setStatusDialogVisible(false);
-  };
-
-  const handleStatusCancel = () => {
-    viewUpdateStatus.current?.dismiss();
-    setStatusDialogVisible(false);
-  };
   const handleRemoveCancel = () => {
     setRemoveDialogVisible(false);
   };
@@ -106,15 +118,25 @@ const SpacesPosted = ({ layout }: { layout: "tiles" | "box" }) => {
     if (!selectedSpace?.id || deletePropertyPending) return;
     try {
       await deletePropertyMutation({ propertyId: selectedSpace.id });
+      await refetchProperties();
       setRemoveDialogVisible(false);
       setSelectedSpace(null);
     } catch {
       // Toast handled in mutation onError
     }
   };
-  const handleUpdateStatusPress = () => {
-    viewUpdateStatus.current?.dismiss();
-    setStatusDialogVisible(true);
+  const handleUpdateStatusPress = async () => {
+    if (!selectedSpace?.id || updatePropertyStatusPending) return;
+    try {
+      await updatePropertyStatusMutation({
+        propertyId: selectedSpace.id,
+        status: selectedStatus,
+      });
+      await refetchProperties();
+      viewUpdateStatus.current?.dismiss();
+    } catch {
+      // Toast handled in mutation onError
+    }
   };
   const formatCurrency = (amount: number) =>
     `NGN ${new Intl.NumberFormat("en-NG").format(amount || 0)}`;
@@ -122,15 +144,14 @@ const SpacesPosted = ({ layout }: { layout: "tiles" | "box" }) => {
   const formatCostFrequency = (value: string) => value.replace(/^per_/, "").replace(/_/g, " ");
 
   const getBadgeType = (item: PropertyListItem): string | undefined => {
-    if (item.status === "available") return "available";
-    if (item.status === "booked") return "reserved";
-    if (item.status === "completed") return "rented";
+    const status = item.status?.toLowerCase?.();
+    if (status) return status;
     if (item.is_verified) return "verified";
     return undefined;
   };
 
   const postedSpaces = useMemo(
-    () => properties.filter((item) => !["pending", "deleted", "rejected"].includes(item.status)),
+    () => properties.filter((item) => !["draft", "deleted"].includes(item.status)),
     [properties],
   );
 
@@ -141,7 +162,7 @@ const SpacesPosted = ({ layout }: { layout: "tiles" | "box" }) => {
         imageSource: item.media?.[0]?.file_url
           ? { uri: item.media[0].file_url }
           : require("@/assets/images/featuredSpaceImage1.png"),
-        title: item.title,
+        title: item.title || "Untitled space",
         location:
           [
             item.address?.street,
@@ -211,25 +232,23 @@ const SpacesPosted = ({ layout }: { layout: "tiles" | "box" }) => {
         data={cardData}
         renderItem={({ item }) =>
           layout === "box" ? (
-            <>
-              <HouseCard {...item} onPress={() => handleViewSpace(item)} />
-            </>
+            <HouseCard {...item} onPress={() => handleViewSpace(item)} />
           ) : (
-            <>
-              <HouseCardTile
-                imageSource={item.imageSource}
-                name={item.title}
-                location={item.location}
-                price={item.price}
-                badgeType={item.badgeType}
-                duration={item.duration}
-                onPress={() => handleViewSpace(item)}
-              />
-            </>
+            <HouseCardTile
+              imageSource={item.imageSource}
+              name={item.title}
+              location={item.location}
+              price={item.price}
+              badgeType={item.badgeType}
+              duration={item.duration}
+              onPress={() => handleViewSpace(item)}
+            />
           )
         }
         showsVerticalScrollIndicator={false}
+        key={`posted-${layout}-${cardData.length}`}
         keyExtractor={(item) => item.id}
+        extraData={cardData}
         contentContainerStyle={{ gap: 16 }}
         onEndReached={handleLoadMore}
         onEndReachedThreshold={0.4}
@@ -247,8 +266,7 @@ const SpacesPosted = ({ layout }: { layout: "tiles" | "box" }) => {
         bottomSheetProps={{
           ref: viewSpaceref,
           snapPoints,
-          index: 2,
-          onDismiss: handlePrimarySheetDismiss,
+          index: 0,
         }}
       >
         <View style={homeStyles.modalContainer}>
@@ -312,8 +330,8 @@ const SpacesPosted = ({ layout }: { layout: "tiles" | "box" }) => {
       <CustomBottomSheet
         bottomSheetProps={{
           ref: viewUpdateStatus,
-          snapPoints,
-          index: 2,
+          snapPoints: statusSnapPoints,
+          index: 0,
         }}
       >
         <View style={homeStyles.modalContainer}>
@@ -344,40 +362,53 @@ const SpacesPosted = ({ layout }: { layout: "tiles" | "box" }) => {
           <View style={homeStyles.statusSummary}>
             <Text style={homeStyles.statusSummaryLabel}>Current status:</Text>
             <Text style={homeStyles.statusSummaryValue}>
-              {selectedStatus.charAt(0).toUpperCase() + selectedStatus.slice(1)}
+              {prettyStatus(selectedStatus)}
             </Text>
           </View>
 
           <View style={homeStyles.statusActionsWrap}>
             <SimpleSelector
-              title="Available"
-              isChecked={selectedStatus === "available"}
-              onChange={() => setSelectedStatus("available")}
+              title="Active"
+              isChecked={selectedStatus === "active"}
+              onChange={() => setSelectedStatus("active")}
             />
             <SimpleSelector
-              title="Reserved"
-              isChecked={selectedStatus === "reserved"}
-              onChange={() => setSelectedStatus("reserved")}
+              title="Pending"
+              isChecked={selectedStatus === "pending"}
+              onChange={() => setSelectedStatus("pending")}
             />
             <SimpleSelector
               title="Rented"
               isChecked={selectedStatus === "rented"}
               onChange={() => setSelectedStatus("rented")}
             />
+            <SimpleSelector
+              title="Sold"
+              isChecked={selectedStatus === "sold"}
+              onChange={() => setSelectedStatus("sold")}
+            />
+            <SimpleSelector
+              title="Inactive"
+              isChecked={selectedStatus === "inactive"}
+              onChange={() => setSelectedStatus("inactive")}
+            />
+            <SimpleSelector
+              title="Archived"
+              isChecked={selectedStatus === "archived"}
+              onChange={() => setSelectedStatus("archived")}
+            />
           </View>
 
           <View style={homeStyles.actionsWrap}>
-            <AppButton onPress={handleUpdateStatusPress} title="Update" fullwidth />
+            <AppButton
+              onPress={handleUpdateStatusPress}
+              title={updatePropertyStatusPending ? "Updating..." : "Update"}
+              fullwidth
+              disabled={updatePropertyStatusPending}
+            />
           </View>
         </View>
       </CustomBottomSheet>
-      <ConfirmDialog
-        visible={isStatusDialogVisible}
-        onConfirm={handleStatusConfirm}
-        onCancel={handleStatusCancel}
-        title="Confirm Status Update"
-        message="You are about to change the status of the property. Do you wish to proceed?"
-      />
       <ConfirmDialog
         visible={isRemoveDialogVisible}
         onConfirm={handleRemoveConfirm}

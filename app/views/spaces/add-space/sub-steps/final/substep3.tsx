@@ -85,7 +85,8 @@ const RentalCostSubstep: React.FC<RentalCostSubstepProps> = ({
   const handleNext = () => {
     if (
       spaceForm.value.rentalCost?.rentalCost &&
-      spaceForm.value.rentalCost?.rentDuration
+      spaceForm.value.rentalCost?.rentDuration &&
+      spaceForm.value.rentalCost?.maxRentPayout
     ) {
       onNext();
     }
@@ -93,7 +94,8 @@ const RentalCostSubstep: React.FC<RentalCostSubstepProps> = ({
 
   const isValid =
     spaceForm.value.rentalCost?.rentalCost &&
-    spaceForm.value.rentalCost?.rentDuration;
+    spaceForm.value.rentalCost?.rentDuration &&
+    spaceForm.value.rentalCost?.maxRentPayout;
 
   return (
     <View style={styles.container}>

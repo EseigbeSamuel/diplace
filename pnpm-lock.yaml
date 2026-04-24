@@ -125,6 +125,9 @@ importers:
       nativewind:
         specifier: ^4.1.23
         version: 4.1.23(react-native-reanimated@4.1.6(@babel/core@7.28.0)(react-native-worklets@0.5.1(@babel/core@7.28.0)(react-native@0.81.5(@babel/core@7.28.0)(@types/react@19.1.13)(react@19.1.0))(react@19.1.0))(react-native@0.81.5(@babel/core@7.28.0)(@types/react@19.1.13)(react@19.1.0))(react@19.1.0))(react-native-safe-area-context@5.6.1(react-native@0.81.5(@babel/core@7.28.0)(@types/react@19.1.13)(react@19.1.0))(react@19.1.0))(react-native-svg@15.12.1(react-native@0.81.5(@babel/core@7.28.0)(@types/react@19.1.13)(react@19.1.0))(react@19.1.0))(react-native@0.81.5(@babel/core@7.28.0)(@types/react@19.1.13)(react@19.1.0))(react@19.1.0)(tailwindcss@3.4.17)
+      prop-types:
+        specifier: ^15.8.1
+        version: 15.8.1
       react:
         specifier: 19.1.0
         version: 19.1.0
@@ -188,9 +191,6 @@ importers:
       react-native-swiper-flatlist:
         specifier: ^3.2.5
         version: 3.2.5(react-native@0.81.5(@babel/core@7.28.0)(@types/react@19.1.13)(react@19.1.0))
-      react-native-toast-message:
-        specifier: ^2.3.3
-        version: 2.3.3(react-native@0.81.5(@babel/core@7.28.0)(@types/react@19.1.13)(react@19.1.0))(react@19.1.0)
       react-native-vision-camera:
         specifier: ^4.7.3
         version: 4.7.3(react-native-reanimated@4.1.6(@babel/core@7.28.0)(react-native-worklets@0.5.1(@babel/core@7.28.0)(react-native@0.81.5(@babel/core@7.28.0)(@types/react@19.1.13)(react@19.1.0))(react@19.1.0))(react-native@0.81.5(@babel/core@7.28.0)(@types/react@19.1.13)(react@19.1.0))(react@19.1.0))(react-native-worklets-core@1.6.3(react-native@0.81.5(@babel/core@7.28.0)(@types/react@19.1.13)(react@19.1.0))(react@19.1.0))(react-native@0.81.5(@babel/core@7.28.0)(@types/react@19.1.13)(react@19.1.0))(react@19.1.0)
@@ -4126,12 +4126,6 @@ packages:
     resolution: {integrity: sha512-pP6Yioo//PgxBf1Ac/utPaAMaCTXF0QW/Q55hQofGtE7B5/hL0nb9u4cXEdgGJslx0oBCkir4AJAbbD5FpWnaA==}
     peerDependencies:
       react-native: '>=0.59.0'
-
-  react-native-toast-message@2.3.3:
-    resolution: {integrity: sha512-4IIUHwUPvKHu4gjD0Vj2aGQzqPATiblL1ey8tOqsxOWRPGGu52iIbL8M/mCz4uyqecvPdIcMY38AfwRuUADfQQ==}
-    peerDependencies:
-      react: '*'
-      react-native: '*'
 
   react-native-vision-camera-face-detector@1.10.1:
     resolution: {integrity: sha512-KTGJNVh2KszeMnVs/QsSYyUIu2wmZA0H3cQLaOqNXDsc33HB32EPRhO/+A574GGw0/FuYEAnBp3+hFnMCSISGA==}
@@ -9695,11 +9689,6 @@ snapshots:
 
   react-native-swiper-flatlist@3.2.5(react-native@0.81.5(@babel/core@7.28.0)(@types/react@19.1.13)(react@19.1.0)):
     dependencies:
-      react-native: 0.81.5(@babel/core@7.28.0)(@types/react@19.1.13)(react@19.1.0)
-
-  react-native-toast-message@2.3.3(react-native@0.81.5(@babel/core@7.28.0)(@types/react@19.1.13)(react@19.1.0))(react@19.1.0):
-    dependencies:
-      react: 19.1.0
       react-native: 0.81.5(@babel/core@7.28.0)(@types/react@19.1.13)(react@19.1.0)
 
   react-native-vision-camera-face-detector@1.10.1(react-native-vision-camera@4.7.3(react-native-reanimated@4.1.6(@babel/core@7.28.0)(react-native-worklets@0.5.1(@babel/core@7.28.0)(react-native@0.81.5(@babel/core@7.28.0)(@types/react@19.1.13)(react@19.1.0))(react@19.1.0))(react-native@0.81.5(@babel/core@7.28.0)(@types/react@19.1.13)(react@19.1.0))(react@19.1.0))(react-native-worklets-core@1.6.3(react-native@0.81.5(@babel/core@7.28.0)(@types/react@19.1.13)(react@19.1.0))(react@19.1.0))(react-native@0.81.5(@babel/core@7.28.0)(@types/react@19.1.13)(react@19.1.0))(react@19.1.0))(react-native@0.81.5(@babel/core@7.28.0)(@types/react@19.1.13)(react@19.1.0))(react@19.1.0):
