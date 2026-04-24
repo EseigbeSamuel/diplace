@@ -1,4 +1,4 @@
-import { checkTokenExpiry, clearAll, getFromLocalStore, hideToast, showToast } from "@/lib";
+import { checkTokenExpiry, clearAll, getFromLocalStore, showToast } from "@/lib";
 import axios, { AxiosResponse, Method } from "axios";
 
 let lastToastMessage = "";
@@ -6,15 +6,19 @@ let lastToastAt = 0;
 
 const showApiToast = (text1: string, text2: string) => {
   const now = Date.now();
+  // Prevent rapid toast churn from concurrent failing requests.
+  if (now - lastToastAt < 1200) {
+    return;
+  }
+
   // Prevent identical toasts from stacking in quick succession.
-  if (lastToastMessage === `${text1}:${text2}` && now - lastToastAt < 1500) {
+  if (lastToastMessage === `${text1}:${text2}` && now - lastToastAt < 4000) {
     return;
   }
 
   lastToastMessage = `${text1}:${text2}`;
   lastToastAt = now;
 
-  hideToast();
   showToast({
     type: "error",
     text1,

@@ -13,6 +13,7 @@ import { useCreateProperty, useUpdateProperty } from "@/hooks";
 import { useTheme } from "@/contexts/themeContext";
 import { useSpaceStore } from "@/store/useSpace";
 import { ColorScheme } from "@/utils";
+import { router } from "expo-router";
 
 interface PublishNowSubstepProps {
   onNext: () => void;
@@ -28,8 +29,9 @@ const PublishNowSubstep: React.FC<PublishNowSubstepProps> = ({
   const [agreedToTerms, setAgreedToTerms] = useState(false);
   const { createPropertyMutation, createPropertyPending } = useCreateProperty();
   const { updatePropertyMutation, updatePropertyPending } = useUpdateProperty();
-  const { spaceForm, editContext } = useSpaceStore();
+  const { spaceForm, editContext, clearForm, editingDraft } = useSpaceStore();
   const isEditMode = !!editContext?.propertyId;
+  const isDraftEdit = isEditMode && editingDraft?.status === "draft";
 
   const steps = [
     {
@@ -68,19 +70,22 @@ const PublishNowSubstep: React.FC<PublishNowSubstepProps> = ({
     }
 
     try {
-      if (isEditMode) {
+      if (isEditMode && !isDraftEdit) {
         await updatePropertyMutation({
           propertyId: editContext.propertyId,
           addressId: editContext.addressId,
           type: spaceForm.type,
           value: spaceForm.value,
         });
-      } else {
-        await createPropertyMutation({
-          type: spaceForm.type,
-          value: spaceForm.value,
-        });
+        clearForm();
+        router.replace("/(tabs)/spaces");
+        return;
       }
+
+      await createPropertyMutation({
+        type: spaceForm.type,
+        value: spaceForm.value,
+      });
       onNext();
     } catch (error) {
       console.log("create property error", error);
@@ -143,12 +148,14 @@ const PublishNowSubstep: React.FC<PublishNowSubstepProps> = ({
       {/* Post Button */}
       <View style={styles.buttonContainer}>
         <AppButton
-          title={isEditMode ? "Update" : "Post"}
+          title="Looks Good!"
           onPress={handlePost}
           size="large"
           fullwidth={true}
           disabled={
-            !agreedToTerms || createPropertyPending || updatePropertyPending
+            !agreedToTerms ||
+            createPropertyPending ||
+            updatePropertyPending
           }
         />
       </View>

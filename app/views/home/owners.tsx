@@ -118,7 +118,7 @@ export default function OwnersHome() {
               <Text style={custom.text} className=" font-medium">
                 Confirm space availability
               </Text>
-              <View className="w-full px-4 mt-4">
+              <View className="w-full mt-4">
                 <View className="rounded-3xl overflow-hidden bg-white shadow-lg shadow-black/20">
                   <View className="w-full h-48 overflow-hidden rounded-3xl">
                     <Image

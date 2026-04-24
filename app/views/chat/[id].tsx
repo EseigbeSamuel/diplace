@@ -23,6 +23,7 @@ import {
   View,
 } from "react-native";
 import ReportBottomSheet from "../report/report";
+import { SimpleSelector } from "@/components/selector";
 
 const { width: screenWidth } = Dimensions.get("window");
 
@@ -615,7 +616,8 @@ const ChatPage = () => {
               style={styles.menuItem}
               onPress={() => {
                 setShowMenu(false);
-                reportRef.current?.present();
+                // reportRef.current?.present();
+                setShowReportModal(true);
               }}
             >
               <Image
@@ -691,7 +693,7 @@ const ChatPage = () => {
       </Modal>
 
       {/* Report Modal */}
-      {/* <Modal
+      <Modal
         visible={showReportModal}
         transparent
         animationType="slide"
@@ -717,7 +719,6 @@ const ChatPage = () => {
               Let us know what the case is with the agent/space manager.
             </Text>
 
-            {/* Report Reasons 
             <View style={styles.reportList}>
               {reportReasons.map((reason, index) => (
                 <SimpleSelector
@@ -729,12 +730,10 @@ const ChatPage = () => {
               ))}
             </View>
 
-            {/* Submit Button 
-
             <AppButton title="Submit" onPress={handleSubmitReport} />
           </Pressable>
         </Pressable>
-      </Modal> */}
+      </Modal>
 
       <CustomBottomSheet
         bottomSheetProps={{

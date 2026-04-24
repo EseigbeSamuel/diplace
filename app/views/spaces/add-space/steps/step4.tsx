@@ -1,5 +1,5 @@
 import React from "react";
-import { View, Text, Image, ScrollView, Pressable } from "react-native";
+import { View, Text, Image, ScrollView } from "react-native";
 import AppButton from "@/components/button";
 
 import { useTheme } from "@/contexts/themeContext";
@@ -10,7 +10,7 @@ interface StepOverviewProps {
   onSkip: () => void;
 }
 
-const Step4Overview: React.FC<StepOverviewProps> = ({ onNext, onSkip }) => {
+const Step4Overview: React.FC<StepOverviewProps> = ({ onNext }) => {
   const { colors } = useTheme();
   const styles = createStyles(colors);
 
@@ -64,9 +64,6 @@ const Step4Overview: React.FC<StepOverviewProps> = ({ onNext, onSkip }) => {
       </ScrollView>
 
       <View style={styles.bottomButtons}>
-        <Pressable onPress={onSkip} style={styles.skipButton}>
-          <Text style={styles.skipText}>Skip</Text>
-        </Pressable>
         <View style={styles.nextButtonWrapper}>
           <AppButton title="Next" onPress={onNext} size="medium" />
         </View>

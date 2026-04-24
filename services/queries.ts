@@ -52,11 +52,13 @@ export const postRequest = async <TResponse, TRequest>({
   payload,
   protectedRoute = true,
   headers,
+  notifyOnError,
 }: {
   url: string;
   payload: TRequest;
   protectedRoute?: boolean;
   headers?: Record<string, string>;
+  notifyOnError?: boolean;
 }): Promise<TResponse> => {
 
   return await apiService<TResponse, TRequest>(
@@ -66,6 +68,9 @@ export const postRequest = async <TResponse, TRequest>({
     protectedRoute,
     undefined,
     headers,
+    undefined,
+    "json",
+    notifyOnError,
   );
 };
 
@@ -73,16 +78,23 @@ export const patchRequest = async <TResponse, TRequest>({
   url,
   payload,
   protectedRoute = true,
+  notifyOnError,
 }: {
   url: string;
   payload: TRequest;
   protectedRoute?: boolean;
+  notifyOnError?: boolean;
 }): Promise<TResponse> => {
   return await apiService<TResponse, TRequest>(
     url,
     "PATCH",
     payload,
     protectedRoute,
+    undefined,
+    {},
+    undefined,
+    "json",
+    notifyOnError,
   );
 };
 
@@ -90,25 +102,44 @@ export const putRequest = async <TResponse, TRequest>({
   url,
   payload,
   protectedRoute = true,
+  notifyOnError,
 }: {
   url: string;
   payload: TRequest;
   protectedRoute?: boolean;
+  notifyOnError?: boolean;
 }): Promise<TResponse> => {
   return await apiService<TResponse, TRequest>(
     url,
     "PUT",
     payload,
     protectedRoute,
+    undefined,
+    {},
+    undefined,
+    "json",
+    notifyOnError,
   );
 };
 
 export const deleteRequest = async <TResponse>({
   url,
   protectedRoute = true,
+  notifyOnError,
 }: {
   url: string;
   protectedRoute?: boolean;
+  notifyOnError?: boolean;
 }): Promise<TResponse> => {
-  return await apiService<TResponse>(url, "DELETE", undefined, protectedRoute);
+  return await apiService<TResponse>(
+    url,
+    "DELETE",
+    undefined,
+    protectedRoute,
+    undefined,
+    {},
+    undefined,
+    "json",
+    notifyOnError,
+  );
 };

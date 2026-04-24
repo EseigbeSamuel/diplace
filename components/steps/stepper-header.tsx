@@ -25,6 +25,7 @@ interface StepperWithHeaderProps {
   initialStepIndex?: number;
   initialSubstepIndex?: number;
   onSaveAndEditLater?: () => Promise<void> | void;
+  rightActionTitle?: string;
 }
 
 const StepperWithHeader: React.FC<StepperWithHeaderProps> = ({
@@ -33,6 +34,7 @@ const StepperWithHeader: React.FC<StepperWithHeaderProps> = ({
   initialStepIndex = 0,
   initialSubstepIndex = 0,
   onSaveAndEditLater,
+  rightActionTitle = "Save as Draft",
 }) => {
   const [currentStepIndex, setCurrentStepIndex] = useState(initialStepIndex);
   const [currentSubstepIndex, setCurrentSubstepIndex] = useState(initialSubstepIndex);
@@ -93,7 +95,7 @@ const StepperWithHeader: React.FC<StepperWithHeaderProps> = ({
 
   const rightIconView = (
     <AppButton
-      title="Save as Draft"
+      title={rightActionTitle}
       variant="tertiary"
       onPress={handleSaveAndEditLater}
     />

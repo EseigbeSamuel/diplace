@@ -1,5 +1,12 @@
 import React, { useState } from "react";
-import { View, Text, StyleSheet, TextInput, ScrollView } from "react-native";
+import {
+  View,
+  Text,
+  StyleSheet,
+  TextInput,
+  KeyboardAvoidingView,
+  Platform,
+} from "react-native";
 import { RFValue } from "react-native-responsive-fontsize";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import AppButton from "@/components/button";
@@ -7,6 +14,7 @@ import NumericField from "@/components/NumberField";
 import { useTheme } from "@/contexts/themeContext";
 import { ColorScheme } from "@/utils";
 import { useSpaceStore } from "@/store/useSpace";
+import { showToast } from "@/lib";
 
 interface CapacitySubstepProps {
   onNext: () => void;
@@ -28,6 +36,11 @@ const EventCapacitySubstep: React.FC<CapacitySubstepProps> = ({
   const handleNext = () => {
     if (!isRoomSizeValid) {
       setRoomSizeError("Use this format: 30ft x 40ft");
+      showToast({
+        type: "error",
+        text1: "Invalid space size",
+        text2: "Use this format: 30ft x 40ft",
+      });
       return;
     }
 
@@ -35,10 +48,14 @@ const EventCapacitySubstep: React.FC<CapacitySubstepProps> = ({
   };
 
   return (
-    <View style={styles.container}>
+    <KeyboardAvoidingView
+      style={styles.container}
+      behavior={Platform.OS === "ios" ? "padding" : "height"}
+      keyboardVerticalOffset={Platform.OS === "ios" ? 88 : 24}
+    >
       <KeyboardAwareScrollView
         enableOnAndroid={true}
-        extraScrollHeight={20}
+        extraScrollHeight={90}
         enableAutomaticScroll={true}
         showsVerticalScrollIndicator={false}
         contentContainerStyle={styles.scrollContent}
@@ -151,13 +168,12 @@ const EventCapacitySubstep: React.FC<CapacitySubstepProps> = ({
           disabled={
             !spaceForm.value.capacity?.caps ||
             !spaceForm.value.capacity?.roomSize ||
-            !isRoomSizeValid ||
             spaceForm.value.capacity?.changingRooms === 0 ||
             spaceForm.value.capacity?.bathrooms === 0
           }
         />
       </View>
-    </View>
+    </KeyboardAvoidingView>
   );
 };
 

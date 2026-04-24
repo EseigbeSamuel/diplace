@@ -118,6 +118,7 @@ const HouseCard = ({
           </View>
         );
       case "reserved":
+      case "booked":
         return (
           <View className="flex flex-row items-center gap-2 px-2 py-1 border border-[#F59E0B] rounded-full bg-[#FEF3C7]">
             <Image
@@ -128,13 +129,54 @@ const HouseCard = ({
           </View>
         );
       case "available":
+      case "approved":
+      case "active":
         return (
           <View className="flex flex-row items-center gap-2 px-2 py-1 border border-[#3B82F6] rounded-full bg-[#DBEAFE]">
             <Image
               source={require("@/assets/icons/Unlock-fill.png")}
               className="w-4 h-4"
             />
-            <Text className="text-[#2563EB]">Reserved</Text>
+            <Text className="text-[#2563EB]">Available</Text>
+          </View>
+        );
+      case "sold":
+      case "completed":
+      case "rented":
+        return (
+          <View className="flex flex-row items-center gap-2 px-2 py-1 border border-green-500 rounded-full bg-green-400/40">
+            <Image
+              source={require("@/assets/icons/badge-check-green.png")}
+              className="w-4 h-4"
+            />
+            <Text className="text-green-600">
+              {badgeType === "sold" ? "Sold" : "Rented"}
+            </Text>
+          </View>
+        );
+      case "rejected":
+      case "cancelled":
+      case "inactive":
+      case "archived":
+        return (
+          <View className="flex flex-row items-center gap-2 px-2 py-1 border border-red-500 rounded-full bg-red-400/20">
+            <Image
+              source={require("@/assets/icons/delete.png")}
+              className="w-4 h-4"
+            />
+            <Text className="text-red-600">
+              {badgeType.charAt(0).toUpperCase() + badgeType.slice(1)}
+            </Text>
+          </View>
+        );
+      case "unverified":
+        return (
+          <View className="flex flex-row items-center gap-2 px-2 py-1 border border-[#60646C] rounded-full bg-[#F2F2F5]">
+            <Image
+              source={require("@/assets/icons/Checkbox-circle-intermediate.png")}
+              className="w-4 h-4"
+            />
+            <Text className="text-[#1C2024]">Unverified</Text>
           </View>
         );
     }
@@ -156,7 +198,13 @@ const HouseCard = ({
         <View className="flex flex-row justify-between items-start gap-3 px-1 pt-2">
           <View className="flex-1">
             <View className="flex flex-row items-start justify-between gap-3">
-              <Text style={homeStyles.title}>{title}</Text>
+              <Text
+                style={homeStyles.title}
+                numberOfLines={1}
+                ellipsizeMode="tail"
+              >
+                {title}
+              </Text>
               {showBookmark ? (
                 <TouchableOpacity
                   onPress={handleBookmarkPress}
