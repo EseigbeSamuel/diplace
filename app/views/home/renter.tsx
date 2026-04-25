@@ -1,6 +1,7 @@
-import React, { useEffect, useMemo, useState } from "react";
+import { CustomBottomSheet } from "@/components/bottom-sheet";
 import AppButton from "@/components/button";
 import Filter from "@/components/filter";
+import FilterBottomSheets from "@/components/filterBS";
 import { AppHeader } from "@/components/header";
 import HouseCard from "@/components/housecard";
 import SafeAreaViewContainer from "@/components/safeareaview";
@@ -13,7 +14,9 @@ import {
 } from "@/hooks";
 import { PropertyListItem } from "@/types";
 import { ColorScheme } from "@/utils";
+import { BottomSheetModal } from "@gorhom/bottom-sheet";
 import { router } from "expo-router";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import {
   ActivityIndicator,
   FlatList,
@@ -23,6 +26,7 @@ import {
   Text,
   View,
 } from "react-native";
+import { useSharedValue } from "react-native-reanimated";
 import { RFValue } from "react-native-responsive-fontsize";
 
 type PropertyCardItem = {
@@ -197,6 +201,32 @@ export default function RenterHome() {
     }
   };
 
+  //bottom sheet handlers
+  const [type, setType] = useState("Any");
+  const [rooms, setRooms] = useState(0);
+  const [baths, setBaths] = useState(0);
+
+  const openCity = () => {};
+  const openNeighborhood = () => {};
+  const clear = () => {
+    setType("Any");
+    setRooms(0);
+    setBaths(0);
+  };
+
+  const apply = () => {
+    addFilterRef.current?.dismiss();
+  };
+  const addFilterRef = useRef<BottomSheetModal>(null);
+
+  const anim = useSharedValue(0);
+
+  const handleAddFilter = () => {
+    addFilterRef.current?.present();
+  };
+
+  const snapPoints = useMemo(() => ["25%", "50%", "75%", "90%"], []);
+
   return (
     <SafeAreaViewContainer>
       <View className="gap-2">
@@ -219,7 +249,7 @@ export default function RenterHome() {
             </View>
           }
         />
-        <Filter size="small" />
+        <Filter size="small" showFilter onFilterPress={handleAddFilter} />
       </View>
 
       <FlatList
@@ -409,6 +439,32 @@ export default function RenterHome() {
           ) : null
         }
       />
+
+      {/* Filter Bottom Sheet */}
+
+      <CustomBottomSheet
+        bottomSheetProps={{
+          ref: addFilterRef,
+          snapPoints,
+          index: -1,
+          enableContentPanningGesture: true,
+          enableHandlePanningGesture: true,
+          enablePanDownToClose: true,
+        }}
+      >
+        <FilterBottomSheets
+          selectedType={type}
+          onSelectType={setType}
+          rooms={rooms}
+          setRooms={setRooms}
+          baths={baths}
+          setBaths={setBaths}
+          onPressCity={openCity}
+          onPressNeighborhood={openNeighborhood}
+          onClear={clear}
+          onApply={apply}
+        />
+      </CustomBottomSheet>
     </SafeAreaViewContainer>
   );
 }
