@@ -24,7 +24,7 @@ export default function Login() {
   const { loginMutation, loginMutationPending } = useLogin();
 
   return (
-    <SafeAreaViewContainer className="justify-center flex-1 bg-white">
+    <SafeAreaViewContainer className="justify-center flex-1 ">
       <KeyboardAwareScrollView
         enableOnAndroid={true}
         extraScrollHeight={20}
@@ -74,7 +74,11 @@ export default function Login() {
                 icon={() => (
                   <Image
                     source={require("../../assets/icons/mail-outline-light.png")}
-                    style={{ width: 20, height: 20, tintColor: colors.slate[650] }}
+                    style={{
+                      width: 20,
+                      height: 20,
+                      tintColor: colors.slate[650],
+                    }}
                     resizeMode="contain"
                   />
                 )}
@@ -101,7 +105,11 @@ export default function Login() {
                 icon={() => (
                   <Image
                     source={require("../../assets/icons/password-lock.png")}
-                    style={{ width: 20, height: 20, tintColor: colors.slate[650] }}
+                    style={{
+                      width: 20,
+                      height: 20,
+                      tintColor: colors.slate[650],
+                    }}
                     resizeMode="contain"
                   />
                 )}
@@ -115,7 +123,11 @@ export default function Login() {
                 icon={() => (
                   <Image
                     source={require("../../assets/icons/password-hide.png")}
-                    style={{ width: 20, height: 20, tintColor: colors.slate[650] }}
+                    style={{
+                      width: 20,
+                      height: 20,
+                      tintColor: colors.slate[650],
+                    }}
                     resizeMode="contain"
                   />
                 )}
