@@ -1,12 +1,14 @@
 import Filter from "@/components/filter";
 import { AppHeader } from "@/components/header";
 import SafeAreaViewContainer from "@/components/safeareaview";
-import { mockChats } from "@/constants/mockChats";
 import { useTheme } from "@/contexts/themeContext";
+import { useGetConversations } from "@/hooks";
+import { ConversationResponse } from "@/types";
 import { ColorScheme } from "@/utils";
 import { useRouter } from "expo-router";
 import React, { useState } from "react";
 import {
+  ActivityIndicator,
   FlatList,
   Image,
   StatusBar,
@@ -20,7 +22,7 @@ import { RFValue } from "react-native-responsive-fontsize";
 const filterTabs = ["All", "Unread", "Read", "Dates"];
 
 interface ChatItemProps {
-  item: (typeof mockChats)[0];
+  item: ConversationResponse;
   colors: ColorScheme;
   isDarkMode: boolean;
 }
@@ -32,26 +34,44 @@ const VerifiedBadge = () => (
   </View>
 );
 
-const ChatItem: React.FC<ChatItemProps> = ({ item, colors, isDarkMode }) => {
+const ChatItem: React.FC<ChatItemProps> = ({ item, colors }) => {
   const router = useRouter();
+
+  const otherParticipant = item.participants?.[0];
+  const displayName = otherParticipant
+    ? `${otherParticipant.first_name ?? ""} ${otherParticipant.last_name ?? ""}`.trim() ||
+      otherParticipant.email
+    : "Unknown";
+  const avatarUri = otherParticipant?.profile_picture ?? undefined;
+  const isVerified = otherParticipant?.status === "verified";
+  const formattedTime = item.last_message_at
+    ? new Date(item.last_message_at).toLocaleTimeString([], {
+        hour: "2-digit",
+        minute: "2-digit",
+      })
+    : "";
 
   return (
     <TouchableOpacity
       style={[styles.chatItem, { backgroundColor: colors.background }]}
-      onPress={() => router.push("/views/chat/[id]")}
+      onPress={() =>
+        router.push({ pathname: "/views/chat/[id]", params: { id: item.public_id } })
+      }
     >
       <View style={styles.avatarContainer}>
-        <Image source={{ uri: item.avatar }} style={styles.avatar} />
-        {item.isOnline && (
+        {avatarUri ? (
+          <Image source={{ uri: avatarUri }} style={styles.avatar} />
+        ) : (
           <View
             style={[
-              styles.onlineIndicator,
-              {
-                backgroundColor: colors.success[200],
-                borderColor: colors.background,
-              },
+              styles.avatar,
+              { backgroundColor: colors.slate[300], justifyContent: "center", alignItems: "center" },
             ]}
-          />
+          >
+            <Text style={{ color: colors.slate[650], fontWeight: "700", fontSize: RFValue(16) }}>
+              {displayName.charAt(0).toUpperCase()}
+            </Text>
+          </View>
         )}
       </View>
 
@@ -62,12 +82,12 @@ const ChatItem: React.FC<ChatItemProps> = ({ item, colors, isDarkMode }) => {
               style={[styles.chatName, { color: colors.slate[650] }]}
               numberOfLines={1}
             >
-              {item.name}
+              {displayName}
             </Text>
-            {item.isVerified && <VerifiedBadge />}
+            {isVerified && <VerifiedBadge />}
           </View>
           <Text style={[styles.chatTime, { color: colors.slate[500] }]}>
-            {item.time}
+            {formattedTime}
           </Text>
         </View>
 
@@ -76,23 +96,23 @@ const ChatItem: React.FC<ChatItemProps> = ({ item, colors, isDarkMode }) => {
             style={[
               styles.chatMessage,
               { color: colors.slate[500] },
-              item.unread > 0 && {
+              item.unread_count > 0 && {
                 color: colors.slate[600],
                 fontWeight: "500",
               },
             ]}
             numberOfLines={1}
           >
-            {item.message || "No messages yet"}
+            {item.last_message_preview || "No messages yet"}
           </Text>
-          {item.unread > 0 && (
+          {item.unread_count > 0 && (
             <View
               style={[
                 styles.unreadBadge,
                 { backgroundColor: colors.error[200] },
               ]}
             >
-              <Text style={styles.unreadText}>{item.unread}</Text>
+              <Text style={styles.unreadText}>{item.unread_count}</Text>
             </View>
           )}
         </View>
@@ -106,18 +126,21 @@ const ChatsPage: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [activeFilter, setActiveFilter] = useState("All");
 
-  const filteredChats = mockChats.filter((chat) => {
-    const matchesSearch =
-      chat.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      chat.message.toLowerCase().includes(searchQuery.toLowerCase());
-
-    if (activeFilter === "All") return matchesSearch;
-    if (activeFilter === "Unread") return matchesSearch && chat.unread > 0;
-    if (activeFilter === "Read") return matchesSearch && chat.unread === 0;
-    return matchesSearch;
+  const { conversations, isConversationsLoading } = useGetConversations({
+    q: searchQuery || undefined,
+    skip: 0,
+    limit: 50,
   });
 
-  const renderChatItem = ({ item }: { item: (typeof mockChats)[0] }) => (
+  const allConversations = conversations?.conversations ?? [];
+
+  const filteredChats = allConversations.filter((conv) => {
+    if (activeFilter === "Unread") return conv.unread_count > 0;
+    if (activeFilter === "Read") return conv.unread_count === 0;
+    return true;
+  });
+
+  const renderChatItem = ({ item }: { item: ConversationResponse }) => (
     <ChatItem item={item} colors={colors} isDarkMode={isDarkMode} />
   );
 
@@ -147,12 +170,12 @@ const ChatsPage: React.FC = () => {
       >
         {tab}
       </Text>
-      {tab === "Unread" && mockChats.some((chat) => chat.unread > 0) && (
+      {tab === "Unread" && allConversations.some((c) => c.unread_count > 0) && (
         <View
           style={[styles.filterBadge, { backgroundColor: colors.error[200] }]}
         >
           <Text style={styles.filterBadgeText}>
-            {mockChats.filter((chat) => chat.unread > 0).length}
+            {allConversations.filter((c) => c.unread_count > 0).length}
           </Text>
         </View>
       )}
@@ -173,14 +196,27 @@ const ChatsPage: React.FC = () => {
       </View>
 
       {/* Chat List */}
-      <FlatList
-        data={filteredChats}
-        renderItem={renderChatItem}
-        keyExtractor={(item) => item.id}
-        style={styles.chatList}
-        showsVerticalScrollIndicator={false}
-        contentContainerStyle={styles.chatListContent}
-      />
+      {isConversationsLoading ? (
+        <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
+          <ActivityIndicator size="large" color={colors.slate[650]} />
+        </View>
+      ) : (
+        <FlatList
+          data={filteredChats}
+          renderItem={renderChatItem}
+          keyExtractor={(item) => item.public_id}
+          style={styles.chatList}
+          showsVerticalScrollIndicator={false}
+          contentContainerStyle={styles.chatListContent}
+          ListEmptyComponent={
+            <View style={{ alignItems: "center", marginTop: 60 }}>
+              <Text style={{ color: colors.slate[500], fontSize: RFValue(14) }}>
+                No conversations yet.
+              </Text>
+            </View>
+          }
+        />
+      )}
     </SafeAreaViewContainer>
   );
 };

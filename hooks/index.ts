@@ -1,5 +1,6 @@
 export * from "./auth";
 export * from "./chat";
+export * from "./useChatWebSocket";
 export * from "./bookmark";
 export * from "./property";
 export * from "./review";

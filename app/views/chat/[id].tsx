@@ -1,12 +1,12 @@
 import { CustomBottomSheet } from "@/components/bottom-sheet";
 import AppButton from "@/components/button";
 import SafeAreaViewContainer from "@/components/safeareaview";
-import { mockMessages } from "@/constants/mockMessages";
 import { useTheme } from "@/contexts/themeContext";
+import { useGetConversationMessages, useSendMessage, useChatWebSocket, WsNewMessagePayload } from "@/hooks";
 import { ColorScheme } from "@/utils";
 import { BottomSheetModal } from "@gorhom/bottom-sheet";
-import { useRouter } from "expo-router";
-import React, { useEffect, useMemo, useRef, useState } from "react";
+import { useLocalSearchParams, useRouter } from "expo-router";
+import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
   Dimensions,
   FlatList,
@@ -268,10 +268,74 @@ const MessageItem: React.FC<MessageItemProps> = ({
 
 const ChatPage = () => {
   const { colors, isDarkMode } = useTheme();
-  const [messages, setMessages] = useState<Message[]>(mockMessages);
+  const { id: conversationId } = useLocalSearchParams<{ id: string }>();
+
+  // --- API hooks ---
+  const { messages: apiMessages, isMessagesLoading } = useGetConversationMessages({
+    conversationId,
+    enabled: !!conversationId,
+  });
+  const { sendMessageMutation, isSendMessagePending } = useSendMessage();
+
+  // Map API messages to the local Message shape used by the UI components
+  const [localMessages, setLocalMessages] = useState<Message[]>([]);
+
+  useEffect(() => {
+    if (apiMessages) {
+      setLocalMessages(
+        apiMessages.map((m) => ({
+          id: m.public_id,
+          text: m.content,
+          timestamp: "", // API doesn't surface a timestamp field yet
+          isUser: m.sender_id === m.sender?.public_id, // will be refined once auth context is wired
+          type: "text" as const,
+        }))
+      );
+    }
+  }, [apiMessages]);
+
+  const messages = localMessages;
   const [inputText, setInputText] = useState("");
   const [replyTo, setReplyTo] = useState<string | null>(null);
   const flatListRef = useRef<FlatList>(null);
+
+  // --- WebSocket (real-time incoming messages) ---
+  const handleNewMessage = useCallback(
+    (payload: WsNewMessagePayload) => {
+      setLocalMessages((prev) => {
+        // De-duplicate: ignore if we already have a message with this ID
+        if (prev.some((m) => m.id === payload.public_id)) return prev;
+        return [
+          ...prev,
+          {
+            id: payload.public_id,
+            text: payload.content,
+            timestamp: new Date(payload.date_created).toLocaleTimeString([], {
+              hour: "2-digit",
+              minute: "2-digit",
+            }),
+            isUser: false, // incoming WS messages are from the other participant
+            type: "text" as const,
+          },
+        ];
+      });
+    },
+    []
+  );
+
+  const { isConnected, isConnecting, sendWsMessage, markConversationRead } =
+    useChatWebSocket({
+      conversationId,
+      onNewMessage: handleNewMessage,
+      enabled: !!conversationId,
+    });
+
+  // Mark conversation as read when the screen opens and WS is connected
+  useEffect(() => {
+    if (isConnected && conversationId) {
+      markConversationRead({ conversation_id: conversationId });
+    }
+  }, [isConnected, conversationId, markConversationRead]);
 
   // Menu states
   const [showMenu, setShowMenu] = useState(false);
@@ -296,12 +360,14 @@ const ChatPage = () => {
     }
   }, [messages]);
 
-  const sendMessage = () => {
-    if (inputText.trim().length === 0) return;
+  const sendMessage = async () => {
+    if (inputText.trim().length === 0 || !conversationId) return;
 
-    const newMessage: Message = {
-      id: Date.now().toString(),
-      text: inputText.trim(),
+    const draft = inputText.trim();
+    const optimisticId = Date.now().toString();
+    const optimisticMessage: Message = {
+      id: optimisticId,
+      text: draft,
       timestamp: new Date().toLocaleTimeString([], {
         hour: "2-digit",
         minute: "2-digit",
@@ -310,34 +376,30 @@ const ChatPage = () => {
       replyTo: replyTo || undefined,
     };
 
-    setMessages((prevMessages) => [...prevMessages, newMessage]);
+    setLocalMessages((prev) => [...prev, optimisticMessage]);
     setInputText("");
     setReplyTo(null);
 
-    // Simulate response after a delay
-    setTimeout(() => {
-      const responses = [
-        "Thanks for your message!",
-        "I'll get back to you shortly.",
-        "Let me check on that for you.",
-        "That sounds great!",
-        "I understand your concern.",
-      ];
-      const randomResponse =
-        responses[Math.floor(Math.random() * responses.length)];
+    // Try WebSocket first — instant delivery when connected
+    const sentViaWs = sendWsMessage({
+      conversation_id: conversationId,
+      content: draft,
+    });
 
-      const responseMessage: Message = {
-        id: (Date.now() + 1).toString(),
-        text: randomResponse,
-        timestamp: new Date().toLocaleTimeString([], {
-          hour: "2-digit",
-          minute: "2-digit",
-        }),
-        isUser: false,
-      };
-
-      setMessages((prevMessages) => [...prevMessages, responseMessage]);
-    }, 1500);
+    if (!sentViaWs) {
+      // WS not ready — fall back to HTTP
+      try {
+        await sendMessageMutation({
+          conversation_id: conversationId,
+          content: draft,
+        });
+      } catch {
+        // Roll back the optimistic message on HTTP failure too
+        setLocalMessages((prev) =>
+          prev.filter((m) => m.id !== optimisticId)
+        );
+      }
+    }
   };
 
   const handleSubmitReview = () => {
@@ -434,11 +496,25 @@ const ChatPage = () => {
                 </View>
               )}
             </View>
-            <Text
-              style={[styles.contactStatus, { color: colors.success[200] }]}
-            >
-              {contactInfo.status}
-            </Text>
+            <View style={{ flexDirection: "row", alignItems: "center", gap: 6 }}>
+              <View
+                style={{
+                  width: 8,
+                  height: 8,
+                  borderRadius: 4,
+                  backgroundColor: isConnecting
+                    ? "#F59E0B"
+                    : isConnected
+                    ? colors.success[200]
+                    : colors.error[200],
+                }}
+              />
+              <Text
+                style={[styles.contactStatus, { color: colors.slate[500] }]}
+              >
+                {isConnecting ? "Connecting..." : isConnected ? "Live" : "Reconnecting..."}
+              </Text>
+            </View>
           </View>
         </View>
 
@@ -546,7 +622,7 @@ const ChatPage = () => {
           <TouchableOpacity
             style={[styles.sendButton]}
             onPress={sendMessage}
-            disabled={inputText.trim().length === 0}
+            disabled={inputText.trim().length === 0 || isSendMessagePending}
           >
             {isDarkMode ? (
               <Image
