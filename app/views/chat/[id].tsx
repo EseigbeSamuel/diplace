@@ -2,7 +2,7 @@ import { CustomBottomSheet } from "@/components/bottom-sheet";
 import AppButton from "@/components/button";
 import SafeAreaViewContainer from "@/components/safeareaview";
 import { useTheme } from "@/contexts/themeContext";
-import { useGetConversationMessages, useSendMessage, useChatWebSocket, WsNewMessagePayload } from "@/hooks";
+import { useGetConversationMessages, useSendMessage, useChatWebSocket, WsNewMessagePayload, useGetConversations, useGetCurrentUser } from "@/hooks";
 import { ColorScheme } from "@/utils";
 import { BottomSheetModal } from "@gorhom/bottom-sheet";
 import { useLocalSearchParams, useRouter } from "expo-router";
@@ -43,13 +43,7 @@ interface Message {
   };
 }
 
-// Contact info
-const contactInfo = {
-  name: "Sarhmy Kalu",
-  status: "Active now",
-  avatar: "https://randomuser.me/api/portraits/men/1.jpg",
-  isVerified: true,
-};
+// Report reasons (contactInfo is now dynamically resolved inside the component)
 
 // Report reasons
 const reportReasons = [
@@ -271,28 +265,66 @@ const ChatPage = () => {
   const { id: conversationId } = useLocalSearchParams<{ id: string }>();
 
   // --- API hooks ---
+  const { currentUser } = useGetCurrentUser();
+  const { conversations } = useGetConversations();
   const { messages: apiMessages, isMessagesLoading } = useGetConversationMessages({
     conversationId,
     enabled: !!conversationId,
   });
   const { sendMessageMutation, isSendMessagePending } = useSendMessage();
 
+  // Find other participant details dynamically
+  const currentConversation = useMemo(() => {
+    return conversations?.conversations?.find((c) => c.public_id === conversationId);
+  }, [conversations, conversationId]);
+
+  const otherParticipant = useMemo(() => {
+    return currentConversation?.participants?.[0];
+  }, [currentConversation]);
+
+  const contactInfo = useMemo(() => {
+    const displayName = otherParticipant
+      ? `${otherParticipant.first_name ?? ""} ${otherParticipant.last_name ?? ""}`.trim() ||
+        otherParticipant.email
+      : "Chat Room";
+    const avatarUri = otherParticipant?.profile_picture || "https://randomuser.me/api/portraits/men/1.jpg";
+    const isVerified = otherParticipant?.status === "verified";
+    
+    return {
+      name: displayName,
+      avatar: avatarUri,
+      isVerified,
+    };
+  }, [otherParticipant]);
+
   // Map API messages to the local Message shape used by the UI components
   const [localMessages, setLocalMessages] = useState<Message[]>([]);
 
   useEffect(() => {
-    if (apiMessages) {
-      setLocalMessages(
-        apiMessages.map((m) => ({
+    if (apiMessages && currentUser) {
+      const mappedApiMessages = apiMessages.map((m) => {
+        const formattedTime = (m as any).date_created
+          ? new Date((m as any).date_created).toLocaleTimeString([], {
+              hour: "2-digit",
+              minute: "2-digit",
+            })
+          : "";
+        return {
           id: m.public_id,
           text: m.content,
-          timestamp: "", // API doesn't surface a timestamp field yet
-          isUser: m.sender_id === m.sender?.public_id, // will be refined once auth context is wired
+          timestamp: formattedTime,
+          isUser: m.sender_id === currentUser.public_id,
           type: "text" as const,
-        }))
-      );
+        };
+      });
+
+      setLocalMessages((prev) => {
+        const apiIds = new Set(mappedApiMessages.map((m) => m.id));
+        const remainingLocal = prev.filter((m) => !apiIds.has(m.id));
+        return [...mappedApiMessages, ...remainingLocal];
+      });
     }
-  }, [apiMessages]);
+  }, [apiMessages, currentUser]);
 
   const messages = localMessages;
   const [inputText, setInputText] = useState("");
@@ -302,6 +334,8 @@ const ChatPage = () => {
   // --- WebSocket (real-time incoming messages) ---
   const handleNewMessage = useCallback(
     (payload: WsNewMessagePayload) => {
+      if (payload.conversation_id !== conversationId) return;
+
       setLocalMessages((prev) => {
         // De-duplicate: ignore if we already have a message with this ID
         if (prev.some((m) => m.id === payload.public_id)) return prev;
@@ -314,13 +348,13 @@ const ChatPage = () => {
               hour: "2-digit",
               minute: "2-digit",
             }),
-            isUser: false, // incoming WS messages are from the other participant
+            isUser: payload.sender_id === currentUser?.public_id,
             type: "text" as const,
           },
         ];
       });
     },
-    []
+    [conversationId, currentUser]
   );
 
   const { isConnected, isConnecting, sendWsMessage, markConversationRead } =

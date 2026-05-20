@@ -5,10 +5,12 @@ import SafeAreaViewContainer from "@/components/safeareaview";
 import { categories, featuredLister, slider } from "@/constants/discover";
 import { featuredSpaces } from "@/constants/home";
 import { useTheme } from "@/contexts/themeContext";
+import { useListProperties } from "@/hooks";
+import { PropertyListItem } from "@/types";
 import { ColorScheme } from "@/utils";
 import { BlurView } from "expo-blur";
 import { router } from "expo-router";
-import React, { useState } from "react";
+import React, { useState, useMemo } from "react";
 import {
   Dimensions,
   FlatList,
@@ -18,6 +20,7 @@ import {
   StyleSheet,
   Text,
   View,
+  ActivityIndicator,
 } from "react-native";
 import { useSharedValue } from "react-native-reanimated";
 import Carousel from "react-native-reanimated-carousel";
@@ -30,6 +33,77 @@ const Discover = () => {
   const anim = useSharedValue(0);
   const { width } = Dimensions.get("window");
   const CARD_WIDTH = width * 0.88;
+
+  // --- Live property hook ---
+  const { properties, isPropertiesLoading } = useListProperties({
+    params: { limit: 100 },
+  });
+
+  const formatCurrency = (amount: number) =>
+    `NGN ${new Intl.NumberFormat("en-NG").format(amount || 0)}`;
+
+  const formatCostFrequency = (value: string) =>
+    value ? value.replace(/^per_/, "").replace(/_/g, " ") : "";
+
+  const mapBadgeType = (item: PropertyListItem): string | undefined => {
+    if (item.is_verified) return "verified";
+    if (item.listing_type === "sponsored") return "hot";
+    if (item.status === "booked") return "reserved";
+    return undefined;
+  };
+
+  const mapToCardProps = (item: PropertyListItem) => ({
+    id: item.public_id,
+    imageSource: item.media?.[0]?.file_url
+      ? { uri: item.media[0].file_url }
+      : require("@/assets/images/featuredSpaceImage1.png"),
+    title: item.title,
+    location:
+      [
+        item.address?.street,
+        item.address?.city,
+        item.address?.state,
+        item.address?.country,
+      ]
+        .filter(Boolean)
+        .join(", ") || "Unknown location",
+    price: formatCurrency(item.price),
+    badgeType: mapBadgeType(item),
+    duration: formatCostFrequency(item.cost_frequency),
+  });
+
+  const handleOpenProperty = (propertyId: string) => {
+    router.push({
+      pathname: "/views/place-details/[id]",
+      params: { id: propertyId },
+    });
+  };
+
+  const featuredSpacesList = useMemo(() => {
+    const available = properties.filter(
+      (p) => p.status === "available" || p.status === "approved" || p.status === "active"
+    );
+    const filtered = available.filter((p) => p.is_verified || p.listing_type !== "normal");
+    return (filtered.length > 0 ? filtered : available).map(mapToCardProps);
+  }, [properties]);
+
+  const discountedSpacesList = useMemo(() => {
+    const available = properties.filter(
+      (p) => p.status === "available" || p.status === "approved" || p.status === "active"
+    );
+    const filtered = [...available].sort((a, b) => a.price - b.price);
+    return (filtered.length > 0 ? filtered : available).map(mapToCardProps);
+  }, [properties]);
+
+  const eventPlacesList = useMemo(() => {
+    const available = properties.filter(
+      (p) => p.status === "available" || p.status === "approved" || p.status === "active"
+    );
+    const filtered = available.filter(
+      (p) => p.property_type === "hall" || p.property_type === "event_centre"
+    );
+    return (filtered.length > 0 ? filtered : available.slice().reverse()).map(mapToCardProps);
+  }, [properties]);
 
   return (
     <SafeAreaViewContainer className="flex-1">
@@ -243,20 +317,25 @@ const Discover = () => {
               )}
             </Pressable>
           </View>
-          <FlatList
-            data={featuredSpaces}
-            renderItem={({ item }) => (
-              <HouseCard
-                {...item}
-                onPress={() => router.push("/views/place-details/[id]")}
-              />
-            )}
-            keyExtractor={(item) => item.id}
-            horizontal
-            showsHorizontalScrollIndicator={false}
-            //contentContainerStyle={{ gap: 16 }}
-            contentContainerStyle={{ gap: 16 }}
-          />
+          {isPropertiesLoading ? (
+            <View className="py-10 items-center justify-center">
+              <ActivityIndicator color={colors.slate[650]} size="small" />
+            </View>
+          ) : (
+            <FlatList
+              data={featuredSpacesList}
+              renderItem={({ item }) => (
+                <HouseCard
+                  {...item}
+                  onPress={() => handleOpenProperty(item.id)}
+                />
+              )}
+              keyExtractor={(item) => item.id}
+              horizontal
+              showsHorizontalScrollIndicator={false}
+              contentContainerStyle={{ gap: 16 }}
+            />
+          )}
         </View>
 
         <View className="flex flex-col gap-3 my-5">
@@ -282,19 +361,25 @@ const Discover = () => {
               )}
             </Pressable>
           </View>
-          <FlatList
-            data={featuredSpaces}
-            renderItem={({ item }) => (
-              <HouseCard
-                {...item}
-                onPress={() => router.push("/views/place-details/[id]")}
-              />
-            )}
-            keyExtractor={(item) => item.id}
-            horizontal
-            showsHorizontalScrollIndicator={false}
-            contentContainerStyle={{ gap: 16 }}
-          />
+          {isPropertiesLoading ? (
+            <View className="py-10 items-center justify-center">
+              <ActivityIndicator color={colors.slate[650]} size="small" />
+            </View>
+          ) : (
+            <FlatList
+              data={discountedSpacesList}
+              renderItem={({ item }) => (
+                <HouseCard
+                  {...item}
+                  onPress={() => handleOpenProperty(item.id)}
+                />
+              )}
+              keyExtractor={(item) => item.id}
+              horizontal
+              showsHorizontalScrollIndicator={false}
+              contentContainerStyle={{ gap: 16 }}
+            />
+          )}
         </View>
 
         <View className="flex flex-col gap-3 my-5">
@@ -320,19 +405,25 @@ const Discover = () => {
               )}
             </Pressable>
           </View>
-          <FlatList
-            data={featuredSpaces}
-            renderItem={({ item }) => (
-              <HouseCard
-                {...item}
-                onPress={() => router.push("/views/place-details/[id]")}
-              />
-            )}
-            keyExtractor={(item) => item.id}
-            horizontal
-            showsHorizontalScrollIndicator={false}
-            contentContainerStyle={{ gap: 16 }}
-          />
+          {isPropertiesLoading ? (
+            <View className="py-10 items-center justify-center">
+              <ActivityIndicator color={colors.slate[650]} size="small" />
+            </View>
+          ) : (
+            <FlatList
+              data={eventPlacesList}
+              renderItem={({ item }) => (
+                <HouseCard
+                  {...item}
+                  onPress={() => handleOpenProperty(item.id)}
+                />
+              )}
+              keyExtractor={(item) => item.id}
+              horizontal
+              showsHorizontalScrollIndicator={false}
+              contentContainerStyle={{ gap: 16 }}
+            />
+          )}
         </View>
       </ScrollView>
     </SafeAreaViewContainer>
