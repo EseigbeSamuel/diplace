@@ -61,6 +61,10 @@ export default function Register() {
             textContentType="emailAddress"
             autoCapitalize="none"
             autoCorrect={false}
+            textColor={colors.slate[650]}
+            placeholderTextColor={colors.slate[450]}
+            outlineColor={colors.slate[300]}
+            activeOutlineColor={colors.slate[650]}
             left={
               <TextInput.Icon
                 icon={() => (
@@ -87,6 +91,10 @@ export default function Register() {
             textContentType="telephoneNumber"
             autoCapitalize="none"
             autoCorrect={false}
+            textColor={colors.slate[650]}
+            placeholderTextColor={colors.slate[450]}
+            outlineColor={colors.slate[300]}
+            activeOutlineColor={colors.slate[650]}
             left={
               <TextInput.Icon
                 icon={() => (
@@ -110,6 +118,10 @@ export default function Register() {
               setFormData({ ...formData, password: text.toString() })
             }
             secureTextEntry={!showPassword}
+            textColor={colors.slate[650]}
+            placeholderTextColor={colors.slate[450]}
+            outlineColor={colors.slate[300]}
+            activeOutlineColor={colors.slate[650]}
             left={
               <TextInput.Icon
                 icon={() => (
@@ -146,6 +158,10 @@ export default function Register() {
               setFormData({ ...formData, confirmPassword: text.toString() })
             }
             secureTextEntry={!showConfirmPassword}
+            textColor={colors.slate[650]}
+            placeholderTextColor={colors.slate[450]}
+            outlineColor={colors.slate[300]}
+            activeOutlineColor={colors.slate[650]}
             left={
               <TextInput.Icon
                 icon={() => (
@@ -199,7 +215,12 @@ export default function Register() {
         </View>
 
         <View className="flex-row justify-center mt-8">
-          <Text className="text-sm font-medium">Or continue with</Text>
+          <Text
+            style={[{ color: colors.slate[650] }]}
+            className="text-sm font-medium"
+          >
+            Or continue with
+          </Text>
         </View>
 
         <View className="justify-center gap-2 mt-2">
@@ -221,8 +242,11 @@ export default function Register() {
           />
         </View>
         <View className="flex-row justify-center mt-8">
-          <Text className="text-base font-medium">
-            I already have an account?
+          <Text
+            style={[{ color: colors.slate[650] }]}
+            className="text-base font-medium flex gap-2"
+          >
+            I already have an account?{" "}
             <Link href="/auth/login" className="text-[#3B82F6]">
               Log in
             </Link>

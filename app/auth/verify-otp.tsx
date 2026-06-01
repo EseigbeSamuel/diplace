@@ -5,7 +5,6 @@
 // import { ColorScheme } from "@/utils";
 // import { useRouter } from "expo-router";
 // import React, { useRef, useState } from "react";
-// // import { TextInputKeyPressEventData } from "react-native";
 // import {
 //   NativeSyntheticEvent,
 //   TextInput as RNTextInput,
@@ -15,7 +14,6 @@
 //   View,
 // } from "react-native";
 // import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
-// import { Surface, TextInput } from "react-native-paper";
 // import { RFValue } from "react-native-responsive-fontsize";
 
 // export default function ForgotPassowrd() {
@@ -38,40 +36,44 @@
 //       const filledOtp = [...otp];
 
 //       newOtp.forEach((digit, i) => {
-//         filledOtp[i] = digit;
+//         if (i < 6) {
+//           filledOtp[i] = digit;
+//         }
 //       });
 
 //       setOtp(filledOtp);
 
-//       // Focus last filled input
-//       const nextIndex = Math.min(newOtp.length - 1, 5);
-//       otpRefs.current[nextIndex]?.focus();
+//       // Focus last filled input or the next empty one
+//       const nextIndex = Math.min(newOtp.length, 5);
+//       setTimeout(() => {
+//         otpRefs.current[nextIndex]?.focus();
+//       }, 0);
 
 //       return;
 //     }
 
-//     // Normal typing
+//     // Normal typing - single digit
 //     const newOtp = [...otp];
 //     newOtp[idx] = cleaned;
 //     setOtp(newOtp);
 
-//     // Move forward automatically
+//     // Move forward automatically if digit was entered
 //     if (cleaned && idx < 5) {
-//       otpRefs.current[idx + 1]?.focus();
+//       setTimeout(() => {
+//         otpRefs.current[idx + 1]?.focus();
+//       }, 0);
 //     }
 //   };
 
 //   const handleOtpKeyPress = (
 //     e: NativeSyntheticEvent<TextInputKeyPressEventData>,
-//     idx: number
+//     idx: number,
 //   ) => {
-//     if (
-//       e.nativeEvent.key === "Backspace" &&
-//       !otp[idx] &&
-//       idx > 0 &&
-//       otpRefs.current[idx - 1]
-//     ) {
-//       otpRefs.current[idx - 1]?.focus();
+//     if (e.nativeEvent.key === "Backspace" && !otp[idx] && idx > 0) {
+//       // Move to previous input on backspace
+//       setTimeout(() => {
+//         otpRefs.current[idx - 1]?.focus();
+//       }, 0);
 //     }
 //   };
 
@@ -100,31 +102,22 @@
 
 //         <View className="gap-1" style={styles.container}>
 //           {otp.map((digit, idx) => (
-//             <Surface key={idx} style={styles.otpInputSurface} elevation={0}>
-//               <TextInput
-//                 render={(props) => {
-//                   return (
-//                     <RNTextInput
-//                       {...props}
-//                       ref={(el) => {
-//                         otpRefs.current[idx] = el;
-//                       }}
-//                       value={digit}
-//                       onChangeText={(text) => handleOtpChange(text, idx)}
-//                       onKeyPress={(e) => handleOtpKeyPress(e, idx)}
-//                       style={[styles.input]}
-//                       keyboardType="number-pad"
-//                       maxLength={1}
-//                       editable={true}
-//                       accessibilityLabel={`Verification code digit ${
-//                         idx + 1
-//                       } of 6`}
-//                       accessibilityRole="text"
-//                     />
-//                   );
+//             <View key={idx} style={styles.otpInputSurface}>
+//               <RNTextInput
+//                 ref={(el) => {
+//                   otpRefs.current[idx] = el;
 //                 }}
+//                 value={digit}
+//                 onChangeText={(text) => handleOtpChange(text, idx)}
+//                 onKeyPress={(e) => handleOtpKeyPress(e, idx)}
+//                 style={styles.input}
+//                 keyboardType="number-pad"
+//                 maxLength={1}
+//                 selectTextOnFocus
+//                 accessibilityLabel={`Verification code digit ${idx + 1} of 6`}
+//                 accessibilityRole="text"
 //               />
-//             </Surface>
+//             </View>
 //           ))}
 //         </View>
 //         <AppButton
@@ -154,18 +147,10 @@
 //       justifyContent: "space-between",
 //       marginVertical: 20,
 //     },
-//     otpInputContainer: {
-//       flexDirection: "row",
-//       justifyContent: "center",
-//       gap: 8,
-//       marginBottom: 16,
-//       alignItems: "center",
-//       width: "100%",
-//       paddingHorizontal: 10,
-//     },
 //     otpInputSurface: {
 //       borderRadius: 12,
 //       backgroundColor: "#fff",
+//       elevation: 0,
 //     },
 //     input: {
 //       width: RFValue(40),
@@ -180,94 +165,123 @@
 //       textAlign: "center",
 //     },
 //   });
-
 import AppButton from "@/components/button";
 import SafeAreaViewContainer from "@/components/safeareaview";
 import { useTheme } from "@/contexts/themeContext";
 import { useVerifyOtp } from "@/hooks";
 import { ColorScheme } from "@/utils";
-import { useRouter } from "expo-router";
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import {
-  NativeSyntheticEvent,
-  TextInput as RNTextInput,
+  Animated,
+  Platform,
   StyleSheet,
   Text,
-  TextInputKeyPressEventData,
+  TextInput,
+  TouchableOpacity,
   View,
 } from "react-native";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import { RFValue } from "react-native-responsive-fontsize";
 
+const OTP_LENGTH = 6;
+const RESEND_SECONDS = 30;
+
 export default function ForgotPassowrd() {
-  const [otp, setOtp] = useState<string[]>(["", "", "", "", "", ""]);
-  const otpRefs = useRef<(RNTextInput | null)[]>(Array(6).fill(null));
+  const [otp, setOtp] = useState("");
+  const [timer, setTimer] = useState(RESEND_SECONDS);
+  const [isError, setIsError] = useState(false);
+
+  const inputRef = useRef<TextInput>(null);
+  const shakeAnim = useRef(new Animated.Value(0)).current;
+
   const { colors } = useTheme();
   const styles = verifyOtpStyles(colors);
 
-  const router = useRouter();
-
   const { verifyOtpMutation, verifyOtpMutationPending } = useVerifyOtp();
 
-  const handleOtpChange = (text: string, idx: number) => {
-    // Keep only numbers
+  // Handle input
+  const handleChange = (text: string) => {
     const cleaned = text.replace(/[^0-9]/g, "");
-
-    // Handle paste (user pastes full OTP)
-    if (cleaned.length > 1) {
-      const newOtp = cleaned.slice(0, 6).split("");
-      const filledOtp = [...otp];
-
-      newOtp.forEach((digit, i) => {
-        if (i < 6) {
-          filledOtp[i] = digit;
-        }
-      });
-
-      setOtp(filledOtp);
-
-      // Focus last filled input or the next empty one
-      const nextIndex = Math.min(newOtp.length, 5);
-      setTimeout(() => {
-        otpRefs.current[nextIndex]?.focus();
-      }, 0);
-
-      return;
-    }
-
-    // Normal typing - single digit
-    const newOtp = [...otp];
-    newOtp[idx] = cleaned;
-    setOtp(newOtp);
-
-    // Move forward automatically if digit was entered
-    if (cleaned && idx < 5) {
-      setTimeout(() => {
-        otpRefs.current[idx + 1]?.focus();
-      }, 0);
-    }
+    setOtp(cleaned.slice(0, OTP_LENGTH));
   };
 
-  const handleOtpKeyPress = (
-    e: NativeSyntheticEvent<TextInputKeyPressEventData>,
-    idx: number,
-  ) => {
-    if (e.nativeEvent.key === "Backspace" && !otp[idx] && idx > 0) {
-      // Move to previous input on backspace
-      setTimeout(() => {
-        otpRefs.current[idx - 1]?.focus();
-      }, 0);
+  // Auto submit
+  useEffect(() => {
+    if (otp.length === OTP_LENGTH) {
+      handleSubmit();
     }
+  }, [otp]);
+
+  const handleSubmit = () => {
+    if (otp.length !== OTP_LENGTH) return;
+
+    verifyOtpMutation(
+      { token: otp },
+      {
+        onError: () => {
+          triggerError();
+        },
+      },
+    );
+  };
+
+  // Error animation
+  const triggerError = () => {
+    setIsError(true);
+
+    Animated.sequence([
+      Animated.timing(shakeAnim, {
+        toValue: 10,
+        duration: 50,
+        useNativeDriver: true,
+      }),
+      Animated.timing(shakeAnim, {
+        toValue: -10,
+        duration: 50,
+        useNativeDriver: true,
+      }),
+      Animated.timing(shakeAnim, {
+        toValue: 6,
+        duration: 50,
+        useNativeDriver: true,
+      }),
+      Animated.timing(shakeAnim, {
+        toValue: -6,
+        duration: 50,
+        useNativeDriver: true,
+      }),
+      Animated.timing(shakeAnim, {
+        toValue: 0,
+        duration: 50,
+        useNativeDriver: true,
+      }),
+    ]).start(() => {
+      setOtp("");
+      setIsError(false);
+    });
+  };
+
+  // Resend timer
+  useEffect(() => {
+    if (timer === 0) return;
+
+    const interval = setInterval(() => {
+      setTimer((prev) => prev - 1);
+    }, 1000);
+
+    return () => clearInterval(interval);
+  }, [timer]);
+
+  const handleResend = () => {
+    if (timer > 0) return;
+
+    // TODO: call resend API here
+    setTimer(RESEND_SECONDS);
   };
 
   return (
     <SafeAreaViewContainer className="justify-center flex-1 bg-white">
-      <KeyboardAwareScrollView
-        enableOnAndroid={true}
-        extraScrollHeight={20}
-        enableAutomaticScroll={true}
-        contentContainerClassName="flex-1 justify-center"
-      >
+      <KeyboardAwareScrollView contentContainerClassName="flex-1 justify-center">
         <View className="gap-1 mb-6">
           <Text
             style={{ fontSize: RFValue(24), color: colors.slate[650] }}
@@ -275,48 +289,80 @@ export default function ForgotPassowrd() {
           >
             Verify OTP
           </Text>
+
           <Text
             style={{ fontSize: RFValue(16), color: colors.slate[600] }}
-            className="font-normal text-center"
+            className="text-center"
           >
-            Please input the code sent to your email / phone number.
+            Enter the code sent to your device
           </Text>
         </View>
 
-        <View className="gap-1" style={styles.container}>
-          {otp.map((digit, idx) => (
-            <View key={idx} style={styles.otpInputSurface}>
-              <RNTextInput
-                ref={(el) => {
-                  otpRefs.current[idx] = el;
-                }}
-                value={digit}
-                onChangeText={(text) => handleOtpChange(text, idx)}
-                onKeyPress={(e) => handleOtpKeyPress(e, idx)}
-                style={styles.input}
-                keyboardType="number-pad"
-                maxLength={1}
-                selectTextOnFocus
-                accessibilityLabel={`Verification code digit ${idx + 1} of 6`}
-                accessibilityRole="text"
-              />
-            </View>
-          ))}
-        </View>
-        <AppButton
-          onPress={() => {
-            const token = otp.join("");
-            if (token.length !== 6) return;
+        {/* Hidden Input (handles typing + autofill) */}
+        <TextInput
+          ref={inputRef}
+          value={otp}
+          onChangeText={handleChange}
+          keyboardType="number-pad"
+          maxLength={OTP_LENGTH}
+          autoFocus
+          style={{ position: "absolute", opacity: 0 }}
+          textContentType="oneTimeCode" // iOS autofill
+          autoComplete={Platform.OS === "android" ? "sms-otp" : "one-time-code"} // Android autofill
+        />
 
-            verifyOtpMutation({ token });
-          }}
+        {/* OTP Boxes */}
+        <TouchableOpacity
+          activeOpacity={1}
+          onPress={() => inputRef.current?.focus()}
+        >
+          <Animated.View
+            style={[
+              styles.container,
+              { transform: [{ translateX: shakeAnim }] },
+            ]}
+          >
+            {Array.from({ length: OTP_LENGTH }).map((_, i) => {
+              const digit = otp[i] || "";
+              const isFocused = otp.length === i;
+
+              return (
+                <View
+                  key={i}
+                  style={[
+                    styles.box,
+                    isFocused && { borderColor: colors.slate[650] },
+                    isError && { borderColor: "red" },
+                  ]}
+                >
+                  <Text style={styles.text}>{digit}</Text>
+                </View>
+              );
+            })}
+          </Animated.View>
+        </TouchableOpacity>
+
+        {/* Resend */}
+        <TouchableOpacity onPress={handleResend} disabled={timer > 0}>
+          <Text
+            style={{
+              textAlign: "center",
+              marginTop: 20,
+              color: timer > 0 ? colors.slate[400] : colors.slate[650],
+            }}
+          >
+            {timer > 0 ? `Resend in ${timer}s` : "Resend Code"}
+          </Text>
+        </TouchableOpacity>
+
+        {/* Button (optional since auto-submit exists) */}
+        <AppButton
+          onPress={handleSubmit}
           title="Verify"
           fullwidth
           variant="primary"
           size="large"
-          disabled={
-            otp.some((digit) => digit === "") || verifyOtpMutationPending
-          }
+          disabled={otp.length !== OTP_LENGTH || verifyOtpMutationPending}
         />
       </KeyboardAwareScrollView>
     </SafeAreaViewContainer>
@@ -330,21 +376,18 @@ const verifyOtpStyles = (colors: ColorScheme) =>
       justifyContent: "space-between",
       marginVertical: 20,
     },
-    otpInputSurface: {
-      borderRadius: 12,
-      backgroundColor: "#fff",
-      elevation: 0,
-    },
-    input: {
+    box: {
       width: RFValue(40),
       height: RFValue(46),
       borderRadius: RFValue(12),
       borderWidth: 1.5,
       borderColor: colors.slate[300],
-      backgroundColor: colors.background,
+      justifyContent: "center",
+      alignItems: "center",
+    },
+    text: {
       fontSize: RFValue(20),
       fontWeight: "600",
       color: colors.slate[650],
-      textAlign: "center",
     },
   });
