@@ -3,15 +3,15 @@ import { AppHeader } from "@/components/header";
 import HouseCard from "@/components/housecard";
 import SafeAreaViewContainer from "@/components/safeareaview";
 import { categories, featuredLister, slider } from "@/constants/discover";
-import { featuredSpaces } from "@/constants/home";
 import { useTheme } from "@/contexts/themeContext";
 import { useListProperties } from "@/hooks";
 import { PropertyListItem } from "@/types";
 import { ColorScheme } from "@/utils";
 import { BlurView } from "expo-blur";
 import { router } from "expo-router";
-import React, { useState, useMemo } from "react";
+import React, { useMemo, useState } from "react";
 import {
+  ActivityIndicator,
   Dimensions,
   FlatList,
   Image,
@@ -20,7 +20,6 @@ import {
   StyleSheet,
   Text,
   View,
-  ActivityIndicator,
 } from "react-native";
 import { useSharedValue } from "react-native-reanimated";
 import Carousel from "react-native-reanimated-carousel";
@@ -81,15 +80,23 @@ const Discover = () => {
 
   const featuredSpacesList = useMemo(() => {
     const available = properties.filter(
-      (p) => p.status === "available" || p.status === "approved" || p.status === "active"
+      (p) =>
+        p.status === "available" ||
+        p.status === "approved" ||
+        p.status === "active",
     );
-    const filtered = available.filter((p) => p.is_verified || p.listing_type !== "normal");
+    const filtered = available.filter(
+      (p) => p.is_verified || p.listing_type !== "normal",
+    );
     return (filtered.length > 0 ? filtered : available).map(mapToCardProps);
   }, [properties]);
 
   const discountedSpacesList = useMemo(() => {
     const available = properties.filter(
-      (p) => p.status === "available" || p.status === "approved" || p.status === "active"
+      (p) =>
+        p.status === "available" ||
+        p.status === "approved" ||
+        p.status === "active",
     );
     const filtered = [...available].sort((a, b) => a.price - b.price);
     return (filtered.length > 0 ? filtered : available).map(mapToCardProps);
@@ -97,12 +104,17 @@ const Discover = () => {
 
   const eventPlacesList = useMemo(() => {
     const available = properties.filter(
-      (p) => p.status === "available" || p.status === "approved" || p.status === "active"
+      (p) =>
+        p.status === "available" ||
+        p.status === "approved" ||
+        p.status === "active",
     );
     const filtered = available.filter(
-      (p) => p.property_type === "hall" || p.property_type === "event_centre"
+      (p) => p.property_type === "hall" || p.property_type === "event_centre",
     );
-    return (filtered.length > 0 ? filtered : available.slice().reverse()).map(mapToCardProps);
+    return (filtered.length > 0 ? filtered : available.slice().reverse()).map(
+      mapToCardProps,
+    );
   }, [properties]);
 
   return (
@@ -129,12 +141,12 @@ const Discover = () => {
                   item.name === "apartment"
                     ? "bg-blue-50 border-blue-500"
                     : item.name === "shops"
-                    ? "bg-amber-50 border-amber-500"
-                    : item.name === "offices"
-                    ? "bg-green-50 border-green-500"
-                    : item.name === "event center"
-                    ? "bg-pink-50 border-pink-500"
-                    : "bg-gray-50 border-gray-300"
+                      ? "bg-amber-50 border-amber-500"
+                      : item.name === "offices"
+                        ? "bg-green-50 border-green-500"
+                        : item.name === "event center"
+                          ? "bg-pink-50 border-pink-500"
+                          : "bg-gray-50 border-gray-300"
                 }`}
               >
                 <Image className="size-[28px]" source={item.icon} />
@@ -173,7 +185,7 @@ const Discover = () => {
 
                   {item.location && (
                     <BlurView
-                      intensity={10}
+                      intensity={20}
                       tint={isDarkMode ? "dark" : "light"}
                       className="absolute flex-row items-center w-full gap-2 p-4 -bottom-1 rounded-xl"
                     >
