@@ -30,7 +30,7 @@ export default function Spaces() {
     }
   };
   return (
-    <SafeAreaViewContainer className="flex-1">
+    <SafeAreaViewContainer disableBottom className="flex-1">
       <AppHeader title="My Spaces" />
       <HeaderTabs
         tabs={[

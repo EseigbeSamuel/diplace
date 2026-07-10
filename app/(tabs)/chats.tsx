@@ -183,7 +183,7 @@ const ChatsPage: React.FC = () => {
   );
 
   return (
-    <SafeAreaViewContainer>
+    <SafeAreaViewContainer disableBottom>
       <StatusBar backgroundColor={colors.background} barStyle="dark-content" />
 
       <AppHeader title={"Chats"} />

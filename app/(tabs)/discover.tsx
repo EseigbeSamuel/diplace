@@ -118,7 +118,7 @@ const Discover = () => {
   }, [properties]);
 
   return (
-    <SafeAreaViewContainer className="flex-1">
+    <SafeAreaViewContainer disableBottom className="flex-1">
       <AppHeader title={"Discover"} />
       <View className="py-3">
         <Filter size="large" />

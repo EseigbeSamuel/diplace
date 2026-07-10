@@ -320,7 +320,16 @@ const ChatPage = () => {
 
       setLocalMessages((prev) => {
         const apiIds = new Set(mappedApiMessages.map((m) => m.id));
-        const remainingLocal = prev.filter((m) => !apiIds.has(m.id));
+        const apiTexts = new Set(mappedApiMessages.map((m) => m.text));
+
+        // Filter out any optimistic messages that are already present in the API response
+        const remainingLocal = prev.filter((m) => {
+          if (apiIds.has(m.id)) return false;
+          // If it's an optimistic message (no hyphen) and the text is already in the API response, remove it
+          if (!m.id.includes("-") && apiTexts.has(m.text)) return false;
+          return true;
+        });
+
         return [...mappedApiMessages, ...remainingLocal];
       });
     }
@@ -337,8 +346,31 @@ const ChatPage = () => {
       if (payload.conversation_id !== conversationId) return;
 
       setLocalMessages((prev) => {
-        // De-duplicate: ignore if we already have a message with this ID
+        // De-duplicate: check if we already have this server message ID
         if (prev.some((m) => m.id === payload.public_id)) return prev;
+
+        // If it's a message from the current user, try to find and replace the optimistic message
+        if (payload.sender_id === currentUser?.public_id) {
+          const optimisticIndex = prev.findIndex(
+            (m) => m.isUser && m.text === payload.content && !m.id.includes("-")
+          );
+          if (optimisticIndex !== -1) {
+            const next = [...prev];
+            next[optimisticIndex] = {
+              id: payload.public_id,
+              text: payload.content,
+              timestamp: new Date(payload.date_created).toLocaleTimeString([], {
+                hour: "2-digit",
+                minute: "2-digit",
+              }),
+              isUser: true,
+              type: "text" as const,
+            };
+            return next;
+          }
+        }
+
+        // Otherwise, append the new message
         return [
           ...prev,
           {

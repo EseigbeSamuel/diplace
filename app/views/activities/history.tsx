@@ -1,10 +1,17 @@
 import HistoryCard from "@/components/HistoryCard";
 import { useTheme } from "@/contexts/themeContext";
+import { useUser } from "@/contexts/user-context";
 import React from "react";
 import { Text, View } from "react-native";
+import AgentActivityHistory from "./agentHistory";
 
 const ActivityHistory = () => {
-  const { colors, isDarkMode } = useTheme();
+  const { colors } = useTheme();
+  const { userType } = useUser();
+
+  if (userType !== "renter") {
+    return <AgentActivityHistory />;
+  }
 
   return (
     <View>

@@ -4,12 +4,16 @@ import SafeAreaViewContainer from "@/components/safeareaview";
 import { useRef, useState } from "react";
 import { StyleSheet, View } from "react-native";
 import ActiveActivity from "../views/activities/active";
+import AgentActiveActivity from "../views/activities/agentActive";
 import ActivityHistory from "../views/activities/history";
+import { useUser } from "@/contexts/user-context";
 import React from "react";
 
 const Activity = () => {
   const [activeTab, setActiveTab] = useState("active");
   const isInitialMount = useRef(true);
+  const { userType } = useUser();
+
   const handleTabChange = (tabId: string) => {
     if (!isInitialMount.current) {
       setActiveTab(tabId);
@@ -21,7 +25,7 @@ const Activity = () => {
   const renderContent = (activeTab: string) => {
     switch (activeTab) {
       case "active":
-        return <ActiveActivity />;
+        return userType === "renter" ? <ActiveActivity /> : <AgentActiveActivity />;
       case "history":
         return <ActivityHistory />;
       default:
@@ -29,9 +33,11 @@ const Activity = () => {
     }
   };
 
+  const headerTitle = userType === "renter" ? "Activity" : "Bookings";
+
   return (
-    <SafeAreaViewContainer>
-      <AppHeader title="Activity" />
+    <SafeAreaViewContainer disableBottom>
+      <AppHeader title={headerTitle} />
       <View className="flex-1">
         <HeaderTabs
           tabs={[
@@ -48,4 +54,3 @@ const Activity = () => {
 };
 
 export default Activity;
-const styles = StyleSheet.create({});

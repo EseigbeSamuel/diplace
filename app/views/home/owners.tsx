@@ -85,7 +85,7 @@ export default function OwnersHome() {
   //   useTransactionHistory(filters);
 
   return (
-    <SafeAreaViewContainer className="flex-col gap-5">
+    <SafeAreaViewContainer disableBottom className="flex-col gap-5">
       <AppHeader
         title={
           <View className="gap-2">

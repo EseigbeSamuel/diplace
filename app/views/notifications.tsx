@@ -24,7 +24,7 @@ import { NotificationItem } from "@/types";
 
 const Notifications = () => {
   const { colors, isDarkMode } = useTheme();
-  const custom = styles(colors);
+  const custom = styles(colors, isDarkMode);
   const [activeTab, setActiveTab] = useState("all");
   const [isRefreshing, setIsRefreshing] = useState(false);
 
@@ -131,7 +131,7 @@ const Notifications = () => {
   }, [activeTab, notifications]);
 
   return (
-    <SafeAreaViewContainer>
+    <SafeAreaViewContainer disableBottom>
       <SectionHeader
         title="Notification"
         rightIconView={
@@ -158,7 +158,7 @@ const Notifications = () => {
           horizontal
           keyExtractor={(item) => item.id}
           showsHorizontalScrollIndicator={false}
-          contentContainerClassName="gap-4 px-4"
+          contentContainerStyle={{ gap: RFValue(8) }}
           renderItem={({ item }) => {
             const isActive = activeTab.toLowerCase() === item.name.toLowerCase();
             const showBadge = item.name.toLowerCase() === "unread" && unreadCount > 0;
@@ -174,18 +174,23 @@ const Notifications = () => {
                       ? colors.slate[150]
                       : "transparent",
                   }}
-                  className="rounded-full py-2.5 px-4 border flex-row items-center gap-2"
+                  className="rounded-full py-1.5 px-3.5 border flex-row items-center gap-1.5"
                 >
                   {item.icons && (
-                    <Image source={item.icons} className="size-4" />
+                    <Image
+                      source={item.icons}
+                      className="size-3.5"
+                      style={{ tintColor: isActive ? colors.slate[650] : colors.slate[500] }}
+                    />
                   )}
 
                   <Text
                     style={{
-                      color: isActive ? colors.slate[650] : colors.slate[600],
-                      fontSize: RFValue(13),
+                      color: isActive ? colors.slate[650] : colors.slate[550],
+                      fontSize: RFValue(11.5),
+                      fontWeight: isActive ? "600" : "500",
                     }}
-                    className="capitalize font-medium"
+                    className="capitalize"
                   >
                     {item.name}
                   </Text>
@@ -193,16 +198,17 @@ const Notifications = () => {
                   {showBadge && (
                     <View
                       style={{
-                        minWidth: 18,
-                        height: 18,
-                        borderRadius: 9,
-                        backgroundColor: "red",
+                        minWidth: RFValue(14),
+                        height: RFValue(14),
+                        borderRadius: RFValue(7),
+                        backgroundColor: colors.error[200],
                         alignItems: "center",
                         justifyContent: "center",
-                        paddingHorizontal: 4,
+                        paddingHorizontal: 2,
+                        marginLeft: 2,
                       }}
                     >
-                      <Text style={{ color: "#fff", fontSize: 10, fontWeight: "bold" }}>
+                      <Text style={{ color: "#fff", fontSize: RFValue(8), fontWeight: "bold" }}>
                         {unreadCount}
                       </Text>
                     </View>
@@ -233,7 +239,7 @@ const Notifications = () => {
         ) : (
           <FlatList
             data={filteredNotes}
-            contentContainerClassName="gap-4 p-4 pb-10"
+            contentContainerStyle={{ gap: RFValue(12), paddingBottom: RFValue(30) }}
             refreshing={isRefreshing}
             onRefresh={handleRefresh}
             renderItem={({ item }) => {
@@ -243,72 +249,69 @@ const Notifications = () => {
               return (
                 <Pressable
                   onPress={() => handleNotificationPress(item)}
-                  style={[{ backgroundColor: colors.background }, custom.shadow]}
+                  style={[
+                    {
+                      backgroundColor: isDarkMode ? colors.slate[100] : "#FFFFFF",
+                      borderWidth: 1,
+                      borderColor: isDarkMode ? colors.slate[200] : colors.slate[200],
+                    },
+                    custom.shadow,
+                  ]}
                   className="flex flex-row gap-4 p-4 rounded-2xl"
                 >
-                  <View className="p-3 size-[50px] flex flex-row items-center justify-center rounded-full bg-gray-100">
+                  <View
+                    style={{ backgroundColor: isDarkMode ? colors.slate[200] : colors.slate[150] }}
+                    className="size-[44px] flex flex-row items-center justify-center rounded-full"
+                  >
                     <Image
                       source={
                         isBell
                           ? require("@/assets/icons/notification.png")
                           : require("@/assets/icons/Lock.png")
                       }
-                      className="size-6"
+                      className="size-5"
+                      style={{ tintColor: colors.slate[650] }}
                     />
                   </View>
 
-                  <View className="flex-1 gap-3">
+                  <View className="flex-1 gap-2.5">
                     <View>
-                      <View className="flex flex-row items-center justify-between">
-                        <Text style={custom.smallDark} className="font-semibold flex-1 mr-2">
+                      <View className="flex flex-row items-start justify-between">
+                        <Text style={custom.itemTitle} className="flex-1 mr-2" numberOfLines={1}>
                           {item.title}
                         </Text>
 
-                        <View className="flex flex-row items-center gap-2">
-                          <Text
-                            style={custom.tiny}
-                            className="text-xs text-gray-500"
-                          >
+                        <View className="flex flex-row items-center gap-1.5 mt-0.5">
+                          <Text style={custom.itemTime}>
                             {formatTimeAgo(item.date_created)}
                           </Text>
                           {isUnread && (
-                            <View className="w-2.5 h-2.5 rounded-full bg-red-600" />
+                            <View className="w-2 h-2 rounded-full bg-red-500" />
                           )}
                         </View>
                       </View>
 
-                      <Text style={custom.smallDark} className="text-gray-600 mt-1">
-                        {item.message || item.description || ""}
+                      <Text style={custom.itemMessage}>
+                        {item.message || ""}
                       </Text>
                     </View>
 
-                    <View className="flex flex-row items-center gap-2">
-                      <Text
-                        style={custom.smallDark}
-                        className="text-primary-600 font-medium"
-                      >
+                    <View className="flex flex-row items-center gap-1 mt-0.5">
+                      <Text style={custom.itemAction}>
                         {getActionText(item)}
                       </Text>
 
-                      {isDarkMode ? (
-                        <Image
-                          source={
-                            getActionText(item) === "Download receipt"
-                              ? require("@/assets/icons/Download - Iconly Pro.png")
-                              : require("@/assets/icons/arrow-right-light.png")
-                          }
-                          className="size-[20px]"
-                        />
-                      ) : (
-                        <Image
-                          source={
-                            getActionText(item) === "Download receipt"
-                              ? require("@/assets/icons/Download - Iconly Pro.png")
+                      <Image
+                        source={
+                          getActionText(item) === "Download receipt"
+                            ? require("@/assets/icons/Download - Iconly Pro.png")
+                            : isDarkMode
+                              ? require("@/assets/icons/arrow-right-light.png")
                               : require("@/assets/icons/arrow-right-dark.png")
-                          }
-                          className="size-[20px]"
-                        />
-                      )}
+                        }
+                        className="size-4"
+                        style={{ tintColor: isDarkMode ? colors.info[200] : colors.info[300] }}
+                      />
                     </View>
                   </View>
                 </Pressable>
@@ -325,55 +328,37 @@ const Notifications = () => {
 
 export default Notifications;
 
-const styles = (colors: ColorScheme) =>
+const styles = (colors: ColorScheme, isDarkMode: boolean) =>
   StyleSheet.create({
     container: {
       backgroundColor: colors.background,
     },
-    container2: { backgroundColor: colors.slate[150] },
-    border: {
-      borderColor: colors.slate[300],
-    },
-    big: {
-      fontSize: RFValue(24),
-      lineHeight: RFValue(32),
+    itemTitle: {
+      fontSize: RFValue(13.5),
+      fontWeight: "600",
       color: colors.slate[650],
+      lineHeight: RFValue(18),
     },
-    title: {
-      fontSize: RFValue(20),
-      lineHeight: RFValue(28),
-      color: colors.slate[650],
-    },
-    subTitle: {
-      fontSize: RFValue(18),
-      lineHeight: RFValue(24),
-      color: colors.slate[650],
-    },
-    text: {
-      fontSize: RFValue(16),
-      lineHeight: RFValue(24),
-      color: colors.slate[650],
-    },
-    small: {
-      fontSize: RFValue(14),
-      lineHeight: RFValue(20),
-      color: colors.slate[600],
-    },
-    smallDark: {
-      fontSize: RFValue(14),
-      lineHeight: RFValue(20),
-      color: colors.slate[650],
-    },
-    tiny: {
+    itemMessage: {
       fontSize: RFValue(12),
-      lineHeight: RFValue(16),
-      color: colors.slate[650],
+      color: colors.slate[600],
+      lineHeight: RFValue(16.5),
+      marginTop: RFValue(2),
+    },
+    itemAction: {
+      fontSize: RFValue(12.5),
+      fontWeight: "600",
+      color: isDarkMode ? colors.info[200] : colors.info[300],
+    },
+    itemTime: {
+      fontSize: RFValue(10.5),
+      color: colors.slate[500],
     },
     shadow: {
-      shadowColor: colors.slate[500],
-      shadowOffset: { width: 0, height: 4 },
-      shadowOpacity: 0.2,
+      shadowColor: "#000",
+      shadowOffset: { width: 0, height: 2 },
+      shadowOpacity: isDarkMode ? 0.15 : 0.04,
       shadowRadius: 6,
-      elevation: 6,
+      elevation: 2,
     },
   });

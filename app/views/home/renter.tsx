@@ -228,7 +228,7 @@ export default function RenterHome() {
   const snapPoints = useMemo(() => ["25%", "50%", "75%", "90%"], []);
 
   return (
-    <SafeAreaViewContainer>
+    <SafeAreaViewContainer disableBottom>
       <View className="gap-2">
         <AppHeader
           title={

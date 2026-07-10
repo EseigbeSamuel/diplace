@@ -15,21 +15,21 @@ import { showToast } from "@/lib";
 export function useMyNotifications({
   enabled = true,
   limit = 50,
-  skip = 0,
+  offset = 0,
   is_read,
 }: {
   enabled?: boolean;
   limit?: number;
-  skip?: number;
+  offset?: number;
   is_read?: boolean;
 } = {}) {
   const query = useQuery({
-    queryKey: ["my-notifications", { limit, skip, is_read }],
+    queryKey: ["my-notifications", { limit, offset, is_read }],
     enabled,
     queryFn: async () => {
       const params: Record<string, string | number | boolean> = {
         limit,
-        skip,
+        offset,
       };
       if (is_read !== undefined) {
         params.is_read = is_read;
@@ -44,7 +44,9 @@ export function useMyNotifications({
 
   return {
     notifications: query.data?.items ?? [],
-    pagination: query.data?.pagination,
+    total: query.data?.total ?? 0,
+    limit: query.data?.limit ?? limit,
+    offset: query.data?.offset ?? offset,
     isNotificationsLoading: query.isLoading,
     isNotificationsFetching: query.isFetching,
     notificationsError: query.error,
