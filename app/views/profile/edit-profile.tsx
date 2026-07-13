@@ -33,7 +33,7 @@ const EditProfile = () => {
   const [phoneNumber, setPhoneNumber] = useState("+234-810-293-4980");
   const [city, setCity] = useState("Port Harcourt");
   const [address, setAddress] = useState(
-    "15 Orukeri Street, Rumuibekwe, Port Harc..."
+    "15 Orukeri Street, Rumuibekwe, Port Harc...",
   );
   const [showMediaModal, setShowMediaModal] = useState(false);
 
@@ -386,7 +386,7 @@ const styles = (colors: ColorScheme) =>
     buttonContainer: {
       position: "fixed",
       bottom: 0,
-      paddingBottom: RFValue(30),
+      // paddingBottom: RFValue(10),
     },
     modalOverlay: {
       flex: 1,

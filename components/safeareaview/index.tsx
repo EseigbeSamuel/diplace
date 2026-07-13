@@ -2,7 +2,10 @@ import { useTheme } from "@/contexts/themeContext";
 import { ColorScheme } from "@/utils";
 import React from "react";
 import { StyleSheet } from "react-native";
-import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
+import {
+  SafeAreaView,
+  useSafeAreaInsets,
+} from "react-native-safe-area-context";
 
 interface Props {
   children: React.ReactNode;
@@ -17,7 +20,8 @@ export default function SafeAreaViewContainer(props: Props) {
     <SafeAreaView
       className={props.className}
       edges={["top", "right", "bottom", "left"]}
-      style={[styles(colors).container, { paddingBottom: insets.bottom }]}
+      // style={[styles(colors).container, { paddingBottom: insets.bottom }]}
+      style={[styles(colors).container]}
     >
       {props.children}
     </SafeAreaView>
