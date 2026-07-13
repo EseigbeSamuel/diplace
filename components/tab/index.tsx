@@ -25,11 +25,11 @@ export const TabBarLabel = ({
   const { colors } = useTheme();
   return (
     <Text
-      className={cn("uppercase")}
+      className={cn("uppercase font-semibold")}
       style={{
-        fontSize: RFValue(12),
-        marginTop: hp(1.2),
-        color: colors.slate[650],
+        fontSize: RFValue(9.5),
+        marginTop: RFValue(4),
+        color: focused ? colors.slate[650] : colors.slate[400],
       }}
     >
       {title ?? children}
@@ -48,8 +48,7 @@ const tabBarIconBaseStyle = StyleSheet.create({
   iconWrapper: {
     alignItems: "center",
     justifyContent: "center",
-    // paddingTop: hp(0.4),
-    height: RFValue(62),
+    height: RFValue(24),
   },
 });
 
@@ -70,6 +69,7 @@ type CustomTabIconProps = {
   focused: boolean;
   activeIcon: ImageSourcePropType;
   inactiveIcon: ImageSourcePropType;
+  badge?: number;
   size?: number;
 };
 
@@ -77,15 +77,47 @@ export const CustomTabIcon: React.FC<CustomTabIconProps> = ({
   focused,
   activeIcon,
   inactiveIcon,
+  badge,
 }) => {
+  const { colors } = useTheme();
+
   return (
     <TabBarIcon
       focused={focused}
       Icon={
-        <Image
-          source={focused ? activeIcon : inactiveIcon}
-          style={{ width: RFValue(20), height: RFValue(20) }}
-        />
+        <View style={{ position: "relative" }}>
+          <Image
+            source={focused ? activeIcon : inactiveIcon}
+            style={{ width: RFValue(22), height: RFValue(22) }}
+            resizeMode="contain"
+          />
+          {badge !== undefined && badge > 0 && (
+            <View
+              style={{
+                position: "absolute",
+                top: -RFValue(4),
+                right: -RFValue(6),
+                minWidth: RFValue(14),
+                height: RFValue(14),
+                borderRadius: RFValue(7),
+                backgroundColor: colors.error[200],
+                justifyContent: "center",
+                alignItems: "center",
+                paddingHorizontal: 2.5,
+              }}
+            >
+              <Text
+                style={{
+                  color: "#FFFFFF",
+                  fontSize: RFValue(8),
+                  fontWeight: "bold",
+                }}
+              >
+                {badge}
+              </Text>
+            </View>
+          )}
+        </View>
       }
     />
   );

@@ -10,11 +10,16 @@ import {
 interface Props {
   children: React.ReactNode;
   className?: string;
+  disableBottom?: boolean;
 }
 
 export default function SafeAreaViewContainer(props: Props) {
   const { colors } = useTheme();
   const insets = useSafeAreaInsets();
+
+  const edges: ("top" | "right" | "bottom" | "left")[] = props.disableBottom
+    ? ["top", "left", "right"]
+    : ["top", "left", "right", "bottom"];
 
   return (
     <SafeAreaView

@@ -1,3 +1,4 @@
+import { useGetConversations } from "@/hooks";
 import { CustomBottomSheet } from "@/components/bottom-sheet";
 import { CustomTabIcon, TabBarLabel } from "@/components/tab";
 import { useTheme } from "@/contexts/themeContext";
@@ -15,6 +16,12 @@ const TabLayout = () => {
   const { colors, isDarkMode } = useTheme();
   const { userType } = useUser();
 
+  const { conversations } = useGetConversations({ limit: 50, skip: 0 });
+  const unreadChatsCount = useMemo(() => {
+    if (!conversations?.conversations) return 0;
+    return conversations.conversations.filter((c) => c.unread_count > 0).length;
+  }, [conversations]);
+
   console.log(userType);
 
   const addSpaceRef = useRef<BottomSheetModal>(null);
@@ -31,24 +38,19 @@ const TabLayout = () => {
         screenOptions={{
           headerShown: false,
           tabBarStyle: {
-            height: hp("11.57%"),
+            height: hp("9.5%"),
             backgroundColor: colors.background,
-            paddingBottom: hp(0.8),
-            paddingTop: hp(0.5),
-            borderTopLeftRadius: RFValue(30),
-            borderTopRightRadius: RFValue(30),
+            borderTopLeftRadius: RFValue(25),
+            borderTopRightRadius: RFValue(25),
+            borderTopWidth: 0,
             shadowColor: "#000",
             shadowOffset: { width: 0, height: -3 },
-            shadowOpacity: 0.12,
+            shadowOpacity: 0.05,
             shadowRadius: 6,
-
-            // Android shadow
-            elevation: 10,
+            elevation: 8,
           },
-
           tabBarItemStyle: {
-            paddingVertical: hp(0.8),
-            backgroundColor: colors.background,
+            paddingVertical: hp("0.8%"),
           },
         }}
         initialRouteName="index"
@@ -73,15 +75,29 @@ const TabLayout = () => {
                 ? {
                     tabBarLabel: () => null,
                     tabBarIcon: () => (
-                      <Pressable onPress={handleAddSpace}>
+                      <Pressable
+                        onPress={handleAddSpace}
+                        style={{
+                          top: -RFValue(12),
+                          height: RFValue(52),
+                          width: RFValue(52),
+                          justifyContent: "center",
+                          alignItems: "center",
+                        }}
+                      >
                         <View
                           style={{
-                            width: RFValue(30),
-                            height: RFValue(30),
-                            borderRadius: 100,
+                            width: RFValue(48),
+                            height: RFValue(48),
+                            borderRadius: RFValue(24),
                             justifyContent: "center",
                             alignItems: "center",
                             backgroundColor: colors.slate[650],
+                            shadowColor: colors.slate[650],
+                            shadowOffset: { width: 0, height: 6 },
+                            shadowOpacity: 0.25,
+                            shadowRadius: 8,
+                            elevation: 8,
                           }}
                         >
                           <Image
@@ -90,7 +106,7 @@ const TabLayout = () => {
                                 ? require("@/assets/icons/plus.png")
                                 : require("@/assets/icons/plus-white.png")
                             }
-                            style={{ width: RFValue(30), height: RFValue(30) }}
+                            style={{ width: RFValue(18), height: RFValue(18) }}
                             resizeMode="contain"
                           />
                         </View>
@@ -99,7 +115,9 @@ const TabLayout = () => {
                   }
                 : {
                     tabBarLabel: (props) => (
-                      <TabBarLabel {...props}>{item.label}</TabBarLabel>
+                      <TabBarLabel {...props}>
+                        {item.name === "activity" && userType !== "renter" ? "Bookings" : item.label}
+                      </TabBarLabel>
                     ),
                     tabBarLabelPosition: "below-icon",
                     tabBarIcon: ({ focused }) => (
@@ -107,6 +125,7 @@ const TabLayout = () => {
                         focused={focused}
                         activeIcon={item.activeIcon}
                         inactiveIcon={item.inactiveIcon}
+                        badge={item.name === "chats" ? unreadChatsCount : undefined}
                       />
                     ),
                   }),

@@ -6,3 +6,4 @@ export * from "./property";
 export * from "./review";
 export * from "./user";
 export * from "./welcome";
+export * from "./notification";
