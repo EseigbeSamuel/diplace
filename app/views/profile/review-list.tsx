@@ -1,71 +1,47 @@
 import React from "react";
-import { Image, ScrollView, StyleSheet, Text, View } from "react-native";
+import {
+  ActivityIndicator,
+  Image,
+  ScrollView,
+  StyleSheet,
+  Text,
+  View,
+} from "react-native";
 import { RFValue } from "react-native-responsive-fontsize";
 import SafeAreaViewContainer from "@/components/safeareaview";
 import SectionHeader from "@/components/sectionheader";
 import { useTheme } from "@/contexts/themeContext";
 import { ColorScheme } from "@/utils";
+import { useListReviews } from "@/hooks";
+import { PropertyReviewItem } from "@/types";
 
-interface Review {
-  id: number;
-  name: string;
-  verified: boolean;
-  date: string;
-  avatar: any;
-  comment: string;
-}
+const getReviewerUser = (review: PropertyReviewItem) => {
+  if ("user" in review.reviewer) return review.reviewer.user;
+  return review.reviewer;
+};
+
+const formatReviewDate = (dateString: string) => {
+  const date = new Date(dateString);
+  if (Number.isNaN(date.getTime())) return "";
+
+  return date.toLocaleDateString("en-NG", {
+    month: "short",
+    day: "numeric",
+    year: "numeric",
+  });
+};
 
 const ReviewsList = () => {
   const { colors } = useTheme();
   const reviewsListStyles = styles(colors);
-
-  const reviews: Review[] = [
-    {
-      id: 1,
-      name: "Elizabeth Anniesamka",
-      verified: true,
-      date: "2 days ago",
-      avatar: require("@/assets/images/user.png"),
-      comment:
-        "This agent is very professional and down to earth. The images he uploads describes what I saw and I appreciate his openess.",
-    },
-    {
-      id: 2,
-      name: "John Zighan",
-      verified: false,
-      date: "3 weeks ago",
-      avatar: require("@/assets/images/user.png"),
-      comment:
-        "Compared to other agents, his rates are fair and he treated me with alot of respect, I advocate.",
-    },
-    {
-      id: 3,
-      name: "Samuel Timipre",
-      verified: false,
-      date: "3 weeks ago",
-      avatar: require("@/assets/images/user.png"),
-      comment:
-        "I got the booking done with so so quickly, love what I saw and it was my perfect fit.",
-    },
-    {
-      id: 4,
-      name: "Sarah Oloum",
-      verified: true,
-      date: "3 weeks ago",
-      avatar: require("@/assets/images/user.png"),
-      comment:
-        "I got the booking done with so so quickly, love what I saw and it was my perfect fit.",
-    },
-    {
-      id: 5,
-      name: "Martha Inerighe",
-      verified: false,
-      date: "3 weeks ago",
-      avatar: require("@/assets/images/user.png"),
-      comment:
-        "I got the booking done with so so quickly, love what I saw and it was my perfect fit.",
-    },
-  ];
+  const { reviews, reviewsTotal, isReviewsLoading, reviewsError } =
+    useListReviews({
+      params: {
+        current_user: true,
+        status: "active",
+        limit: 100,
+      },
+    });
 
   return (
     <SafeAreaViewContainer>
@@ -73,38 +49,60 @@ const ReviewsList = () => {
       <ScrollView showsVerticalScrollIndicator={false}>
         <View style={reviewsListStyles.container}>
           <Text style={reviewsListStyles.reviewCount}>
-            Reviews ({reviews.length})
+            Reviews ({reviewsTotal})
           </Text>
 
-          {reviews.map((review) => (
-            <View key={review.id} style={reviewsListStyles.reviewCard}>
-              <View style={reviewsListStyles.reviewHeader}>
-                <Image
-                  source={review.avatar}
-                  style={reviewsListStyles.avatar}
-                />
-                <View style={reviewsListStyles.reviewerInfo}>
-                  <View style={reviewsListStyles.reviewerNameRow}>
-                    <Text style={reviewsListStyles.reviewerName}>
-                      {review.name}
-                    </Text>
-                    {review.verified && (
-                      <Image
-                        source={require("@/assets/icons/badge-check-green.png")}
-                        style={reviewsListStyles.verifiedBadge}
-                      />
-                    )}
+          {isReviewsLoading ? (
+            <ActivityIndicator size="small" color={colors.slate[650]} />
+          ) : reviewsError ? (
+            <Text style={reviewsListStyles.emptyText}>
+              Unable to load reviews.
+            </Text>
+          ) : reviews.length ? (
+            reviews.map((review) => {
+              const reviewer = getReviewerUser(review);
+              const reviewerName =
+                [reviewer.first_name, reviewer.last_name]
+                  .filter(Boolean)
+                  .join(" ") || "User";
+
+              return (
+                <View key={review.public_id} style={reviewsListStyles.reviewCard}>
+                  <View style={reviewsListStyles.reviewHeader}>
+                    <Image
+                      source={
+                        reviewer.profile_picture
+                          ? { uri: reviewer.profile_picture }
+                          : require("@/assets/images/user.png")
+                      }
+                      style={reviewsListStyles.avatar}
+                    />
+                    <View style={reviewsListStyles.reviewerInfo}>
+                      <View style={reviewsListStyles.reviewerNameRow}>
+                        <Text style={reviewsListStyles.reviewerName}>
+                          {reviewerName}
+                        </Text>
+                        {review.status === "verified" && (
+                          <Image
+                            source={require("@/assets/icons/badge-check-green.png")}
+                            style={reviewsListStyles.verifiedBadge}
+                          />
+                        )}
+                      </View>
+                      <Text style={reviewsListStyles.reviewDate}>
+                        {formatReviewDate(review.date_created)}
+                      </Text>
+                    </View>
                   </View>
-                  <Text style={reviewsListStyles.reviewDate}>
-                    {review.date}
+                  <Text style={reviewsListStyles.reviewComment}>
+                    {review.comment}
                   </Text>
                 </View>
-              </View>
-              <Text style={reviewsListStyles.reviewComment}>
-                {review.comment}
-              </Text>
-            </View>
-          ))}
+              );
+            })
+          ) : (
+            <Text style={reviewsListStyles.emptyText}>No reviews yet.</Text>
+          )}
         </View>
       </ScrollView>
     </SafeAreaViewContainer>
@@ -168,5 +166,10 @@ const styles = (colors: ColorScheme) =>
       fontSize: RFValue(14),
       color: colors.slate[600],
       lineHeight: RFValue(20),
+    },
+    emptyText: {
+      fontSize: RFValue(14),
+      color: colors.slate[500],
+      paddingVertical: RFValue(12),
     },
   });

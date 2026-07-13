@@ -2,10 +2,13 @@ import AppButton from "@/components/button";
 import SafeAreaViewContainer from "@/components/safeareaview";
 import ViewHeader from "@/components/view-header";
 import { useTheme } from "@/contexts/themeContext";
+import { useDeleteBank, useGetUserBanks } from "@/hooks";
 import { ColorScheme } from "@/utils";
 import { useRouter } from "expo-router";
 import React from "react";
 import {
+  ActivityIndicator,
+  Alert,
   Image,
   Pressable,
   ScrollView,
@@ -15,35 +18,29 @@ import {
 } from "react-native";
 import { RFValue } from "react-native-responsive-fontsize";
 
-interface BankCard {
-  id: number;
-  accountNumber: string;
-  accountName: string;
-  bank: string;
-}
-
 const PaymentDetails = () => {
   const { colors } = useTheme();
   const router = useRouter();
   const paymentStyles = styles(colors);
-
-  // Example bank card data - can be empty array if no cards
-  const bankCards: BankCard[] = [
-    {
-      id: 1,
-      accountNumber: "8102934980",
-      accountName: "IBE X ALEX",
-      bank: "ACCESS BANK PLC",
-    },
-  ];
+  const { banks, isBanksLoading, banksError, refetchBanks } = useGetUserBanks();
+  const { deleteBankMutation, deleteBankPending } = useDeleteBank();
 
   const handleAddBankDetails = () => {
     router.push("/views/profile/add-bank-complete");
   };
 
-  const handleRemoveCard = (cardId: number) => {
-    // Handle remove card logic
-    console.log("Remove card:", cardId);
+  const handleRemoveCard = (bankId: string) => {
+    Alert.alert("Remove Bank", "Remove this bank account?", [
+      { text: "Cancel", style: "cancel" },
+      {
+        text: "Remove",
+        style: "destructive",
+        onPress: async () => {
+          if (deleteBankPending) return;
+          await deleteBankMutation({ bankId });
+        },
+      },
+    ]);
   };
 
   return (
@@ -52,10 +49,23 @@ const PaymentDetails = () => {
       <ScrollView showsVerticalScrollIndicator={false}>
         <View style={paymentStyles.container}>
           {/* Bank Cards List */}
-          {bankCards.length > 0 ? (
+          {isBanksLoading ? (
+            <View style={paymentStyles.emptyState}>
+              <ActivityIndicator size="small" color={colors.slate[650]} />
+            </View>
+          ) : banksError ? (
+            <View style={paymentStyles.emptyState}>
+              <Text style={paymentStyles.emptyStateText}>
+                Unable to load bank details
+              </Text>
+              <Pressable onPress={() => refetchBanks()}>
+                <Text style={paymentStyles.retryText}>Retry</Text>
+              </Pressable>
+            </View>
+          ) : banks.length > 0 ? (
             <View style={paymentStyles.cardsContainer}>
-              {bankCards.map((card) => (
-                <View key={card.id} style={paymentStyles.cardWrapper}>
+              {banks.map((card) => (
+                <View key={card.public_id} style={paymentStyles.cardWrapper}>
                   <View style={paymentStyles.bankCard}>
                     <View style={paymentStyles.cardHeader}>
                       <View style={paymentStyles.bankIconContainer}>
@@ -69,7 +79,7 @@ const PaymentDetails = () => {
                           Account Number
                         </Text>
                         <Text style={paymentStyles.accountNumber}>
-                          {card.accountNumber}
+                          {card.account_number}
                         </Text>
                       </View>
                     </View>
@@ -79,18 +89,21 @@ const PaymentDetails = () => {
                           Account Name
                         </Text>
                         <Text style={paymentStyles.accountName}>
-                          {card.accountName}
+                          {card.account_name}
                         </Text>
                       </View>
                       <View style={paymentStyles.bankSection}>
                         <Text style={paymentStyles.bankLabel}>Bank</Text>
-                        <Text style={paymentStyles.bankName}>{card.bank}</Text>
+                        <Text style={paymentStyles.bankName}>
+                          {card.bank_name}
+                        </Text>
                       </View>
                     </View>
                   </View>
                   <Pressable
                     style={paymentStyles.removeButton}
-                    onPress={() => handleRemoveCard(card.id)}
+                    onPress={() => handleRemoveCard(card.public_id)}
+                    disabled={deleteBankPending}
                   >
                     <Image
                       source={require("@/assets/icons/delete.png")}
@@ -232,6 +245,12 @@ const styles = (colors: ColorScheme) =>
     emptyStateText: {
       fontSize: RFValue(15),
       color: colors.slate[500],
+    },
+    retryText: {
+      marginTop: RFValue(10),
+      fontSize: RFValue(14),
+      color: colors.slate[650],
+      fontWeight: "600",
     },
     buttonContainer: {
       paddingHorizontal: RFValue(5),
