@@ -108,7 +108,7 @@ const AgentHistoryCard = ({ item }: { item: HistoryItem }) => {
       {/* Details Wrapper */}
       <View className="flex-1">
         <View className="flex flex-row items-center justify-between gap-2 mb-1.5">
-          <Text style={{ fontSize: RFValue(10.5), color: colors.slate[500] }}>
+          <Text style={{ fontSize: RFValue(12.5), color: colors.slate[500] }}>
             {item.dateText}
           </Text>
           <View
@@ -122,7 +122,7 @@ const AgentHistoryCard = ({ item }: { item: HistoryItem }) => {
             <Text
               style={{
                 color: isDarkMode ? colors.slate[600] : item.statusColor,
-                fontSize: RFValue(9.5),
+                fontSize: RFValue(11.5),
                 fontWeight: "bold",
               }}
             >
@@ -133,19 +133,19 @@ const AgentHistoryCard = ({ item }: { item: HistoryItem }) => {
 
         <Text
           style={{
-            fontSize: RFValue(13),
+            fontSize: RFValue(15.5),
             fontWeight: "600",
             color: colors.slate[650],
-            lineHeight: RFValue(17),
+            lineHeight: RFValue(20.5),
           }}
         >
           {item.title}
         </Text>
         <Text
           style={{
-            fontSize: RFValue(11.5),
+            fontSize: RFValue(13.5),
             color: colors.slate[600],
-            lineHeight: RFValue(15.5),
+            lineHeight: RFValue(18.5),
             marginTop: 3,
           }}
         >
@@ -164,7 +164,7 @@ const AgentActivityHistory = () => {
       {historyGroups.map((group, index) => (
         <View key={index} className="py-4">
           <Text
-            style={{ color: colors.slate[650], fontSize: RFValue(15) }}
+            style={{ color: colors.slate[650], fontSize: RFValue(18) }}
             className="font-bold mb-2"
           >
             {group.month}

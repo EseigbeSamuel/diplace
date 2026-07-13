@@ -1,5 +1,5 @@
 // src/components/common/Header.tsx
-import { useGetCurrentUser } from "@/hooks";
+import { useGetCurrentUser, useNotificationUnreadCount } from "@/hooks";
 import { useTheme } from "@/contexts/themeContext";
 import { ColorScheme } from "@/utils";
 import { useRouter } from "expo-router";
@@ -14,6 +14,7 @@ interface HeaderProps {
 export const AppHeader = (props: HeaderProps) => {
   const { colors, isDarkMode } = useTheme();
   const { currentUser } = useGetCurrentUser();
+  const { unreadCount } = useNotificationUnreadCount();
   const headerStyles = styles(colors);
   const router = useRouter();
 
@@ -50,9 +51,16 @@ export const AppHeader = (props: HeaderProps) => {
               }
             />
           </Pressable>
-          <View className="absolute top-0 right-0 items-center justify-center w-[18px] h-[18px] font-semibold bg-red-500 rounded-full">
-            <Text className="text-xs text-white">2</Text>
-          </View>
+          {unreadCount > 0 && (
+            <View
+              style={{ backgroundColor: colors.error[200] }}
+              className="absolute -top-1 -right-1 items-center justify-center min-w-[18px] h-[18px] px-1 rounded-full"
+            >
+              <Text className="text-[10px] font-bold text-white">
+                {unreadCount > 99 ? "99+" : unreadCount}
+              </Text>
+            </View>
+          )}
         </View>
         <Pressable
           onPress={() => router.push("/views/profile")}

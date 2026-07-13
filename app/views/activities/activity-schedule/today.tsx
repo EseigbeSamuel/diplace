@@ -1,3 +1,5 @@
+import SafeAreaViewContainer from "@/components/safeareaview";
+import SectionHeader from "@/components/sectionheader";
 import { useTheme } from "@/contexts/themeContext";
 import { router } from "expo-router";
 import React from "react";
@@ -89,10 +91,10 @@ const TodayActivityCard = ({ item }: { item: ActivityCardItem }) => {
     >
       {/* Top Header Row */}
       <View className="flex flex-row items-center justify-between mb-2">
-        <Text style={{ color: colors.slate[500], fontSize: RFValue(11) }} className="font-bold uppercase">
+        <Text style={{ color: colors.slate[500], fontSize: RFValue(13) }} className="font-bold uppercase">
           {item.category}
         </Text>
-        <Text style={{ color: colors.slate[500], fontSize: RFValue(11) }}>
+        <Text style={{ color: colors.slate[500], fontSize: RFValue(13) }}>
           {item.dateText}
         </Text>
       </View>
@@ -101,13 +103,13 @@ const TodayActivityCard = ({ item }: { item: ActivityCardItem }) => {
       <View className="flex flex-row justify-between items-start mb-3">
         <View className="flex-1 mr-2">
           <Text
-            style={{ color: colors.slate[650], fontSize: RFValue(14) }}
+            style={{ color: colors.slate[650], fontSize: RFValue(16) }}
             className="font-bold"
           >
             {item.title}
           </Text>
           <Text
-            style={{ color: colors.slate[550], fontSize: RFValue(11.5), marginTop: 2 }}
+            style={{ color: colors.slate[550], fontSize: RFValue(13.5), marginTop: 2 }}
             className="font-medium"
             numberOfLines={1}
           >
@@ -123,8 +125,7 @@ const TodayActivityCard = ({ item }: { item: ActivityCardItem }) => {
         ) : (
           <Image
             source={require("@/assets/icons/arrow-right-up-outline-dark.png")}
-            className="w-4 h-4"
-            style={{ tintColor: colors.slate[550] }}
+            style={{ width: 14, height: 14, tintColor: colors.slate[550] }}
           />
         )}
       </View>
@@ -134,10 +135,10 @@ const TodayActivityCard = ({ item }: { item: ActivityCardItem }) => {
         <View className="flex flex-row items-center gap-2">
           <Image
             source={item.user.avatar}
-            style={{ width: RFValue(24), height: RFValue(24), borderRadius: RFValue(12) }}
+            style={{ width: RFValue(20), height: RFValue(20), borderRadius: RFValue(10) }}
           />
           <Text
-            style={{ color: colors.slate[650], fontSize: RFValue(12) }}
+            style={{ color: colors.slate[650], fontSize: RFValue(14) }}
             className="font-semibold flex-row items-center"
           >
             {item.user.name}{" "}
@@ -154,15 +155,13 @@ const TodayActivityCard = ({ item }: { item: ActivityCardItem }) => {
           <Pressable>
             <Image
               source={require("@/assets/icons/Chat - Iconly Pro.png")}
-              className="w-4.5 h-4.5"
-              style={{ tintColor: colors.slate[550] }}
+              style={{ width: 16, height: 16, tintColor: colors.slate[550] }}
             />
           </Pressable>
           <Pressable>
             <Image
               source={require("@/assets/icons/calling.png")}
-              className="w-4.5 h-4.5"
-              style={{ tintColor: colors.slate[550] }}
+              style={{ width: 16, height: 16, tintColor: colors.slate[550] }}
             />
           </Pressable>
         </View>
@@ -172,63 +171,22 @@ const TodayActivityCard = ({ item }: { item: ActivityCardItem }) => {
 };
 
 const TodayActivityScreen = () => {
-  const { colors } = useTheme();
-
   return (
-    <View style={{ backgroundColor: colors.background }} className="flex-1">
-      {/* Header Bar */}
-      <View className="px-4 pt-12 pb-4 flex flex-row items-center justify-between">
-        <View className="flex flex-row items-center gap-3">
-          <Pressable
-            onPress={() => router.back()}
-            style={{
-              width: RFValue(36),
-              height: RFValue(36),
-              borderRadius: RFValue(18),
-              backgroundColor: colors.slate[150],
-              alignItems: "center",
-              justifyContent: "center",
-            }}
-          >
-            <Image
-              source={require("@/assets/icons/arrow-right-dark.png")}
-              style={{ width: 16, height: 16, transform: [{ rotate: "180deg" }], tintColor: colors.slate[650] }}
-            />
-          </Pressable>
-          <Text
-            style={{ color: colors.slate[650], fontSize: RFValue(20) }}
-            className="font-bold"
-          >
-            Today's Activity
-          </Text>
-        </View>
-
-        <Pressable
-          style={{
-            width: RFValue(36),
-            height: RFValue(36),
-            borderRadius: RFValue(18),
-            backgroundColor: colors.slate[150],
-            alignItems: "center",
-            justifyContent: "center",
-          }}
-        >
-          <Image
-            source={require("@/assets/icons/plus.png")}
-            style={{ width: 16, height: 16, tintColor: colors.slate[650] }}
-          />
-        </Pressable>
-      </View>
+    <SafeAreaViewContainer disableBottom>
+      <SectionHeader
+        title="Today's Activity"
+        rightIconSource={require("@/assets/icons/plus.png")}
+      />
 
       {/* Main List */}
-      <ScrollView className="px-4 flex-1" showsVerticalScrollIndicator={false}>
-        <View className="pt-2 pb-10">
+      <ScrollView className="px-4 flex-1 pt-2" showsVerticalScrollIndicator={false}>
+        <View className="pb-10">
           {todayActivities.map((activity) => (
             <TodayActivityCard key={activity.id} item={activity} />
           ))}
         </View>
       </ScrollView>
-    </View>
+    </SafeAreaViewContainer>
   );
 };
 

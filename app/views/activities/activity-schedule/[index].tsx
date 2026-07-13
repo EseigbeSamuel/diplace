@@ -5,6 +5,13 @@ import { router, useLocalSearchParams } from "expo-router";
 import React from "react";
 import { Image, ScrollView, StyleSheet, Text, View, Pressable } from "react-native";
 import { RFValue } from "react-native-responsive-fontsize";
+import Animated, {
+  useAnimatedScrollHandler,
+  useAnimatedStyle,
+  useSharedValue,
+  interpolate,
+  Extrapolate,
+} from "react-native-reanimated";
 
 const ActivitySchedule = () => {
   const { colors, isDarkMode } = useTheme();
@@ -27,8 +34,54 @@ const ActivitySchedule = () => {
     router.back();
   };
 
+  const scrollY = useSharedValue(0);
+  const scrollHandler = useAnimatedScrollHandler({
+    onScroll: (event) => {
+      scrollY.value = event.contentOffset.y;
+    },
+  });
+
+  const IMAGE_HEIGHT = 280;
+  const imageAnimatedStyle = useAnimatedStyle(() => {
+    const translateY = interpolate(
+      scrollY.value,
+      [0, IMAGE_HEIGHT],
+      [0, -IMAGE_HEIGHT * 0.4],
+      Extrapolate.CLAMP
+    );
+    const scale = interpolate(
+      scrollY.value,
+      [-100, 0],
+      [1.3, 1],
+      Extrapolate.CLAMP
+    );
+    return {
+      transform: [
+        { translateY },
+        { scale },
+      ],
+    };
+  });
+
   return (
     <View style={{ backgroundColor: colors.background }} className="relative flex-1">
+      {/* Background Image Banner */}
+      <Animated.View
+        style={[
+          {
+            position: "absolute",
+            top: 0,
+            left: 0,
+            right: 0,
+            height: IMAGE_HEIGHT,
+            zIndex: 1,
+          },
+          imageAnimatedStyle,
+        ]}
+      >
+        <Image source={propertyImage} className="w-full h-full" resizeMode="cover" />
+      </Animated.View>
+
       {/* Absolute Custom Header Overlaid on Image */}
       <View className="absolute z-20 w-full px-4 top-10 flex flex-row items-center justify-between">
         <Pressable
@@ -75,33 +128,37 @@ const ActivitySchedule = () => {
         </Pressable>
       </View>
 
-      <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ pb: 100 }}>
-        {/* Top Image Banner */}
-        <View className="h-[280px] w-full">
-          <Image source={propertyImage} className="w-full h-full" resizeMode="cover" />
-        </View>
+      <Animated.ScrollView
+        onScroll={scrollHandler}
+        scrollEventThrottle={16}
+        showsVerticalScrollIndicator={false}
+        style={{ zIndex: 10, flex: 1 }}
+        contentContainerStyle={{ paddingBottom: 100 }}
+      >
+        {/* Transparent Spacer matching image height minus the border overlap */}
+        <View style={{ height: IMAGE_HEIGHT - 32, backgroundColor: "transparent" }} />
 
         {/* Content Overlap Container */}
         <View
           style={{ backgroundColor: colors.background }}
-          className="flex flex-col -mt-8 rounded-t-[28px] px-4 pt-6 pb-24"
+          className="flex flex-col rounded-t-[28px] px-4 pt-6 pb-24"
         >
           {/* Title & Info */}
           <View className="pb-4">
             <Text
-              style={{ color: colors.slate[650], fontSize: RFValue(20) }}
+              style={{ color: colors.slate[650], fontSize: RFValue(22) }}
               className="font-bold"
             >
               {title}
             </Text>
             <Text
-              style={{ color: colors.slate[550], fontSize: RFValue(13.5), marginTop: 4 }}
+              style={{ color: colors.slate[550], fontSize: RFValue(15.5), marginTop: 4 }}
               className="font-medium"
             >
               📍 {locationText}
             </Text>
             <Text
-              style={{ color: colors.slate[650], fontSize: RFValue(15), marginTop: 8 }}
+              style={{ color: colors.slate[650], fontSize: RFValue(17.5), marginTop: 8 }}
               className="font-bold"
             >
               {priceText}
@@ -115,34 +172,34 @@ const ActivitySchedule = () => {
             {status === "booked" && !isEventCenter ? (
               // Case: Apartment Booked
               <View className="gap-3.5">
-                <Text style={{ color: colors.slate[650], fontSize: RFValue(13) }} className="font-bold">
+                <Text style={{ color: colors.slate[650], fontSize: RFValue(15) }} className="font-bold">
                   Booking Details
                 </Text>
                 <View className="flex flex-row items-center justify-between">
                   <View className="flex flex-row items-center gap-2">
                     <Image source={require("@/assets/icons/contract.png")} className="w-5 h-5" style={{ tintColor: colors.slate[550] }} />
-                    <Text style={{ color: colors.slate[600], fontSize: RFValue(12.5) }} className="font-medium">Rent - 1 Year</Text>
+                    <Text style={{ color: colors.slate[600], fontSize: RFValue(14.5) }} className="font-medium">Rent - 1 Year</Text>
                   </View>
                 </View>
                 <View className="flex flex-row items-center justify-between">
                   <View className="flex flex-row items-center gap-2">
                     <Image source={require("@/assets/icons/calendar.png")} className="w-5 h-5" style={{ tintColor: colors.slate[550] }} />
-                    <Text style={{ color: colors.slate[600], fontSize: RFValue(12.5) }} className="font-medium">Move In: Fri, 20th Aug, 2025</Text>
+                    <Text style={{ color: colors.slate[600], fontSize: RFValue(14.5) }} className="font-medium">Move In: Fri, 20th Aug, 2025</Text>
                   </View>
                   <View className="bg-emerald-50 px-3 py-1 rounded-full border border-emerald-200">
-                    <Text className="text-emerald-600 font-bold text-[10px]">✓ Booked</Text>
+                    <Text className="text-emerald-600 font-bold text-[12px]">✓ Booked</Text>
                   </View>
                 </View>
                 <View className="flex flex-row items-center gap-2">
                   <Image source={require("@/assets/icons/user.png")} className="w-5 h-5" style={{ tintColor: colors.slate[550] }} />
-                  <Text style={{ color: colors.slate[600], fontSize: RFValue(12.5) }} className="font-medium">Occupants: 1 Adult, 0 Children</Text>
+                  <Text style={{ color: colors.slate[600], fontSize: RFValue(14.5) }} className="font-medium">Occupants: 1 Adult, 0 Children</Text>
                 </View>
               </View>
             ) : (
               // Other Cases: Scheduled, Inspected, Reserved, Event Center Booked
               <View className="gap-3.5">
                 {isEventCenter && (
-                  <Text style={{ color: colors.slate[650], fontSize: RFValue(13) }} className="font-bold">
+                  <Text style={{ color: colors.slate[650], fontSize: RFValue(15) }} className="font-bold">
                     Wedding & Engagement
                   </Text>
                 )}
@@ -154,46 +211,46 @@ const ActivitySchedule = () => {
                       className="w-5 h-5"
                       style={{ tintColor: colors.slate[550] }}
                     />
-                    <Text style={{ color: colors.slate[600], fontSize: RFValue(12.5) }} className="font-medium">
+                    <Text style={{ color: colors.slate[600], fontSize: RFValue(14.5) }} className="font-medium">
                       {isEventCenter ? "Thu, 17 Aug - Sat, 19 Aug, 2025" : "Wed, 9th August, 2025"}
                     </Text>
                   </View>
-
+ 
                   {/* Status Badge */}
                   {status === "scheduled" && (
                     <View className="bg-blue-50 px-3 py-1 rounded-full border border-blue-200">
-                      <Text className="text-blue-600 font-bold text-[10px]">● Scheduled</Text>
+                      <Text className="text-blue-600 font-bold text-[12px]">● Scheduled</Text>
                     </View>
                   )}
                   {status === "inspected" && (
                     <View className="bg-gray-100 px-3 py-1 rounded-full border border-gray-300 flex flex-row items-center gap-1">
                       <Image source={require("@/assets/icons/badge-check-green.png")} className="w-3 h-3" style={{ tintColor: "#1C2024" }} />
-                      <Text className="text-gray-800 font-bold text-[10px]">Inspected</Text>
+                      <Text className="text-gray-800 font-bold text-[12px]">Inspected</Text>
                     </View>
                   )}
                   {status === "reserved" && (
                     <View className="bg-amber-50 px-3 py-1 rounded-full border border-amber-200">
-                      <Text className="text-amber-600 font-bold text-[10px]">● Reserved</Text>
+                      <Text className="text-amber-600 font-bold text-[12px]">● Reserved</Text>
                     </View>
                   )}
                   {status === "booked" && isEventCenter && (
                     <View className="bg-emerald-50 px-3 py-1 rounded-full border border-emerald-200">
-                      <Text className="text-emerald-600 font-bold text-[10px]">✓ Booked</Text>
+                      <Text className="text-emerald-600 font-bold text-[12px]">✓ Booked</Text>
                     </View>
                   )}
                 </View>
-
+ 
                 <View className="flex flex-row items-center gap-2">
                   <Image
                     source={require("@/assets/icons/Time.png")}
                     className="w-5 h-5"
                     style={{ tintColor: colors.slate[550] }}
                   />
-                  <Text style={{ color: colors.slate[600], fontSize: RFValue(12.5) }} className="font-medium">
+                  <Text style={{ color: colors.slate[600], fontSize: RFValue(14.5) }} className="font-medium">
                     {isEventCenter ? "Full work day (10 hours)" : "1PM - 3PM Afternoon slot"}
                   </Text>
                 </View>
-
+ 
                 {!isEventCenter && (
                   <View className="flex flex-row items-center gap-2">
                     <Image
@@ -201,7 +258,7 @@ const ActivitySchedule = () => {
                       className="w-5 h-5"
                       style={{ tintColor: colors.slate[550] }}
                     />
-                    <Text style={{ color: colors.slate[600], fontSize: RFValue(12.5) }} className="font-medium">
+                    <Text style={{ color: colors.slate[600], fontSize: RFValue(14.5) }} className="font-medium">
                       Fee: ₦2,000
                     </Text>
                   </View>
@@ -220,11 +277,11 @@ const ActivitySchedule = () => {
                 style={{ width: RFValue(40), height: RFValue(40), borderRadius: RFValue(20) }}
               />
               <View>
-                <Text style={{ color: colors.slate[500], fontSize: RFValue(11) }}>
+                <Text style={{ color: colors.slate[500], fontSize: RFValue(13) }}>
                   {status === "booked" ? "Booked By:" : status === "reserved" ? "Reserved By:" : "Scheduled By:"}
                 </Text>
                 <Text
-                  style={{ color: colors.slate[650], fontSize: RFValue(13.5) }}
+                  style={{ color: colors.slate[650], fontSize: RFValue(15.5) }}
                   className="font-bold flex-row items-center"
                 >
                   Sammy Kalu{" "}
@@ -264,16 +321,16 @@ const ActivitySchedule = () => {
           {isEventCenter && status === "reserved" && (
             <View className="py-4 border-t border-gray-200/80 gap-3">
               <View className="flex flex-row justify-between">
-                <Text style={{ color: colors.slate[550], fontSize: RFValue(13) }}>Initial deposit:</Text>
-                <Text style={{ color: colors.slate[650], fontSize: RFValue(13.5) }} className="font-bold">₦251,200.00</Text>
+                <Text style={{ color: colors.slate[550], fontSize: RFValue(15) }}>Initial deposit:</Text>
+                <Text style={{ color: colors.slate[650], fontSize: RFValue(15.5) }} className="font-bold">₦251,200.00</Text>
               </View>
               <View className="flex flex-row justify-between">
-                <Text style={{ color: colors.slate[550], fontSize: RFValue(13) }}>Balance payment:</Text>
-                <Text style={{ color: colors.slate[650], fontSize: RFValue(13.5) }} className="font-bold">₦1,034,800.00</Text>
+                <Text style={{ color: colors.slate[550], fontSize: RFValue(15) }}>Balance payment:</Text>
+                <Text style={{ color: colors.slate[650], fontSize: RFValue(15.5) }} className="font-bold">₦1,034,800.00</Text>
               </View>
               <View className="flex flex-row justify-between">
-                <Text style={{ color: colors.slate[550], fontSize: RFValue(13) }}>Balance due:</Text>
-                <Text className="text-red-500 font-bold text-sm">Thu. 10th Aug, 2025</Text>
+                <Text style={{ color: colors.slate[550], fontSize: RFValue(15) }}>Balance due:</Text>
+                <Text className="text-red-500 font-bold text-base">Thu. 10th Aug, 2025</Text>
               </View>
             </View>
           )}
@@ -281,10 +338,10 @@ const ActivitySchedule = () => {
           {/* Dynamic Section 4: Renter's Notes (Only for Booked or Reserved status) */}
           {(status === "booked" || status === "reserved") && (
             <View className="py-4 border-t border-gray-200/80">
-              <Text style={{ color: colors.slate[650], fontSize: RFValue(13), marginBottom: 6 }} className="font-bold">
+              <Text style={{ color: colors.slate[650], fontSize: RFValue(15.5), marginBottom: 6 }} className="font-bold">
                 Renter's Notes
               </Text>
-              <Text style={{ color: colors.slate[600], fontSize: RFValue(12.5), lineHeight: RFValue(17) }}>
+              <Text style={{ color: colors.slate[600], fontSize: RFValue(14.5), lineHeight: RFValue(19.5) }}>
                 {isEventCenter
                   ? "We are expecting dignitaries and would like the place to be on lock down."
                   : "I would love everything to be fixed before moving in. Just work with my move in date."}
@@ -298,13 +355,13 @@ const ActivitySchedule = () => {
               style={{ backgroundColor: isDarkMode ? colors.slate[100] : "#FFFBEB", borderColor: "#FDE68A" }}
               className="p-4 rounded-xl border mt-4"
             >
-              <Text style={{ color: "#D97706", fontSize: RFValue(11.5), lineHeight: RFValue(16) }}>
+              <Text style={{ color: "#D97706", fontSize: RFValue(13.5), lineHeight: RFValue(18.5) }}>
                 ⚠️ Heads up! The price you see is for the space only. Renter is to pay other charges from their app.
               </Text>
             </View>
           )}
         </View>
-      </ScrollView>
+      </Animated.ScrollView>
 
       {/* Floating Bottom Button Bar */}
       <View
@@ -325,7 +382,7 @@ const ActivitySchedule = () => {
           <AppButton
             title="Hold for Renter"
             onPress={handleBack}
-            style={{ width: "100%" }}
+            fullwidth
           />
         ) : (
           // Scheduled, Booked, Reserved status: cancel + view space buttons
@@ -337,7 +394,7 @@ const ActivitySchedule = () => {
               <AppButton
                 title="View space"
                 onPress={handleBack}
-                style={{ width: "100%" }}
+                fullwidth
               />
             </View>
           </View>

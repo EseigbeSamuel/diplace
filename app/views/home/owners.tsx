@@ -12,6 +12,7 @@ import { ArrowUpRight, MapPin } from "lucide-react-native";
 import React, { useMemo, useRef, useState } from "react";
 import {
   Dimensions,
+  DimensionValue,
   FlatList,
   Image,
   Pressable,
@@ -107,8 +108,8 @@ export default function OwnersHome() {
       />
 
       <FlatList
-        data={RecentEarningsDB}
-        keyExtractor={(item) => item.id}
+        data={[]}
+        renderItem={() => null}
         showsVerticalScrollIndicator={false}
         contentContainerClassName="gap-8 pb-10"
         ListHeaderComponent={
@@ -226,9 +227,11 @@ export default function OwnersHome() {
                       className="w-full h-3 rounded-full "
                     >
                       <View
-                        style={{ backgroundColor: colors.info[200] }}
+                        style={{
+                          backgroundColor: colors.info[200],
+                          width: progressWidth as DimensionValue,
+                        }}
                         className="rounded-full h-3"
-                        width={progressWidth}
                       ></View>
                     </View>
                   </View>

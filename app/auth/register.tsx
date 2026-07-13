@@ -135,12 +135,16 @@ export default function Register() {
             }
             right={
               <TextInput.Icon
-                accessibilityLabel="Show password"
+                accessibilityLabel={showPassword ? "Hide password" : "Show password"}
                 accessibilityRole="button"
                 onPress={() => setShowPassword((prev) => !prev)}
                 icon={() => (
                   <Image
-                    source={require("../../assets/icons/password-hide.png")}
+                    source={
+                      showPassword
+                        ? require("../../assets/icons/password-show.png")
+                        : require("../../assets/icons/password-hide.png")
+                    }
                     style={{ width: 20, height: 20 }}
                     resizeMode="contain"
                   />
@@ -175,12 +179,16 @@ export default function Register() {
             }
             right={
               <TextInput.Icon
-                accessibilityLabel="Show password"
+                accessibilityLabel={showConfirmPassword ? "Hide password" : "Show password"}
                 accessibilityRole="button"
                 onPress={() => setShowConfirmPassword((prev) => !prev)}
                 icon={() => (
                   <Image
-                    source={require("../../assets/icons/password-hide.png")}
+                    source={
+                      showConfirmPassword
+                        ? require("../../assets/icons/password-show.png")
+                        : require("../../assets/icons/password-hide.png")
+                    }
                     style={{ width: 20, height: 20 }}
                     resizeMode="contain"
                   />

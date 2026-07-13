@@ -127,7 +127,7 @@ const AgentBookingCard = ({
       >
         <Text
           style={{
-            fontSize: RFValue(9),
+            fontSize: RFValue(11),
             color: colors.slate[500],
             textTransform: "uppercase",
           }}
@@ -137,7 +137,7 @@ const AgentBookingCard = ({
         </Text>
         <Text
           style={{
-            fontSize: RFValue(14),
+            fontSize: RFValue(16.5),
             fontWeight: "bold",
             color: colors.slate[650],
             marginTop: -2,
@@ -152,7 +152,7 @@ const AgentBookingCard = ({
         {dueText && (
           <Text
             style={{
-              fontSize: RFValue(10),
+              fontSize: RFValue(12),
               color: colors.slate[500],
               marginBottom: 1,
             }}
@@ -163,7 +163,7 @@ const AgentBookingCard = ({
         )}
         <Text
           style={{
-            fontSize: RFValue(13.5),
+            fontSize: RFValue(16),
             fontWeight: "600",
             color: colors.slate[650],
           }}
@@ -173,7 +173,7 @@ const AgentBookingCard = ({
         </Text>
         <Text
           style={{
-            fontSize: RFValue(11.5),
+            fontSize: RFValue(13.5),
             color: colors.slate[500],
             marginTop: 1,
           }}
@@ -197,7 +197,7 @@ const AgentBookingCard = ({
             <Text
               style={{
                 color: "#EF4444",
-                fontSize: RFValue(9),
+                fontSize: RFValue(10.5),
                 fontWeight: "bold",
               }}
             >
@@ -265,7 +265,7 @@ const AgentActiveActivity = () => {
         <Text
           style={{
             color: colors.slate[650],
-            fontSize: RFValue(15),
+            fontSize: RFValue(18),
             fontWeight: "700",
             marginBottom: RFValue(8),
           }}
@@ -372,13 +372,13 @@ const AgentActiveActivity = () => {
             />
             <View className="flex-1 gap-1">
               <Text
-                style={{ color: colors.slate[650], fontSize: RFValue(14) }}
+                style={{ color: colors.slate[650], fontSize: RFValue(16) }}
                 className="font-bold"
               >
                 Today’s Activity
               </Text>
               <Text
-                style={{ color: colors.slate[600], fontSize: RFValue(12.5), lineHeight: RFValue(17) }}
+                style={{ color: colors.slate[600], fontSize: RFValue(14), lineHeight: RFValue(19) }}
                 className="font-medium"
               >
                 You have (4) activity lined up for you today. Check them out now.
@@ -389,7 +389,7 @@ const AgentActiveActivity = () => {
           <View className="flex flex-row items-center justify-between mt-1 pt-2 border-t border-dashed" style={{ borderColor: colors.slate[250] }}>
             {/* Avatar Stack */}
             <View className="flex flex-row items-center gap-1.5">
-              <Text style={{ fontSize: RFValue(11), color: colors.slate[550] }}>With:</Text>
+              <Text style={{ fontSize: RFValue(13), color: colors.slate[550] }}>With:</Text>
               <View className="flex flex-row items-center">
                 <Image
                   source={require("@/assets/images/sammy.jpg")}
@@ -425,7 +425,7 @@ const AgentActiveActivity = () => {
                     marginLeft: -RFValue(6),
                   }}
                 >
-                  <Text style={{ fontSize: RFValue(8), color: colors.slate[550], fontWeight: "bold" }}>
+                  <Text style={{ fontSize: RFValue(9.5), color: colors.slate[550], fontWeight: "bold" }}>
                     +2
                   </Text>
                 </View>
@@ -436,7 +436,7 @@ const AgentActiveActivity = () => {
               onPress={() => router.push("/views/activities/activity-schedule/today")}
               className="flex flex-row items-center gap-1"
             >
-              <Text style={{ color: colors.slate[650], fontSize: RFValue(12) }} className="font-semibold">
+              <Text style={{ color: colors.slate[650], fontSize: RFValue(14) }} className="font-semibold">
                 View schedule
               </Text>
               <Image

@@ -76,11 +76,16 @@ export function useLogin() {
         });
 
         // ✅ Navigation decision
-        if (!user?.verifications || user.verifications.length === 0) {
-          router.replace("/onboarding/welcome");
-          // router.replace("/(tabs)");
-        } else {
+        const isAlreadyVerified =
+          user?.status === "verified" ||
+          user?.status === "completed" ||
+          user?.status === "approved" ||
+          user?.status === "active";
+
+        if (isAlreadyVerified || (user?.verifications && user.verifications.length > 0)) {
           router.replace("/(tabs)");
+        } else {
+          router.replace("/onboarding/welcome");
         }
       } catch (error) {
         console.log("Failed to fetch user after login", error);
