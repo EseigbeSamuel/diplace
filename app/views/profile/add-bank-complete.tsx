@@ -2,8 +2,11 @@ import AppButton from "@/components/button";
 import SafeAreaViewContainer from "@/components/safeareaview";
 import SectionHeader from "@/components/sectionheader";
 import TextField from "@/components/textfield";
+import { NIGERIAN_BANKS, NigerianBank } from "@/constants/banks";
 import { useTheme } from "@/contexts/themeContext";
+import { useBankNameInquiry, useCreateBank } from "@/hooks";
 import { ColorScheme } from "@/utils";
+import { router } from "expo-router";
 import React, { useEffect, useState } from "react";
 import {
   ActivityIndicator,
@@ -19,82 +22,76 @@ import {
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import { RFValue } from "react-native-responsive-fontsize";
 
-interface Bank {
-  id: number;
-  name: string;
-}
-
 const AddBankDetails = () => {
   const { colors } = useTheme();
   const addBankStyles = styles(colors);
+  const { bankNameInquiryMutation, bankNameInquiryPending } =
+    useBankNameInquiry();
+  const { createBankMutation, createBankPending } = useCreateBank();
 
-  const [selectedBank, setSelectedBank] = useState<string>("");
+  const [selectedBank, setSelectedBank] = useState<NigerianBank | null>(null);
   const [accountNumber, setAccountNumber] = useState("");
   const [accountName, setAccountName] = useState("");
+  const [accountType, setAccountType] = useState("savings");
   const [showBankModal, setShowBankModal] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
-  const [isVerifying, setIsVerifying] = useState(false);
+  const isSubmitting = createBankPending;
+  const isVerifying = bankNameInquiryPending;
 
-  const banks: Bank[] = [
-    { id: 1, name: "Access Bank Plc" },
-    { id: 2, name: "First Bank of Nigeria Plc" },
-    { id: 3, name: "OPAY" },
-    { id: 4, name: "Moniepoint MFB" },
-    { id: 5, name: "United Bank of Africa (UBA)" },
-    { id: 6, name: "Guarantee Trust Bank (GTB)" },
-    { id: 7, name: "Union Bank" },
-    { id: 8, name: "Keystone Bank" },
-    { id: 9, name: "Eco Bank" },
-    { id: 10, name: "Wema Bank" },
-    { id: 11, name: "Fidelity Bank" },
-    { id: 12, name: "Kuda MFB" },
-  ];
-
-  const filteredBanks = banks.filter((bank) =>
+  const filteredBanks = NIGERIAN_BANKS.filter((bank) =>
     bank.name.toLowerCase().includes(searchQuery.toLowerCase()),
   );
 
   // Auto-verify account when 10 digits are entered
   useEffect(() => {
-    if (accountNumber.length === 10 && selectedBank) {
+    if (accountNumber.length === 10 && selectedBank?.code) {
       verifyAccountNumber();
     } else if (accountNumber.length < 10) {
       setAccountName("");
     }
-  }, [accountNumber, selectedBank]);
+  }, [accountNumber, selectedBank?.code]);
 
   const verifyAccountNumber = async () => {
-    setIsVerifying(true);
     setAccountName("");
+    if (!selectedBank?.code || accountNumber.length !== 10) return;
 
-    // Simulate API call to verify account
-    setTimeout(() => {
-      // Mock response - replace with actual API call
-      setAccountName("IBE X ALEX");
-      setIsVerifying(false);
-    }, 2000);
-  };
-
-  const handleSelectBank = (bankName: string) => {
-    setSelectedBank(bankName);
-    setShowBankModal(false);
-    setSearchQuery("");
-    // Reset account name when bank changes
-    setAccountName("");
-  };
-
-  const handleComplete = () => {
-    if (selectedBank && accountNumber.length === 10 && accountName) {
-      // Handle form submission
-      console.log("Bank:", selectedBank);
-      console.log("Account Number:", accountNumber);
-      console.log("Account Name:", accountName);
-      // Navigate back or show success message
+    try {
+      const response = await bankNameInquiryMutation({
+        bankCode: selectedBank.code,
+        accountNumber,
+      });
+      setAccountName(response.account_name || "");
+      setAccountType(response.account_type || "savings");
+    } catch {
+      setAccountName("");
     }
   };
 
+  const handleSelectBank = (bank: NigerianBank) => {
+    setSelectedBank(bank);
+    setShowBankModal(false);
+    setSearchQuery("");
+    setAccountName("");
+  };
+
+  const handleComplete = async () => {
+    if (!selectedBank || accountNumber.length !== 10 || !accountName) return;
+
+    await createBankMutation({
+      bank_name: selectedBank.name,
+      account_number: accountNumber,
+      account_name: accountName,
+      account_type: accountType,
+    });
+    router.back();
+  };
+
   const isFormValid =
-    selectedBank && accountNumber.length === 10 && accountName && !isVerifying;
+    !!selectedBank &&
+    accountNumber.length === 10 &&
+    !!accountName &&
+    !isVerifying &&
+    !isSubmitting;
 
   return (
     <SafeAreaViewContainer>
@@ -137,7 +134,7 @@ const AddBankDetails = () => {
               <View style={addBankStyles.bankSection}>
                 <Text style={addBankStyles.bankLabel}>Bank</Text>
                 <Text style={addBankStyles.bankName}>
-                  {selectedBank || "UNAVAILABLE"}
+                  {selectedBank?.name || "UNAVAILABLE"}
                 </Text>
               </View>
             </View>
@@ -156,8 +153,8 @@ const AddBankDetails = () => {
                 type="dropdown"
                 label="Bank Name"
                 onDropdownPress={() => setShowBankModal(true)}
-                value={selectedBank}
-                onChange={(text) => setSelectedBank(text.toString())}
+                value={selectedBank?.name || ""}
+                onChange={() => {}}
               />
 
               <TextField
@@ -242,18 +239,18 @@ const AddBankDetails = () => {
             <ScrollView style={addBankStyles.bankList}>
               {filteredBanks.map((bank) => (
                 <Pressable
-                  key={bank.id}
+                  key={bank.code}
                   style={addBankStyles.bankItem}
-                  onPress={() => handleSelectBank(bank.name)}
+                  onPress={() => handleSelectBank(bank)}
                 >
                   <View
                     style={[
                       addBankStyles.radioButton,
-                      selectedBank === bank.name &&
+                      selectedBank?.code === bank.code &&
                         addBankStyles.radioButtonSelected,
                     ]}
                   >
-                    {selectedBank === bank.name && (
+                    {selectedBank?.code === bank.code && (
                       <View style={addBankStyles.radioButtonInner} />
                     )}
                   </View>

@@ -7,3 +7,4 @@ export * from "./review";
 export * from "./user";
 export * from "./welcome";
 export * from "./notification";
+export * from "./bank";

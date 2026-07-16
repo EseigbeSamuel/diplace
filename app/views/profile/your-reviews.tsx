@@ -1,5 +1,6 @@
-import React from "react";
+import React, { useMemo } from "react";
 import {
+  ActivityIndicator,
   Image,
   Pressable,
   ScrollView,
@@ -14,68 +15,86 @@ import { useTheme } from "@/contexts/themeContext";
 import { ColorScheme } from "@/utils";
 import { useRouter } from "expo-router";
 import ViewHeader from "@/components/view-header";
+import { useListReviews } from "@/hooks";
+import { PropertyReviewItem } from "@/types";
+
+const getReviewerUser = (review: PropertyReviewItem) => {
+  if ("user" in review.reviewer) return review.reviewer.user;
+  return review.reviewer;
+};
+
+const formatReviewDate = (dateString: string) => {
+  const date = new Date(dateString);
+  if (Number.isNaN(date.getTime())) return "";
+
+  const diffDays = Math.floor(
+    (Date.now() - date.getTime()) / (24 * 60 * 60 * 1000),
+  );
+
+  if (diffDays < 1) return "Today";
+  if (diffDays === 1) return "1 day ago";
+  if (diffDays < 30) return `${diffDays} days ago`;
+
+  return date.toLocaleDateString("en-NG", {
+    month: "short",
+    day: "numeric",
+    year: "numeric",
+  });
+};
 
 const YourReviews = () => {
   const { colors } = useTheme();
   const router = useRouter();
   const reviewStyles = styles(colors);
+  const { reviews, reviewsTotal, isReviewsLoading, reviewsError } =
+    useListReviews({
+      params: {
+        current_user: true,
+        status: "active",
+        limit: 100,
+      },
+    });
+
+  const reviewSummary = useMemo(() => {
+    const total = reviews.length;
+    const ratingCounts = [5, 4, 3, 2, 1].map((stars) => ({
+      stars,
+      count: reviews.filter((review) => Math.round(review.rating) === stars)
+        .length,
+    }));
+    const average =
+      total > 0
+        ? reviews.reduce((sum, review) => sum + review.rating, 0) / total
+        : 0;
+
+    return {
+      average,
+      roundedAverage: Math.round(average),
+      ratingData: ratingCounts.map((item) => ({
+        ...item,
+        percentage: total ? Math.round((item.count / total) * 100) : 0,
+      })),
+    };
+  }, [reviews]);
 
   const stats = [
     {
       icon: require("@/assets/icons/activity-active.png"),
-      value: "85%",
+      value: reviewsTotal ? "100%" : "0%",
       label: "Success",
       color: colors.info[200],
     },
     {
       icon: require("@/assets/icons/Time Circle - Iconly Pro-1.png"),
-      value: "2mins",
+      value: "--",
       label: "Average Response\nTime",
       color: colors.error[300],
     },
     {
       icon: require("@/assets/icons/checkbox-circle-fill.png"),
-      value: "245",
+      value: String(reviewsTotal),
       label: "Completed\nBookings",
       color: colors.success[200],
-    },
-  ];
-
-  const ratingData = [
-    { stars: 5, count: 150, percentage: 90 },
-    { stars: 4, count: 80, percentage: 60 },
-    { stars: 3, count: 30, percentage: 30 },
-    { stars: 2, count: 10, percentage: 15 },
-    { stars: 1, count: 5, percentage: 8 },
-  ];
-
-  const reviews = [
-    {
-      id: 1,
-      name: "Elizabeth Anniesamka",
-      verified: true,
-      date: "2 days ago",
-      avatar: "https://randomuser.me/api/portraits/men/1.jpg",
-      comment:
-        "This agent is very professional and down to earth. The images he uploads describes what I saw and I appreciate his openess.",
-    },
-    {
-      id: 2,
-      name: "Elizabeth Anniesamka",
-      verified: false,
-      date: "2 days ago",
-      avatar: "https://randomuser.me/api/portraits/men/1.jpg",
-      comment:
-        "This agent is very professional and down to earth. The images he uploads describes what I saw and I appreciate his openess.",
-    },
-    {
-      id: 3,
-      name: "Elizabeth Anniesamka",
-      verified: true,
-      date: "2 days ago",
-      avatar: "https://randomuser.me/api/portraits/men/1.jpg",
-      comment:
-        "This agent is very professional and down to earth. The images he uploads describes what I saw and I appreciate his openess.",
     },
   ];
 
@@ -132,13 +151,15 @@ const YourReviews = () => {
 
           {/* Average Rating */}
           <View style={reviewStyles.averageRatingContainer}>
-            <Text style={reviewStyles.averageRating}>4.5</Text>
-            {renderStars(4)}
+            <Text style={reviewStyles.averageRating}>
+              {reviewSummary.average.toFixed(1)}
+            </Text>
+            {renderStars(reviewSummary.roundedAverage)}
           </View>
 
           {/* Rating Bars */}
           <View style={reviewStyles.ratingBarsContainer}>
-            {ratingData.map((rating) => (
+            {reviewSummary.ratingData.map((rating) => (
               <View key={rating.stars} style={reviewStyles.ratingRow}>
                 <Text style={reviewStyles.ratingNumber}>{rating.stars}</Text>
                 <Image
@@ -161,7 +182,9 @@ const YourReviews = () => {
         {/* Reviews Section */}
         <View style={reviewStyles.section}>
           <View style={reviewStyles.reviewsHeader}>
-            <Text style={reviewStyles.sectionTitle}>Reviews (15)</Text>
+            <Text style={reviewStyles.sectionTitle}>
+              Reviews ({reviewsTotal})
+            </Text>
             <Pressable onPress={handleSeeMore}>
               <View style={reviewStyles.seeMoreButton}>
                 <Text style={reviewStyles.seeMoreText}>See more</Text>
@@ -174,29 +197,55 @@ const YourReviews = () => {
           </View>
 
           {/* Review Cards */}
-          {reviews.map((review) => (
-            <View key={review.id} style={reviewStyles.reviewCard}>
-              <View style={reviewStyles.reviewHeader}>
-                <Image
-                  source={{ uri: review.avatar }}
-                  style={reviewStyles.avatar}
-                />
-                <View style={reviewStyles.reviewerInfo}>
-                  <View style={reviewStyles.reviewerNameRow}>
-                    <Text style={reviewStyles.reviewerName}>{review.name}</Text>
-                    {review.verified && (
-                      <Image
-                        source={require("@/assets/icons/badge-check-green.png")}
-                        style={reviewStyles.verifiedBadge}
-                      />
-                    )}
+          {isReviewsLoading ? (
+            <ActivityIndicator size="small" color={colors.slate[650]} />
+          ) : reviewsError ? (
+            <Text style={reviewStyles.emptyText}>Unable to load reviews.</Text>
+          ) : reviews.length ? (
+            reviews.slice(0, 3).map((review) => {
+              const reviewer = getReviewerUser(review);
+              const reviewerName =
+                [reviewer.first_name, reviewer.last_name]
+                  .filter(Boolean)
+                  .join(" ") || "User";
+
+              return (
+                <View key={review.public_id} style={reviewStyles.reviewCard}>
+                  <View style={reviewStyles.reviewHeader}>
+                    <Image
+                      source={
+                        reviewer.profile_picture
+                          ? { uri: reviewer.profile_picture }
+                          : require("@/assets/images/user.png")
+                      }
+                      style={reviewStyles.avatar}
+                    />
+                    <View style={reviewStyles.reviewerInfo}>
+                      <View style={reviewStyles.reviewerNameRow}>
+                        <Text style={reviewStyles.reviewerName}>
+                          {reviewerName}
+                        </Text>
+                        {review.status === "verified" && (
+                          <Image
+                            source={require("@/assets/icons/badge-check-green.png")}
+                            style={reviewStyles.verifiedBadge}
+                          />
+                        )}
+                      </View>
+                      <Text style={reviewStyles.reviewDate}>
+                        {formatReviewDate(review.date_created)}
+                      </Text>
+                    </View>
                   </View>
-                  <Text style={reviewStyles.reviewDate}>{review.date}</Text>
+                  <Text style={reviewStyles.reviewComment}>
+                    {review.comment}
+                  </Text>
                 </View>
-              </View>
-              <Text style={reviewStyles.reviewComment}>{review.comment}</Text>
-            </View>
-          ))}
+              );
+            })
+          ) : (
+            <Text style={reviewStyles.emptyText}>No reviews yet.</Text>
+          )}
         </View>
       </ScrollView>
     </SafeAreaViewContainer>
@@ -370,5 +419,10 @@ const styles = (colors: ColorScheme) =>
       fontSize: RFValue(14),
       color: colors.slate[600],
       lineHeight: RFValue(20),
+    },
+    emptyText: {
+      fontSize: RFValue(14),
+      color: colors.slate[500],
+      paddingVertical: RFValue(12),
     },
   });

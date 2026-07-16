@@ -1,7 +1,7 @@
 import { CustomBottomSheet } from "@/components/bottom-sheet";
 import { AppHeader } from "@/components/header";
 import SafeAreaViewContainer from "@/components/safeareaview";
-import { promoData, RecentEarningsDB } from "@/constants/ownerHome";
+import { promoData } from "@/constants/ownerHome";
 import { useTheme } from "@/contexts/themeContext";
 import { useGetCurrentUser, useListProperties } from "@/hooks";
 import { ColorScheme } from "@/utils";
@@ -26,6 +26,32 @@ import Carousel from "react-native-reanimated-carousel";
 import { RFValue } from "react-native-responsive-fontsize";
 import MyEarnings from "../profile/my-earnings";
 import AddSpaceBottomSheet from "../spaces/components/AddSpacesBottomContainer";
+
+function SkeletonBlock({
+  width = "100%",
+  height = 16,
+  borderRadius = 8,
+  style,
+}: {
+  width?: number | `${number}%` | "100%";
+  height?: number;
+  borderRadius?: number;
+  style?: any;
+}) {
+  return (
+    <View
+      style={[
+        {
+          width,
+          height,
+          borderRadius,
+          backgroundColor: "rgba(148, 163, 184, 0.22)",
+        },
+        style,
+      ]}
+    />
+  );
+}
 
 export default function OwnersHome() {
   const { colors, isDarkMode } = useTheme();
@@ -139,20 +165,39 @@ export default function OwnersHome() {
                       }}
                     />
                     <View className="absolute bottom-4 left-4 right-4">
-                      <Text className="text-white text-lg font-semibold">
-                        {isOverviewLoading
-                          ? "Loading property..."
-                          : latestPropertyTitle}
-                      </Text>
-
-                      <View className="flex-row items-center mt-1">
-                        <MapPin size={16} color="#fff" />
-                        <Text className="text-white ml-1 text-sm">
-                          {isOverviewLoading
-                            ? "Loading location..."
-                            : latestPropertyAddress}
-                        </Text>
-                      </View>
+                      {isOverviewLoading ? (
+                        <View>
+                          <SkeletonBlock
+                            width="62%"
+                            height={18}
+                            borderRadius={8}
+                            style={{
+                              backgroundColor: "rgba(255,255,255,0.35)",
+                            }}
+                          />
+                          <SkeletonBlock
+                            width="48%"
+                            height={14}
+                            borderRadius={8}
+                            style={{
+                              marginTop: 8,
+                              backgroundColor: "rgba(255,255,255,0.3)",
+                            }}
+                          />
+                        </View>
+                      ) : (
+                        <>
+                          <Text className="text-white text-lg font-semibold">
+                            {latestPropertyTitle}
+                          </Text>
+                          <View className="flex-row items-center mt-1">
+                            <MapPin size={16} color="#fff" />
+                            <Text className="text-white ml-1 text-sm">
+                              {latestPropertyAddress}
+                            </Text>
+                          </View>
+                        </>
+                      )}
                     </View>
                     <TouchableOpacity className="absolute bottom-4 right-4 bg-black/80 rounded-full w-10 h-10 flex items-center justify-center">
                       <ArrowUpRight size={20} color="#ffffff" />
@@ -206,9 +251,13 @@ export default function OwnersHome() {
                     >
                       <Image source={require("@/assets/icons/paper.png")} />
                     </View>
-                    <Text style={custom.big} className="font-semibold">
-                      {isOverviewLoading ? "..." : totalSpaces}
-                    </Text>
+                    {isOverviewLoading ? (
+                      <SkeletonBlock width={40} height={28} borderRadius={10} />
+                    ) : (
+                      <Text style={custom.big} className="font-semibold">
+                        {totalSpaces}
+                      </Text>
+                    )}
                   </View>
 
                   <View>
@@ -216,11 +265,13 @@ export default function OwnersHome() {
                       <Image
                         source={require("@/assets/icons/blue-unlock.png")}
                       />
-                      <Text style={custom.small}>
-                        {isOverviewLoading
-                          ? "Loading..."
-                          : `${availableSpaces} Available spaces`}
-                      </Text>
+                      {isOverviewLoading ? (
+                        <SkeletonBlock width={120} height={14} />
+                      ) : (
+                        <Text style={custom.small}>
+                          {`${availableSpaces} Available spaces`}
+                        </Text>
+                      )}
                     </View>
                     <View
                       style={{ backgroundColor: colors.slate[250] }}
@@ -232,6 +283,7 @@ export default function OwnersHome() {
                           width: progressWidth as DimensionValue,
                         }}
                         className="rounded-full h-3"
+                        width={isOverviewLoading ? "35%" : progressWidth}
                       ></View>
                     </View>
                   </View>
@@ -247,9 +299,20 @@ export default function OwnersHome() {
                     />
                     <View>
                       <Text style={custom.small}>Booked Space</Text>
-                      <Text style={custom.subTitle} className=" font-semibold">
-                        {isOverviewLoading ? "..." : bookedSpaces}
-                      </Text>
+                      {isOverviewLoading ? (
+                        <SkeletonBlock
+                          width={34}
+                          height={22}
+                          borderRadius={8}
+                        />
+                      ) : (
+                        <Text
+                          style={custom.subTitle}
+                          className=" font-semibold"
+                        >
+                          {bookedSpaces}
+                        </Text>
+                      )}
                     </View>
                   </View>
 
@@ -260,9 +323,20 @@ export default function OwnersHome() {
                     <Image source={require("@/assets/icons/yellow-lock.png")} />
                     <View>
                       <Text style={custom.small}>Reserved Space</Text>
-                      <Text style={custom.subTitle} className=" font-semibold">
-                        {isOverviewLoading ? "..." : reservedSpaces}
-                      </Text>
+                      {isOverviewLoading ? (
+                        <SkeletonBlock
+                          width={34}
+                          height={22}
+                          borderRadius={8}
+                        />
+                      ) : (
+                        <Text
+                          style={custom.subTitle}
+                          className=" font-semibold"
+                        >
+                          {reservedSpaces}
+                        </Text>
+                      )}
                     </View>
                   </View>
                 </View>

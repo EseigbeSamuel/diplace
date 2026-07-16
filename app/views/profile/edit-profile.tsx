@@ -1,7 +1,7 @@
-import React, { useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import {
+  Alert,
   Image,
-  Modal,
   Pressable,
   ScrollView,
   StyleSheet,
@@ -9,6 +9,7 @@ import {
   TextInput,
   View,
 } from "react-native";
+import * as ImagePicker from "expo-image-picker";
 import { RFValue } from "react-native-responsive-fontsize";
 import SafeAreaViewContainer from "@/components/safeareaview";
 import SectionHeader from "@/components/sectionheader";
@@ -18,23 +19,32 @@ import { ColorScheme } from "@/utils";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import MediaPickerModal from "@/components/media-picker-modal";
 import { useUser } from "@/contexts/user-context";
-import { useGetCurrentUser } from "@/hooks";
+import { useGetCurrentUser, useUpdateProfile } from "@/hooks";
+import { uploadAssets } from "@/services/upload";
+
+const splitFullName = (value: string) => {
+  const parts = value.trim().split(/\s+/).filter(Boolean);
+  const firstName = parts[0] || "";
+  const lastName = parts.slice(1).join(" ");
+
+  return { firstName, lastName };
+};
 
 const EditProfile = () => {
   const { colors } = useTheme();
   const { userType } = useUser();
-  const { currentUser } = useGetCurrentUser();
+  const { currentUser, isCurrentUserLoading } = useGetCurrentUser();
+  const { updateProfileMutation, updateProfilePending } = useUpdateProfile();
   const editProfileStyles = styles(colors);
 
-  // Form state
-  const [fullName, setFullName] = useState("Ibe Alex");
-  const [businessName, setBusinessName] = useState("Atraz Palace");
-  const [email, setEmail] = useState("ibealex@gmail.com");
-  const [phoneNumber, setPhoneNumber] = useState("+234-810-293-4980");
-  const [city, setCity] = useState("Port Harcourt");
-  const [address, setAddress] = useState(
-    "15 Orukeri Street, Rumuibekwe, Port Harc..."
-  );
+  const [fullName, setFullName] = useState("");
+  const [email, setEmail] = useState("");
+  const [phoneNumber, setPhoneNumber] = useState("");
+  const [city, setCity] = useState("");
+  const [address, setAddress] = useState("");
+  const [selectedImageUri, setSelectedImageUri] = useState<string | null>(null);
+  const [removePhoto, setRemovePhoto] = useState(false);
+  const [isUploadingPhoto, setIsUploadingPhoto] = useState(false);
   const [showMediaModal, setShowMediaModal] = useState(false);
 
   const normalizeImageUrl = (url?: string) => {
@@ -44,42 +54,169 @@ const EditProfile = () => {
     return `https://diplace.api.elsoft.ng/${url}`;
   };
   const profileImageUrl = normalizeImageUrl(currentUser?.profile_picture);
+  const displayedImageUrl = removePhoto
+    ? null
+    : selectedImageUri || profileImageUrl;
+  const isSaving = updateProfilePending || isUploadingPhoto;
+  const currentFullName = useMemo(
+    () =>
+      currentUser?.full_name?.trim() ||
+      `${currentUser?.first_name || ""} ${currentUser?.last_name || ""}`.trim(),
+    [currentUser],
+  );
 
-  const handleSaveChanges = () => {
-    // Handle save logic here
-    console.log("Saving changes...");
+  useEffect(() => {
+    if (!currentUser) return;
+
+    setFullName(currentFullName);
+    setEmail(currentUser.email || "");
+    setPhoneNumber(currentUser.phone_number || "");
+    setCity(currentUser.address?.city || "");
+    setAddress(currentUser.address?.street || "");
+    setSelectedImageUri(null);
+    setRemovePhoto(false);
+  }, [currentUser, currentFullName]);
+
+  const requestMediaPermission = async () => {
+    const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+
+    if (status !== "granted") {
+      Alert.alert(
+        "Permission Required",
+        "Please allow photo library access to update your profile picture.",
+      );
+      return false;
+    }
+
+    return true;
+  };
+
+  const requestCameraPermission = async () => {
+    const { status } = await ImagePicker.requestCameraPermissionsAsync();
+
+    if (status !== "granted") {
+      Alert.alert(
+        "Permission Required",
+        "Please allow camera access to take a profile picture.",
+      );
+      return false;
+    }
+
+    return true;
+  };
+
+  const handleSaveChanges = async () => {
+    const trimmedFullName = fullName.trim();
+    const trimmedEmail = email.trim();
+    const trimmedPhoneNumber = phoneNumber.trim();
+    const trimmedCity = city.trim();
+    const trimmedAddress = address.trim();
+
+    if (!trimmedFullName) {
+      Alert.alert("Full Name Required", "Please enter your full name.");
+      return;
+    }
+
+    if (!trimmedEmail) {
+      Alert.alert("Email Required", "Please enter your email address.");
+      return;
+    }
+
+    const { firstName, lastName } = splitFullName(trimmedFullName);
+    let avatarUrl: string | null | undefined;
+
+    try {
+      if (selectedImageUri) {
+        setIsUploadingPhoto(true);
+        const urls = await uploadAssets(
+          [
+            {
+              uri: selectedImageUri,
+              type: "image/jpeg",
+              name: "profile-picture.jpg",
+            },
+          ],
+          "profile-picture",
+        );
+        avatarUrl = urls[0];
+      } else if (removePhoto) {
+        avatarUrl = null;
+      }
+
+      await updateProfileMutation({
+        first_name: firstName,
+        last_name: lastName,
+        email: trimmedEmail,
+        phone_number: trimmedPhoneNumber,
+        user_type: userType,
+        ...(avatarUrl !== undefined ? { profile_picture: avatarUrl } : {}),
+        address: {
+          street: trimmedAddress,
+          city: trimmedCity,
+          state: currentUser?.address?.state || "",
+          zip_code: currentUser?.address?.zip_code || "",
+          country: currentUser?.address?.country || "Nigeria",
+          latitude: currentUser?.address?.latitude || 0,
+          longitude: currentUser?.address?.longitude || 0,
+        },
+      });
+
+      setSelectedImageUri(null);
+      setRemovePhoto(false);
+    } catch {
+      // Toast is handled by API/upload layers.
+    } finally {
+      setIsUploadingPhoto(false);
+    }
   };
 
   const handleRemovePhoto = () => {
-    // Handle remove photo logic here
-    console.log("Removing photo...");
-  };
-
-  const handleCityPress = () => {
-    // Navigate to city selection screen
-    console.log("Opening city selector...");
+    setSelectedImageUri(null);
+    setRemovePhoto(true);
   };
 
   const handleCameraPress = () => {
     setShowMediaModal(true);
   };
 
-  const handleTakePicture = () => {
+  const handleTakePicture = async () => {
     setShowMediaModal(false);
-    // Open camera to take picture
-    console.log("Opening camera...");
+    const hasPermission = await requestCameraPermission();
+    if (!hasPermission) return;
+
+    const result = await ImagePicker.launchCameraAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      allowsEditing: true,
+      aspect: [1, 1],
+      quality: 0.8,
+    });
+
+    if (!result.canceled) {
+      setSelectedImageUri(result.assets[0].uri);
+      setRemovePhoto(false);
+    }
   };
 
-  const handleChoosePhoto = () => {
+  const handleChoosePhoto = async () => {
     setShowMediaModal(false);
-    // Open photo library
-    console.log("Opening photo library...");
+    const hasPermission = await requestMediaPermission();
+    if (!hasPermission) return;
+
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      allowsEditing: true,
+      aspect: [1, 1],
+      quality: 0.8,
+    });
+
+    if (!result.canceled) {
+      setSelectedImageUri(result.assets[0].uri);
+      setRemovePhoto(false);
+    }
   };
 
   const handleCameraRoll = () => {
-    setShowMediaModal(false);
-    // Open camera roll
-    console.log("Opening camera roll...");
+    handleChoosePhoto();
   };
 
   return (
@@ -96,8 +233,8 @@ const EditProfile = () => {
             <View style={editProfileStyles.avatarContainer}>
               <Image
                 source={
-                  profileImageUrl
-                    ? { uri: profileImageUrl }
+                  displayedImageUrl
+                    ? { uri: displayedImageUrl }
                     : require("@/assets/images/user.png")
                 }
                 style={editProfileStyles.avatar}
@@ -166,10 +303,15 @@ const EditProfile = () => {
                   </Text>
                   <TextInput
                     style={editProfileStyles.input}
-                    value={businessName}
-                    onChangeText={setBusinessName}
+                    value={
+                      currentUser?.agent_type === "business"
+                        ? currentFullName
+                        : ""
+                    }
+                    onChangeText={() => {}}
                     placeholder="Enter your business name"
                     placeholderTextColor={colors.slate[450]}
+                    editable={false}
                   />
                 </View>
               </View>
@@ -224,22 +366,19 @@ const EditProfile = () => {
             <View style={editProfileStyles.section}>
               <Text style={editProfileStyles.sectionTitle}>Location</Text>
 
-              {/* City Selector */}
-              <Pressable
-                style={editProfileStyles.inputContainer}
-                onPress={handleCityPress}
-              >
+              {/* City Input */}
+              <View style={editProfileStyles.inputContainer}>
                 <View style={editProfileStyles.inputWrapper}>
                   <Text style={editProfileStyles.inputLabel}>City</Text>
-                  <View style={editProfileStyles.selectableInput}>
-                    <Text style={editProfileStyles.selectableText}>{city}</Text>
-                    <Image
-                      source={require("@/assets/icons/chevron-right.png")}
-                      style={editProfileStyles.chevronIcon}
-                    />
-                  </View>
+                  <TextInput
+                    style={editProfileStyles.input}
+                    value={city}
+                    onChangeText={setCity}
+                    placeholder="Enter your city"
+                    placeholderTextColor={colors.slate[450]}
+                  />
                 </View>
-              </Pressable>
+              </View>
 
               {/* Address Input */}
               <View style={editProfileStyles.inputContainer}>
@@ -263,10 +402,11 @@ const EditProfile = () => {
       {/* Save Button */}
       <View style={editProfileStyles.buttonContainer}>
         <AppButton
-          title="Save changes"
+          title={isSaving ? "Saving changes..." : "Save changes"}
           onPress={handleSaveChanges}
           size="large"
           fullwidth={true}
+          disabled={isSaving || isCurrentUserLoading}
         />
       </View>
 
@@ -371,22 +511,10 @@ const styles = (colors: ColorScheme) =>
       padding: 0,
       margin: 0,
     },
-    selectableInput: {
-      flexDirection: "row",
-      alignItems: "center",
-      justifyContent: "space-between",
-    },
-    selectableText: {
-      fontSize: RFValue(15),
-      color: colors.slate[650],
-    },
-    chevronIcon: {
-      tintColor: colors.slate[600],
-    },
     buttonContainer: {
       position: "fixed",
       bottom: 0,
-      paddingBottom: RFValue(30),
+      // paddingBottom: RFValue(10),
     },
     modalOverlay: {
       flex: 1,

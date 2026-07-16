@@ -39,6 +39,32 @@ type PropertyCardItem = {
   duration: string;
 };
 
+function SkeletonBlock({
+  width = "100%",
+  height = 16,
+  borderRadius = 8,
+  style,
+}: {
+  width?: number | `${number}%` | "100%";
+  height?: number;
+  borderRadius?: number;
+  style?: any;
+}) {
+  return (
+    <View
+      style={[
+        {
+          width,
+          height,
+          borderRadius,
+          backgroundColor: "rgba(148, 163, 184, 0.22)",
+        },
+        style,
+      ]}
+    />
+  );
+}
+
 export default function RenterHome() {
   const { colors, isDarkMode } = useTheme();
   const homeStyles = styles(colors);
@@ -325,8 +351,28 @@ export default function RenterHome() {
               contentContainerStyle={{ gap: 16 }}
               ListEmptyComponent={
                 isPropertiesLoading ? (
-                  <View className="py-3">
-                    <ActivityIndicator size="small" color={colors.slate[650]} />
+                  <View className="flex-row gap-4 py-1">
+                    {Array.from({ length: 2 }).map((_, index) => (
+                      <View
+                        key={`featured-skeleton-${index}`}
+                        className="w-[280px] rounded-3xl p-4"
+                        style={{ backgroundColor: colors.slate[150] }}
+                      >
+                        <SkeletonBlock height={130} borderRadius={20} />
+                        <SkeletonBlock
+                          width="70%"
+                          height={18}
+                          borderRadius={8}
+                          style={{ marginTop: 14 }}
+                        />
+                        <SkeletonBlock
+                          width="50%"
+                          height={14}
+                          borderRadius={8}
+                          style={{ marginTop: 8 }}
+                        />
+                      </View>
+                    ))}
                   </View>
                 ) : null
               }
@@ -336,18 +382,43 @@ export default function RenterHome() {
               Spaces Nearby 📍
             </Text>
 
-            {(showAllNearby ? nearbyCards : nearbyCardsPreview).map((item) => (
-              <View key={`nearby-${item.id}`} className="pb-4">
-                <HouseCard
-                  {...item}
-                  showBookmark
-                  isBookmarked={isBookmarked(item.id)}
-                  bookmarkDisabled={!!bookmarkPendingIds[item.id]}
-                  onToggleBookmark={() => handleToggleBookmark(item.id)}
-                  onPress={() => handleOpenProperty(item)}
-                />
-              </View>
-            ))}
+            {isPropertiesLoading
+              ? Array.from({ length: 2 }).map((_, index) => (
+                  <View
+                    key={`nearby-skeleton-${index}`}
+                    className="rounded-3xl p-4 pb-6 mb-4"
+                    style={{ backgroundColor: colors.slate[150] }}
+                  >
+                    <SkeletonBlock height={150} borderRadius={20} />
+                    <SkeletonBlock
+                      width="72%"
+                      height={18}
+                      style={{ marginTop: 12 }}
+                    />
+                    <SkeletonBlock
+                      width="48%"
+                      height={14}
+                      style={{ marginTop: 8 }}
+                    />
+                    <SkeletonBlock
+                      width="38%"
+                      height={14}
+                      style={{ marginTop: 8 }}
+                    />
+                  </View>
+                ))
+              : (showAllNearby ? nearbyCards : nearbyCardsPreview).map((item) => (
+                  <View key={`nearby-${item.id}`} className="pb-4">
+                    <HouseCard
+                      {...item}
+                      showBookmark
+                      isBookmarked={isBookmarked(item.id)}
+                      bookmarkDisabled={!!bookmarkPendingIds[item.id]}
+                      onToggleBookmark={() => handleToggleBookmark(item.id)}
+                      onPress={() => handleOpenProperty(item)}
+                    />
+                  </View>
+                ))}
 
             {canViewMoreNearby ? (
               <View className="pb-6">
@@ -403,6 +474,31 @@ export default function RenterHome() {
               horizontal
               showsHorizontalScrollIndicator={false}
               contentContainerStyle={{ gap: 16 }}
+              ListEmptyComponent={
+                isPropertiesLoading ? (
+                  <View className="flex-row gap-4 py-1">
+                    {Array.from({ length: 2 }).map((_, index) => (
+                      <View
+                        key={`recent-skeleton-${index}`}
+                        className="w-[280px] rounded-3xl p-4"
+                        style={{ backgroundColor: colors.slate[150] }}
+                      >
+                        <SkeletonBlock height={130} borderRadius={20} />
+                        <SkeletonBlock
+                          width="66%"
+                          height={18}
+                          style={{ marginTop: 14 }}
+                        />
+                        <SkeletonBlock
+                          width="46%"
+                          height={14}
+                          style={{ marginTop: 8 }}
+                        />
+                      </View>
+                    ))}
+                  </View>
+                ) : null
+              }
             />
 
             <Text style={homeStyles.title} className="pt-8 pb-4 font-semibold">
@@ -425,7 +521,32 @@ export default function RenterHome() {
         ListEmptyComponent={
           <View className="py-8 items-center">
             {isPropertiesLoading ? (
-              <ActivityIndicator size="small" color={colors.slate[650]} />
+              <View className="w-full gap-4">
+                {Array.from({ length: 2 }).map((_, index) => (
+                  <View
+                    key={`recommended-skeleton-${index}`}
+                    className="rounded-3xl p-4"
+                    style={{ backgroundColor: colors.slate[150] }}
+                  >
+                    <SkeletonBlock height={150} borderRadius={20} />
+                    <SkeletonBlock
+                      width="72%"
+                      height={18}
+                      style={{ marginTop: 12 }}
+                    />
+                    <SkeletonBlock
+                      width="48%"
+                      height={14}
+                      style={{ marginTop: 8 }}
+                    />
+                    <SkeletonBlock
+                      width="35%"
+                      height={14}
+                      style={{ marginTop: 8 }}
+                    />
+                  </View>
+                ))}
+              </View>
             ) : (
               <Text style={homeStyles.text}>No spaces available yet.</Text>
             )}

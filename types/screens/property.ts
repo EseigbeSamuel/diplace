@@ -213,7 +213,16 @@ export interface PropertyReviewItem {
   reviewer_id: string;
   rating: number;
   comment: string;
-  reviewer: PropertyListUser;
+  reviewer:
+    | PropertyListUser
+    | {
+        public_id: string;
+        date_created: string;
+        date_modified: string;
+        status: PropertyStatus;
+        user_id: string;
+        user: PropertyListUser;
+      };
   property_id: string;
 }
 
@@ -225,6 +234,22 @@ export interface ListPropertyReviewsResponse {
     total_pages: number;
   };
   items: PropertyReviewItem[];
+}
+
+export interface ListPropertyReviewsParams {
+  start_date?: string;
+  end_date?: string;
+  q?: string;
+  skip?: number;
+  limit?: number;
+  sort_by?: string;
+  sort_order?: "asc" | "desc";
+  status?: PropertyStatus;
+  property_id?: string;
+  reviewer_id?: string;
+  rating?: number;
+  comment?: string;
+  current_user?: boolean;
 }
 
 export interface ListPropertiesParams {
