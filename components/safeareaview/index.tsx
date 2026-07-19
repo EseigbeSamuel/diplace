@@ -24,7 +24,7 @@ export default function SafeAreaViewContainer(props: Props) {
   return (
     <SafeAreaView
       className={props.className}
-      edges={["top", "right", "bottom", "left"]}
+      edges={edges}
       // style={[styles(colors).container, { paddingBottom: insets.bottom }]}
       style={[styles(colors).container]}
     >

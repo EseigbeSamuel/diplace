@@ -110,25 +110,29 @@ const Notifications = () => {
     return "View details";
   };
 
+  const sortedNotifications = useMemo(() => {
+    return [...notifications].sort((a, b) => {
+      const timeA = a.date_created ? new Date(a.date_created).getTime() : 0;
+      const timeB = b.date_created ? new Date(b.date_created).getTime() : 0;
+      return timeB - timeA;
+    });
+  }, [notifications]);
+
   const filteredNotes = useMemo(() => {
     const tab = activeTab.toLowerCase();
     switch (tab) {
       case "unread":
-        return notifications.filter((note) => !note.is_read);
+        return sortedNotifications.filter((note) => !note.is_read);
 
       case "previous":
-        return notifications.filter((note) => note.is_read);
+        return sortedNotifications.filter((note) => note.is_read);
 
       case "date":
-        return [...notifications].sort(
-          (a, b) => new Date(b.date_created).getTime() - new Date(a.date_created).getTime(),
-        );
-
       case "all":
       default:
-        return notifications;
+        return sortedNotifications;
     }
-  }, [activeTab, notifications]);
+  }, [activeTab, sortedNotifications]);
 
   return (
     <SafeAreaViewContainer disableBottom>

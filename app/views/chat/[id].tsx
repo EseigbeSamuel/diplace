@@ -303,8 +303,9 @@ const ChatPage = () => {
   useEffect(() => {
     if (apiMessages && currentUser) {
       const mappedApiMessages = apiMessages.map((m) => {
-        const formattedTime = (m as any).date_created
-          ? new Date((m as any).date_created).toLocaleTimeString([], {
+        const rawDate = m.date_created || m.created_at;
+        const formattedTime = rawDate
+          ? new Date(rawDate).toLocaleTimeString([], {
               hour: "2-digit",
               minute: "2-digit",
             })

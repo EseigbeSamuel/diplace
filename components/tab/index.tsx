@@ -25,11 +25,11 @@ export const TabBarLabel = ({
   const { colors } = useTheme();
   return (
     <Text
-      className={cn("uppercase font-semibold")}
       style={{
-        fontSize: RFValue(9.5),
-        marginTop: RFValue(4),
-        color: focused ? colors.slate[650] : colors.slate[400],
+        fontSize: RFValue(10.5),
+        marginTop: RFValue(2),
+        fontWeight: focused ? "600" : "500",
+        color: focused ? colors.slate[650] : colors.slate[600],
       }}
     >
       {title ?? children}
@@ -70,6 +70,7 @@ type CustomTabIconProps = {
   activeIcon: ImageSourcePropType;
   inactiveIcon: ImageSourcePropType;
   badge?: number;
+  showDot?: boolean;
   size?: number;
 };
 
@@ -78,6 +79,8 @@ export const CustomTabIcon: React.FC<CustomTabIconProps> = ({
   activeIcon,
   inactiveIcon,
   badge,
+  showDot,
+  size = RFValue(22),
 }) => {
   const { colors } = useTheme();
 
@@ -88,35 +91,51 @@ export const CustomTabIcon: React.FC<CustomTabIconProps> = ({
         <View style={{ position: "relative" }}>
           <Image
             source={focused ? activeIcon : inactiveIcon}
-            style={{ width: RFValue(22), height: RFValue(22) }}
+            style={{
+              width: size,
+              height: size,
+              tintColor: focused ? colors.slate[650] : colors.slate[600],
+            }}
             resizeMode="contain"
           />
-          {badge !== undefined && badge > 0 && (
+          {badge !== undefined && badge > 0 ? (
             <View
               style={{
                 position: "absolute",
                 top: -RFValue(4),
                 right: -RFValue(6),
-                minWidth: RFValue(14),
-                height: RFValue(14),
-                borderRadius: RFValue(7),
-                backgroundColor: colors.error[200],
+                minWidth: RFValue(15),
+                height: RFValue(15),
+                borderRadius: RFValue(7.5),
+                backgroundColor: colors.error[200] || "#EF4444",
                 justifyContent: "center",
                 alignItems: "center",
-                paddingHorizontal: 2.5,
+                paddingHorizontal: 3,
               }}
             >
               <Text
                 style={{
                   color: "#FFFFFF",
-                  fontSize: RFValue(8),
+                  fontSize: RFValue(8.5),
                   fontWeight: "bold",
                 }}
               >
                 {badge}
               </Text>
             </View>
-          )}
+          ) : showDot ? (
+            <View
+              style={{
+                position: "absolute",
+                top: -RFValue(2),
+                right: -RFValue(3),
+                width: RFValue(7),
+                height: RFValue(7),
+                borderRadius: RFValue(3.5),
+                backgroundColor: colors.error[200] || "#EF4444",
+              }}
+            />
+          ) : null}
         </View>
       }
     />

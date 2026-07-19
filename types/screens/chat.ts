@@ -78,4 +78,6 @@ export interface MessageResponse {
   sender_id: string;
   content: string;
   sender: ChatUser;
+  date_created?: string;
+  created_at?: string;
 }

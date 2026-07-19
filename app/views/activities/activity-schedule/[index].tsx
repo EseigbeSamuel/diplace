@@ -12,9 +12,11 @@ import Animated, {
   interpolate,
   Extrapolate,
 } from "react-native-reanimated";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 const ActivitySchedule = () => {
   const { colors, isDarkMode } = useTheme();
+  const insets = useSafeAreaInsets();
   const params = useLocalSearchParams<{ index?: string; status?: string; title?: string }>();
 
   const status = (params.status || "scheduled").toLowerCase();
@@ -43,16 +45,16 @@ const ActivitySchedule = () => {
 
   const IMAGE_HEIGHT = 280;
   const imageAnimatedStyle = useAnimatedStyle(() => {
-    const translateY = interpolate(
-      scrollY.value,
-      [0, IMAGE_HEIGHT],
-      [0, -IMAGE_HEIGHT * 0.4],
-      Extrapolate.CLAMP
-    );
     const scale = interpolate(
       scrollY.value,
-      [-100, 0],
-      [1.3, 1],
+      [-IMAGE_HEIGHT, 0],
+      [2, 1],
+      Extrapolate.CLAMP
+    );
+    const translateY = interpolate(
+      scrollY.value,
+      [-IMAGE_HEIGHT, 0, IMAGE_HEIGHT],
+      [IMAGE_HEIGHT / 2, 0, -IMAGE_HEIGHT * 0.5],
       Extrapolate.CLAMP
     );
     return {
@@ -83,7 +85,7 @@ const ActivitySchedule = () => {
       </Animated.View>
 
       {/* Absolute Custom Header Overlaid on Image */}
-      <View className="absolute z-20 w-full px-4 top-10 flex flex-row items-center justify-between">
+      <View style={{ top: Math.max(insets.top, 16) }} className="absolute z-20 w-full px-4 flex flex-row items-center justify-between">
         <Pressable
           onPress={handleBack}
           style={{
@@ -133,7 +135,7 @@ const ActivitySchedule = () => {
         scrollEventThrottle={16}
         showsVerticalScrollIndicator={false}
         style={{ zIndex: 10, flex: 1 }}
-        contentContainerStyle={{ paddingBottom: 100 }}
+        contentContainerStyle={{ paddingBottom: insets.bottom + 120 }}
       >
         {/* Transparent Spacer matching image height minus the border overlap */}
         <View style={{ height: IMAGE_HEIGHT - 32, backgroundColor: "transparent" }} />
@@ -165,7 +167,7 @@ const ActivitySchedule = () => {
             </Text>
           </View>
 
-          <View className="border-t border-gray-200/80 my-2" />
+          <View style={{ borderTopWidth: 1, borderColor: colors.slate[200] }} className="my-2" />
 
           {/* Dynamic Section 1: Booking Details */}
           <View className="py-4">
@@ -203,7 +205,7 @@ const ActivitySchedule = () => {
                     Wedding & Engagement
                   </Text>
                 )}
-                
+
                 <View className="flex flex-row items-center justify-between">
                   <View className="flex flex-row items-center gap-2">
                     <Image
@@ -215,7 +217,7 @@ const ActivitySchedule = () => {
                       {isEventCenter ? "Thu, 17 Aug - Sat, 19 Aug, 2025" : "Wed, 9th August, 2025"}
                     </Text>
                   </View>
- 
+
                   {/* Status Badge */}
                   {status === "scheduled" && (
                     <View className="bg-blue-50 px-3 py-1 rounded-full border border-blue-200">
@@ -239,7 +241,7 @@ const ActivitySchedule = () => {
                     </View>
                   )}
                 </View>
- 
+
                 <View className="flex flex-row items-center gap-2">
                   <Image
                     source={require("@/assets/icons/Time.png")}
@@ -250,11 +252,11 @@ const ActivitySchedule = () => {
                     {isEventCenter ? "Full work day (10 hours)" : "1PM - 3PM Afternoon slot"}
                   </Text>
                 </View>
- 
+
                 {!isEventCenter && (
                   <View className="flex flex-row items-center gap-2">
                     <Image
-                      source={require("@/assets/icons/tag.png")}
+                      source={require("@/assets/icons/money-bag.png")}
                       className="w-5 h-5"
                       style={{ tintColor: colors.slate[550] }}
                     />
@@ -267,7 +269,7 @@ const ActivitySchedule = () => {
             )}
           </View>
 
-          <View className="border-t border-gray-200/80 my-2" />
+          <View style={{ borderTopWidth: 1, borderColor: colors.slate[200] }} className="my-2" />
 
           {/* Dynamic Section 2: Contact Details */}
           <View className="py-4 flex flex-row items-center justify-between">
@@ -280,16 +282,18 @@ const ActivitySchedule = () => {
                 <Text style={{ color: colors.slate[500], fontSize: RFValue(13) }}>
                   {status === "booked" ? "Booked By:" : status === "reserved" ? "Reserved By:" : "Scheduled By:"}
                 </Text>
-                <Text
-                  style={{ color: colors.slate[650], fontSize: RFValue(15.5) }}
-                  className="font-bold flex-row items-center"
-                >
-                  Sammy Kalu{" "}
+                <View className="flex flex-row items-center gap-1">
+                  <Text
+                    style={{ color: colors.slate[650], fontSize: RFValue(15.5) }}
+                    className="font-bold"
+                  >
+                    Sammy Kalu
+                  </Text>
                   <Image
                     source={require("@/assets/icons/badge-check-green.png")}
                     style={{ width: 14, height: 14 }}
                   />
-                </Text>
+                </View>
               </View>
             </View>
 
@@ -319,7 +323,7 @@ const ActivitySchedule = () => {
 
           {/* Dynamic Section 3: Financial Details (Only for Event Center Reserved) */}
           {isEventCenter && status === "reserved" && (
-            <View className="py-4 border-t border-gray-200/80 gap-3">
+            <View style={{ borderColor: colors.slate[200] }} className="py-4 border-t gap-3">
               <View className="flex flex-row justify-between">
                 <Text style={{ color: colors.slate[550], fontSize: RFValue(15) }}>Initial deposit:</Text>
                 <Text style={{ color: colors.slate[650], fontSize: RFValue(15.5) }} className="font-bold">₦251,200.00</Text>
@@ -337,7 +341,7 @@ const ActivitySchedule = () => {
 
           {/* Dynamic Section 4: Renter's Notes (Only for Booked or Reserved status) */}
           {(status === "booked" || status === "reserved") && (
-            <View className="py-4 border-t border-gray-200/80">
+            <View style={{ borderColor: colors.slate[200] }} className="py-4 border-t">
               <Text style={{ color: colors.slate[650], fontSize: RFValue(15.5), marginBottom: 6 }} className="font-bold">
                 Renter's Notes
               </Text>
@@ -349,17 +353,25 @@ const ActivitySchedule = () => {
             </View>
           )}
 
+          <View style={{ borderTopWidth: 1, borderColor: colors.slate[200] }} className="my-2" />
+
           {/* Warning notice banner */}
           {(status === "scheduled" || status === "inspected") && (
             <View
-              style={{ backgroundColor: isDarkMode ? colors.slate[100] : "#FFFBEB", borderColor: "#FDE68A" }}
-              className="p-4 rounded-xl border mt-4"
+              style={{
+                backgroundColor: colors.warning[100],
+                borderColor: isDarkMode ? colors.warning[100] : colors.warning[200],
+                borderWidth: 1,
+                borderRadius: RFValue(12),
+              }}
+              className="p-4 mt-4"
             >
-              <Text style={{ color: "#D97706", fontSize: RFValue(13.5), lineHeight: RFValue(18.5) }}>
-                ⚠️ Heads up! The price you see is for the space only. Renter is to pay other charges from their app.
+              <Text style={{ fontSize: RFValue(13.5), lineHeight: RFValue(18.5), color: isDarkMode ? colors.warning[300] : colors.warning[300] }}>
+                ⚠️ <Text className="font-bold">Heads up!</Text> The price you see is for the space only. Renter is to pay other charges from their app.
               </Text>
             </View>
           )}
+
         </View>
       </Animated.ScrollView>
 
@@ -374,7 +386,8 @@ const ActivitySchedule = () => {
           borderTopWidth: 1,
           borderColor: colors.slate[200],
           paddingHorizontal: 16,
-          paddingVertical: 12,
+          paddingTop: 12,
+          paddingBottom: Math.max(insets.bottom, 12),
         }}
       >
         {status === "inspected" ? (

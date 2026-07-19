@@ -1,7 +1,8 @@
 import { getFromLocalStore } from "@/lib";
 import { useCallback, useEffect, useRef, useState } from "react";
 
-const WS_BASE_URL = "wss://diplace.api.elsoft.ng/api/v1";
+const HTTP_BASE_URL = process.env.EXPO_PUBLIC_API_URL || "https://diplace.api.elsoft.ng/api/v1";
+const WS_BASE_URL = HTTP_BASE_URL.replace(/^http/, "ws");
 const RECONNECT_DELAY_MS = 3000;
 
 // ─── Server → Client types ───────────────────────────────────────────────────
