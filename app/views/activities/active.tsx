@@ -2,6 +2,7 @@ import ActiveActivityCard from "@/components/ActiveActivityCard";
 import { useTheme } from "@/contexts/themeContext";
 import React from "react";
 import { Image, ScrollView, Text, View } from "react-native";
+import { router } from "expo-router";
 
 const ActiveActivity = () => {
   const { colors, isDarkMode } = useTheme();
@@ -60,6 +61,7 @@ const ActiveActivity = () => {
                 : require("@/assets/icons/calendar.png")
             }
             location="Rumuewhera, Port Harcourt"
+            onPress={() => router.push({ pathname: "/views/activities/activity-schedule/[index]", params: { index: "1", role: "renter", status: "scheduled", title: "2 Bedroom in-suite apartment" } })}
           />
           <ActiveActivityCard
             buttonTitle="View"
@@ -71,6 +73,7 @@ const ActiveActivity = () => {
                 : require("@/assets/icons/calendar.png")
             }
             location="Rumuewhera, Port Harcourt"
+            onPress={() => router.push({ pathname: "/views/activities/activity-schedule/[index]", params: { index: "2", role: "renter", status: "scheduled", title: "2 Bedroom in-suite apartment" } })}
           />
           <ActiveActivityCard
             buttonTitle="View"
@@ -82,6 +85,7 @@ const ActiveActivity = () => {
                 : require("@/assets/icons/calendar.png")
             }
             location="Rumuewhera, Port Harcourt"
+            onPress={() => router.push({ pathname: "/views/activities/activity-schedule/[index]", params: { index: "3", role: "renter", status: "scheduled", title: "2 Bedroom in-suite apartment" } })}
           />
         </View>
       </View>
@@ -102,6 +106,7 @@ const ActiveActivity = () => {
               : require("@/assets/icons/Lock.png")
           }
           location="GRA Phase II, Port Harcourt"
+          onPress={() => router.push({ pathname: "/views/activities/activity-schedule/[index]", params: { index: "4", role: "renter", status: "reserved", title: "Atraz Palace Event Hall" } })}
         />
       </View>
       <View className="p-4 border-b border-gray-300">
@@ -120,6 +125,7 @@ const ActiveActivity = () => {
               : require("@/assets/icons/Lock.png")
           }
           location="GRA Phase II, Port Harcourt"
+          onPress={() => router.push({ pathname: "/views/activities/activity-schedule/[index]", params: { index: "5", role: "renter", status: "inspected", title: "2 Bedroom in-suite apartment" } })}
         />
       </View>
     </ScrollView>

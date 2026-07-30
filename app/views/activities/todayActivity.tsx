@@ -74,6 +74,7 @@ const TodayActivityCard = ({ item }: { item: ActivityCardItem }) => {
         index: item.id,
         status: item.statusType || "scheduled",
         title: item.title,
+        role: "renter",
       },
     });
   };

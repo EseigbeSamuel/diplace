@@ -11,12 +11,14 @@ const ActiveActivityCard = ({
   date,
   location,
   title,
+  onPress,
 }: {
   buttonTitle: string;
   image: ImageSourcePropType;
   date?: string;
   location: string;
   title: string;
+  onPress?: () => void;
 }) => {
   const { colors } = useTheme();
   return (
@@ -51,7 +53,11 @@ const ActiveActivityCard = ({
           <AppButton
             title={buttonTitle}
             onPress={() => {
-              router.push("/views/activities/activity-schedule/[index]");
+              if (onPress) {
+                onPress();
+              } else {
+                router.push("/views/activities/activity-schedule/[index]");
+              }
             }}
             variant="secondary"
           />
