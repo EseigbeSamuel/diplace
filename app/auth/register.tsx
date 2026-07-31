@@ -19,7 +19,7 @@ export default function Register() {
   });
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-  const { colors } = useTheme();
+  const { colors, isDarkMode } = useTheme();
   const styles = registerStyles(colors);
   const { registerMutation, registerMutationPending } = useRegister();
 
@@ -142,8 +142,12 @@ export default function Register() {
                   <Image
                     source={
                       showPassword
-                        ? require("../../assets/icons/password-show.png")
-                        : require("../../assets/icons/password-hide.png")
+                        ? isDarkMode
+                          ? require("../../assets/icons/eye-open-light.png")
+                          : require("../../assets/icons/eye-open-dark.png")
+                        : isDarkMode
+                        ? require("../../assets/icons/eye-closed-light.png")
+                        : require("../../assets/icons/eye-closed-dark.png")
                     }
                     style={{ width: 20, height: 20 }}
                     resizeMode="contain"
@@ -186,8 +190,12 @@ export default function Register() {
                   <Image
                     source={
                       showConfirmPassword
-                        ? require("../../assets/icons/password-show.png")
-                        : require("../../assets/icons/password-hide.png")
+                        ? isDarkMode
+                          ? require("../../assets/icons/eye-open-light.png")
+                          : require("../../assets/icons/eye-open-dark.png")
+                        : isDarkMode
+                        ? require("../../assets/icons/eye-closed-light.png")
+                        : require("../../assets/icons/eye-closed-dark.png")
                     }
                     style={{ width: 20, height: 20 }}
                     resizeMode="contain"

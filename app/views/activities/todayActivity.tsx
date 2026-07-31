@@ -3,77 +3,21 @@ import SectionHeader from "@/components/sectionheader";
 import { useTheme } from "@/contexts/themeContext";
 import { router } from "expo-router";
 import React from "react";
-import { Image, ScrollView, Text, View, Pressable } from "react-native";
+import { Image, ScrollView, Text, View, Pressable, ActivityIndicator } from "react-native";
 import { RFValue } from "react-native-responsive-fontsize";
+import { useGetTodayActivities } from "@/hooks";
+import { TodayActivityItem } from "@/types";
 
-interface ActivityCardItem {
-  id: string;
-  category: string;
-  dateText: string;
-  title: string;
-  location: string;
-  statusText?: string;
-  statusType?: "scheduled" | "reserved" | "booked";
-  user: {
-    name: string;
-    avatar: any;
-    verified: boolean;
-  };
-}
-
-const todayActivities: ActivityCardItem[] = [
-  {
-    id: "1",
-    category: "Space Inspection",
-    dateText: "16 Sept, 2025",
-    title: "2 Bedroom in-suite apartment",
-    location: "10 Tenable Str, D&D Phase II, Port Harcourt",
-    statusText: "Scheduled",
-    statusType: "scheduled",
-    user: {
-      name: "Sammy Kalu",
-      avatar: require("@/assets/images/sammy.jpg"),
-      verified: true,
-    },
-  },
-  {
-    id: "2",
-    category: "Reservation Due",
-    dateText: "18 Aug - 20 Aug, 2025 (10 Hours)",
-    title: "Atraz Palace Event Hall",
-    location: "10 Tenable Str, D&D Phase II, Port Harcourt",
-    statusType: "reserved",
-    user: {
-      name: "Sammy Kalu",
-      avatar: require("@/assets/images/sammy.jpg"),
-      verified: true,
-    },
-  },
-  {
-    id: "3",
-    category: "Wedding & Engagement",
-    dateText: "18 Aug - 20 Aug, 2025 (10 Hours)",
-    title: "Atraz Palace Event Hall",
-    location: "10 Tenable Str, D&D Phase II, Port Harcourt",
-    statusType: "booked",
-    user: {
-      name: "Sammy Kalu",
-      avatar: require("@/assets/images/sammy.jpg"),
-      verified: true,
-    },
-  },
-];
-
-const TodayActivityCard = ({ item }: { item: ActivityCardItem }) => {
+const TodayActivityCard = ({ item }: { item: TodayActivityItem }) => {
   const { colors, isDarkMode } = useTheme();
 
   const handlePress = () => {
     router.push({
       pathname: "/views/activities/activity-schedule/[index]",
       params: {
-        index: item.id,
-        status: item.statusType || "scheduled",
-        title: item.title,
+        index: item.booking_id || item.inspection_id,
+        status: "scheduled", // TODO: Update based on real status if needed from API
+        title: item.property.title,
         role: "renter",
       },
     });
@@ -93,10 +37,10 @@ const TodayActivityCard = ({ item }: { item: ActivityCardItem }) => {
       {/* Top Header Row */}
       <View className="flex flex-row items-center justify-between mb-2">
         <Text style={{ color: colors.slate[500], fontSize: RFValue(13) }} className="font-bold uppercase">
-          {item.category}
+          {item.activity_type}
         </Text>
         <Text style={{ color: colors.slate[500], fontSize: RFValue(13) }}>
-          {item.dateText}
+          {item.time_label}
         </Text>
       </View>
 
@@ -107,43 +51,38 @@ const TodayActivityCard = ({ item }: { item: ActivityCardItem }) => {
             style={{ color: colors.slate[650], fontSize: RFValue(16) }}
             className="font-bold"
           >
-            {item.title}
+            {item.property.title}
           </Text>
           <Text
             style={{ color: colors.slate[550], fontSize: RFValue(13.5), marginTop: 2 }}
             className="font-medium"
             numberOfLines={1}
           >
-            📍 {item.location}
+            📍 {item.property.location}
           </Text>
         </View>
 
         {/* Right Pill/Badge or Arrow */}
-        {item.statusText ? (
-          <View className="bg-blue-50 px-2 py-0.5 rounded border border-blue-200">
-            <Text className="text-blue-600 font-bold text-[9px]">{item.statusText}</Text>
-          </View>
-        ) : (
-          <Image
-            source={require("@/assets/icons/arrow-right-up-outline-dark.png")}
-            style={{ width: 14, height: 14, tintColor: colors.slate[550] }}
-          />
-        )}
+        {/* We can map activity_type to a status tag if necessary, else show arrow */}
+        <Image
+          source={require("@/assets/icons/arrow-right-up-outline-dark.png")}
+          style={{ width: 14, height: 14, tintColor: colors.slate[550] }}
+        />
       </View>
 
       {/* Bottom Separator */}
       <View style={{ borderTopWidth: 1, borderColor: colors.slate[200], borderStyle: "dashed" }} className="pt-3 flex flex-row items-center justify-between">
         <View className="flex flex-row items-center gap-2">
           <Image
-            source={item.user.avatar}
+            source={{ uri: item.actor.profile_picture || "https://ui-avatars.com/api/?name=" + item.actor.first_name }}
             style={{ width: RFValue(20), height: RFValue(20), borderRadius: RFValue(10) }}
           />
           <Text
             style={{ color: colors.slate[650], fontSize: RFValue(14) }}
             className="font-semibold flex-row items-center"
           >
-            {item.user.name}{" "}
-            {item.user.verified && (
+            {item.actor.first_name} {item.actor.last_name}{" "}
+            {item.actor.status === "verified" && (
               <Image
                 source={require("@/assets/icons/badge-check-green.png")}
                 style={{ width: 12, height: 12 }}
@@ -172,6 +111,9 @@ const TodayActivityCard = ({ item }: { item: ActivityCardItem }) => {
 };
 
 const TodayActivityScreen = () => {
+  const { data: todayActivities, isLoading } = useGetTodayActivities();
+  const { colors } = useTheme();
+
   return (
     <SafeAreaViewContainer disableBottom>
       <SectionHeader
@@ -182,9 +124,17 @@ const TodayActivityScreen = () => {
       {/* Main List */}
       <ScrollView className="px-4 flex-1 pt-2" showsVerticalScrollIndicator={false}>
         <View className="pb-10">
-          {todayActivities.map((activity) => (
-            <TodayActivityCard key={activity.id} item={activity} />
-          ))}
+          {isLoading ? (
+            <ActivityIndicator size="large" color={colors.slate[650]} className="mt-10" />
+          ) : todayActivities && todayActivities.length > 0 ? (
+            todayActivities.map((activity, index) => (
+              <TodayActivityCard key={activity.booking_id || activity.inspection_id || index} item={activity} />
+            ))
+          ) : (
+            <Text style={{ color: colors.slate[500], textAlign: "center", marginTop: 20 }}>
+              No activities for today.
+            </Text>
+          )}
         </View>
       </ScrollView>
     </SafeAreaViewContainer>
