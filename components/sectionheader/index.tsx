@@ -66,7 +66,9 @@ const SectionHeader = ({
           className="items-center justify-center w-12 h-12 rounded-full"
           style={Styles.container}
         >
-          {rightIconSource ? <Image source={rightIconSource} className="w-6 h-6" /> : null}
+          {rightIconSource ? (
+            <Image source={rightIconSource} className="w-6 h-6" />
+          ) : null}
         </TouchableOpacity>
       )}
     </View>
@@ -78,6 +80,6 @@ export default SectionHeader;
 const styles = (colors: ColorScheme) =>
   StyleSheet.create({
     container: {
-      backgroundColor: "#F9F9FBBF",
+      backgroundColor: colors.slate[200],
     },
   });

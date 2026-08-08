@@ -50,7 +50,7 @@ export default function TextField({
   onCountryCodeChange,
   ...rest
 }: Props) {
-  const { colors } = useTheme();
+  const { colors, isDarkMode } = useTheme();
   const style = styles(colors);
   const [showPassword, setShowPassword] = useState(false);
   const [showCountryModal, setShowCountryModal] = useState(false);
@@ -117,8 +117,12 @@ export default function TextField({
         <Image
           source={
             !showPassword
-              ? require("../../assets/icons/password-hide.png")
-              : require("../../assets/icons/password-show.png")
+              ? isDarkMode
+                ? require("../../assets/icons/eye-closed-light.png")
+                : require("../../assets/icons/eye-closed-dark.png")
+              : isDarkMode
+              ? require("../../assets/icons/eye-open-light.png")
+              : require("../../assets/icons/eye-open-dark.png")
           }
           style={style.passwordIcon}
           resizeMode="contain"
@@ -275,14 +279,17 @@ const styles = (colors: ColorScheme) =>
     leftIconImage: {
       width: 20,
       height: 20,
+      tintColor: colors.slate[650],
     },
     clearIcon: {
       width: 18,
       height: 18,
+      tintColor: colors.slate[650],
     },
     passwordIcon: {
       width: 20,
       height: 20,
+      tintColor: colors.slate[650],
     },
     chevronIcon: {
       width: 16,

@@ -1,7 +1,7 @@
 import { CustomBottomSheet } from "@/components/bottom-sheet";
 import { AppHeader } from "@/components/header";
 import SafeAreaViewContainer from "@/components/safeareaview";
-import { promoData, RecentEarningsDB } from "@/constants/ownerHome";
+import { promoData } from "@/constants/ownerHome";
 import { useTheme } from "@/contexts/themeContext";
 import { useGetCurrentUser, useListProperties } from "@/hooks";
 import { ColorScheme } from "@/utils";
@@ -12,6 +12,7 @@ import { ArrowUpRight, MapPin } from "lucide-react-native";
 import React, { useMemo, useRef, useState } from "react";
 import {
   Dimensions,
+  DimensionValue,
   FlatList,
   Image,
   Pressable,
@@ -133,8 +134,8 @@ export default function OwnersHome() {
       />
 
       <FlatList
-        data={RecentEarningsDB}
-        keyExtractor={(item) => item.id}
+        data={[]}
+        renderItem={() => null}
         showsVerticalScrollIndicator={false}
         contentContainerClassName="gap-8 pb-10"
         ListHeaderComponent={
@@ -170,7 +171,9 @@ export default function OwnersHome() {
                             width="62%"
                             height={18}
                             borderRadius={8}
-                            style={{ backgroundColor: "rgba(255,255,255,0.35)" }}
+                            style={{
+                              backgroundColor: "rgba(255,255,255,0.35)",
+                            }}
                           />
                           <SkeletonBlock
                             width="48%"
@@ -275,7 +278,10 @@ export default function OwnersHome() {
                       className="w-full h-3 rounded-full "
                     >
                       <View
-                        style={{ backgroundColor: colors.info[200] }}
+                        style={{
+                          backgroundColor: colors.info[200],
+                          width: progressWidth as DimensionValue,
+                        }}
                         className="rounded-full h-3"
                         width={isOverviewLoading ? "35%" : progressWidth}
                       ></View>
@@ -294,9 +300,16 @@ export default function OwnersHome() {
                     <View>
                       <Text style={custom.small}>Booked Space</Text>
                       {isOverviewLoading ? (
-                        <SkeletonBlock width={34} height={22} borderRadius={8} />
+                        <SkeletonBlock
+                          width={34}
+                          height={22}
+                          borderRadius={8}
+                        />
                       ) : (
-                        <Text style={custom.subTitle} className=" font-semibold">
+                        <Text
+                          style={custom.subTitle}
+                          className=" font-semibold"
+                        >
                           {bookedSpaces}
                         </Text>
                       )}
@@ -311,9 +324,16 @@ export default function OwnersHome() {
                     <View>
                       <Text style={custom.small}>Reserved Space</Text>
                       {isOverviewLoading ? (
-                        <SkeletonBlock width={34} height={22} borderRadius={8} />
+                        <SkeletonBlock
+                          width={34}
+                          height={22}
+                          borderRadius={8}
+                        />
                       ) : (
-                        <Text style={custom.subTitle} className=" font-semibold">
+                        <Text
+                          style={custom.subTitle}
+                          className=" font-semibold"
+                        >
                           {reservedSpaces}
                         </Text>
                       )}

@@ -19,7 +19,7 @@ export default function Register() {
   });
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-  const { colors } = useTheme();
+  const { colors, isDarkMode } = useTheme();
   const styles = registerStyles(colors);
   const { registerMutation, registerMutationPending } = useRegister();
 
@@ -135,12 +135,20 @@ export default function Register() {
             }
             right={
               <TextInput.Icon
-                accessibilityLabel="Show password"
+                accessibilityLabel={showPassword ? "Hide password" : "Show password"}
                 accessibilityRole="button"
                 onPress={() => setShowPassword((prev) => !prev)}
                 icon={() => (
                   <Image
-                    source={require("../../assets/icons/password-hide.png")}
+                    source={
+                      showPassword
+                        ? isDarkMode
+                          ? require("../../assets/icons/eye-open-light.png")
+                          : require("../../assets/icons/eye-open-dark.png")
+                        : isDarkMode
+                        ? require("../../assets/icons/eye-closed-light.png")
+                        : require("../../assets/icons/eye-closed-dark.png")
+                    }
                     style={{ width: 20, height: 20 }}
                     resizeMode="contain"
                   />
@@ -175,12 +183,20 @@ export default function Register() {
             }
             right={
               <TextInput.Icon
-                accessibilityLabel="Show password"
+                accessibilityLabel={showConfirmPassword ? "Hide password" : "Show password"}
                 accessibilityRole="button"
                 onPress={() => setShowConfirmPassword((prev) => !prev)}
                 icon={() => (
                   <Image
-                    source={require("../../assets/icons/password-hide.png")}
+                    source={
+                      showConfirmPassword
+                        ? isDarkMode
+                          ? require("../../assets/icons/eye-open-light.png")
+                          : require("../../assets/icons/eye-open-dark.png")
+                        : isDarkMode
+                        ? require("../../assets/icons/eye-closed-light.png")
+                        : require("../../assets/icons/eye-closed-dark.png")
+                    }
                     style={{ width: 20, height: 20 }}
                     resizeMode="contain"
                   />

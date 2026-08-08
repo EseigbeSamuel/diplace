@@ -11,7 +11,7 @@ const HistoryCard = ({
   description,
   action,
 }: {
-  badgeType?: "reserved" | "inprogress" | "successful";
+  badgeType?: "reserved" | "inprogress" | "successful" | "failed" | "pending";
   date: string;
   title: string;
   description: string;
@@ -37,6 +37,18 @@ const HistoryCard = ({
         return (
           <View className="px-2 py-1 border border-green-500 rounded-full bg-green-400/40">
             <Text className="text-green-600">Successful</Text>
+          </View>
+        );
+      case "failed":
+        return (
+          <View className="px-2 py-1 border border-red-500 rounded-full bg-red-400/40">
+            <Text className="text-red-600">Failed</Text>
+          </View>
+        );
+      case "pending":
+        return (
+          <View className="px-2 py-1 border border-blue-500 rounded-full bg-blue-400/40">
+            <Text className="text-blue-600">Pending</Text>
           </View>
         );
     }
