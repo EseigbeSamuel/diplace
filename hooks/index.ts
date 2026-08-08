@@ -8,3 +8,7 @@ export * from "./user";
 export * from "./welcome";
 export * from "./notification";
 export * from "./bank";
+
+export * from "./bookings";
+export * from "./inspection";
+export * from "./payment";

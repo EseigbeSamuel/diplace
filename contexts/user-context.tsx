@@ -15,7 +15,7 @@ interface UserProviderProps {
 }
 
 export const UserProvider = ({ children }: UserProviderProps) => {
-  const [userType, setUserType] = useState<UserType>("renter");
+  const [userType, setUserType] = useState<UserType>("agent");
   const { currentUser, isCurrentUserLoading } = useGetCurrentUser();
 
   // Update userType when currentUser changes

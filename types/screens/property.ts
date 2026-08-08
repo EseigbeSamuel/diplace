@@ -252,6 +252,53 @@ export interface ListPropertyReviewsParams {
   current_user?: boolean;
 }
 
+export interface ReviewPayload {
+  rating: number;
+  comment: string;
+}
+
+export interface PropertyReviewPayload extends ReviewPayload {
+  property_id: string;
+}
+
+export interface AgentReviewItem {
+  public_id: string;
+  date_created: string;
+  date_modified: string;
+  status: PropertyStatus;
+  reviewer_id: string;
+  agent_id: string;
+  rating: number;
+  comment: string;
+  reviewer: {
+    public_id: string;
+    status: PropertyStatus;
+    user_id: string;
+    user?: PropertyListUser;
+  };
+  agent: {
+    public_id: string;
+    status: PropertyStatus;
+    user_id: string;
+    user?: PropertyListUser;
+  };
+}
+
+export interface ListAgentReviewsResponse {
+  pagination: {
+    total_items: number;
+    limit: number;
+    skip: number;
+    total_pages: number;
+  };
+  items: AgentReviewItem[];
+}
+
+export interface ListAgentReviewsParams
+  extends Omit<ListPropertyReviewsParams, "property_id"> {
+  agent_id?: string;
+}
+
 export interface ListPropertiesParams {
   start_date?: string;
   end_date?: string;

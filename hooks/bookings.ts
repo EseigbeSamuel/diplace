@@ -1,6 +1,6 @@
 import { showToast } from "@/lib";
-import { getRequest, postRequest } from "@/services";
-import { BookingRequestPayload, BookingResponse } from "@/types";
+import { getRequest, getRequestWithParams, postRequest } from "@/services";
+import { BookingRequestPayload, BookingResponse, BookingsListResponse } from "@/types";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
 
@@ -25,9 +25,9 @@ export function useCreateBooking() {
     onError: (error) => {
       const message = axios.isAxiosError(error)
         ? error.response?.data?.detail ||
-          error.response?.data?.message ||
-          error.message ||
-          "Unable to create booking."
+        error.response?.data?.message ||
+        error.message ||
+        "Unable to create booking."
         : "Unable to create booking.";
 
       showToast({
@@ -41,6 +41,41 @@ export function useCreateBooking() {
   return {
     createBookingMutation: mutateAsync,
     isCreateBookingPending: isPending,
+  };
+}
+
+
+export function useGetMyBookings(
+  params: {
+    q?: string;
+    skip?: number;
+    limit?: number;
+    sort_by?: string;
+    sort_order?: "asc" | "desc";
+    status?: string;
+  } = {},
+) {
+  const query = useQuery({
+    queryKey: ["bookings", "me", params],
+    queryFn: async () =>
+      await getRequestWithParams<BookingsListResponse>({
+        url: "/bookings/me",
+        params: {
+          skip: params.skip ?? 0,
+          limit: params.limit ?? 100,
+          sort_by: params.sort_by ?? "date_created",
+          sort_order: params.sort_order ?? "desc",
+          ...params,
+        },
+      }),
+  });
+
+  return {
+    myBookings: query.data?.items ?? [],
+    myBookingsPagination: query.data?.pagination,
+    isMyBookingsLoading: query.isLoading,
+    myBookingsError: query.error,
+    refetchMyBookings: query.refetch,
   };
 }
 
@@ -92,9 +127,9 @@ export function useCancelBooking() {
     onError: (error) => {
       const message = axios.isAxiosError(error)
         ? error.response?.data?.detail ||
-          error.response?.data?.message ||
-          error.message ||
-          "Unable to cancel booking."
+        error.response?.data?.message ||
+        error.message ||
+        "Unable to cancel booking."
         : "Unable to cancel booking.";
 
       showToast({

@@ -2,7 +2,12 @@ import AppButton from "@/components/button";
 import SafeAreaViewContainer from "@/components/safeareaview";
 import SectionHeader from "@/components/sectionheader";
 import { useTheme } from "@/contexts/themeContext";
-import { useGetPropertyDetails, useListPropertyReviews } from "@/hooks";
+import {
+  useGetPropertyAvailability,
+  useGetPropertyDetails,
+  useListPropertyReviews,
+  useScheduleInspection,
+} from "@/hooks";
 import { useSpaceStore } from "@/store/useSpace";
 import { ColorScheme } from "@/utils";
 import { useLocalSearchParams, useRouter } from "expo-router";
@@ -26,6 +31,7 @@ import { RFValue } from "react-native-responsive-fontsize";
 type timeslot = {
   id: string;
   label: string;
+  price?: number;
 };
 
 const timeslotDB: timeslot[] = [
@@ -44,10 +50,7 @@ const Placedetails = () => {
   const { id } = useLocalSearchParams<{ id?: string }>();
   const propertyId = Array.isArray(id) ? id[0] : id;
 
-  const [selectedTime, setSelectedTime] = useState<{
-    id: string;
-    label: string;
-  } | null>(null);
+  const [selectedTime, setSelectedTime] = useState<timeslot | null>(null);
   const [enlargeMapVisible, setEnlargeMapVisible] = useState(false);
   const [showLocationSheet, setShowLocationSheet] = useState(false);
   const [selectedDate, setSelectedDate] = useState<string | null>(null);
@@ -71,6 +74,13 @@ const Placedetails = () => {
     propertyId: propertyId,
     enabled: !!propertyId,
   });
+  const { propertyAvailability } = useGetPropertyAvailability({
+    propertyId,
+    enabled: !!propertyId,
+    params: { status: "available", limit: 100, sort_order: "asc" },
+  });
+  const { scheduleInspectionMutation, isScheduleInspectionPending } =
+    useScheduleInspection();
 
   const fallbackGallery = [
     require("@/assets/images/SpacesNearbyImage1.png"),
@@ -213,6 +223,71 @@ const Placedetails = () => {
     return sum + amount;
   }, 0);
 
+
+  const formatMoneyParam = (value: number) =>
+    `₦${new Intl.NumberFormat("en-NG").format(value)}`;
+
+  const formatAvailabilityTime = (start: string, end: string) => {
+    const options: Intl.DateTimeFormatOptions = {
+      hour: "numeric",
+      minute: "2-digit",
+    };
+    const startLabel = new Date(start).toLocaleTimeString("en-NG", options);
+    const endLabel = new Date(end).toLocaleTimeString("en-NG", options);
+    return `${startLabel} - ${endLabel}`;
+  };
+
+  const inspectionTimeSlots = useMemo(() => {
+    const slots = propertyAvailability
+      .filter((slot) => {
+        const slotDate = slot.start_datetime.slice(0, 10);
+        return slot.is_available && (!selectedDate || slotDate === selectedDate);
+      })
+      .map((slot) => ({
+        id: slot.public_id,
+        label: formatAvailabilityTime(slot.start_datetime, slot.end_datetime),
+        price: slot.price,
+      }));
+
+    return slots.length || propertyId ? slots : timeslotDB;
+  }, [propertyAvailability, propertyId, selectedDate]);
+
+  const bookingRouteParams = {
+    propertyId: property?.public_id || propertyId || "",
+    propertyType: property?.property_type || spaceForm.type || "apartment",
+    propertyName: displayTitle,
+    propertyLocation: displayAddress,
+    propertyPrice: formatMoneyParam(Number(displayPrice) || 0),
+    propertyImage:
+      property?.media?.[0]?.file_url || (spaceForm.value.media?.[0]?.uri ?? ""),
+    rentAmount: formatMoneyParam(Number(property?.price) || 0),
+    cautionFee: formatMoneyParam(Number(property?.fees?.caution_fee) || 0),
+    platformFee: formatMoneyParam(Number(property?.fees?.platform_fee) || 0),
+    totalAmount: formatMoneyParam(totalPackage),
+    amountValue: String(totalPackage),
+    rentDays: "1",
+  };
+
+  const handleScheduleInspection = async () => {
+    if (!selectedTime?.id) return;
+
+    const inspection = await scheduleInspectionMutation({
+      availability_id: selectedTime.id,
+      agreed_to_terms: true,
+    });
+
+    setShowInspectionModal(false);
+    router.push({
+      pathname: "/views/booking/payment",
+      params: {
+        type: "inspection",
+        amount: formatMoneyParam(selectedTime.price ?? 0),
+        amountValue: String(selectedTime.price ?? 0),
+        relatedId: inspection.public_id,
+        purpose: "inspection_fee",
+      },
+    });
+  };
   const formatReadableDate = (
     dateString: string | Date | null | undefined,
   ): string => {
@@ -832,21 +907,24 @@ const Placedetails = () => {
                   {/* Buttons */}
                   <View style={styles.inspectionButtons}>
                     <AppButton
-                      title="Schedule Inspection"
-                      onPress={() => {
-                        setShowInspectionModal(false);
-                        router.push({
-                          pathname: "/views/booking/payment",
-                          params: { type: "inspection", amount: "₦1,000" },
-                        });
-                      }}
-                      disabled={!selectedTime || !selectedDate}
+                      title={
+                        isScheduleInspectionPending
+                          ? "Scheduling..."
+                          : "Schedule Inspection"
+                      }
+                      onPress={handleScheduleInspection}
+                      disabled={
+                        !selectedTime || !selectedDate || isScheduleInspectionPending
+                      }
                     />
                     <AppButton
                       title="Skip & Proceed to Book Now"
                       onPress={() => {
                         setShowInspectionModal(false);
-                        router.push("/views/booking/renters-info");
+                        router.push({
+                          pathname: "/views/booking/renters-info",
+                          params: bookingRouteParams,
+                        });
                       }}
                       variant="tertiary"
                     />
@@ -883,7 +961,10 @@ const Placedetails = () => {
               <View className="h-[1px] bg-gray-200 dark:bg-gray-700 mb-4" />
 
               <Calendar
-                onDayPress={(day) => setSelectedDate(day.dateString)}
+                onDayPress={(day) => {
+                  setSelectedDate(day.dateString);
+                  setSelectedTime(null);
+                }}
                 markingType={"custom"}
                 markedDates={
                   selectedDate
@@ -964,7 +1045,7 @@ const Placedetails = () => {
               </Text>
 
               <View style={styles.timeSlotList}>
-                {timeslotDB.map((item) => {
+                {inspectionTimeSlots.map((item: timeslot) => {
                   const isSelected = selectedTime?.id === item.id;
                   return (
                     <TouchableOpacity

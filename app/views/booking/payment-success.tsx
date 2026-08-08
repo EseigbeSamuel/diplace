@@ -20,17 +20,22 @@ const PaymentSuccessScreen = () => {
   const { colors } = useTheme();
   const styles = getStyles(colors);
 
-  // Mock receipt data
   const receiptData = {
-    referenceNumber: "024700124746",
-    dateTime: "05 Aug 2025, 09:34 AM",
-    paymentMethod: "Credit card",
-    totalAmount: "₦1,256,000.00",
+    referenceNumber: params.txRef || "Pending confirmation",
+    dateTime: new Date().toLocaleString("en-NG", {
+      day: "2-digit",
+      month: "short",
+      year: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+    }),
+    paymentMethod: params.paymentMethod || params.gateway || "Flutterwave",
+    totalAmount: params.amount || "₦0",
   };
 
   const handleContactManager = () => {
     // Navigate to chat or contact screen
-    router.push("/views/");
+    router.push("/");
   };
 
   const handleBackHome = () => {
