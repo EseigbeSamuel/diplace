@@ -1,26 +1,30 @@
 import ActiveActivityCard from "@/components/ActiveActivityCard";
 import { useTheme } from "@/contexts/themeContext";
 import React from "react";
-import { Image, ScrollView, Text, View, ActivityIndicator } from "react-native";
+import { ActivityIndicator, Image, ScrollView, StyleSheet, Text, View } from "react-native";
 import { router } from "expo-router";
 import { useGetActiveActivities } from "@/hooks";
 import { ActiveActivityItem } from "@/types";
+import { ColorScheme } from "@/utils";
 
 const ActiveActivity = () => {
   const { colors, isDarkMode } = useTheme();
+  const s = styles(colors, isDarkMode);
   const { data: activeActivities, isLoading } = useGetActiveActivities();
 
-  const renderSection = (title: string, data: ActiveActivityItem[] | undefined, icon: any, status: string, buttonTitle: string = "View", datePrefix: string = "") => {
+  const renderSection = (
+    title: string,
+    data: ActiveActivityItem[] | undefined,
+    icon: any,
+    status: string,
+    buttonTitle: string = "View",
+    datePrefix: string = "",
+  ) => {
     if (!data || data.length === 0) return null;
 
     return (
-      <View className="p-4 border-b border-gray-300">
-        <Text
-          style={{ color: colors.slate[650] }}
-          className="pb-4 text-lg font-semibold"
-        >
-          {title}
-        </Text>
+      <View style={s.sectionContainer}>
+        <Text style={s.sectionTitle}>{title}</Text>
         <View className="gap-4">
           {data.map((item, index) => (
             <ActiveActivityCard
@@ -50,32 +54,22 @@ const ActiveActivity = () => {
 
   return (
     <ScrollView>
-      <View
-        style={{
-          borderColor: colors.slate[300],
-          backgroundColor: colors.slate[150],
-        }}
-        className="flex flex-row gap-4 p-4 border rounded-lg m-4"
-      >
+      <View style={s.todayCard} className="flex flex-row gap-4 p-4 border rounded-lg m-4">
         <Image
           source={require("@/assets/icons/calender-dark.png")}
           className="w-9 h-9"
         />
         <View>
-          <Text
-            style={{ color: colors.slate[650] }}
-            className="text-lg font-semibold"
-          >
-            Today’s Activity
-          </Text>
-          <Text
-            style={{ color: colors.slate[650] }}
-            className="break-words w-[80%] font-medium"
-          >
+          <Text style={s.todayTitle}>Today's Activity</Text>
+          <Text style={s.todayBody} className="break-words w-[80%] font-medium">
             Check your today's schedule for upcoming events.
           </Text>
           <View className="flex flex-row items-center gap-2">
-            <Text style={{ color: colors.slate[650] }} className="pt-7" onPress={() => router.push("/views/activities/todayActivity")}>
+            <Text
+              style={s.viewLink}
+              className="pt-7"
+              onPress={() => router.push("/views/activities/todayActivity")}
+            >
               View schedule
             </Text>
           </View>
@@ -89,37 +83,46 @@ const ActiveActivity = () => {
           {renderSection(
             "Scheduled",
             activeActivities.scheduled,
-            isDarkMode ? require("@/assets/icons/calender-white.png") : require("@/assets/icons/calendar.png"),
-            "scheduled"
+            isDarkMode
+              ? require("@/assets/icons/calender-white.png")
+              : require("@/assets/icons/calendar.png"),
+            "scheduled",
           )}
           {renderSection(
             "Reserved",
             activeActivities.reserved,
-            isDarkMode ? require("@/assets/icons/lock-light.png") : require("@/assets/icons/Lock.png"),
+            isDarkMode
+              ? require("@/assets/icons/lock-light.png")
+              : require("@/assets/icons/Lock.png"),
             "reserved",
             "View",
-            "Due: "
+            "Due: ",
           )}
           {renderSection(
             "Booked",
             activeActivities.booked,
-            isDarkMode ? require("@/assets/icons/lock-light.png") : require("@/assets/icons/Lock.png"),
+            isDarkMode
+              ? require("@/assets/icons/lock-light.png")
+              : require("@/assets/icons/Lock.png"),
             "booked",
-            "View"
+            "View",
           )}
           {renderSection(
             "Inspected",
             activeActivities.inspected,
-            isDarkMode ? require("@/assets/icons/lock-light.png") : require("@/assets/icons/Lock.png"),
+            isDarkMode
+              ? require("@/assets/icons/lock-light.png")
+              : require("@/assets/icons/Lock.png"),
             "inspected",
-            "Book"
+            "Book",
           )}
 
-          {!activeActivities.scheduled?.length && !activeActivities.reserved?.length && !activeActivities.booked?.length && !activeActivities.inspected?.length && (
-            <Text style={{ color: colors.slate[500], textAlign: "center", marginTop: 20 }}>
-              No active activities found.
-            </Text>
-          )}
+          {!activeActivities.scheduled?.length &&
+            !activeActivities.reserved?.length &&
+            !activeActivities.booked?.length &&
+            !activeActivities.inspected?.length && (
+              <Text style={s.emptyText}>No active activities found.</Text>
+            )}
         </>
       ) : null}
     </ScrollView>
@@ -127,3 +130,40 @@ const ActiveActivity = () => {
 };
 
 export default ActiveActivity;
+
+// ─── Styles ───────────────────────────────────────────────────────────────────
+
+const styles = (colors: ColorScheme, isDarkMode: boolean) =>
+  StyleSheet.create({
+    todayCard: {
+      borderColor: colors.slate[300],
+      backgroundColor: colors.slate[150],
+    },
+    todayTitle: {
+      color: colors.slate[650],
+      fontSize: 18,
+      fontWeight: "600",
+    },
+    todayBody: {
+      color: colors.slate[650],
+    },
+    viewLink: {
+      color: colors.slate[650],
+    },
+    sectionContainer: {
+      padding: 16,
+      borderBottomWidth: 1,
+      borderBottomColor: colors.slate[300],
+    },
+    sectionTitle: {
+      color: colors.slate[650],
+      paddingBottom: 16,
+      fontSize: 18,
+      fontWeight: "600",
+    },
+    emptyText: {
+      color: colors.slate[500],
+      textAlign: "center",
+      marginTop: 20,
+    },
+  });

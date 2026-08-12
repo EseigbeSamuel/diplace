@@ -35,3 +35,24 @@ export const useGetTodayActivities = () => {
       }),
   });
 };
+
+// Agent-specific hooks — same endpoints, backend scopes results by auth token role
+export const useGetAgentActiveActivities = () => {
+  return useQuery({
+    queryKey: ["agent-active-activities"],
+    queryFn: () =>
+      getRequest<ActiveActivitiesResponse>({
+        url: "/bookings/activity/active",
+      }),
+  });
+};
+
+export const useGetAgentHistoryActivities = () => {
+  return useQuery({
+    queryKey: ["agent-history-activities"],
+    queryFn: () =>
+      getRequest<HistoryActivitiesResponse>({
+        url: "/bookings/activity/history",
+      }),
+  });
+};

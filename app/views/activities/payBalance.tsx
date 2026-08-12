@@ -114,7 +114,7 @@ const PayBalance = () => {
           <View style={homeStyles.borderB} className="py-4 border-t ">
             <Text style={homeStyles.title}>Renter’s Information</Text>
             <View
-              style={{ backgroundColor: colors.slate[150] }}
+              style={homeStyles.infoBox}
               className=" rounded-xl p-4 mt-4"
             >
               <Text style={homeStyles.title}>Rhema Generation Inc.</Text>
@@ -127,7 +127,7 @@ const PayBalance = () => {
           <View style={homeStyles.borderB} className="py-4 border-t">
             <Text style={homeStyles.title}>Event Details</Text>
             <View
-              style={{ backgroundColor: colors.slate[150] }}
+              style={homeStyles.infoBox}
               className=" rounded-xl p-4 mt-4 flex flex-col gap-1"
             >
               <View>
@@ -203,5 +203,8 @@ const styles = (colors: ColorScheme) =>
     },
     gray: {
       color: colors.slate[600],
+    },
+    infoBox: {
+      backgroundColor: colors.slate[150],
     },
   });

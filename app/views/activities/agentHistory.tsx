@@ -1,177 +1,106 @@
 import { useTheme } from "@/contexts/themeContext";
 import React from "react";
-import { Image, ScrollView, Text, View } from "react-native";
+import { ActivityIndicator, Image, ScrollView, StyleSheet, Text, View } from "react-native";
 import { RFValue } from "react-native-responsive-fontsize";
+import { useGetAgentHistoryActivities } from "@/hooks";
+import { HistoryActivityItem, HistoryActivitiesResponseItem } from "@/types";
+import { ColorScheme } from "@/utils";
 
-interface HistoryItem {
-  id: string;
-  dateText: string;
-  status: string;
-  statusColor: string;
-  statusBg: string;
-  title: string;
-  description: string;
-}
+// ─── Badge colour mapping ─────────────────────────────────────────────────────
 
-const historyGroups = [
-  {
-    month: "August, 2025",
-    items: [
-      {
-        id: "1",
-        dateText: "9th Aug, 2025 • Scheduled",
-        status: "Inspected",
-        statusColor: "#16A34A",
-        statusBg: "#D1FAE5",
-        title: "Inspected 2 Bedroom in-suite apartment",
-        description: "You inspected 2 bedroom apartment at Rumuewhera, Port Harcourt with a renter.",
-      },
-      {
-        id: "2",
-        dateText: "9th Aug, 2025 • Booked",
-        status: "Booked",
-        statusColor: "#0F766E",
-        statusBg: "#CCFBF1",
-        title: "Booked Atraz Palace Event Hall",
-        description: "You got a booking for Atraz Palace Event Hall for 17th - 19th August, 2025.",
-      },
-      {
-        id: "3",
-        dateText: "9th Aug, 2025 • Reserved",
-        status: "Reserved",
-        statusColor: "#2563EB",
-        statusBg: "#DBEAFE",
-        title: "Reserved Atraz Palace Event Hall",
-        description: "You got a reservation for Atraz Palace Event Hall for 17th - 19th August, 2025.",
-      },
-    ],
-  },
-  {
-    month: "July, 2025",
-    items: [
-      {
-        id: "4",
-        dateText: "28th Jul, 2025 • Cancellation",
-        status: "In progress",
-        statusColor: "#D97706",
-        statusBg: "#FEF3C7",
-        title: "Cancelled booking",
-        description: "You cancelled reservation for Mini Flat in Yaba.",
-      },
-      {
-        id: "5",
-        dateText: "28th Jul, 2025 • Reported",
-        status: "Reported",
-        statusColor: "#4B5563",
-        statusBg: "#F3F4F6",
-        title: "Reported a user",
-        description: "You reported a user, Sammy Kalu, for inappropriate behaviour.",
-      },
-      {
-        id: "6",
-        dateText: "28th Jul, 2025 • Cancellation",
-        status: "Refunded",
-        statusColor: "#16A34A",
-        statusBg: "#D1FAE5",
-        title: "Cancelled booking",
-        description: "Renter cancelled reservation for Mini Flat in Yaba.",
-      },
-    ],
-  },
-];
+const BADGE_COLORS: Record<string, { color: string; bg: string }> = {
+  successful: { color: "#16A34A", bg: "#D1FAE5" },
+  inspected:  { color: "#16A34A", bg: "#D1FAE5" },
+  booked:     { color: "#0F766E", bg: "#CCFBF1" },
+  reserved:   { color: "#2563EB", bg: "#DBEAFE" },
+  inprogress: { color: "#D97706", bg: "#FEF3C7" },
+  pending:    { color: "#D97706", bg: "#FEF3C7" },
+  failed:     { color: "#DC2626", bg: "#FEE2E2" },
+  cancelled:  { color: "#DC2626", bg: "#FEE2E2" },
+  reported:   { color: "#4B5563", bg: "#F3F4F6" },
+  refunded:   { color: "#16A34A", bg: "#D1FAE5" },
+};
 
-const AgentHistoryCard = ({ item }: { item: HistoryItem }) => {
+const getBadgeStyle = (badge: string) =>
+  BADGE_COLORS[badge.toLowerCase()] ?? { color: "#4B5563", bg: "#F3F4F6" };
+
+// ─── Card Component ───────────────────────────────────────────────────────────
+
+const AgentHistoryCard = ({ item }: { item: HistoryActivityItem }) => {
   const { colors, isDarkMode } = useTheme();
+  const s = styles(colors, isDarkMode);
+  const { color: statusColor, bg: statusBg } = getBadgeStyle(item.badge);
+
+  const dateText = item.occurred_at || item.date_created
+    ? new Date(item.occurred_at || item.date_created).toLocaleDateString("en-GB", {
+        day: "numeric",
+        month: "short",
+        year: "numeric",
+      }) + (item.action ? ` • ${item.action}` : "")
+    : "";
 
   return (
-    <View
-      className="flex flex-row gap-3 py-3 border-b"
-      style={{ borderColor: colors.slate[200] }}
-    >
-      {/* Icon Wrapper */}
-      <View
-        style={{
-          width: RFValue(36),
-          height: RFValue(36),
-          borderRadius: RFValue(18),
-          backgroundColor: colors.slate[150],
-          justifyContent: "center",
-          alignItems: "center",
-        }}
-      >
+    <View style={s.card} className="flex flex-row gap-3 py-3 border-b">
+      {/* Icon */}
+      <View style={s.iconWrapper}>
         <Image
           source={require("@/assets/icons/Time.png")}
-          style={{ width: 16, height: 16, tintColor: colors.slate[650] }}
+          style={s.iconImage}
         />
       </View>
 
-      {/* Details Wrapper */}
+      {/* Details */}
       <View className="flex-1">
         <View className="flex flex-row items-center justify-between gap-2 mb-1.5">
-          <Text style={{ fontSize: RFValue(12.5), color: colors.slate[500] }}>
-            {item.dateText}
-          </Text>
+          <Text style={s.dateText}>{dateText}</Text>
           <View
-            style={{
-              backgroundColor: isDarkMode ? "rgba(255, 255, 255, 0.08)" : item.statusBg,
-              paddingHorizontal: 8,
-              paddingVertical: 2.5,
-              borderRadius: 12,
-            }}
+            style={[
+              s.statusBadge,
+              { backgroundColor: isDarkMode ? "rgba(255, 255, 255, 0.08)" : statusBg },
+            ]}
           >
-            <Text
-              style={{
-                color: isDarkMode ? colors.slate[600] : item.statusColor,
-                fontSize: RFValue(11.5),
-                fontWeight: "bold",
-              }}
-            >
-              {item.status}
+            <Text style={[s.statusText, { color: isDarkMode ? colors.slate[600] : statusColor }]}>
+              {item.badge.charAt(0).toUpperCase() + item.badge.slice(1)}
             </Text>
           </View>
         </View>
 
-        <Text
-          style={{
-            fontSize: RFValue(15.5),
-            fontWeight: "600",
-            color: colors.slate[650],
-            lineHeight: RFValue(20.5),
-          }}
-        >
-          {item.title}
-        </Text>
-        <Text
-          style={{
-            fontSize: RFValue(13.5),
-            color: colors.slate[600],
-            lineHeight: RFValue(18.5),
-            marginTop: 3,
-          }}
-        >
-          {item.description}
-        </Text>
+        <Text style={s.cardTitle}>{item.title}</Text>
+        <Text style={s.cardDescription}>{item.description}</Text>
       </View>
     </View>
   );
 };
 
+// ─── Main Screen ──────────────────────────────────────────────────────────────
+
 const AgentActivityHistory = () => {
-  const { colors } = useTheme();
+  const { colors, isDarkMode } = useTheme();
+  const s = styles(colors, isDarkMode);
+  const { data: historyData, isLoading } = useGetAgentHistoryActivities();
+
+  if (isLoading) {
+    return (
+      <ActivityIndicator size="large" color={colors.slate[650]} className="mt-10" />
+    );
+  }
+
+  if (!historyData || historyData.length === 0) {
+    return (
+      <View className="py-8">
+        <Text style={s.emptyText}>No activity history found.</Text>
+      </View>
+    );
+  }
 
   return (
     <ScrollView showsVerticalScrollIndicator={false}>
-      {historyGroups.map((group, index) => (
-        <View key={index} className="py-4">
-          <Text
-            style={{ color: colors.slate[650], fontSize: RFValue(18) }}
-            className="font-bold mb-2"
-          >
-            {group.month}
-          </Text>
-          <View style={{ gap: RFValue(4) }}>
-            {group.items.map((item) => (
-              <AgentHistoryCard key={item.id} item={item} />
+      {historyData.map((group: HistoryActivitiesResponseItem, index: number) => (
+        <View key={group.label || index} className="py-4">
+          <Text style={s.groupTitle}>{group.label}</Text>
+          <View className="gap-1">
+            {group.items.map((item: HistoryActivityItem) => (
+              <AgentHistoryCard key={item.public_id || item.booking_id} item={item} />
             ))}
           </View>
         </View>
@@ -181,3 +110,60 @@ const AgentActivityHistory = () => {
 };
 
 export default AgentActivityHistory;
+
+// ─── Styles ───────────────────────────────────────────────────────────────────
+
+const styles = (colors: ColorScheme, isDarkMode: boolean) =>
+  StyleSheet.create({
+    groupTitle: {
+      color: colors.slate[650],
+      fontSize: RFValue(18),
+      fontWeight: "bold",
+      marginBottom: RFValue(8),
+    },
+    card: {
+      borderColor: colors.slate[200],
+    },
+    iconWrapper: {
+      width: RFValue(36),
+      height: RFValue(36),
+      borderRadius: RFValue(18),
+      backgroundColor: colors.slate[150],
+      justifyContent: "center",
+      alignItems: "center",
+    },
+    iconImage: {
+      width: 16,
+      height: 16,
+      tintColor: colors.slate[650],
+    },
+    dateText: {
+      fontSize: RFValue(12.5),
+      color: colors.slate[500],
+    },
+    statusBadge: {
+      paddingHorizontal: 8,
+      paddingVertical: 2.5,
+      borderRadius: 12,
+    },
+    statusText: {
+      fontSize: RFValue(11.5),
+      fontWeight: "bold",
+    },
+    cardTitle: {
+      fontSize: RFValue(15.5),
+      fontWeight: "600",
+      color: colors.slate[650],
+      lineHeight: RFValue(20.5),
+    },
+    cardDescription: {
+      fontSize: RFValue(13.5),
+      color: colors.slate[600],
+      lineHeight: RFValue(18.5),
+      marginTop: 3,
+    },
+    emptyText: {
+      color: colors.slate[500],
+      textAlign: "center",
+    },
+  });

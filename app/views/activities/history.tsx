@@ -2,13 +2,15 @@ import HistoryCard from "@/components/HistoryCard";
 import { useTheme } from "@/contexts/themeContext";
 import { useUser } from "@/contexts/user-context";
 import React from "react";
-import { Text, View, ActivityIndicator } from "react-native";
+import { ActivityIndicator, StyleSheet, Text, View } from "react-native";
 import AgentActivityHistory from "./agentHistory";
 import { useGetHistoryActivities } from "@/hooks";
 import { HistoryActivityItem } from "@/types";
+import { ColorScheme } from "@/utils";
 
 const ActivityHistory = () => {
   const { colors } = useTheme();
+  const s = styles(colors);
   const { userType } = useUser();
   const { data: historyData, isLoading } = useGetHistoryActivities();
 
@@ -23,9 +25,7 @@ const ActivityHistory = () => {
   if (!historyData || historyData.length === 0) {
     return (
       <View className="py-8">
-        <Text style={{ color: colors.slate[500], textAlign: "center" }}>
-          No activity history found.
-        </Text>
+        <Text style={s.emptyText}>No activity history found.</Text>
       </View>
     );
   }
@@ -34,16 +34,11 @@ const ActivityHistory = () => {
     <View>
       {historyData.map((group, groupIndex) => (
         <View key={group.label || groupIndex} className="py-4">
-          <Text
-            style={{ color: colors.slate[650] }}
-            className="font-semibold text-lg pb-2"
-          >
-            {group.label}
-          </Text>
+          <Text style={s.groupLabel}>{group.label}</Text>
           {group.items.map((item: HistoryActivityItem, itemIndex) => (
             <HistoryCard
               key={item.public_id || itemIndex}
-              badgeType={item.badge as "successful" | "inprogress" | "failed" | "pending"} // Need to cast depending on badge types
+              badgeType={item.badge as "successful" | "inprogress" | "failed" | "pending"}
               action={item.action}
               date={new Date(item.occurred_at || item.date_created).toLocaleDateString()}
               description={item.description}
@@ -57,3 +52,19 @@ const ActivityHistory = () => {
 };
 
 export default ActivityHistory;
+
+// ─── Styles ───────────────────────────────────────────────────────────────────
+
+const styles = (colors: ColorScheme) =>
+  StyleSheet.create({
+    groupLabel: {
+      color: colors.slate[650],
+      fontWeight: "600",
+      fontSize: 18,
+      paddingBottom: 8,
+    },
+    emptyText: {
+      color: colors.slate[500],
+      textAlign: "center",
+    },
+  });

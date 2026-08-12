@@ -70,7 +70,11 @@ export default function Register() {
                 icon={() => (
                   <Image
                     source={require("../../assets/icons/mail-outline-light.png")}
-                    style={{ width: 20, height: 20 }}
+                    style={{
+                      width: 20,
+                      height: 20,
+                      tintColor: colors.slate[650],
+                    }}
                     resizeMode="contain"
                   />
                 )}
@@ -99,8 +103,12 @@ export default function Register() {
               <TextInput.Icon
                 icon={() => (
                   <Image
-                    source={require("../../assets/icons/mail-outline-light.png")}
-                    style={{ width: 20, height: 20 }}
+                    source={require("../../assets/icons/phone-keypad.png")}
+                    style={{
+                      width: 20,
+                      height: 20,
+                      tintColor: colors.slate[650],
+                    }}
                     resizeMode="contain"
                   />
                 )}
@@ -127,15 +135,22 @@ export default function Register() {
                 icon={() => (
                   <Image
                     source={require("../../assets/icons/password-lock.png")}
-                    style={{ width: 20, height: 20 }}
+                    style={{
+                      width: 20,
+                      height: 20,
+                      tintColor: colors.slate[650],
+                    }}
                     resizeMode="contain"
+                    tintColor={colors.slate[650]}
                   />
                 )}
               />
             }
             right={
               <TextInput.Icon
-                accessibilityLabel={showPassword ? "Hide password" : "Show password"}
+                accessibilityLabel={
+                  showPassword ? "Hide password" : "Show password"
+                }
                 accessibilityRole="button"
                 onPress={() => setShowPassword((prev) => !prev)}
                 icon={() => (
@@ -146,10 +161,14 @@ export default function Register() {
                           ? require("../../assets/icons/eye-open-light.png")
                           : require("../../assets/icons/eye-open-dark.png")
                         : isDarkMode
-                        ? require("../../assets/icons/eye-closed-light.png")
-                        : require("../../assets/icons/eye-closed-dark.png")
+                          ? require("../../assets/icons/eye-closed-light.png")
+                          : require("../../assets/icons/eye-closed-dark.png")
                     }
-                    style={{ width: 20, height: 20 }}
+                    style={{
+                      width: 20,
+                      height: 20,
+                      tintColor: colors.slate[650],
+                    }}
                     resizeMode="contain"
                   />
                 )}
@@ -175,7 +194,11 @@ export default function Register() {
                 icon={() => (
                   <Image
                     source={require("../../assets/icons/password-lock.png")}
-                    style={{ width: 20, height: 20 }}
+                    style={{
+                      width: 20,
+                      height: 20,
+                      tintColor: colors.slate[650],
+                    }}
                     resizeMode="contain"
                   />
                 )}
@@ -183,7 +206,9 @@ export default function Register() {
             }
             right={
               <TextInput.Icon
-                accessibilityLabel={showConfirmPassword ? "Hide password" : "Show password"}
+                accessibilityLabel={
+                  showConfirmPassword ? "Hide password" : "Show password"
+                }
                 accessibilityRole="button"
                 onPress={() => setShowConfirmPassword((prev) => !prev)}
                 icon={() => (
@@ -194,10 +219,14 @@ export default function Register() {
                           ? require("../../assets/icons/eye-open-light.png")
                           : require("../../assets/icons/eye-open-dark.png")
                         : isDarkMode
-                        ? require("../../assets/icons/eye-closed-light.png")
-                        : require("../../assets/icons/eye-closed-dark.png")
+                          ? require("../../assets/icons/eye-closed-light.png")
+                          : require("../../assets/icons/eye-closed-dark.png")
                     }
-                    style={{ width: 20, height: 20 }}
+                    style={{
+                      width: 20,
+                      height: 20,
+                      tintColor: colors.slate[650],
+                    }}
                     resizeMode="contain"
                   />
                 )}
