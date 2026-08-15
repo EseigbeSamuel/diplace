@@ -1,11 +1,14 @@
+import BookmarkButton from "@/components/bookmark";
 import AppButton from "@/components/button";
 import SafeAreaViewContainer from "@/components/safeareaview";
 import SectionHeader from "@/components/sectionheader";
+import { SimpleSelector } from "@/components/selector";
 import { useTheme } from "@/contexts/themeContext";
 import {
   useGetPropertyAvailability,
   useGetPropertyDetails,
   useListPropertyReviews,
+  useReportProperty,
   useScheduleInspection,
 } from "@/hooks";
 import { useSpaceStore } from "@/store/useSpace";
@@ -21,12 +24,14 @@ import {
   ScrollView,
   StyleSheet,
   Text,
+  TextInput,
   TouchableOpacity,
   View,
 } from "react-native";
 import { Calendar } from "react-native-calendars";
 import MapView, { Marker } from "react-native-maps";
 import { RFValue } from "react-native-responsive-fontsize";
+import type { ReportPropertyReason } from "@/types";
 
 type timeslot = {
   id: string;
@@ -42,6 +47,16 @@ const timeslotDB: timeslot[] = [
 
 const { width } = Dimensions.get("window");
 const HAS_GOOGLE_KEY = !!process.env.EXPO_PUBLIC_GOOGLE_PLACES_API_KEY;
+
+const REPORT_REASON_MAP: Record<string, ReportPropertyReason> = {
+  "Wrong & incorrect information": "inaccurate_information",
+  "Fake / Scam listing": "fraudulent_listing",
+  "Already rented out": "inaccurate_information",
+  "Misleading photos and videos": "inappropriate_content",
+  "Property is duplicated in the app": "inaccurate_information",
+  "Inaccessible address": "inaccurate_information",
+  Others: "other",
+};
 
 const Placedetails = () => {
   const { colors, isDarkMode } = useTheme();
@@ -59,6 +74,22 @@ const Placedetails = () => {
   const [showInspectionModal, setShowInspectionModal] = useState(false);
   const [showTimeSlotModal, setShowTimeSlotModal] = useState(false);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const [showOptionsMenu, setShowOptionsMenu] = useState(false);
+  const [showReportModal, setShowReportModal] = useState(false);
+  const [selectedReportReasons, setSelectedReportReasons] = useState<string[]>(
+    [],
+  );
+  const [othersText, setOthersText] = useState("");
+
+  const reportReasons = [
+    "Wrong & incorrect information",
+    "Fake / Scam listing",
+    "Already rented out",
+    "Misleading photos and videos",
+    "Property is duplicated in the app",
+    "Inaccessible address",
+    "Others",
+  ];
 
   const router = useRouter();
   const galleryScrollRef = useRef<ScrollView>(null);
@@ -81,14 +112,7 @@ const Placedetails = () => {
   });
   const { scheduleInspectionMutation, isScheduleInspectionPending } =
     useScheduleInspection();
-
-  const fallbackGallery = [
-    require("@/assets/images/SpacesNearbyImage1.png"),
-    require("@/assets/images/SpacesNearbyImage2.png"),
-    require("@/assets/images/featuredSpaceImage1.png"),
-    require("@/assets/images/SpacesNearbyImage1.png"),
-    require("@/assets/images/SpacesNearbyImage2.png"),
-  ];
+  const { reportPropertyMutation, reportPropertyPending } = useReportProperty();
 
   const galleryData = useMemo(() => {
     if (property?.media?.length) {
@@ -97,7 +121,7 @@ const Placedetails = () => {
     if (spaceForm.value.media && spaceForm.value.media.length > 0) {
       return spaceForm.value.media.map((item) => ({ uri: item.uri }));
     }
-    return fallbackGallery;
+    return [{ uri: require("@/assets/images/diplace.jpg") }];
   }, [property, spaceForm.value.media]);
 
   const displayAddress =
@@ -157,18 +181,7 @@ const Placedetails = () => {
     property?.description ||
     "Atraz Palace is a premium 500 capacity event space perfect for weddings, conferences, parties, and special occasions. With elegant interiors, ample parking, and flexible seating arrangements, it offers a seamless experience for both hosts and guests. The hall is fully air-conditioned, generator-powered, and located in a secure, accessible area.";
 
-  const amenities = property?.amenities?.length
-    ? property.amenities
-    : [
-        "Full Air Conditioning coverage",
-        "Standby Generator",
-        "Stage platform",
-        "Changing rooms",
-        "Sound system & DJ setup",
-        "About 500 Chairs & 300 Tables",
-        "Spot lighting fixtures",
-        "Restrooms",
-      ];
+  const amenities = property?.amenities?.length ? property.amenities : [];
 
   const costBreakdown = property
     ? [
@@ -223,7 +236,6 @@ const Placedetails = () => {
     return sum + amount;
   }, 0);
 
-
   const formatMoneyParam = (value: number) =>
     `₦${new Intl.NumberFormat("en-NG").format(value)}`;
 
@@ -237,11 +249,55 @@ const Placedetails = () => {
     return `${startLabel} - ${endLabel}`;
   };
 
+  const toggleReportReason = (reason: string) => {
+    setSelectedReportReasons((prev) =>
+      prev.includes(reason)
+        ? prev.filter((r) => r !== reason)
+        : [...prev, reason],
+    );
+  };
+
+  const resetReportForm = () => {
+    setShowReportModal(false);
+    setSelectedReportReasons([]);
+    setOthersText("");
+  };
+
+  const handleSubmitReport = async () => {
+    const activePropertyId = property?.public_id || propertyId;
+    if (!activePropertyId || selectedReportReasons.length === 0) return;
+
+    const primaryReason = selectedReportReasons[0];
+    const otherDetails = othersText.trim();
+    const details = [
+      `Selected reasons: ${selectedReportReasons.join(", ")}`,
+      otherDetails ? `Additional details: ${otherDetails}` : null,
+    ]
+      .filter(Boolean)
+      .join("\n");
+
+    try {
+      await reportPropertyMutation({
+        propertyId: activePropertyId,
+        payload: {
+          reason: REPORT_REASON_MAP[primaryReason] || "other",
+          details,
+        },
+      });
+
+      resetReportForm();
+    } catch {
+      // Error toast is handled by the report mutation.
+    }
+  };
+
   const inspectionTimeSlots = useMemo(() => {
     const slots = propertyAvailability
       .filter((slot) => {
         const slotDate = slot.start_datetime.slice(0, 10);
-        return slot.is_available && (!selectedDate || slotDate === selectedDate);
+        return (
+          slot.is_available && (!selectedDate || slotDate === selectedDate)
+        );
       })
       .map((slot) => ({
         id: slot.public_id,
@@ -288,6 +344,7 @@ const Placedetails = () => {
       },
     });
   };
+
   const formatReadableDate = (
     dateString: string | Date | null | undefined,
   ): string => {
@@ -353,6 +410,7 @@ const Placedetails = () => {
       <SectionHeader
         title=""
         rightIconSource={require("@/assets/icons/more-2-line.png")}
+        onRightIconPress={() => setShowOptionsMenu(true)}
       />
       <View style={styles.contentContainer}>
         <ScrollView
@@ -370,7 +428,7 @@ const Placedetails = () => {
             ) : (
               <View>
                 <Image
-                  source={galleryData[0]}
+                  source={require("@/assets/images/diplace.jpg")}
                   style={styles.mainImage}
                   resizeMode="cover"
                 />
@@ -404,10 +462,7 @@ const Placedetails = () => {
 
             {/* Bookmark Icon */}
             <TouchableOpacity style={styles.bookmarkButton}>
-              <Image
-                source={require("@/assets/icons/bookmark-active-dark.png")}
-                style={styles.bookmarkIcon}
-              />
+              <BookmarkButton id={propertyId} />
             </TouchableOpacity>
           </View>
 
@@ -416,20 +471,23 @@ const Placedetails = () => {
           {/* Property Info Card */}
           <View style={styles.propertyCard}>
             <View style={styles.propertyTitleRow}>
-              <Text style={styles.propertyTitle}>{displayTitle}</Text>
-              <Text style={styles.priceText}>₦{displayPrice}</Text>
-            </View>
+              <View style={styles.propertyTitleContainer}>
+                <Text style={styles.propertyTitle}>{displayTitle}</Text>
+                <View style={styles.locationRow}>
+                  <Image
+                    source={require("@/assets/icons/location.png")}
+                    style={styles.locationIcon}
+                    resizeMode="contain"
+                  />
+                  <Text style={styles.addressText}>{displayAddress}</Text>
+                </View>
+              </View>
+              <View style={styles.badgeContainer}>
+                <Text style={styles.priceText}>₦{displayPrice}</Text>
 
-            <View style={styles.locationRow}>
-              <Image
-                source={require("@/assets/icons/location-1.png")}
-                style={styles.locationIcon}
-                resizeMode="contain"
-              />
-              <Text style={styles.addressText}>{displayAddress}</Text>
+                <Text style={styles.priceUnit}>/{displayDuration}</Text>
+              </View>
             </View>
-
-            <Text style={styles.priceUnit}>/{displayDuration}</Text>
 
             <View className="px-3 py-2 border-t border-b border-gray-300">
               <Text
@@ -673,7 +731,10 @@ const Placedetails = () => {
                 <Text style={styles.totalAmount}>₦{totalPackage}</Text>
               </View>
             </View>
-            <Pressable className="flex flex-row items-center gap-3 py-4">
+            <Pressable
+              className="flex flex-row items-center gap-1 py-4"
+              onPress={() => setShowReportModal(true)}
+            >
               <Image
                 source={require("@/assets/icons/flag-red.png")}
                 className="w-6 h-6"
@@ -820,6 +881,149 @@ const Placedetails = () => {
           </SafeAreaViewContainer>
         </Modal>
 
+        {/* Options Dropdown Menu */}
+        <Modal
+          visible={showOptionsMenu}
+          transparent
+          animationType="fade"
+          onRequestClose={() => setShowOptionsMenu(false)}
+        >
+          <Pressable
+            style={styles.optionsMenuOverlay}
+            onPress={() => setShowOptionsMenu(false)}
+          >
+            <Pressable
+              style={styles.optionsMenuContainer}
+              onPress={(e) => e.stopPropagation()}
+            >
+              <TouchableOpacity
+                style={styles.optionsMenuItem}
+                onPress={() => {}}
+              >
+                <BookmarkButton id={propertyId} showLabel />
+              </TouchableOpacity>
+
+              <View style={styles.optionsMenuDivider} />
+
+              <TouchableOpacity
+                style={styles.optionsMenuItem}
+                onPress={() => {
+                  setShowOptionsMenu(false);
+                  // trigger share logic here
+                }}
+              >
+                <Image
+                  source={require("@/assets/icons/share.png")}
+                  style={styles.optionsMenuIcon}
+                />
+                <Text style={styles.optionsMenuText}>Share</Text>
+              </TouchableOpacity>
+
+              <View style={styles.optionsMenuDivider} />
+
+              <TouchableOpacity
+                style={styles.optionsMenuItem}
+                onPress={() => {
+                  setShowOptionsMenu(false);
+                  setShowReportModal(true);
+                }}
+              >
+                <Image
+                  source={require("@/assets/icons/flag-red.png")}
+                  style={styles.optionsMenuIcon}
+                />
+                <Text
+                  style={[styles.optionsMenuText, { color: colors.error[200] }]}
+                >
+                  Report listing
+                </Text>
+              </TouchableOpacity>
+            </Pressable>
+          </Pressable>
+        </Modal>
+
+        {/* Report Property Modal - Bottom Sheet */}
+        <Modal
+          visible={showReportModal}
+          transparent
+          animationType="slide"
+          onRequestClose={() => setShowReportModal(false)}
+        >
+          <Pressable
+            style={styles.reportModalOverlay}
+            onPress={() => setShowReportModal(false)}
+          >
+            <Pressable
+              style={styles.reportBottomSheet}
+              onPress={(e) => e.stopPropagation()}
+            >
+              <View style={styles.modalHandle} />
+
+              <ScrollView showsVerticalScrollIndicator={false}>
+                <View style={styles.reportModalBody}>
+                  <Text style={styles.reportModalTitle}>
+                    Report this property
+                  </Text>
+                  <Text style={styles.reportModalSubtitle}>
+                    Let us know what the case is with this listing.
+                  </Text>
+
+                  <View style={styles.reportReasonsList}>
+                    {reportReasons.map((reason) => {
+                      const isSelected = selectedReportReasons.includes(reason);
+                      const isOthers = reason === "Others";
+                      return (
+                        <React.Fragment key={reason}>
+                          <SimpleSelector
+                            isChecked={isSelected}
+                            onChange={() => toggleReportReason(reason)}
+                            title={reason}
+                          />
+                          {isOthers && isSelected && (
+                            <View style={styles.othersInputContainer}>
+                              <TextInput
+                                style={styles.othersInput}
+                                placeholder="Type here..."
+                                placeholderTextColor={colors.slate[450]}
+                                value={othersText}
+                                onChangeText={setOthersText}
+                              />
+                              {othersText.length > 0 && (
+                                <TouchableOpacity
+                                  onPress={() => setOthersText("")}
+                                >
+                                  <Image
+                                    source={require("@/assets/icons/close-contained.png")}
+                                    style={styles.othersInputClearIcon}
+                                  />
+                                </TouchableOpacity>
+                              )}
+                            </View>
+                          )}
+                        </React.Fragment>
+                      );
+                    })}
+                  </View>
+
+                  <View style={styles.reportSubmitContainer}>
+                    <AppButton
+                      title={reportPropertyPending ? "Submitting..." : "Submit"}
+                      disabled={
+                        reportPropertyPending ||
+                        selectedReportReasons.length === 0 ||
+                        (selectedReportReasons.includes("Others") &&
+                          othersText.trim().length === 0)
+                      }
+                      fullwidth={true}
+                      onPress={handleSubmitReport}
+                    />
+                  </View>
+                </View>
+              </ScrollView>
+            </Pressable>
+          </Pressable>
+        </Modal>
+
         {/* Inspection Modal - Bottom Sheet */}
         <Modal
           visible={showInspectionModal}
@@ -914,7 +1118,9 @@ const Placedetails = () => {
                       }
                       onPress={handleScheduleInspection}
                       disabled={
-                        !selectedTime || !selectedDate || isScheduleInspectionPending
+                        !selectedTime ||
+                        !selectedDate ||
+                        isScheduleInspectionPending
                       }
                     />
                     <AppButton
@@ -1260,6 +1466,14 @@ const createStyles = (colors: ColorScheme) =>
       flex: 1,
       marginRight: RFValue(12),
     },
+    propertyTitleContainer: {
+      flex: 1,
+      marginRight: RFValue(12),
+    },
+    badgeContainer: {
+      flexDirection: "column",
+      alignItems: "flex-end",
+    },
     locationRow: {
       flexDirection: "row",
       alignItems: "center",
@@ -1282,9 +1496,9 @@ const createStyles = (colors: ColorScheme) =>
       color: colors.slate[650],
     },
     priceUnit: {
-      fontSize: RFValue(13),
+      fontSize: RFValue(14),
       fontWeight: "400",
-      color: colors.slate[500],
+      color: colors.slate[650],
       marginBottom: RFValue(12),
     },
     featuresRow: {
@@ -1487,6 +1701,100 @@ const createStyles = (colors: ColorScheme) =>
       paddingTop: RFValue(16),
       borderTopWidth: 1,
       borderTopColor: colors.slate[300],
+    },
+    // Options dropdown menu
+    optionsMenuOverlay: {
+      flex: 1,
+      backgroundColor: "rgba(0,0,0,0.15)",
+      alignItems: "flex-end",
+      paddingTop: RFValue(56),
+      paddingRight: RFValue(16),
+    },
+    optionsMenuContainer: {
+      backgroundColor: colors.background,
+      borderRadius: RFValue(14),
+      width: RFValue(180),
+      paddingVertical: RFValue(4),
+      shadowColor: "#000",
+      shadowOffset: { width: 0, height: 4 },
+      shadowOpacity: 0.15,
+      shadowRadius: 10,
+      elevation: 8,
+    },
+    optionsMenuItem: {
+      flexDirection: "row",
+      alignItems: "center",
+      gap: RFValue(10),
+      paddingVertical: RFValue(12),
+      paddingHorizontal: RFValue(14),
+    },
+    optionsMenuIcon: {
+      width: RFValue(18),
+      height: RFValue(18),
+      tintColor: colors.slate[650],
+    },
+    optionsMenuText: {
+      fontSize: RFValue(14),
+      fontWeight: "500",
+      color: colors.slate[650],
+    },
+    optionsMenuDivider: {
+      height: 1,
+      backgroundColor: colors.slate[300],
+      marginHorizontal: RFValue(14),
+    },
+
+    // Report property modal - Bottom Sheet
+    reportModalOverlay: {
+      flex: 1,
+      backgroundColor: "rgba(0, 0, 0, 0.5)",
+      justifyContent: "flex-end",
+    },
+    reportBottomSheet: {
+      backgroundColor: colors.background,
+      borderTopLeftRadius: RFValue(24),
+      borderTopRightRadius: RFValue(24),
+      paddingHorizontal: RFValue(20),
+      paddingBottom: RFValue(32),
+      maxHeight: "85%",
+    },
+    reportModalBody: {
+      gap: RFValue(10),
+      paddingBottom: RFValue(8),
+    },
+    reportModalTitle: {
+      fontSize: RFValue(18),
+      fontWeight: "700",
+      color: colors.slate[650],
+      textAlign: "center",
+      marginBottom: RFValue(4),
+    },
+    reportModalSubtitle: {
+      fontSize: RFValue(13),
+      color: colors.slate[500],
+      textAlign: "center",
+      marginBottom: RFValue(12),
+    },
+    reportReasonsList: {
+      gap: RFValue(12),
+    },
+    reportReasonItem: {
+      flexDirection: "row",
+      alignItems: "center",
+      padding: RFValue(16),
+      backgroundColor: colors.slate[150],
+      borderRadius: RFValue(12),
+      borderWidth: 1,
+      borderColor: colors.slate[300],
+      gap: RFValue(12),
+    },
+    reportReasonText: {
+      flex: 1,
+      fontSize: RFValue(14),
+      color: colors.slate[650],
+    },
+    reportSubmitContainer: {
+      paddingTop: RFValue(20),
     },
     totalLabel: {
       fontSize: RFValue(16),
@@ -1798,5 +2106,27 @@ const createStyles = (colors: ColorScheme) =>
       fontSize: RFValue(14),
       fontWeight: "600",
       textAlign: "center",
+    },
+    othersInputContainer: {
+      flexDirection: "row",
+      alignItems: "center",
+      backgroundColor: colors.slate[150],
+      borderRadius: RFValue(12),
+      borderWidth: 1,
+      borderColor: colors.slate[300],
+      paddingHorizontal: RFValue(16),
+      paddingVertical: RFValue(4),
+      marginTop: -RFValue(4),
+    },
+    othersInput: {
+      flex: 1,
+      fontSize: RFValue(14),
+      color: colors.slate[650],
+      paddingVertical: RFValue(10),
+    },
+    othersInputClearIcon: {
+      width: RFValue(18),
+      height: RFValue(18),
+      tintColor: colors.slate[450],
     },
   });

@@ -7,11 +7,7 @@ import HouseCard from "@/components/housecard";
 import SafeAreaViewContainer from "@/components/safeareaview";
 import { Tabs } from "@/constants/home";
 import { useTheme } from "@/contexts/themeContext";
-import {
-  useListProperties,
-  useMyBookmarks,
-  useTogglePropertyBookmark,
-} from "@/hooks";
+import { useListProperties } from "@/hooks";
 import { PropertyListItem } from "@/types";
 import { ColorScheme } from "@/utils";
 import { BottomSheetModal } from "@gorhom/bottom-sheet";
@@ -70,12 +66,7 @@ export default function RenterHome() {
   const homeStyles = styles(colors);
   const [activeTab, setActiveTab] = useState("All");
   const [showAllNearby, setShowAllNearby] = useState(false);
-  const [bookmarkOverrides, setBookmarkOverrides] = useState<
-    Record<string, boolean>
-  >({});
-  const [bookmarkPendingIds, setBookmarkPendingIds] = useState<
-    Record<string, boolean>
-  >({});
+
   const {
     properties,
     isPropertiesLoading,
@@ -92,8 +83,6 @@ export default function RenterHome() {
     pageSize: 20,
     enabled: true,
   });
-  const { bookmarkedPropertyIds } = useMyBookmarks({ enabled: true });
-  const { togglePropertyBookmarkMutation } = useTogglePropertyBookmark();
 
   const formatCurrency = (amount: number) =>
     `NGN ${new Intl.NumberFormat("en-NG").format(amount || 0)}`;
@@ -180,10 +169,6 @@ export default function RenterHome() {
   );
   const recommendedCards = useMemo(() => nearbyCards, [nearbyCards]);
   const canViewMoreNearby = nearbyCards.length > 10 && !showAllNearby;
-  const bookmarkedSet = useMemo(
-    () => new Set(bookmarkedPropertyIds),
-    [bookmarkedPropertyIds],
-  );
 
   useEffect(() => {
     setShowAllNearby(false);
@@ -201,36 +186,13 @@ export default function RenterHome() {
     fetchMoreProperties();
   };
 
-  const isBookmarked = (propertyId: string) =>
-    bookmarkOverrides[propertyId] ?? bookmarkedSet.has(propertyId);
-
-  const handleToggleBookmark = async (propertyId: string) => {
-    if (bookmarkPendingIds[propertyId]) return;
-    const current = isBookmarked(propertyId);
-
-    setBookmarkPendingIds((prev) => ({ ...prev, [propertyId]: true }));
-    setBookmarkOverrides((prev) => ({ ...prev, [propertyId]: !current }));
-
-    try {
-      const response = await togglePropertyBookmarkMutation({ propertyId });
-      const next =
-        response.bookmarked.status === "added"
-          ? true
-          : response.bookmarked.status === "removed"
-            ? false
-            : !current;
-      setBookmarkOverrides((prev) => ({ ...prev, [propertyId]: next }));
-    } catch {
-      setBookmarkOverrides((prev) => ({ ...prev, [propertyId]: current }));
-    } finally {
-      setBookmarkPendingIds((prev) => ({ ...prev, [propertyId]: false }));
-    }
-  };
-
   //bottom sheet handlers
   const [type, setType] = useState("Any");
   const [rooms, setRooms] = useState(0);
   const [baths, setBaths] = useState(0);
+  const [minBudget, setMinBudget] = useState(10);
+  const [maxBudget, setMaxBudget] = useState(11);
+  const [selectedAmenities, setSelectedAmenities] = useState<string[]>([]);
 
   const openCity = () => {};
   const openNeighborhood = () => {};
@@ -238,14 +200,18 @@ export default function RenterHome() {
     setType("Any");
     setRooms(0);
     setBaths(0);
+    setMinBudget(0);
+    setMaxBudget(100);
+    setSelectedAmenities([]);
   };
 
   const apply = () => {
     addFilterRef.current?.dismiss();
+    // TODO: trigger useListProperties refetch with { type, rooms, baths, minBudget, maxBudget, selectedAmenities }
   };
   const addFilterRef = useRef<BottomSheetModal>(null);
 
-  const anim = useSharedValue(0);
+  const anim = useSharedValue(30);
 
   const handleAddFilter = () => {
     addFilterRef.current?.present();
@@ -339,9 +305,6 @@ export default function RenterHome() {
                 <HouseCard
                   {...item}
                   showBookmark
-                  isBookmarked={isBookmarked(item.id)}
-                  bookmarkDisabled={!!bookmarkPendingIds[item.id]}
-                  onToggleBookmark={() => handleToggleBookmark(item.id)}
                   onPress={() => handleOpenProperty(item)}
                 />
               )}
@@ -407,18 +370,17 @@ export default function RenterHome() {
                     />
                   </View>
                 ))
-              : (showAllNearby ? nearbyCards : nearbyCardsPreview).map((item) => (
-                  <View key={`nearby-${item.id}`} className="pb-4">
-                    <HouseCard
-                      {...item}
-                      showBookmark
-                      isBookmarked={isBookmarked(item.id)}
-                      bookmarkDisabled={!!bookmarkPendingIds[item.id]}
-                      onToggleBookmark={() => handleToggleBookmark(item.id)}
-                      onPress={() => handleOpenProperty(item)}
-                    />
-                  </View>
-                ))}
+              : (showAllNearby ? nearbyCards : nearbyCardsPreview).map(
+                  (item) => (
+                    <View key={`nearby-${item.id}`} className="pb-4">
+                      <HouseCard
+                        {...item}
+                        showBookmark
+                        onPress={() => handleOpenProperty(item)}
+                      />
+                    </View>
+                  ),
+                )}
 
             {canViewMoreNearby ? (
               <View className="pb-6">
@@ -464,9 +426,6 @@ export default function RenterHome() {
                 <HouseCard
                   {...item}
                   showBookmark
-                  isBookmarked={isBookmarked(item.id)}
-                  bookmarkDisabled={!!bookmarkPendingIds[item.id]}
-                  onToggleBookmark={() => handleToggleBookmark(item.id)}
                   onPress={() => handleOpenProperty(item)}
                 />
               )}
@@ -511,9 +470,6 @@ export default function RenterHome() {
             <HouseCard
               {...item}
               showBookmark
-              isBookmarked={isBookmarked(item.id)}
-              bookmarkDisabled={!!bookmarkPendingIds[item.id]}
-              onToggleBookmark={() => handleToggleBookmark(item.id)}
               onPress={() => handleOpenProperty(item)}
             />
           </View>

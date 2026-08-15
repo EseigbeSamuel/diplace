@@ -6,6 +6,7 @@ import {
   BottomSheetModal,
   BottomSheetScrollView,
 } from "@gorhom/bottom-sheet";
+import React from "react";
 import { StyleSheet } from "react-native";
 import {
   heightPercentageToDP as hp,

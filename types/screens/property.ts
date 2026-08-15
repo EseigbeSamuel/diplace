@@ -205,6 +205,28 @@ export interface ToggleBookmarkResponse {
   };
 }
 
+export type ReportPropertyReason =
+  | "inaccurate_information"
+  | "fraudulent_listing"
+  | "inappropriate_content"
+  | "other";
+
+export interface ReportPropertyPayload {
+  reason: ReportPropertyReason;
+  details: string;
+}
+
+export interface ReportPropertyResponse {
+  public_id: string;
+  date_created: string;
+  date_modified: string;
+  status: PropertyStatus;
+  reason: ReportPropertyReason;
+  details: string;
+  is_resolved: boolean;
+  reporter: PropertyListUser;
+}
+
 export interface PropertyReviewItem {
   public_id: string;
   date_created: string;
