@@ -1,43 +1,54 @@
 import { useTheme } from "@/contexts/themeContext";
-import React from "react";
-import { ActivityIndicator, Image, ScrollView, StyleSheet, Text, View } from "react-native";
-import { RFValue } from "react-native-responsive-fontsize";
 import { useGetAgentHistoryActivities } from "@/hooks";
-import { HistoryActivityItem, HistoryActivitiesResponseItem } from "@/types";
+import { HistoryActivitiesResponseItem, HistoryActivityItem } from "@/types";
 import { ColorScheme } from "@/utils";
+import React from "react";
+import {
+  ActivityIndicator,
+  Image,
+  ScrollView,
+  StyleSheet,
+  Text,
+  View,
+} from "react-native";
+import { RFValue } from "react-native-responsive-fontsize";
 
-// ─── Badge colour mapping ─────────────────────────────────────────────────────
+// Badge colour mapping
 
 const BADGE_COLORS: Record<string, { color: string; bg: string }> = {
   successful: { color: "#16A34A", bg: "#D1FAE5" },
-  inspected:  { color: "#16A34A", bg: "#D1FAE5" },
-  booked:     { color: "#0F766E", bg: "#CCFBF1" },
-  reserved:   { color: "#2563EB", bg: "#DBEAFE" },
+  inspected: { color: "#16A34A", bg: "#D1FAE5" },
+  booked: { color: "#0F766E", bg: "#CCFBF1" },
+  reserved: { color: "#2563EB", bg: "#DBEAFE" },
   inprogress: { color: "#D97706", bg: "#FEF3C7" },
-  pending:    { color: "#D97706", bg: "#FEF3C7" },
-  failed:     { color: "#DC2626", bg: "#FEE2E2" },
-  cancelled:  { color: "#DC2626", bg: "#FEE2E2" },
-  reported:   { color: "#4B5563", bg: "#F3F4F6" },
-  refunded:   { color: "#16A34A", bg: "#D1FAE5" },
+  pending: { color: "#D97706", bg: "#FEF3C7" },
+  failed: { color: "#DC2626", bg: "#FEE2E2" },
+  cancelled: { color: "#DC2626", bg: "#FEE2E2" },
+  reported: { color: "#4B5563", bg: "#F3F4F6" },
+  refunded: { color: "#16A34A", bg: "#D1FAE5" },
 };
 
 const getBadgeStyle = (badge: string) =>
   BADGE_COLORS[badge.toLowerCase()] ?? { color: "#4B5563", bg: "#F3F4F6" };
 
-// ─── Card Component ───────────────────────────────────────────────────────────
+// Card Component
 
 const AgentHistoryCard = ({ item }: { item: HistoryActivityItem }) => {
   const { colors, isDarkMode } = useTheme();
   const s = styles(colors, isDarkMode);
   const { color: statusColor, bg: statusBg } = getBadgeStyle(item.badge);
 
-  const dateText = item.occurred_at || item.date_created
-    ? new Date(item.occurred_at || item.date_created).toLocaleDateString("en-GB", {
-        day: "numeric",
-        month: "short",
-        year: "numeric",
-      }) + (item.action ? ` • ${item.action}` : "")
-    : "";
+  const dateText =
+    item.occurred_at || item.date_created
+      ? new Date(item.occurred_at || item.date_created).toLocaleDateString(
+          "en-GB",
+          {
+            day: "numeric",
+            month: "short",
+            year: "numeric",
+          },
+        ) + (item.action ? ` • ${item.action}` : "")
+      : "";
 
   return (
     <View style={s.card} className="flex flex-row gap-3 py-3 border-b">
@@ -56,10 +67,19 @@ const AgentHistoryCard = ({ item }: { item: HistoryActivityItem }) => {
           <View
             style={[
               s.statusBadge,
-              { backgroundColor: isDarkMode ? "rgba(255, 255, 255, 0.08)" : statusBg },
+              {
+                backgroundColor: isDarkMode
+                  ? "rgba(255, 255, 255, 0.08)"
+                  : statusBg,
+              },
             ]}
           >
-            <Text style={[s.statusText, { color: isDarkMode ? colors.slate[600] : statusColor }]}>
+            <Text
+              style={[
+                s.statusText,
+                { color: isDarkMode ? colors.slate[600] : statusColor },
+              ]}
+            >
               {item.badge.charAt(0).toUpperCase() + item.badge.slice(1)}
             </Text>
           </View>
@@ -72,7 +92,7 @@ const AgentHistoryCard = ({ item }: { item: HistoryActivityItem }) => {
   );
 };
 
-// ─── Main Screen ──────────────────────────────────────────────────────────────
+// Main Screen
 
 const AgentActivityHistory = () => {
   const { colors, isDarkMode } = useTheme();
@@ -81,7 +101,11 @@ const AgentActivityHistory = () => {
 
   if (isLoading) {
     return (
-      <ActivityIndicator size="large" color={colors.slate[650]} className="mt-10" />
+      <ActivityIndicator
+        size="large"
+        color={colors.slate[650]}
+        className="mt-10"
+      />
     );
   }
 
@@ -95,23 +119,26 @@ const AgentActivityHistory = () => {
 
   return (
     <ScrollView showsVerticalScrollIndicator={false}>
-      {historyData.map((group: HistoryActivitiesResponseItem, index: number) => (
-        <View key={group.label || index} className="py-4">
-          <Text style={s.groupTitle}>{group.label}</Text>
-          <View className="gap-1">
-            {group.items.map((item: HistoryActivityItem) => (
-              <AgentHistoryCard key={item.public_id || item.booking_id} item={item} />
-            ))}
+      {historyData.map(
+        (group: HistoryActivitiesResponseItem, index: number) => (
+          <View key={group.label || index} className="py-4">
+            <Text style={s.groupTitle}>{group.label}</Text>
+            <View className="gap-1">
+              {group.items.map((item: HistoryActivityItem) => (
+                <AgentHistoryCard
+                  key={item.public_id || item.booking_id}
+                  item={item}
+                />
+              ))}
+            </View>
           </View>
-        </View>
-      ))}
+        ),
+      )}
     </ScrollView>
   );
 };
 
 export default AgentActivityHistory;
-
-// ─── Styles ───────────────────────────────────────────────────────────────────
 
 const styles = (colors: ColorScheme, isDarkMode: boolean) =>
   StyleSheet.create({

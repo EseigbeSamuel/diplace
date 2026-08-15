@@ -1,3 +1,4 @@
+import { AgentBookingCard } from "@/components/agent-booking-card";
 import { useTheme } from "@/contexts/themeContext";
 import { useGetAgentActiveActivities, useGetTodayActivities } from "@/hooks";
 import { ActiveActivityItem } from "@/types";
@@ -15,64 +16,6 @@ import {
   View,
 } from "react-native";
 import { RFValue } from "react-native-responsive-fontsize";
-
-// ─── Card Component ──────────────────────────────────────────────────────────
-
-const AgentBookingCard = ({
-  item,
-  onPress,
-}: {
-  item: ActiveActivityItem;
-  onPress?: () => void;
-}) => {
-  const { colors, isDarkMode } = useTheme();
-  const s = styles(colors, isDarkMode);
-
-  const date = item.due_date ? new Date(item.due_date) : null;
-  const month = date ? date.toLocaleString("default", { month: "short" }) : "—";
-  const day = date ? String(date.getDate()).padStart(2, "0") : "—";
-  const dueText = item.due_date
-    ? `Due: ${new Date(item.due_date).toLocaleDateString()}`
-    : undefined;
-
-  return (
-    <Pressable
-      onPress={onPress}
-      className="flex flex-row items-center gap-4 py-3"
-    >
-      {/* Left Column: Date Badge */}
-      <View style={s.dateBadge}>
-        <Text style={s.month}>{month}</Text>
-        <Text style={s.day}>{day}</Text>
-      </View>
-
-      {/* Center Column: Text Details */}
-      <View className="flex-1 justify-center">
-        {dueText && <Text style={s.dueText}>{dueText}</Text>}
-        <Text style={s.cardTitle} numberOfLines={1}>
-          {item.property.title}
-        </Text>
-        <Text style={s.cardLocation} numberOfLines={1}>
-          {item.property.location}
-        </Text>
-      </View>
-
-      {/* Right Column: Badge & Arrow */}
-      <View className="flex flex-row items-center gap-2">
-        {item.is_new && (
-          <View style={s.newBadge}>
-            <Text style={s.newBadgeText}>NEW</Text>
-          </View>
-        )}
-        <Image
-          source={require("@/assets/icons/arrow-right-up-outline-dark.png")}
-          className="w-4 h-4"
-          style={s.arrowTint}
-        />
-      </View>
-    </Pressable>
-  );
-};
 
 // ─── Main Screen ─────────────────────────────────────────────────────────────
 
@@ -289,8 +232,6 @@ const AgentActiveActivity = () => {
 };
 
 export default AgentActiveActivity;
-
-// ─── Styles ───────────────────────────────────────────────────────────────────
 
 const styles = (colors: ColorScheme, isDarkMode: boolean) =>
   StyleSheet.create({

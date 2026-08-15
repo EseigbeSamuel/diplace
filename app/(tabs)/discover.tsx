@@ -33,7 +33,7 @@ const Discover = () => {
   const { width } = Dimensions.get("window");
   const CARD_WIDTH = width * 0.88;
 
-  // --- Live property hook ---
+  // Live property hook
   const { properties, isPropertiesLoading } = useListProperties({
     params: { limit: 100 },
   });
