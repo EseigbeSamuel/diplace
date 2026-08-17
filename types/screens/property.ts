@@ -167,6 +167,8 @@ export interface PropertyListItem {
   verified_at: string | null;
   lister: PropertyListUser;
   address: PropertyListAddress;
+  avg_rating?: number;
+  review_count?: number;
 }
 
 export interface ListPropertiesResponse {
@@ -339,6 +341,8 @@ export interface ListPropertiesParams {
   listing_type?: ListingType;
   min_price?: number;
   max_price?: number;
+  min_rating?: number;
+  max_rating?: number;
   is_verified?: boolean;
   lister_id?: string;
   cost_frequency?: CostFrequency;

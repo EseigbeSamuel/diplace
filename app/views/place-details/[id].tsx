@@ -32,6 +32,7 @@ import { Calendar } from "react-native-calendars";
 import MapView, { Marker } from "react-native-maps";
 import { RFValue } from "react-native-responsive-fontsize";
 import type { ReportPropertyReason } from "@/types";
+import { HAS_GOOGLE_MAPS_API_KEY } from "@/constants/google";
 
 type timeslot = {
   id: string;
@@ -46,7 +47,6 @@ const timeslotDB: timeslot[] = [
 ];
 
 const { width } = Dimensions.get("window");
-const HAS_GOOGLE_KEY = !!process.env.EXPO_PUBLIC_GOOGLE_PLACES_API_KEY;
 
 const REPORT_REASON_MAP: Record<string, ReportPropertyReason> = {
   "Wrong & incorrect information": "inaccurate_information",
@@ -653,7 +653,7 @@ const Placedetails = () => {
             <Text style={styles.locationAddress}>{displayAddress}</Text>
 
             <View style={styles.mapContainer}>
-              {HAS_GOOGLE_KEY ? (
+              {HAS_GOOGLE_MAPS_API_KEY ? (
                 <MapView
                   style={{ flex: 1 }}
                   initialRegion={{
@@ -1291,7 +1291,7 @@ const Placedetails = () => {
           }}
         >
           <View style={styles.fullMapContainer}>
-            {HAS_GOOGLE_KEY ? (
+            {HAS_GOOGLE_MAPS_API_KEY ? (
               <MapView
                 style={{ flex: 1 }}
                 initialRegion={{
