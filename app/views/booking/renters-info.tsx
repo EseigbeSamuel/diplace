@@ -14,12 +14,13 @@ import { RFValue } from "react-native-responsive-fontsize";
 import SafeAreaViewContainer from "@/components/safeareaview";
 import { useTheme } from "@/contexts/themeContext";
 import { ColorScheme } from "@/utils";
-import { useRouter } from "expo-router";
+import { useLocalSearchParams, useRouter } from "expo-router";
 import AppButton from "@/components/button";
 import TextField from "@/components/textfield";
 
 const RentersInformation = () => {
   const router = useRouter();
+  const params = useLocalSearchParams();
   const { colors } = useTheme();
   const styles = getStyles(colors);
 
@@ -36,6 +37,7 @@ const RentersInformation = () => {
       router.push({
         pathname: "/views/booking/event-details",
         params: {
+          ...params,
           fullName,
           occupation,
           email,

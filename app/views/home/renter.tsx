@@ -1,32 +1,27 @@
-import { CustomBottomSheet } from "@/components/bottom-sheet";
 import AppButton from "@/components/button";
 import Filter from "@/components/filter";
 import FilterBottomSheets from "@/components/filterBS";
 import { AppHeader } from "@/components/header";
 import HouseCard from "@/components/housecard";
 import SafeAreaViewContainer from "@/components/safeareaview";
+import { SimpleSelector } from "@/components/selector";
 import { Tabs } from "@/constants/home";
 import { useTheme } from "@/contexts/themeContext";
-import {
-  useListProperties,
-  useMyBookmarks,
-  useTogglePropertyBookmark,
-} from "@/hooks";
-import { PropertyListItem } from "@/types";
+import { useListProperties } from "@/hooks";
+import { ListPropertiesParams, PropertyListItem, PropertyType } from "@/types";
 import { ColorScheme } from "@/utils";
-import { BottomSheetModal } from "@gorhom/bottom-sheet";
 import { router } from "expo-router";
-import React, { useEffect, useMemo, useRef, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import {
   ActivityIndicator,
   FlatList,
   Image,
+  Modal,
   Pressable,
   StyleSheet,
   Text,
   View,
 } from "react-native";
-import { useSharedValue } from "react-native-reanimated";
 import { RFValue } from "react-native-responsive-fontsize";
 
 type PropertyCardItem = {
@@ -38,6 +33,15 @@ type PropertyCardItem = {
   badgeType?: string;
   duration: string;
 };
+
+const FILTER_TYPE_MAP: Record<string, PropertyType> = {
+  Apartment: "apartment",
+  Shop: "shop",
+  Office: "office",
+  "Event center": "event_centre",
+};
+const DEFAULT_MIN_BUDGET = 0;
+const DEFAULT_MAX_BUDGET = 100;
 
 function SkeletonBlock({
   width = "100%",
@@ -70,12 +74,31 @@ export default function RenterHome() {
   const homeStyles = styles(colors);
   const [activeTab, setActiveTab] = useState("All");
   const [showAllNearby, setShowAllNearby] = useState(false);
-  const [bookmarkOverrides, setBookmarkOverrides] = useState<
-    Record<string, boolean>
-  >({});
-  const [bookmarkPendingIds, setBookmarkPendingIds] = useState<
-    Record<string, boolean>
-  >({});
+  const [searchText, setSearchText] = useState("");
+
+  //bottom sheet handlers
+  const [type, setType] = useState("Any");
+  const [rooms, setRooms] = useState(0);
+  const [baths, setBaths] = useState(0);
+  const [minBudget, setMinBudget] = useState(DEFAULT_MIN_BUDGET);
+  const [maxBudget, setMaxBudget] = useState(DEFAULT_MAX_BUDGET);
+  const [selectedAmenities, setSelectedAmenities] = useState<string[]>([]);
+  const [showFilterModal, setShowFilterModal] = useState(false);
+  const [showCityModal, setShowCityModal] = useState(false);
+  const [selectedCity, setSelectedCity] = useState<string | null>(null);
+  const [appliedFilters, setAppliedFilters] = useState<ListPropertiesParams>(
+    {},
+  );
+
+  const queryParams = useMemo<ListPropertiesParams>(
+    () => ({
+      sort_by: "date_created",
+      sort_order: "desc",
+      ...appliedFilters,
+    }),
+    [appliedFilters],
+  );
+
   const {
     properties,
     isPropertiesLoading,
@@ -85,15 +108,10 @@ export default function RenterHome() {
     fetchMoreProperties,
     refetchProperties,
   } = useListProperties({
-    params: {
-      sort_by: "date_created",
-      sort_order: "desc",
-    },
+    params: queryParams,
     pageSize: 20,
     enabled: true,
   });
-  const { bookmarkedPropertyIds } = useMyBookmarks({ enabled: true });
-  const { togglePropertyBookmarkMutation } = useTogglePropertyBookmark();
 
   const formatCurrency = (amount: number) =>
     `NGN ${new Intl.NumberFormat("en-NG").format(amount || 0)}`;
@@ -180,10 +198,6 @@ export default function RenterHome() {
   );
   const recommendedCards = useMemo(() => nearbyCards, [nearbyCards]);
   const canViewMoreNearby = nearbyCards.length > 10 && !showAllNearby;
-  const bookmarkedSet = useMemo(
-    () => new Set(bookmarkedPropertyIds),
-    [bookmarkedPropertyIds],
-  );
 
   useEffect(() => {
     setShowAllNearby(false);
@@ -201,57 +215,79 @@ export default function RenterHome() {
     fetchMoreProperties();
   };
 
-  const isBookmarked = (propertyId: string) =>
-    bookmarkOverrides[propertyId] ?? bookmarkedSet.has(propertyId);
+  const cities = ["Abuja", "Port Harcourt", "Lagos", "Owerri"];
 
-  const handleToggleBookmark = async (propertyId: string) => {
-    if (bookmarkPendingIds[propertyId]) return;
-    const current = isBookmarked(propertyId);
-
-    setBookmarkPendingIds((prev) => ({ ...prev, [propertyId]: true }));
-    setBookmarkOverrides((prev) => ({ ...prev, [propertyId]: !current }));
-
-    try {
-      const response = await togglePropertyBookmarkMutation({ propertyId });
-      const next =
-        response.bookmarked.status === "added"
-          ? true
-          : response.bookmarked.status === "removed"
-            ? false
-            : !current;
-      setBookmarkOverrides((prev) => ({ ...prev, [propertyId]: next }));
-    } catch {
-      setBookmarkOverrides((prev) => ({ ...prev, [propertyId]: current }));
-    } finally {
-      setBookmarkPendingIds((prev) => ({ ...prev, [propertyId]: false }));
-    }
+  const openCity = () => {
+    setShowFilterModal(false);
+    setShowCityModal(true);
   };
 
-  //bottom sheet handlers
-  const [type, setType] = useState("Any");
-  const [rooms, setRooms] = useState(0);
-  const [baths, setBaths] = useState(0);
+  const handleCityBack = () => {
+    setShowCityModal(false);
+    setShowFilterModal(true);
+  };
 
-  const openCity = () => {};
+  const handleCityClose = () => {
+    setShowCityModal(false);
+    setShowFilterModal(false);
+  };
+
+  const handleSelectCity = (city: string) => {
+    setSelectedCity(city);
+    setShowCityModal(false);
+    setShowFilterModal(true);
+  };
+
   const openNeighborhood = () => {};
   const clear = () => {
     setType("Any");
     setRooms(0);
     setBaths(0);
+    setMinBudget(DEFAULT_MIN_BUDGET);
+    setMaxBudget(DEFAULT_MAX_BUDGET);
+    setSelectedAmenities([]);
+    setSelectedCity(null);
+    setAppliedFilters(searchText.trim() ? { q: searchText.trim() } : {});
+  };
+
+  const handleAddFilter = () => setShowFilterModal(true);
+
+  const buildFilterParams = (): ListPropertiesParams => {
+    const trimmedSearch = searchText.trim();
+    const params: ListPropertiesParams = {};
+    const mappedType = FILTER_TYPE_MAP[type];
+
+    if (trimmedSearch) params.q = trimmedSearch;
+    if (selectedCity) params.city = selectedCity;
+    if (mappedType) params.property_type = mappedType;
+    if (minBudget > DEFAULT_MIN_BUDGET) params.min_price = minBudget;
+    if (maxBudget < DEFAULT_MAX_BUDGET && maxBudget >= minBudget) {
+      params.max_price = maxBudget;
+    }
+    if (selectedAmenities.length > 0) {
+      params.amenities_contain = selectedAmenities.join(",");
+    }
+
+    return params;
   };
 
   const apply = () => {
-    addFilterRef.current?.dismiss();
-  };
-  const addFilterRef = useRef<BottomSheetModal>(null);
-
-  const anim = useSharedValue(0);
-
-  const handleAddFilter = () => {
-    addFilterRef.current?.present();
+    setAppliedFilters(buildFilterParams());
+    setShowFilterModal(false);
   };
 
-  const snapPoints = useMemo(() => ["25%", "50%", "75%", "90%"], []);
+  const handleSearchSubmit = (value: string) => {
+    const trimmedSearch = value.trim();
+    setAppliedFilters((prev) => {
+      const next = { ...prev };
+      if (trimmedSearch) {
+        next.q = trimmedSearch;
+      } else {
+        delete next.q;
+      }
+      return next;
+    });
+  };
 
   return (
     <SafeAreaViewContainer disableBottom>
@@ -275,7 +311,14 @@ export default function RenterHome() {
             </View>
           }
         />
-        <Filter size="small" showFilter onFilterPress={handleAddFilter} />
+        <Filter
+          size="small"
+          value={searchText}
+          onChangeText={setSearchText}
+          onSubmit={handleSearchSubmit}
+          showFilter
+          onFilterPress={handleAddFilter}
+        />
       </View>
 
       <FlatList
@@ -339,9 +382,6 @@ export default function RenterHome() {
                 <HouseCard
                   {...item}
                   showBookmark
-                  isBookmarked={isBookmarked(item.id)}
-                  bookmarkDisabled={!!bookmarkPendingIds[item.id]}
-                  onToggleBookmark={() => handleToggleBookmark(item.id)}
                   onPress={() => handleOpenProperty(item)}
                 />
               )}
@@ -407,18 +447,17 @@ export default function RenterHome() {
                     />
                   </View>
                 ))
-              : (showAllNearby ? nearbyCards : nearbyCardsPreview).map((item) => (
-                  <View key={`nearby-${item.id}`} className="pb-4">
-                    <HouseCard
-                      {...item}
-                      showBookmark
-                      isBookmarked={isBookmarked(item.id)}
-                      bookmarkDisabled={!!bookmarkPendingIds[item.id]}
-                      onToggleBookmark={() => handleToggleBookmark(item.id)}
-                      onPress={() => handleOpenProperty(item)}
-                    />
-                  </View>
-                ))}
+              : (showAllNearby ? nearbyCards : nearbyCardsPreview).map(
+                  (item) => (
+                    <View key={`nearby-${item.id}`} className="pb-4">
+                      <HouseCard
+                        {...item}
+                        showBookmark
+                        onPress={() => handleOpenProperty(item)}
+                      />
+                    </View>
+                  ),
+                )}
 
             {canViewMoreNearby ? (
               <View className="pb-6">
@@ -464,9 +503,6 @@ export default function RenterHome() {
                 <HouseCard
                   {...item}
                   showBookmark
-                  isBookmarked={isBookmarked(item.id)}
-                  bookmarkDisabled={!!bookmarkPendingIds[item.id]}
-                  onToggleBookmark={() => handleToggleBookmark(item.id)}
                   onPress={() => handleOpenProperty(item)}
                 />
               )}
@@ -511,9 +547,6 @@ export default function RenterHome() {
             <HouseCard
               {...item}
               showBookmark
-              isBookmarked={isBookmarked(item.id)}
-              bookmarkDisabled={!!bookmarkPendingIds[item.id]}
-              onToggleBookmark={() => handleToggleBookmark(item.id)}
               onPress={() => handleOpenProperty(item)}
             />
           </View>
@@ -563,29 +596,99 @@ export default function RenterHome() {
 
       {/* Filter Bottom Sheet */}
 
-      <CustomBottomSheet
-        bottomSheetProps={{
-          ref: addFilterRef,
-          snapPoints,
-          index: -1,
-          enableContentPanningGesture: true,
-          enableHandlePanningGesture: true,
-          enablePanDownToClose: true,
-        }}
+      <Modal
+        visible={showFilterModal}
+        transparent
+        animationType="slide"
+        onRequestClose={() => setShowFilterModal(false)}
       >
-        <FilterBottomSheets
-          selectedType={type}
-          onSelectType={setType}
-          rooms={rooms}
-          setRooms={setRooms}
-          baths={baths}
-          setBaths={setBaths}
-          onPressCity={openCity}
-          onPressNeighborhood={openNeighborhood}
-          onClear={clear}
-          onApply={apply}
-        />
-      </CustomBottomSheet>
+        <Pressable
+          style={homeStyles.filterModalOverlay}
+          onPress={() => setShowFilterModal(false)}
+        >
+          <Pressable
+            style={homeStyles.filterBottomSheet}
+            onPress={(e) => e.stopPropagation()}
+          >
+            <View style={homeStyles.modalHandle} />
+            <FilterBottomSheets
+              selectedType={type}
+              onSelectType={setType}
+              rooms={rooms}
+              setRooms={setRooms}
+              baths={baths}
+              setBaths={setBaths}
+              minBudget={minBudget}
+              maxBudget={maxBudget}
+              onBudgetChange={(min, max) => {
+                setMinBudget(min);
+                setMaxBudget(max);
+              }}
+              selectedAmenities={selectedAmenities}
+              onToggleAmenity={(amenity) =>
+                setSelectedAmenities((prev) =>
+                  prev.includes(amenity)
+                    ? prev.filter((a) => a !== amenity)
+                    : [...prev, amenity],
+                )
+              }
+              onPressCity={openCity}
+              onPressNeighborhood={openNeighborhood}
+              onClear={clear}
+              onApply={apply}
+              selectedCity={selectedCity}
+            />
+          </Pressable>
+        </Pressable>
+      </Modal>
+
+      {/* City Selection Modal */}
+      {/* City Selection Modal - Bottom Sheet */}
+      <Modal
+        visible={showCityModal}
+        transparent
+        animationType="slide"
+        onRequestClose={handleCityBack}
+      >
+        <Pressable
+          style={homeStyles.cityModalOverlay}
+          onPress={handleCityClose}
+        >
+          <Pressable
+            style={homeStyles.cityBottomSheet}
+            onPress={(e) => e.stopPropagation()}
+          >
+            <View style={homeStyles.modalHandle} />
+
+            <View style={homeStyles.cityModalHeader}>
+              <Pressable onPress={handleCityBack}>
+                <Image
+                  source={require("@/assets/icons/arrow-left-light.png")}
+                  style={homeStyles.cityBackIcon}
+                />
+              </Pressable>
+              <Text style={homeStyles.cityModalTitle}>City</Text>
+              <Pressable onPress={handleCityClose}>
+                <Text style={homeStyles.cityCloseIcon}>✕</Text>
+              </Pressable>
+            </View>
+
+            <View style={homeStyles.cityListContainer}>
+              {cities.map((city) => {
+                const isSelected = selectedCity === city;
+                return (
+                  <SimpleSelector
+                    onChange={() => handleSelectCity(city)}
+                    isChecked={isSelected}
+                    title={city}
+                    key={city}
+                  />
+                );
+              })}
+            </View>
+          </Pressable>
+        </Pressable>
+      </Modal>
     </SafeAreaViewContainer>
   );
 }
@@ -608,6 +711,97 @@ const styles = (colors: ColorScheme) =>
     text: {
       fontSize: RFValue(14),
       lineHeight: RFValue(20),
+      color: colors.slate[650],
+    },
+    filterModalOverlay: {
+      flex: 1,
+      backgroundColor: "rgba(0, 0, 0, 0.5)",
+      justifyContent: "flex-end",
+    },
+    filterBottomSheet: {
+      backgroundColor: colors.background,
+      borderTopLeftRadius: RFValue(24),
+      borderTopRightRadius: RFValue(24),
+      height: "90%",
+    },
+    modalHandle: {
+      width: RFValue(40),
+      height: RFValue(4),
+      backgroundColor: colors.slate[300],
+      borderRadius: RFValue(2),
+      alignSelf: "center",
+      marginVertical: RFValue(12),
+    },
+    cityModalOverlay: {
+      flex: 1,
+      backgroundColor: "rgba(0, 0, 0, 0.5)",
+      justifyContent: "flex-end",
+    },
+    cityBottomSheet: {
+      backgroundColor: colors.background,
+      borderTopLeftRadius: RFValue(24),
+      borderTopRightRadius: RFValue(24),
+      height: "50%",
+    },
+    cityModalHeader: {
+      flexDirection: "row",
+      alignItems: "center",
+      justifyContent: "space-between",
+      paddingHorizontal: RFValue(16),
+      paddingBottom: RFValue(16),
+    },
+    cityBackIcon: {
+      width: RFValue(20),
+      height: RFValue(20),
+      tintColor: colors.slate[650],
+    },
+    cityModalTitle: {
+      fontSize: RFValue(17),
+      fontWeight: "700",
+      color: colors.slate[650],
+    },
+    cityCloseIcon: {
+      fontSize: RFValue(18),
+      color: colors.slate[650],
+    },
+    cityListContainer: {
+      paddingHorizontal: RFValue(16),
+      gap: RFValue(12),
+    },
+    cityModalContainer: {
+      flex: 1,
+    },
+
+    cityRow: {
+      flexDirection: "row",
+      alignItems: "center",
+      padding: RFValue(16),
+      backgroundColor: colors.slate[150],
+      borderRadius: RFValue(12),
+      borderWidth: 1,
+      borderColor: colors.slate[300],
+      gap: RFValue(12),
+    },
+    cityRadio: {
+      width: RFValue(20),
+      height: RFValue(20),
+      borderRadius: RFValue(10),
+      borderWidth: 2,
+      borderColor: colors.slate[400],
+      alignItems: "center",
+      justifyContent: "center",
+    },
+    cityRadioSelected: {
+      borderColor: colors.slate[650],
+    },
+    cityRadioInner: {
+      width: RFValue(10),
+      height: RFValue(10),
+      borderRadius: RFValue(5),
+      backgroundColor: colors.slate[650],
+    },
+    cityRowText: {
+      fontSize: RFValue(14),
       color: colors.slate[650],
     },
   });

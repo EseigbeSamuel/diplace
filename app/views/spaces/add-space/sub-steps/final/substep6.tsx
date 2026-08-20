@@ -21,9 +21,9 @@ import { showToast } from "@/lib";
 import MapView, { Marker } from "react-native-maps";
 import { CustomBottomSheet } from "@/components/bottom-sheet";
 import { BottomSheetModal } from "@gorhom/bottom-sheet";
+import { HAS_GOOGLE_MAPS_API_KEY } from "@/constants/google";
 
 const { width } = Dimensions.get("window");
-const HAS_GOOGLE_KEY = !!process.env.EXPO_PUBLIC_GOOGLE_PLACES_API_KEY;
 
 interface SpacePreviewScreenProps {
   onNext?: () => void;
@@ -299,7 +299,7 @@ const SpacePreviewScreen: React.FC<SpacePreviewScreenProps> = ({
 
           {/* Map Placeholder */}
           <View style={styles.mapContainer}>
-            {HAS_GOOGLE_KEY ? (
+            {HAS_GOOGLE_MAPS_API_KEY ? (
               <MapView
                 style={{ flex: 1 }}
                 initialRegion={{
@@ -553,7 +553,7 @@ const SpacePreviewScreen: React.FC<SpacePreviewScreenProps> = ({
       >
         <View style={styles.fullMapContainer}>
           {/* The Map */}
-          {HAS_GOOGLE_KEY ? (
+          {HAS_GOOGLE_MAPS_API_KEY ? (
             <MapView
               style={{ flex: 1 }}
               initialRegion={{

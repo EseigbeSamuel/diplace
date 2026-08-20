@@ -1,6 +1,6 @@
 import { useTheme } from "@/contexts/themeContext";
 import { ColorScheme } from "@/utils";
-import React, { useState } from "react";
+import React from "react";
 import {
   GestureResponderEvent,
   Image,
@@ -8,12 +8,13 @@ import {
   Pressable,
   StyleSheet,
   Text,
-  TouchableOpacity,
   View,
 } from "react-native";
 import { RFValue } from "react-native-responsive-fontsize";
+import BookmarkButton from "../bookmark";
 
 const HouseCard = ({
+  id,
   imageSource,
   title,
   location,
@@ -22,9 +23,6 @@ const HouseCard = ({
   duration,
   type,
   showBookmark = false,
-  isBookmarked,
-  onToggleBookmark,
-  bookmarkDisabled = false,
   onPress,
 }: {
   imageSource: ImageSourcePropType;
@@ -35,25 +33,12 @@ const HouseCard = ({
   duration: string;
   type?: "featured" | "nearby";
   showBookmark?: boolean;
-  isBookmarked?: boolean;
-  onToggleBookmark?: () => void;
-  bookmarkDisabled?: boolean;
+  id: string;
+
   onPress?: ((event: GestureResponderEvent) => void) | null | undefined;
 }) => {
   const { colors, isDarkMode } = useTheme();
   const homeStyles = styles(colors);
-  const [internalBookmarked, setInternalBookmarked] = useState(false);
-  const bookmarked =
-    typeof isBookmarked === "boolean" ? isBookmarked : internalBookmarked;
-
-  const handleBookmarkPress = () => {
-    if (bookmarkDisabled) return;
-    if (onToggleBookmark) {
-      onToggleBookmark();
-      return;
-    }
-    setInternalBookmarked((prev) => !prev);
-  };
 
   const renderBadge = () => {
     switch (badgeType) {
@@ -187,7 +172,11 @@ const HouseCard = ({
       <View className="flex-1 gap-0.5">
         <View className="rounded-2xl">
           <Image
-            source={imageSource}
+            source={
+              !(imageSource as any) || (imageSource as any)["uri"].length < 7
+                ? require("@/assets/images/diplace.jpg")
+                : imageSource
+            }
             style={{
               height: RFValue(155),
               width: "100%",
@@ -205,25 +194,7 @@ const HouseCard = ({
               >
                 {title}
               </Text>
-              {showBookmark ? (
-                <TouchableOpacity
-                  onPress={handleBookmarkPress}
-                  disabled={bookmarkDisabled}
-                  hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
-                  className="pt-0.5"
-                >
-                  <Image
-                    source={
-                      bookmarked
-                        ? require("@/assets/icons/bookmark-light-active.png")
-                        : isDarkMode
-                          ? require("@/assets/icons/bookmark-inactive-white.png")
-                          : require("@/assets/icons/bookmark-inactive.png")
-                    }
-                    style={{ height: RFValue(22), width: RFValue(17) }}
-                  />
-                </TouchableOpacity>
-              ) : null}
+              {showBookmark ? <BookmarkButton id={id} /> : null}
             </View>
             <View className="flex flex-row items-center gap-1 pt-1">
               {/* <Image

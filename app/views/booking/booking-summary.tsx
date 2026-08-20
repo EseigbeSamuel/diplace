@@ -14,36 +14,50 @@ import { useTheme } from "@/contexts/themeContext";
 import { ColorScheme } from "@/utils";
 import { useRouter, useLocalSearchParams } from "expo-router";
 import AppButton from "@/components/button";
+import { useCreateBooking } from "@/hooks";
+import { BookingPropertyType } from "@/types";
 
 const BookingSummary = () => {
   const router = useRouter();
-  const params = useLocalSearchParams();
+  const params = useLocalSearchParams<Record<string, string>>();
   const { colors } = useTheme();
   const styles = getStyles(colors);
+  const { createBookingMutation, isCreateBookingPending } = useCreateBooking();
 
   const [showReserveModal, setShowReserveModal] = useState(false);
   const [showFullPaymentModal, setShowFullPaymentModal] = useState(false);
   const [agreedToTerms, setAgreedToTerms] = useState(false);
 
-  // Mock data - would come from params in production
+  const formatMoney = (value: number) =>
+    `₦${new Intl.NumberFormat("en-NG").format(value)}`;
+
+  const amountValue = Number(params.amountValue) || 0;
+  const reservationAmount = Math.round(amountValue * 0.2);
+
   const bookingData = {
-    totalAmount: "₦1,256,000.00",
-    propertyName: "Atraz Palace Event Hall",
-    propertyLocation: "GRA Phase II, Port Harcourt",
-    propertyPrice: "₦400,000/day",
-    propertyImage: require("@/assets/images/featuredSpaceImage1.png"),
-    rentDays: 3,
-    rentAmount: "₦1,200,000.00",
-    cautionFee: "₦50,000.00",
-    platformFee: "₦6,000.00",
-    renterName: params.fullName || "Rhema Generation Inc.",
-    renterOccupation: params.occupation || "Event Planner",
-    renterEmail: params.email || "info@rgworld.com",
-    renterPhone: params.phoneNumber || "+234-810-293-4980",
-    eventType: params.eventType || "Wedding & Engagement",
-    eventDates: "Thu. 17 Aug. - Sat. 19 Aug. 2025",
-    eventDuration: "Full work day (8 hours)",
-    reservationFee: "₦251,200.00", // 20% of total
+    totalAmount: params.totalAmount || formatMoney(amountValue),
+    propertyName: params.propertyName || "Property",
+    propertyLocation: params.propertyLocation || "",
+    propertyPrice: params.propertyPrice || params.rentAmount || formatMoney(0),
+    propertyImage: params.propertyImage
+      ? { uri: params.propertyImage }
+      : require("@/assets/images/featuredSpaceImage1.png"),
+    rentDays: Number(params.numberOfDays || params.rentDays) || 1,
+    rentAmount: params.rentAmount || params.propertyPrice || formatMoney(0),
+    cautionFee: params.cautionFee || formatMoney(0),
+    platformFee: params.platformFee || formatMoney(0),
+    renterName: params.fullName || "",
+    renterOccupation: params.occupation || "",
+    renterEmail: params.email || "",
+    renterPhone: params.phoneNumber || "",
+    eventType: params.eventType || "Booking",
+    eventDates:
+      params.startDate && params.endDate
+        ? `${params.startDate} - ${params.endDate}`
+        : params.startDate || "",
+    eventDuration: params.duration ? `${params.duration} hours` : "",
+    reservationFee: formatMoney(reservationAmount),
+    reservationAmount,
   };
 
   const handleConfirmPayment = () => {
@@ -54,7 +68,27 @@ const BookingSummary = () => {
     setShowReserveModal(true);
   };
 
-  const handlePaymentRoute = (type: string) => {
+  const handlePaymentRoute = async (type: string) => {
+    const booking = await createBookingMutation({
+      property_id: params.propertyId || "",
+      agreed_to_terms: true,
+      details: {
+        type: (params.propertyType || "apartment") as BookingPropertyType,
+        full_name: bookingData.renterName,
+        occupation: bookingData.renterOccupation,
+        email: bookingData.renterEmail,
+        phone: bookingData.renterPhone,
+        rent_duration: bookingData.rentDays,
+        move_in_date: params.startDate || new Date().toISOString().slice(0, 10),
+        adults: Number(params.adults) || 1,
+        children: Number(params.children) || 0,
+        other_details: params.notes || "",
+      },
+    });
+
+    const paymentAmount =
+      type === "reserve" ? bookingData.reservationAmount : amountValue;
+
     router.push({
       pathname: "/views/booking/payment",
       params: {
@@ -63,6 +97,9 @@ const BookingSummary = () => {
           type === "reserve"
             ? bookingData.reservationFee
             : bookingData.totalAmount,
+        amountValue: String(paymentAmount),
+        relatedId: booking.public_id,
+        purpose: type === "reserve" ? "reservation_fee" : "booking_fee",
       },
     });
   };
@@ -224,12 +261,14 @@ const BookingSummary = () => {
       <View style={styles.footer}>
         <AppButton
           onPress={handleConfirmPayment}
-          title="Confirm & Pay in Full"
+          title={isCreateBookingPending ? "Creating Booking..." : "Confirm & Pay in Full"}
+          disabled={isCreateBookingPending}
         />
         <AppButton
           onPress={handleReserveNow}
-          title="Reserve with Partial Payment"
+          title={isCreateBookingPending ? "Creating Booking..." : "Reserve with Partial Payment"}
           variant="secondary"
+          disabled={isCreateBookingPending}
         />
       </View>
 
@@ -299,7 +338,8 @@ const BookingSummary = () => {
                   setShowReserveModal(false);
                   handlePaymentRoute("reserve");
                 }}
-                title="Make Payment"
+                title={isCreateBookingPending ? "Creating Booking..." : "Make Payment"}
+                disabled={!agreedToTerms || isCreateBookingPending}
               />
             </View>
           </Pressable>
@@ -329,7 +369,8 @@ const BookingSummary = () => {
                   setShowFullPaymentModal(false);
                   handlePaymentRoute("full");
                 }}
-                title="Confirm with Full Payment"
+                title={isCreateBookingPending ? "Creating Booking..." : "Confirm with Full Payment"}
+                disabled={isCreateBookingPending}
               />
               <AppButton
                 onPress={() => {

@@ -1,7 +1,11 @@
-import { WebView } from "react-native-webview";
+import {
+  GOOGLE_MAPS_API_KEY,
+  HAS_GOOGLE_MAPS_API_KEY,
+} from "@/constants/google";
 import { useLocalSearchParams } from "expo-router";
-import { View, Text, StyleSheet, ActivityIndicator } from "react-native";
-import { useState } from "react";
+import React, { useState } from "react";
+import { ActivityIndicator, StyleSheet, Text, View } from "react-native";
+import { WebView } from "react-native-webview";
 
 export default function StreetView() {
   const { lat, lng } = useLocalSearchParams();
@@ -10,48 +14,50 @@ export default function StreetView() {
 
   const latitude = parseFloat(lat as string);
   const longitude = parseFloat(lng as string);
+  const hasValidCoordinates =
+    Number.isFinite(latitude) && Number.isFinite(longitude);
 
-  // Full immersive Street View URL - this gives you the 360° panorama view
-  const streetViewUrl = `https://www.google.com/maps/@${latitude},${longitude},3a,75y,0h,90t/data=!3m7!1e1!3m5!1s0!2e0!6shttps:%2F%2Fstreetviewpixels-pa.googleapis.com%2Fv1%2Fthumbnail!7i16384!8i8192`;
-
-  // Alternative simpler URL that also works
-  const simpleUrl = `https://www.google.com/maps/@?api=1&map_action=pano&viewpoint=${latitude},${longitude}`;
+  const streetViewUrl =
+    HAS_GOOGLE_MAPS_API_KEY && hasValidCoordinates
+      ? `https://www.google.com/maps/embed/v1/streetview?key=${GOOGLE_MAPS_API_KEY}&location=${latitude},${longitude}&heading=0&pitch=0&fov=90`
+      : `https://www.google.com/maps/@?api=1&map_action=pano&viewpoint=${latitude},${longitude}`;
 
   return (
     <View style={{ flex: 1 }}>
-      {loading && (
+      {loading && hasValidCoordinates && !error && (
         <View style={styles.loadingContainer}>
           <ActivityIndicator size="large" color="#0066CC" />
           <Text style={styles.loadingText}>Loading Street View...</Text>
         </View>
       )}
 
-      {error && (
+      {(error || !hasValidCoordinates) && (
         <View style={styles.errorContainer}>
           <Text style={styles.errorText}>
-            Street View not available for this location
+            Street View not available for this location.
           </Text>
         </View>
       )}
 
-      <WebView
-        source={{ uri: simpleUrl }}
-        style={{ flex: 1 }}
-        onLoadStart={() => setLoading(true)}
-        onLoadEnd={() => setLoading(false)}
-        onError={() => {
-          setLoading(false);
-          setError(true);
-        }}
-        startInLoadingState={true}
-        javaScriptEnabled={true}
-        domStorageEnabled={true}
-        allowsFullscreenVideo={true}
-        mediaPlaybackRequiresUserAction={false}
-        // Important for Street View interaction
-        bounces={false}
-        scrollEnabled={true}
-      />
+      {hasValidCoordinates && !error && (
+        <WebView
+          source={{ uri: streetViewUrl }}
+          style={{ flex: 1 }}
+          onLoadStart={() => setLoading(true)}
+          onLoadEnd={() => setLoading(false)}
+          onError={() => {
+            setLoading(false);
+            setError(true);
+          }}
+          startInLoadingState={true}
+          javaScriptEnabled={true}
+          domStorageEnabled={true}
+          allowsFullscreenVideo={true}
+          mediaPlaybackRequiresUserAction={false}
+          bounces={false}
+          scrollEnabled={true}
+        />
+      )}
     </View>
   );
 }

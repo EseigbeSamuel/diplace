@@ -30,6 +30,39 @@ type InitiateVerificationResponse = {
   face_verification_params?: Record<string, unknown> | null;
 };
 
+type ResendVerificationResponse = {
+  message?: string;
+  detail?: string;
+  success?: boolean;
+};
+
+const getApiErrorMessage = (error: unknown) => {
+  if (!axios.isAxiosError(error)) return null;
+
+  const responseData = error.response?.data;
+
+  return (
+    responseData?.detail ||
+    responseData?.message ||
+    responseData?.error ||
+    error.message ||
+    null
+  );
+};
+
+const shouldResendVerificationEmail = (error: unknown) => {
+  if (!axios.isAxiosError(error)) return false;
+
+  const status = error.response?.status;
+  const message = String(getApiErrorMessage(error) || "").toLowerCase();
+
+  return (
+    status === 403 ||
+    message.includes("account is not active") ||
+    message.includes("email is not verified")
+  );
+};
+
 export function useLogin() {
   const queryClient = useQueryClient();
   const router = useRouter();
@@ -53,6 +86,7 @@ export function useLogin() {
         headers: {
           "Content-Type": "application/x-www-form-urlencoded",
         },
+        notifyOnError: false,
       });
     },
 
@@ -93,13 +127,47 @@ export function useLogin() {
       }
     },
 
-    onError: (error) => {
-      const message = axios.isAxiosError(error)
-        ? error.response?.data?.detail ||
-          error.response?.data?.message ||
-          error.message ||
-          "Login failed. Please check your credentials."
-        : "Login failed. Please check your credentials.";
+    onError: async (error, variables) => {
+      if (shouldResendVerificationEmail(error)) {
+        const email = variables.username.trim();
+
+        try {
+          const response = await postRequest<
+            ResendVerificationResponse,
+            Record<string, never>
+          >({
+            url: `/users/resend-verification-email/${encodeURIComponent(email)}`,
+            payload: {},
+            protectedRoute: false,
+            notifyOnError: false,
+          });
+
+          showToast({
+            type: "success",
+            text1: "Verification Email Sent",
+            text2:
+              response?.message ||
+              response?.detail ||
+              `A verification email has been sent to ${email}.`,
+          });
+          return;
+        } catch (resendError) {
+          const resendMessage =
+            getApiErrorMessage(resendError) ||
+            "Unable to resend verification email. Please try again.";
+
+          showToast({
+            type: "error",
+            text1: "Verification Email Failed",
+            text2: String(resendMessage),
+          });
+          return;
+        }
+      }
+
+      const message =
+        getApiErrorMessage(error) ||
+        "Login failed. Please check your credentials.";
 
       showToast({
         type: "error",

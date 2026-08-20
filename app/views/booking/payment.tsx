@@ -2,6 +2,7 @@ import AppButton from "@/components/button";
 import SafeAreaViewContainer from "@/components/safeareaview";
 import TextField from "@/components/textfield";
 import { useTheme } from "@/contexts/themeContext";
+import { useInitiateBookingPayment } from "@/hooks";
 import { ColorScheme } from "@/utils";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import React, { useState } from "react";
@@ -14,6 +15,7 @@ import {
   Switch,
   Text,
   View,
+  Linking,
 } from "react-native";
 import { RFValue } from "react-native-responsive-fontsize";
 
@@ -21,9 +23,13 @@ type PaymentMethod = "card" | "bank" | "ussd" | null;
 
 const PaymentScreen = () => {
   const router = useRouter();
-  const params = useLocalSearchParams();
+  const params = useLocalSearchParams<Record<string, string>>();
   const { colors } = useTheme();
   const styles = getStyles(colors);
+  const {
+    initiateBookingPaymentMutation,
+    isInitiateBookingPaymentPending,
+  } = useInitiateBookingPayment();
 
   const [selectedPaymentMethod, setSelectedPaymentMethod] =
     useState<PaymentMethod>(null);
@@ -36,10 +42,36 @@ const PaymentScreen = () => {
     saveCard: false,
   });
 
-  // Get amount from params or use default
-  const amount = params.amount || "₦1,256,000.00";
+  const amount = params.amount || "₦0";
+  const amountValue = Number(params.amountValue) || 0;
   const isPartialPayment = params.type === "reserve";
   const isInspection = params.type === "inspection";
+
+  const initiatePayment = async (paymentMethod: Exclude<PaymentMethod, null>) => {
+    if (!params.relatedId) return;
+
+    const payment = await initiateBookingPaymentMutation({
+      related_id: params.relatedId,
+      purpose: params.purpose || "booking_fee",
+      gateway: "flutterwave",
+      amount: amountValue,
+      currency: "NGN",
+    });
+
+    if (payment.payment_link) {
+      await Linking.openURL(payment.payment_link);
+    }
+
+    router.push({
+      pathname: "/views/booking/payment-success",
+      params: {
+        txRef: payment.tx_ref,
+        gateway: payment.gateway,
+        paymentMethod,
+        amount,
+      },
+    });
+  };
 
   const handleMakePayment = () => {
     if (selectedPaymentMethod === "card") {
@@ -47,19 +79,18 @@ const PaymentScreen = () => {
     } else if (selectedPaymentMethod === "bank") {
       setShowBankModal(true);
     } else if (selectedPaymentMethod === "ussd") {
-      // Handle USSD payment
-      router.push("/views/booking/payment-success");
+      initiatePayment("ussd");
     }
   };
 
   const handleCardPayment = () => {
     setShowCardModal(false);
-    router.push("/views/booking/payment-success");
+    initiatePayment("card");
   };
 
   const handleBankTransfer = () => {
     setShowBankModal(false);
-    router.push("/views/booking/payment-success");
+    initiatePayment("bank");
   };
 
   return (
@@ -197,8 +228,8 @@ const PaymentScreen = () => {
       <View style={styles.footer}>
         <AppButton
           onPress={handleMakePayment}
-          title="Make Payment"
-          disabled={!selectedPaymentMethod}
+          title={isInitiateBookingPaymentPending ? "Initializing Payment..." : "Make Payment"}
+          disabled={!selectedPaymentMethod || isInitiateBookingPaymentPending}
         />
         <View style={styles.securePaymentNote}>
           <Text style={styles.securePaymentText}>
@@ -295,8 +326,9 @@ const PaymentScreen = () => {
               {/* Confirm Button */}
               <AppButton
                 onPress={handleCardPayment}
-                title={`Confirm & Pay (${amount})`}
+                title={isInitiateBookingPaymentPending ? "Initializing Payment..." : `Confirm & Pay (${amount})`}
                 disabled={
+                  isInitiateBookingPaymentPending ||
                   !creditData.cardNumber ||
                   !creditData.expiryDate ||
                   !creditData.cvv
@@ -383,7 +415,8 @@ const PaymentScreen = () => {
               {/* Confirm Button */}
               <AppButton
                 onPress={handleBankTransfer}
-                title={`I've sent the money (${amount})`}
+                title={isInitiateBookingPaymentPending ? "Initializing Payment..." : `I've sent the money (${amount})`}
+                disabled={isInitiateBookingPaymentPending}
               />
 
               {/* Secure Note */}

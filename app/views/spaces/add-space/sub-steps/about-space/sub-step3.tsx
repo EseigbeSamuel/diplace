@@ -20,6 +20,10 @@ import { useTheme } from "@/contexts/themeContext";
 import { useSpaceStore } from "@/store/useSpace";
 import { ColorScheme } from "@/utils";
 import { LocationData } from "@/types/add-space-types";
+import {
+  GOOGLE_MAPS_API_KEY,
+  HAS_GOOGLE_MAPS_API_KEY,
+} from "@/constants/google";
 
 interface LocationPickerSubstepProps {
   onNext: () => void;
@@ -34,9 +38,6 @@ interface PlaceSuggestion {
     secondary_text: string;
   };
 }
-
-const GOOGLE_PLACES_API_KEY = process.env.EXPO_PUBLIC_GOOGLE_PLACES_API_KEY;
-const HAS_GOOGLE_KEY = !!GOOGLE_PLACES_API_KEY;
 
 const LocationPickerSubstep: React.FC<LocationPickerSubstepProps> = ({
   onNext,
@@ -82,7 +83,7 @@ const LocationPickerSubstep: React.FC<LocationPickerSubstepProps> = ({
 
   // Fetch place suggestions from Google Places API
   const fetchPlaceSuggestions = async (query: string) => {
-    if (!GOOGLE_PLACES_API_KEY) {
+    if (!HAS_GOOGLE_MAPS_API_KEY) {
       setSuggestions([]);
       return;
     }
@@ -96,7 +97,7 @@ const LocationPickerSubstep: React.FC<LocationPickerSubstepProps> = ({
       const response = await fetch(
         `https://maps.googleapis.com/maps/api/place/autocomplete/json?input=${encodeURIComponent(
           query
-        )}&key=${GOOGLE_PLACES_API_KEY}&components=country:ng`
+        )}&key=${GOOGLE_MAPS_API_KEY}&components=country:ng`
       );
 
       const data = await response.json();
@@ -129,12 +130,12 @@ const LocationPickerSubstep: React.FC<LocationPickerSubstepProps> = ({
 
   // Get place details from Google Places API
   const getPlaceDetails = async (placeId: string) => {
-    if (!GOOGLE_PLACES_API_KEY) {
+    if (!HAS_GOOGLE_MAPS_API_KEY) {
       return null;
     }
     try {
       const response = await fetch(
-        `https://maps.googleapis.com/maps/api/place/details/json?place_id=${placeId}&fields=address_components,geometry,formatted_address&key=${GOOGLE_PLACES_API_KEY}`
+        `https://maps.googleapis.com/maps/api/place/details/json?place_id=${placeId}&fields=address_components,geometry,formatted_address&key=${GOOGLE_MAPS_API_KEY}`
       );
 
       const data = await response.json();
@@ -361,7 +362,7 @@ const LocationPickerSubstep: React.FC<LocationPickerSubstepProps> = ({
             {selectedLocation?.address || "Enter the address"}
           </Text>
         </Pressable>
-        {HAS_GOOGLE_KEY ? (
+        {HAS_GOOGLE_MAPS_API_KEY ? (
           <MapView
             ref={mapRef}
             style={styles.map}
@@ -473,7 +474,7 @@ const LocationPickerSubstep: React.FC<LocationPickerSubstepProps> = ({
             <Text style={styles.liveLocationText}>Use live location</Text>
           </Pressable>
 
-          {!HAS_GOOGLE_KEY && (
+          {!HAS_GOOGLE_MAPS_API_KEY && (
             <View style={styles.noResultsContainer}>
               <Text style={styles.noResultsText}>
                 Search suggestions unavailable. You can still use live location
@@ -533,7 +534,7 @@ const LocationPickerSubstep: React.FC<LocationPickerSubstepProps> = ({
             {!isLoadingSuggestions &&
               suggestions.length === 0 &&
               searchQuery.length >= 3 &&
-              HAS_GOOGLE_KEY && (
+              HAS_GOOGLE_MAPS_API_KEY && (
                 <View style={styles.noResultsContainer}>
                   <Text style={styles.noResultsText}>
                     No locations found. Try a different search term.
@@ -617,7 +618,7 @@ const LocationPickerSubstep: React.FC<LocationPickerSubstepProps> = ({
             {/* Map Preview */}
             {tempLocationData && (
               <View style={styles.mapPreview}>
-                {HAS_GOOGLE_KEY ? (
+                {HAS_GOOGLE_MAPS_API_KEY ? (
                   <MapView
                     style={styles.mapPreviewMap}
                     region={{
