@@ -68,7 +68,18 @@
           "locationWhenInUsePermission": "Allow Di Place to access your location while you are using the app."
         }
       ],
-      "react-native-vision-camera"
+      "react-native-vision-camera",
+      "@livekit/react-native-expo-plugin",
+      "@config-plugins/react-native-webrtc",
+      [
+        "expo-notifications",
+        {
+          "icon": "./assets/images/notification-icon.png",
+          "color": "#ffffff",
+          "defaultChannel": "default",
+          "sounds": []
+        }
+      ]
     ],
     "experiments": {
       "typedRoutes": true

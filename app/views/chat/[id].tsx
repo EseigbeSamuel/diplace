@@ -1,12 +1,26 @@
 import { CustomBottomSheet } from "@/components/bottom-sheet";
 import AppButton from "@/components/button";
 import SafeAreaViewContainer from "@/components/safeareaview";
+import { SimpleSelector } from "@/components/selector";
 import { useTheme } from "@/contexts/themeContext";
-import { useGetConversationMessages, useSendMessage, useChatWebSocket, WsNewMessagePayload, useGetConversations, useGetCurrentUser } from "@/hooks";
+import {
+  useChatWebSocket,
+  useGetConversationMessages,
+  useGetConversations,
+  useGetCurrentUser,
+  useSendMessage,
+  WsNewMessagePayload,
+} from "@/hooks";
 import { ColorScheme } from "@/utils";
 import { BottomSheetModal } from "@gorhom/bottom-sheet";
 import { useLocalSearchParams, useRouter } from "expo-router";
-import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import {
   Dimensions,
   FlatList,
@@ -23,7 +37,6 @@ import {
   View,
 } from "react-native";
 import ReportBottomSheet from "../report/report";
-import { SimpleSelector } from "@/components/selector";
 
 const { width: screenWidth } = Dimensions.get("window");
 
@@ -267,15 +280,18 @@ const ChatPage = () => {
   // --- API hooks ---
   const { currentUser } = useGetCurrentUser();
   const { conversations } = useGetConversations();
-  const { messages: apiMessages, isMessagesLoading } = useGetConversationMessages({
-    conversationId,
-    enabled: !!conversationId,
-  });
+  const { messages: apiMessages, isMessagesLoading } =
+    useGetConversationMessages({
+      conversationId,
+      enabled: !!conversationId,
+    });
   const { sendMessageMutation, isSendMessagePending } = useSendMessage();
 
   // Find other participant details dynamically
   const currentConversation = useMemo(() => {
-    return conversations?.conversations?.find((c) => c.public_id === conversationId);
+    return conversations?.conversations?.find(
+      (c) => c.public_id === conversationId,
+    );
   }, [conversations, conversationId]);
 
   const otherParticipant = useMemo(() => {
@@ -287,9 +303,11 @@ const ChatPage = () => {
       ? `${otherParticipant.first_name ?? ""} ${otherParticipant.last_name ?? ""}`.trim() ||
         otherParticipant.email
       : "Chat Room";
-    const avatarUri = otherParticipant?.profile_picture || "https://randomuser.me/api/portraits/men/1.jpg";
+    const avatarUri =
+      otherParticipant?.profile_picture ||
+      "https://randomuser.me/api/portraits/men/1.jpg";
     const isVerified = otherParticipant?.status === "verified";
-    
+
     return {
       name: displayName,
       avatar: avatarUri,
@@ -353,7 +371,8 @@ const ChatPage = () => {
         // If it's a message from the current user, try to find and replace the optimistic message
         if (payload.sender_id === currentUser?.public_id) {
           const optimisticIndex = prev.findIndex(
-            (m) => m.isUser && m.text === payload.content && !m.id.includes("-")
+            (m) =>
+              m.isUser && m.text === payload.content && !m.id.includes("-"),
           );
           if (optimisticIndex !== -1) {
             const next = [...prev];
@@ -387,7 +406,7 @@ const ChatPage = () => {
         ];
       });
     },
-    [conversationId, currentUser]
+    [conversationId, currentUser],
   );
 
   const { isConnected, isConnecting, sendWsMessage, markConversationRead } =
@@ -462,9 +481,7 @@ const ChatPage = () => {
         });
       } catch {
         // Roll back the optimistic message on HTTP failure too
-        setLocalMessages((prev) =>
-          prev.filter((m) => m.id !== optimisticId)
-        );
+        setLocalMessages((prev) => prev.filter((m) => m.id !== optimisticId));
       }
     }
   };
@@ -563,7 +580,9 @@ const ChatPage = () => {
                 </View>
               )}
             </View>
-            <View style={{ flexDirection: "row", alignItems: "center", gap: 6 }}>
+            <View
+              style={{ flexDirection: "row", alignItems: "center", gap: 6 }}
+            >
               <View
                 style={{
                   width: 8,
@@ -572,14 +591,18 @@ const ChatPage = () => {
                   backgroundColor: isConnecting
                     ? "#F59E0B"
                     : isConnected
-                    ? colors.success[200]
-                    : colors.error[200],
+                      ? colors.success[200]
+                      : colors.error[200],
                 }}
               />
               <Text
                 style={[styles.contactStatus, { color: colors.slate[500] }]}
               >
-                {isConnecting ? "Connecting..." : isConnected ? "Live" : "Reconnecting..."}
+                {isConnecting
+                  ? "Connecting..."
+                  : isConnected
+                    ? "Live"
+                    : "Reconnecting..."}
               </Text>
             </View>
           </View>
@@ -588,7 +611,17 @@ const ChatPage = () => {
         <View style={styles.headerActions}>
           <TouchableOpacity
             style={styles.headerButton}
-            onPress={() => router.push("/views/call/incomingCall")}
+            onPress={() =>
+              router.push({
+                pathname: "/views/call",
+                params: {
+                  conversationId,
+                  callerName: contactInfo.name,
+                  callerAvatar: contactInfo.avatar,
+                  mode: "outgoing",
+                },
+              })
+            }
           >
             {isDarkMode ? (
               <Image

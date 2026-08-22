@@ -1,6 +1,7 @@
 import ToastHost from "@/components/toast-host";
 import { ThemeProvider } from "@/contexts/themeContext";
 import { UserProvider } from "@/contexts/user-context";
+import { useIncomingCall } from "@/hooks";
 import { BottomSheetModalProvider } from "@gorhom/bottom-sheet";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { useFonts } from "expo-font";
@@ -23,6 +24,15 @@ const queryClient = new QueryClient({
   },
 });
 
+/**
+ * Inner component that can safely call hooks (needs to be inside providers).
+ * Registers push notifications and listens for incoming calls globally.
+ */
+function AppShell({ children }: { children: React.ReactNode }) {
+  useIncomingCall();
+  return <>{children}</>;
+}
+
 export default function RootLayout() {
   const [fontsLoaded] = useFonts(fontFiles);
 
@@ -35,12 +45,14 @@ export default function RootLayout() {
           <GestureHandlerRootView className="flex-1">
             <BottomSheetModalProvider>
               <UserProvider>
-                <Stack screenOptions={{ headerShown: false }}>
-                  <StatusBar style="dark" animated />
-                  <Stack.Screen name="index" />
-                  <Stack.Screen name="(tabs)" />
-                </Stack>
-                <ToastHost />
+                <AppShell>
+                  <Stack screenOptions={{ headerShown: false }}>
+                    <StatusBar style="dark" animated />
+                    <Stack.Screen name="index" />
+                    <Stack.Screen name="(tabs)" />
+                  </Stack>
+                  <ToastHost />
+                </AppShell>
               </UserProvider>
             </BottomSheetModalProvider>
           </GestureHandlerRootView>
