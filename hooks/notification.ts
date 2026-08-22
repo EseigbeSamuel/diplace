@@ -5,12 +5,18 @@ import {
   putRequest,
 } from "@/services";
 import {
+  DevicePlatform,
+  DeviceTokenPayload,
+  DeviceTokenResponse,
   ListNotificationsResponse,
   NotificationPreferences,
   NotificationStats,
 } from "@/types";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { showToast } from "@/lib";
+import { getFromLocalStore, showToast } from "@/lib";
+import * as Notifications from "expo-notifications";
+import { Platform } from "react-native";
+
 
 export function useMyNotifications({
   enabled = true,
@@ -269,3 +275,146 @@ export function useNotificationPreferences() {
     isUpdatingPreferences: isUpdating,
   };
 }
+
+export function useMyDeviceTokens({ enabled = true }: { enabled?: boolean } = {}) {
+  const query = useQuery({
+    queryKey: ["device-tokens"],
+    enabled,
+    queryFn: async () => {
+      return await getRequest<DeviceTokenResponse[]>({
+        url: "/user-notifications/device-tokens",
+        protectedRoute: true,
+      });
+    },
+  });
+
+  return {
+    deviceTokens: query.data ?? [],
+    isDeviceTokensLoading: query.isLoading,
+    deviceTokensError: query.error,
+    refetchDeviceTokens: query.refetch,
+  };
+}
+
+export function useRegisterDeviceToken() {
+  const queryClient = useQueryClient();
+  const { mutateAsync, isPending } = useMutation({
+    mutationFn: async (payload: DeviceTokenPayload) => {
+      return await postRequest<DeviceTokenResponse, DeviceTokenPayload>({
+        url: "/user-notifications/device-tokens",
+        payload,
+        protectedRoute: true,
+        notifyOnError: false,
+      });
+    },
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey: ["device-tokens"] });
+    },
+  });
+
+  return {
+    registerTokenMutation: mutateAsync,
+    isRegisteringToken: isPending,
+  };
+}
+
+export function useDeleteDeviceToken() {
+  const queryClient = useQueryClient();
+  const { mutateAsync, isPending } = useMutation({
+    mutationFn: async ({ token }: { token: string }) => {
+      return await deleteRequest<any>({
+        url: `/user-notifications/device-tokens/${encodeURIComponent(token)}`,
+        protectedRoute: true,
+      });
+    },
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey: ["device-tokens"] });
+    },
+    onError: (error) => {
+      const message =
+        error instanceof Error ? error.message : "Unable to remove device token.";
+      showToast({
+        type: "error",
+        text1: "Error",
+        text2: message,
+      });
+    },
+  });
+
+  return {
+    deleteTokenMutation: mutateAsync,
+    isDeletingToken: isPending,
+  };
+}
+
+function getPlatformEnum(): DevicePlatform {
+  switch (Platform.OS) {
+    case "ios":
+      return "ios";
+    case "android":
+      return "android";
+    case "web":
+      return "web";
+    default:
+      return "unknown";
+  }
+}
+
+export async function requestExpoPushToken(): Promise<string | null> {
+  try {
+    const { status: existingStatus } = await Notifications.getPermissionsAsync();
+    let finalStatus = existingStatus;
+
+    if (existingStatus !== "granted") {
+      const { status } = await Notifications.requestPermissionsAsync();
+      finalStatus = status;
+    }
+
+    if (finalStatus !== "granted") {
+      return null;
+    }
+
+    if (Platform.OS === "android") {
+      await Notifications.setNotificationChannelAsync("default", {
+        name: "Default",
+        importance: Notifications.AndroidImportance.MAX,
+        vibrationPattern: [0, 250, 250, 250],
+        lightColor: "#22C55E",
+        sound: "default",
+      });
+    }
+
+    const tokenData = await Notifications.getExpoPushTokenAsync();
+    return tokenData.data;
+  } catch (err) {
+    console.warn("[PushNotification] Error requesting Expo push token:", err);
+    return null;
+  }
+}
+
+export function useRegisterPushToken() {
+  const { registerTokenMutation } = useRegisterDeviceToken();
+
+  const registerPushToken = async () => {
+    try {
+      const token = await requestExpoPushToken();
+      if (!token) return null;
+
+      const accessToken = await getFromLocalStore("access_token");
+      if (!accessToken) return null;
+
+      return await registerTokenMutation({
+        token,
+        platform: getPlatformEnum(),
+      });
+    } catch (error) {
+      console.warn("[useRegisterPushToken] Sync failed:", error);
+      return null;
+    }
+  };
+
+  return {
+    registerPushToken,
+  };
+}
+

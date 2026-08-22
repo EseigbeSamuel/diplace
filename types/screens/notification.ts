@@ -49,3 +49,19 @@ export interface NotificationStats {
   unread_count: number;
   read_count: number;
 }
+
+export type DevicePlatform = "unknown" | "ios" | "android" | "web";
+
+export interface DeviceTokenPayload {
+  token: string;
+  platform: DevicePlatform;
+}
+
+export interface DeviceTokenResponse {
+  public_id: string;
+  token: string;
+  platform: string;
+  is_active: boolean;
+  last_seen_at: string;
+}
+

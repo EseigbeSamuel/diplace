@@ -4,6 +4,9 @@ import { useEffect, useRef } from "react";
 import { Platform } from "react-native";
 import { getFromLocalStore } from "@/lib";
 import { postRequest } from "@/services";
+import { DevicePlatform, DeviceTokenPayload, DeviceTokenResponse } from "@/types";
+
+import { requestExpoPushToken } from "./notification";
 
 /**
  * Call-related notification types emitted by the backend.
@@ -14,22 +17,6 @@ const INCOMING_CALL_TYPES = [
   "call_incoming",
   "call_started",
 ] as const;
-
-// ─── Push token API types ─────────────────────────────────────────────────────
-type DevicePlatform = "unknown" | "ios" | "android" | "web";
-
-interface DeviceTokenPayload {
-  token: string;
-  platform: DevicePlatform;
-}
-
-interface DeviceTokenResponse {
-  public_id: string;
-  token: string;
-  platform: string;
-  is_active: boolean;
-  last_seen_at: string;
-}
 
 /** Map React Native's Platform.OS to the backend's accepted enum values. */
 function toPlatformEnum(): DevicePlatform {
@@ -42,39 +29,6 @@ function toPlatformEnum(): DevicePlatform {
       return "web";
     default:
       return "unknown";
-  }
-}
-
-// ─── Push token registration ──────────────────────────────────────────────────
-async function registerForPushNotifications(): Promise<string | null> {
-  try {
-    const { status: existingStatus } = await Notifications.getPermissionsAsync();
-    let finalStatus = existingStatus;
-
-    if (existingStatus !== "granted") {
-      const { status } = await Notifications.requestPermissionsAsync();
-      finalStatus = status;
-    }
-
-    if (finalStatus !== "granted") {
-      return null;
-    }
-
-    if (Platform.OS === "android") {
-      await Notifications.setNotificationChannelAsync("calls", {
-        name: "Incoming Calls",
-        importance: Notifications.AndroidImportance.MAX,
-        vibrationPattern: [0, 250, 250, 250],
-        lightColor: "#22C55E",
-        sound: "default",
-      });
-    }
-
-    const tokenData = await Notifications.getExpoPushTokenAsync();
-    return tokenData.data;
-  } catch (err) {
-    console.warn("[useIncomingCall] Push registration error:", err);
-    return null;
   }
 }
 
@@ -110,7 +64,7 @@ export function useIncomingCall() {
     });
 
     // Register and sync token to backend
-    registerForPushNotifications().then(async (token) => {
+    requestExpoPushToken().then(async (token) => {
       if (!token) return;
       try {
         const accessToken = await getFromLocalStore("access_token");
