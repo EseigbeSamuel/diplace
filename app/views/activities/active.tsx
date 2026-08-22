@@ -1,11 +1,18 @@
 import ActiveActivityCard from "@/components/ActiveActivityCard";
 import { useTheme } from "@/contexts/themeContext";
-import React from "react";
-import { ActivityIndicator, Image, ScrollView, StyleSheet, Text, View } from "react-native";
-import { router } from "expo-router";
 import { useGetActiveActivities } from "@/hooks";
 import { ActiveActivityItem } from "@/types";
 import { ColorScheme } from "@/utils";
+import { router } from "expo-router";
+import React from "react";
+import {
+  ActivityIndicator,
+  Image,
+  ScrollView,
+  StyleSheet,
+  Text,
+  View,
+} from "react-native";
 
 const ActiveActivity = () => {
   const { colors, isDarkMode } = useTheme();
@@ -54,9 +61,12 @@ const ActiveActivity = () => {
 
   return (
     <ScrollView>
-      <View style={s.todayCard} className="flex flex-row gap-4 p-4 border rounded-lg m-4">
+      <View
+        style={s.todayCard}
+        className="flex flex-row gap-4 p-4 border rounded-lg m-4"
+      >
         <Image
-          source={require("@/assets/icons/calender-dark.png")}
+          source={require("@/assets/icons/calendar.png")}
           className="w-9 h-9"
         />
         <View>
@@ -77,7 +87,11 @@ const ActiveActivity = () => {
       </View>
 
       {isLoading ? (
-        <ActivityIndicator size="large" color={colors.slate[650]} className="mt-10" />
+        <ActivityIndicator
+          size="large"
+          color={colors.slate[650]}
+          className="mt-10"
+        />
       ) : activeActivities ? (
         <>
           {renderSection(

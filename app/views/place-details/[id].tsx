@@ -3,6 +3,7 @@ import AppButton from "@/components/button";
 import SafeAreaViewContainer from "@/components/safeareaview";
 import SectionHeader from "@/components/sectionheader";
 import { SimpleSelector } from "@/components/selector";
+import { HAS_GOOGLE_MAPS_API_KEY } from "@/constants/google";
 import { useTheme } from "@/contexts/themeContext";
 import {
   useGetPropertyAvailability,
@@ -12,6 +13,7 @@ import {
   useScheduleInspection,
 } from "@/hooks";
 import { useSpaceStore } from "@/store/useSpace";
+import type { ReportPropertyReason } from "@/types";
 import { ColorScheme } from "@/utils";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import React, { useMemo, useRef, useState } from "react";
@@ -31,8 +33,6 @@ import {
 import { Calendar } from "react-native-calendars";
 import MapView, { Marker } from "react-native-maps";
 import { RFValue } from "react-native-responsive-fontsize";
-import type { ReportPropertyReason } from "@/types";
-import { HAS_GOOGLE_MAPS_API_KEY } from "@/constants/google";
 
 type timeslot = {
   id: string;
@@ -615,7 +615,18 @@ const Placedetails = () => {
               ) : null}
             </View>
             <View className="flex flex-row gap-3">
-              <TouchableOpacity className="flex items-center justify-center w-10 h-10 bg-gray-200 rounded-full">
+              <TouchableOpacity
+                disabled={!property?.lister?.public_id}
+                onPress={() => {
+                  if (!property?.lister?.public_id) return;
+                  router.push({
+                    pathname: "/views/chat/[id]",
+                    params: { id: property.lister.public_id },
+                  });
+                }}
+                style={{ opacity: property?.lister?.public_id ? 1 : 0.4 }}
+                className="flex items-center justify-center w-10 h-10 bg-gray-200 rounded-full"
+              >
                 <Image
                   source={require("@/assets/icons/chat-active.png")}
                   className="w-5 h-5"

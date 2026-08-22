@@ -305,6 +305,7 @@ const Discover = () => {
           />
         </View>
 
+        {/*  Featured spaces */}
         <View className="flex flex-col gap-3 my-5">
           <View className="flex flex-row justify-between ">
             <Text style={homeStyles.title} className="font-semibold">

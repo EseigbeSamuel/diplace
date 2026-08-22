@@ -147,7 +147,7 @@ const AgentActiveActivity = () => {
         >
           <View className="flex flex-row gap-4 items-start">
             <Image
-              source={require("@/assets/icons/calender-dark.png")}
+              source={require("@/assets/icons/calendar.png")}
               className="w-9 h-9"
               style={s.calendarTint}
             />
