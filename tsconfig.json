@@ -5,6 +5,7 @@
     "strict": true,
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,
+    "types": ["jest"],
     "paths": {
       "@/*": ["./*"]
     }
