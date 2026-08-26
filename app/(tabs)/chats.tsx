@@ -2,7 +2,7 @@ import Filter from "@/components/filter";
 import { AppHeader } from "@/components/header";
 import SafeAreaViewContainer from "@/components/safeareaview";
 import { useTheme } from "@/contexts/themeContext";
-import { useGetConversations } from "@/hooks";
+import { useGetConversations, useGetCurrentUser } from "@/hooks";
 import { ConversationResponse } from "@/types";
 import { ColorScheme } from "@/utils";
 import { useRouter } from "expo-router";
@@ -11,6 +11,7 @@ import {
   ActivityIndicator,
   FlatList,
   Image,
+  RefreshControl,
   StatusBar,
   StyleSheet,
   Text,
@@ -25,6 +26,7 @@ interface ChatItemProps {
   item: ConversationResponse;
   colors: ColorScheme;
   isDarkMode: boolean;
+  currentUserId?: string;
 }
 
 // Verified Badge Component
@@ -34,14 +36,16 @@ const VerifiedBadge = () => (
   </View>
 );
 
-const ChatItem: React.FC<ChatItemProps> = ({ item, colors }) => {
+const ChatItem: React.FC<ChatItemProps> = ({ item, colors, currentUserId }) => {
   const router = useRouter();
 
-  const otherParticipant = item.participants?.[0];
+  const otherParticipant =
+    item.participants?.find((p) => p.public_id !== currentUserId) ||
+    item.participants?.[0];
   const displayName = otherParticipant
     ? `${otherParticipant.first_name ?? ""} ${otherParticipant.last_name ?? ""}`.trim() ||
       otherParticipant.email
-    : "Unknown";
+    : "Lister";
   const avatarUri = otherParticipant?.profile_picture ?? undefined;
   const isVerified = otherParticipant?.status === "verified";
   const formattedTime = item.last_message_at
@@ -55,7 +59,14 @@ const ChatItem: React.FC<ChatItemProps> = ({ item, colors }) => {
     <TouchableOpacity
       style={[styles.chatItem, { backgroundColor: colors.background }]}
       onPress={() =>
-        router.push({ pathname: "/views/chat/[id]", params: { id: item.public_id } })
+        router.push({
+          pathname: "/views/chat/[id]",
+          params: {
+            id: item.public_id,
+            recipientName: displayName,
+            recipientAvatar: avatarUri || "",
+          },
+        })
       }
     >
       <View style={styles.avatarContainer}>
@@ -123,14 +134,26 @@ const ChatItem: React.FC<ChatItemProps> = ({ item, colors }) => {
 
 const ChatsPage: React.FC = () => {
   const { colors, isDarkMode } = useTheme();
+  const { currentUser } = useGetCurrentUser();
   const [searchQuery, setSearchQuery] = useState("");
   const [activeFilter, setActiveFilter] = useState("All");
+  const [isRefreshing, setIsRefreshing] = useState(false);
 
-  const { conversations, isConversationsLoading } = useGetConversations({
+  const {
+    conversations,
+    isConversationsLoading,
+    refetchConversations,
+  } = useGetConversations({
     q: searchQuery || undefined,
     skip: 0,
     limit: 50,
   });
+
+  const handleRefresh = async () => {
+    setIsRefreshing(true);
+    await refetchConversations();
+    setIsRefreshing(false);
+  };
 
   const allConversations = conversations?.conversations ?? [];
 
@@ -141,7 +164,12 @@ const ChatsPage: React.FC = () => {
   });
 
   const renderChatItem = ({ item }: { item: ConversationResponse }) => (
-    <ChatItem item={item} colors={colors} isDarkMode={isDarkMode} />
+    <ChatItem
+      item={item}
+      colors={colors}
+      isDarkMode={isDarkMode}
+      currentUserId={currentUser?.public_id}
+    />
   );
 
   const renderFilterTab = (tab: string) => (
@@ -196,7 +224,7 @@ const ChatsPage: React.FC = () => {
       </View>
 
       {/* Chat List */}
-      {isConversationsLoading ? (
+      {isConversationsLoading && !isRefreshing ? (
         <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
           <ActivityIndicator size="large" color={colors.slate[650]} />
         </View>
@@ -208,6 +236,13 @@ const ChatsPage: React.FC = () => {
           style={styles.chatList}
           showsVerticalScrollIndicator={false}
           contentContainerStyle={styles.chatListContent}
+          refreshControl={
+            <RefreshControl
+              refreshing={isRefreshing}
+              onRefresh={handleRefresh}
+              tintColor={colors.slate[650]}
+            />
+          }
           ListEmptyComponent={
             <View style={{ alignItems: "center", marginTop: 60 }}>
               <Text style={{ color: colors.slate[500], fontSize: RFValue(14) }}>

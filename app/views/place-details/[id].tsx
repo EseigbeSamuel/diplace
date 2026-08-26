@@ -6,11 +6,14 @@ import { SimpleSelector } from "@/components/selector";
 import { HAS_GOOGLE_MAPS_API_KEY } from "@/constants/google";
 import { useTheme } from "@/contexts/themeContext";
 import {
+  useGetConversations,
+  useGetCurrentUser,
   useGetPropertyAvailability,
   useGetPropertyDetails,
   useListPropertyReviews,
   useReportProperty,
   useScheduleInspection,
+  useStartConversation,
 } from "@/hooks";
 import { useSpaceStore } from "@/store/useSpace";
 import type { ReportPropertyReason } from "@/types";
@@ -113,6 +116,81 @@ const Placedetails = () => {
   const { scheduleInspectionMutation, isScheduleInspectionPending } =
     useScheduleInspection();
   const { reportPropertyMutation, reportPropertyPending } = useReportProperty();
+
+  const [isContactLoading, setIsContactLoading] = useState<"chat" | "call" | null>(null);
+  const { conversations: conversationsData } = useGetConversations({ limit: 100 });
+  const { startConversationMutation } = useStartConversation();
+  const { currentUser } = useGetCurrentUser();
+
+  const getOrCreateConversation = async (): Promise<string | null> => {
+    const propId = property?.public_id || propertyId;
+    const listerUserId = property?.lister?.public_id || (property as any)?.lister_id;
+
+    // 1. Check if a conversation already exists for this property or with this lister
+    const existingConv = conversationsData?.conversations?.find((c) => {
+      if (propId && c.property_id === propId) return true;
+      if (listerUserId && c.participants?.some((p) => p.public_id === listerUserId)) return true;
+      return false;
+    });
+
+    if (existingConv?.public_id) {
+      return existingConv.public_id;
+    }
+
+    // 2. If no conversation exists yet, start one with the backend
+    try {
+      const newConv = await startConversationMutation({
+        property_id: propId || undefined,
+        message_content: `Hi ${listedByName}, I'm inquiring about "${displayTitle}".`,
+      });
+      return newConv?.public_id || null;
+    } catch (err) {
+      console.warn("Failed to create conversation:", err);
+      return null;
+    }
+  };
+
+  const handleStartChat = async () => {
+    if (isContactLoading) return;
+    setIsContactLoading("chat");
+    try {
+      const convId = await getOrCreateConversation();
+      if (convId) {
+        router.push({
+          pathname: "/views/chat/[id]",
+          params: {
+            id: convId,
+            recipientName: listedByName,
+            recipientAvatar: listedByAvatar || "",
+            propertyId: property?.public_id || propertyId,
+          },
+        });
+      }
+    } finally {
+      setIsContactLoading(null);
+    }
+  };
+
+  const handleStartCall = async () => {
+    if (isContactLoading) return;
+    setIsContactLoading("call");
+    try {
+      const convId = await getOrCreateConversation();
+      if (convId) {
+        router.push({
+          pathname: "/views/call",
+          params: {
+            conversationId: convId,
+            callerName: listedByName,
+            callerAvatar: listedByAvatar || "",
+            mode: "outgoing",
+          },
+        });
+      }
+    } finally {
+      setIsContactLoading(null);
+    }
+  };
 
   const galleryData = useMemo(() => {
     if (property?.media?.length) {
@@ -616,27 +694,38 @@ const Placedetails = () => {
             </View>
             <View className="flex flex-row gap-3">
               <TouchableOpacity
-                disabled={!property?.lister?.public_id}
-                onPress={() => {
-                  if (!property?.lister?.public_id) return;
-                  router.push({
-                    pathname: "/views/chat/[id]",
-                    params: { id: property.lister.public_id },
-                  });
-                }}
-                style={{ opacity: property?.lister?.public_id ? 1 : 0.4 }}
+                disabled={isContactLoading !== null || !property?.lister?.public_id}
+                onPress={handleStartChat}
+                style={{ opacity: !property?.lister?.public_id ? 0.4 : 1 }}
                 className="flex items-center justify-center w-10 h-10 bg-gray-200 rounded-full"
+                accessibilityLabel="Chat with lister"
               >
-                <Image
-                  source={require("@/assets/icons/chat-active.png")}
-                  className="w-5 h-5"
-                />
+                {isContactLoading === "chat" ? (
+                  <ActivityIndicator size="small" color={colors.slate[650]} />
+                ) : (
+                  <Image
+                    source={require("@/assets/icons/chat-active.png")}
+                    className="w-5 h-5"
+                    style={{ tintColor: colors.slate[650] }}
+                  />
+                )}
               </TouchableOpacity>
-              <TouchableOpacity className="flex items-center justify-center w-10 h-10 bg-gray-200 rounded-full">
-                <Image
-                  source={require("@/assets/icons/calling.png")}
-                  className="w-5 h-5"
-                />
+              <TouchableOpacity
+                disabled={isContactLoading !== null || !property?.lister?.public_id}
+                onPress={handleStartCall}
+                style={{ opacity: !property?.lister?.public_id ? 0.4 : 1 }}
+                className="flex items-center justify-center w-10 h-10 bg-gray-200 rounded-full"
+                accessibilityLabel="Call lister"
+              >
+                {isContactLoading === "call" ? (
+                  <ActivityIndicator size="small" color={colors.slate[650]} />
+                ) : (
+                  <Image
+                    source={require("@/assets/icons/calling.png")}
+                    className="w-5 h-5"
+                    style={{ tintColor: colors.slate[650] }}
+                  />
+                )}
               </TouchableOpacity>
             </View>
           </View>

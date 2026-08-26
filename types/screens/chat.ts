@@ -27,10 +27,12 @@ export interface ChatUser {
 }
 
 export interface ConversationPayload {
-  property_id: string;
-  booking_id: string;
-  inspection_booking_id: string;
-  message_content: string;
+  property_id?: string;
+  booking_id?: string;
+  inspection_booking_id?: string;
+  message_content?: string;
+  recipient_id?: string;
+  participant_id?: string;
 }
 
 export interface ConversationResponse {

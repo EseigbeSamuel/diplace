@@ -275,7 +275,15 @@ const MessageItem: React.FC<MessageItemProps> = ({
 
 const ChatPage = () => {
   const { colors, isDarkMode } = useTheme();
-  const { id: conversationId } = useLocalSearchParams<{ id: string }>();
+  const {
+    id: conversationId,
+    recipientName,
+    recipientAvatar,
+  } = useLocalSearchParams<{
+    id: string;
+    recipientName?: string;
+    recipientAvatar?: string;
+  }>();
 
   // --- API hooks ---
   const { currentUser } = useGetCurrentUser();
@@ -302,9 +310,10 @@ const ChatPage = () => {
     const displayName = otherParticipant
       ? `${otherParticipant.first_name ?? ""} ${otherParticipant.last_name ?? ""}`.trim() ||
         otherParticipant.email
-      : "Chat Room";
+      : recipientName || "Chat Room";
     const avatarUri =
       otherParticipant?.profile_picture ||
+      recipientAvatar ||
       "https://randomuser.me/api/portraits/men/1.jpg";
     const isVerified = otherParticipant?.status === "verified";
 
@@ -313,7 +322,7 @@ const ChatPage = () => {
       avatar: avatarUri,
       isVerified,
     };
-  }, [otherParticipant]);
+  }, [otherParticipant, recipientName, recipientAvatar]);
 
   // Map API messages to the local Message shape used by the UI components
   const [localMessages, setLocalMessages] = useState<Message[]>([]);
