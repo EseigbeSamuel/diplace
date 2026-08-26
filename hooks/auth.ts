@@ -240,33 +240,7 @@ export function useVerifyOtp() {
   };
 }
 
-export function useChangePassword() {
-  const router = useRouter();
-
-  const { mutate, isPending } = useMutation({
-    mutationFn: async (payload: ChangePasswordPayload) => {
-      return await postRequest<string, ChangePasswordPayload>({
-        url: "/password/change",
-        payload,
-        protectedRoute: true,
-      });
-    },
-    onSuccess: async (data) => {
-      showToast({
-        type: "success",
-        text1: "Success",
-        text2: typeof data === "string" ? data : "Password changed successfully.",
-      });
-      router.back();
-    },
-    onError: () => { },
-  });
-
-  return {
-    changePasswordMutation: mutate,
-    changePasswordMutationPending: isPending,
-  };
-}
+export { useChangePassword } from "./usePassword";
 
 export function useInitiateVerification() {
   const { mutateAsync, isPending } = useMutation({

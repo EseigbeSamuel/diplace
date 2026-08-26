@@ -289,21 +289,22 @@ export interface AgentReviewItem {
   public_id: string;
   date_created: string;
   date_modified: string;
-  status: PropertyStatus;
+  status: PropertyStatus | string;
   reviewer_id: string;
   agent_id: string;
   rating: number;
   comment: string;
   reviewer: {
     public_id: string;
-    status: PropertyStatus;
+    status: PropertyStatus | string;
     user_id: string;
     user?: PropertyListUser;
   };
   agent: {
     public_id: string;
-    status: PropertyStatus;
+    status: PropertyStatus | string;
     user_id: string;
+    business_name?: string;
     user?: PropertyListUser;
   };
 }

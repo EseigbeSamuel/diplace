@@ -93,12 +93,21 @@ export const apiService = async <TResponse, TRequest = undefined>(
     // eslint-disable-next-line import/no-named-as-default-member
     if (shouldNotify) {
       if (axios.isAxiosError(error)) {
-        const message =
-          error.response?.data?.detail ||
-          error.response?.data?.message ||
-          error.response?.data?.error ||
-          error.message ||
-          "Something went wrong";
+        const detail = error.response?.data?.detail;
+        let message: string;
+        if (Array.isArray(detail)) {
+          message = detail.map((d: any) => d?.msg || String(d)).join("\n");
+        } else if (typeof detail === "string") {
+          message = detail;
+        } else if (detail && typeof detail === "object") {
+          message = JSON.stringify(detail);
+        } else {
+          message =
+            error.response?.data?.message ||
+            error.response?.data?.error ||
+            error.message ||
+            "Something went wrong";
+        }
 
         showApiToast("Request Failed", message);
       } else {

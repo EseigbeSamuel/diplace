@@ -2,20 +2,26 @@ import AppButton from "@/components/button";
 import SafeAreaViewContainer from "@/components/safeareaview";
 import TextField from "@/components/textfield";
 import { useTheme } from "@/contexts/themeContext";
-import { useRouter } from "expo-router";
+import { useForgotPassword } from "@/hooks";
 import React, { useState } from "react";
 import { Text, View } from "react-native";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import { RFValue } from "react-native-responsive-fontsize";
 
-export default function ForgotPassowrd() {
+export default function ForgotPassword() {
   const { colors } = useTheme();
-
-  const router = useRouter();
+  const { forgotPasswordMutation, isForgotPasswordPending } = useForgotPassword();
 
   const [formData, setFormData] = useState({
     email: "",
   });
+
+  const handleSubmit = () => {
+    if (!formData.email.trim()) return;
+    forgotPasswordMutation({
+      email: formData.email.trim(),
+    });
+  };
 
   return (
     <SafeAreaViewContainer className="justify-center flex-1 bg-white">
@@ -42,22 +48,23 @@ export default function ForgotPassowrd() {
 
         <View className="gap-4">
           <TextField
-            label="Email / Phone No."
+            label="Email Address"
             value={formData.email}
             onChange={(text) =>
               setFormData({ ...formData, email: text.toString() })
             }
-            placeholder="Email / Phone No."
+            placeholder="Enter your email"
             icon={require("../../assets/icons/mail-outline-light.png")}
+            type="email"
           />
 
           <AppButton
-            onPress={() => router.navigate("/auth/verify-otp")}
-            title="Verify"
+            onPress={handleSubmit}
+            title={isForgotPasswordPending ? "Sending link..." : "Send Reset Link"}
             fullwidth
             variant="primary"
             size="large"
-            disabled={!formData.email}
+            disabled={!formData.email || isForgotPasswordPending}
           />
         </View>
       </KeyboardAwareScrollView>
