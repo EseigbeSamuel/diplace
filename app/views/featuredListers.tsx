@@ -1,20 +1,23 @@
 import Dropdown from "@/components/dropdown";
 import SafeAreaViewContainer from "@/components/safeareaview";
-import { featuredLister } from "@/constants/discover";
 import { useTheme } from "@/contexts/themeContext";
+import { useFeaturedListers } from "@/hooks";
 import { ColorScheme } from "@/utils";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useNavigation } from "expo-router";
 import React, { useEffect, useState } from "react";
 import {
+  ActivityIndicator,
   FlatList,
   Image,
+  RefreshControl,
   StyleSheet,
   Text,
   TouchableOpacity,
   View,
 } from "react-native";
 import { RFValue } from "react-native-responsive-fontsize";
+
 type DropdownOption = {
   id: string;
   label: string;
@@ -25,6 +28,7 @@ const FeaturedListers = () => {
   const { colors } = useTheme();
   const Styles = styles(colors);
   const navigation = useNavigation();
+  const { featuredListers, isLoading, refetch } = useFeaturedListers();
 
   const handleBackPress = () => {
     navigation.goBack();
@@ -83,42 +87,67 @@ const FeaturedListers = () => {
       </View>
 
       <View className="h-full px-3">
-        {selected.id === "grid" ? (
+        {isLoading ? (
+          <View className="py-20 items-center justify-center">
+            <ActivityIndicator size="large" color={colors.slate[650]} />
+          </View>
+        ) : featuredListers.length === 0 ? (
+          <View className="py-20 items-center justify-center">
+            <Text style={Styles.subTitle}>No featured listers found.</Text>
+          </View>
+        ) : selected.id === "grid" ? (
           <FlatList
-            data={featuredLister}
+            data={featuredListers}
             key={"grid"}
             showsVerticalScrollIndicator={false}
             numColumns={2}
             columnWrapperStyle={{ gap: 10 }}
-            contentContainerClassName="gap-4 "
+            contentContainerClassName="gap-4 pb-28"
+            refreshControl={
+              <RefreshControl
+                refreshing={isLoading}
+                onRefresh={refetch}
+                tintColor={colors.slate[650]}
+              />
+            }
             renderItem={({ item }) => (
               <View
                 style={[Styles.back, Styles.border]}
                 className="flex-1 max-w-[48%] border rounded-xl shadow-lg p-3"
               >
-                <Image source={item.imageSource} />
+                <Image
+                  source={item.imageSource}
+                  className="w-14 h-14 rounded-full self-center mb-2"
+                />
                 <View className="grid gap-1">
-                  <Text style={Styles.title} className="font-medium capitalize">
+                  <Text
+                    style={Styles.title}
+                    className="font-medium capitalize"
+                    numberOfLines={1}
+                  >
                     {item.name}
                   </Text>
                   <View className="flex flex-row items-center w-full">
                     <Image source={require("@/assets/icons/location.png")} />
-                    <Text style={Styles.subTitle} className="capitalize">
+                    <Text
+                      style={Styles.subTitle}
+                      className="capitalize"
+                      numberOfLines={1}
+                    >
                       {item.location}{" "}
                     </Text>
                   </View>
-                  <View className="flex flex-row items-center w-full justify-between ">
+                  <View className="flex flex-row items-center w-full justify-between">
                     <View className="flex flex-row items-center gap-1">
                       <Image
                         source={require("@/assets/icons/star.png")}
-                        className="size-[20px]"
+                        className="size-[18px]"
                       />
-                      <Text style={Styles.text} className=" font-medium">
+                      <Text style={Styles.text} className="font-medium">
                         {item.rating}
                       </Text>
                     </View>
                     <View>
-                      {/* <Image /> */}
                       <Text style={Styles.small}>{item.spaces} Spaces</Text>
                     </View>
                   </View>
@@ -129,39 +158,56 @@ const FeaturedListers = () => {
           />
         ) : (
           <FlatList
-            data={featuredLister}
+            data={featuredListers}
             key={"list"}
             showsHorizontalScrollIndicator={false}
-            contentContainerClassName="gap-4"
+            contentContainerClassName="gap-4 pb-28"
+            refreshControl={
+              <RefreshControl
+                refreshing={isLoading}
+                onRefresh={refetch}
+                tintColor={colors.slate[650]}
+              />
+            }
             renderItem={({ item }) => (
               <View
                 style={[Styles.back, Styles.border]}
-                className="flex flex-row border gap-3 items-center shadow-lg rounded-2xl p-3 w-full "
+                className="flex flex-row border gap-3 items-center shadow-lg rounded-2xl p-3 w-full"
               >
-                <Image source={item.imageSource} />
+                <Image
+                  source={item.imageSource}
+                  className="w-12 h-12 rounded-full"
+                />
                 <View className="flex-1">
-                  <Text style={Styles.title} className="font-medium capitalize">
+                  <Text
+                    style={Styles.title}
+                    className="font-medium capitalize"
+                    numberOfLines={1}
+                  >
                     {item.name}
                   </Text>
                   <View className="flex flex-row items-center">
                     <Image source={require("@/assets/icons/location.png")} />
-                    <Text style={Styles.subTitle}>{item.location} </Text>
+                    <Text style={Styles.subTitle} numberOfLines={1}>
+                      {item.location}{" "}
+                    </Text>
                   </View>
-                  <View className="flex flex-row items-center w-full justify-between ">
+                  <View className="flex flex-row items-center w-full justify-between">
                     <View className="flex flex-row gap-1 items-center flex-shrink">
                       <Image
                         source={require("@/assets/icons/star.png")}
-                        className="size-[20px]"
+                        className="size-[18px]"
                       />
-                      <Text style={Styles.text} className=" font-medium">
+                      <Text style={Styles.text} className="font-medium">
                         {item.rating}
                       </Text>
-                      <Text style={Styles.small} className="text-blue-500 ">
-                        ({item.reviews} Reviews )
-                      </Text>
+                      {item.reviews > 0 && (
+                        <Text style={Styles.small} className="text-blue-500">
+                          ({item.reviews} Reviews)
+                        </Text>
+                      )}
                     </View>
                     <View>
-                      {/* <Image /> */}
                       <Text
                         style={Styles.small}
                         className="flex-shrink text-right"
@@ -182,6 +228,7 @@ const FeaturedListers = () => {
     </SafeAreaViewContainer>
   );
 };
+
 
 export default FeaturedListers;
 

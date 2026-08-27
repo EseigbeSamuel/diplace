@@ -117,19 +117,28 @@ const Placedetails = () => {
     useScheduleInspection();
   const { reportPropertyMutation, reportPropertyPending } = useReportProperty();
 
-  const [isContactLoading, setIsContactLoading] = useState<"chat" | "call" | null>(null);
-  const { conversations: conversationsData } = useGetConversations({ limit: 100 });
+  const [isContactLoading, setIsContactLoading] = useState<
+    "chat" | "call" | null
+  >(null);
+  const { conversations: conversationsData } = useGetConversations({
+    limit: 100,
+  });
   const { startConversationMutation } = useStartConversation();
   const { currentUser } = useGetCurrentUser();
 
   const getOrCreateConversation = async (): Promise<string | null> => {
     const propId = property?.public_id || propertyId;
-    const listerUserId = property?.lister?.public_id || (property as any)?.lister_id;
+    const listerUserId =
+      property?.lister?.public_id || (property as any)?.lister_id;
 
     // 1. Check if a conversation already exists for this property or with this lister
     const existingConv = conversationsData?.conversations?.find((c) => {
       if (propId && c.property_id === propId) return true;
-      if (listerUserId && c.participants?.some((p) => p.public_id === listerUserId)) return true;
+      if (
+        listerUserId &&
+        c.participants?.some((p) => p.public_id === listerUserId)
+      )
+        return true;
       return false;
     });
 
@@ -694,10 +703,15 @@ const Placedetails = () => {
             </View>
             <View className="flex flex-row gap-3">
               <TouchableOpacity
-                disabled={isContactLoading !== null || !property?.lister?.public_id}
+                disabled={
+                  isContactLoading !== null || !property?.lister?.public_id
+                }
                 onPress={handleStartChat}
-                style={{ opacity: !property?.lister?.public_id ? 0.4 : 1 }}
-                className="flex items-center justify-center w-10 h-10 bg-gray-200 rounded-full"
+                style={[
+                  { opacity: !property?.lister?.public_id ? 0.4 : 1 },
+                  { backgroundColor: colors.slate[600] },
+                ]}
+                className="flex items-center justify-center w-10 h-10  rounded-full"
                 accessibilityLabel="Chat with lister"
               >
                 {isContactLoading === "chat" ? (
@@ -711,10 +725,15 @@ const Placedetails = () => {
                 )}
               </TouchableOpacity>
               <TouchableOpacity
-                disabled={isContactLoading !== null || !property?.lister?.public_id}
+                disabled={
+                  isContactLoading !== null || !property?.lister?.public_id
+                }
                 onPress={handleStartCall}
-                style={{ opacity: !property?.lister?.public_id ? 0.4 : 1 }}
-                className="flex items-center justify-center w-10 h-10 bg-gray-200 rounded-full"
+                style={[
+                  { opacity: !property?.lister?.public_id ? 0.4 : 1 },
+                  { backgroundColor: colors.slate[600] },
+                ]}
+                className="flex items-center justify-center w-10 h-10  rounded-full"
                 accessibilityLabel="Call lister"
               >
                 {isContactLoading === "call" ? (

@@ -74,3 +74,16 @@ export interface VerificationItem {
   identifier_used: string;
   last_updated: string;
 }
+
+export interface FeaturedListerItem {
+  id: string;
+  name: string;
+  user_type: UserType;
+  rating: number;
+  reviews: number;
+  location: string;
+  spaces: number;
+  imageSource: { uri: string } | number;
+  isVerified?: boolean;
+}
+

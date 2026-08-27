@@ -66,8 +66,13 @@ const ActiveActivity = () => {
         className="flex flex-row gap-4 p-4 border rounded-lg m-4"
       >
         <Image
-          source={require("@/assets/icons/calendar.png")}
+          source={
+            isDarkMode
+              ? require("@/assets/icons/calender-white.png")
+              : require("@/assets/icons/calendar.png")
+          }
           className="w-9 h-9"
+          style={{ tintColor: colors.slate[650] }}
         />
         <View>
           <Text style={s.todayTitle}>Today's Activity</Text>

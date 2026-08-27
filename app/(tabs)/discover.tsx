@@ -1,11 +1,12 @@
 import Filter from "@/components/filter";
+import FilterBottomSheets from "@/components/filterBS";
 import { AppHeader } from "@/components/header";
 import HouseCard from "@/components/housecard";
 import SafeAreaViewContainer from "@/components/safeareaview";
-import { categories, featuredLister, slider } from "@/constants/discover";
+import { categories, slider } from "@/constants/discover";
 import { useTheme } from "@/contexts/themeContext";
-import { useListProperties } from "@/hooks";
-import { PropertyListItem } from "@/types";
+import { useFeaturedListers, useListProperties } from "@/hooks";
+import { ListPropertiesParams, PropertyListItem, PropertyType } from "@/types";
 import { ColorScheme } from "@/utils";
 import { BlurView } from "expo-blur";
 import { router } from "expo-router";
@@ -15,7 +16,9 @@ import {
   Dimensions,
   FlatList,
   Image,
+  Modal,
   Pressable,
+  RefreshControl,
   ScrollView,
   StyleSheet,
   Text,
@@ -25,6 +28,41 @@ import { useSharedValue } from "react-native-reanimated";
 import Carousel from "react-native-reanimated-carousel";
 import { RFValue } from "react-native-responsive-fontsize";
 
+const FILTER_TYPE_MAP: Record<string, PropertyType> = {
+  Apartment: "apartment",
+  Shop: "shop",
+  Office: "office",
+  "Event center": "event_centre",
+};
+const DEFAULT_MIN_BUDGET = 0;
+const DEFAULT_MAX_BUDGET = 100;
+
+function SkeletonBlock({
+  width = "100%",
+  height = 16,
+  borderRadius = 8,
+  style,
+}: {
+  width?: number | `${number}%` | "100%";
+  height?: number;
+  borderRadius?: number;
+  style?: any;
+}) {
+  return (
+    <View
+      style={[
+        {
+          width,
+          height,
+          borderRadius,
+          backgroundColor: "rgba(148, 163, 184, 0.22)",
+        },
+        style,
+      ]}
+    />
+  );
+}
+
 const Discover = () => {
   const { colors, isDarkMode } = useTheme();
   const homeStyles = styles(colors);
@@ -33,10 +71,49 @@ const Discover = () => {
   const { width } = Dimensions.get("window");
   const CARD_WIDTH = width * 0.88;
 
+  // Search and filter state
+  const [searchText, setSearchText] = useState("");
+  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+  const [type, setType] = useState("Any");
+  const [rooms, setRooms] = useState(0);
+  const [baths, setBaths] = useState(0);
+  const [minBudget, setMinBudget] = useState(DEFAULT_MIN_BUDGET);
+  const [maxBudget, setMaxBudget] = useState(DEFAULT_MAX_BUDGET);
+  const [selectedAmenities, setSelectedAmenities] = useState<string[]>([]);
+  const [showFilterModal, setShowFilterModal] = useState(false);
+  const [showCityModal, setShowCityModal] = useState(false);
+  const [selectedCity, setSelectedCity] = useState<string | null>(null);
+  const [appliedFilters, setAppliedFilters] = useState<ListPropertiesParams>(
+    {},
+  );
+
+  const queryParams = useMemo<ListPropertiesParams>(
+    () => ({
+      sort_by: "date_created",
+      sort_order: "desc",
+      ...appliedFilters,
+    }),
+    [appliedFilters],
+  );
+
   // Live property hook
-  const { properties, isPropertiesLoading } = useListProperties({
-    params: { limit: 100 },
+  const {
+    properties,
+    isPropertiesLoading,
+    isPropertiesFetching,
+    refetchProperties,
+  } = useListProperties({
+    params: queryParams,
+    pageSize: 50,
+    enabled: true,
   });
+
+  // Featured Listers hook (top 20 agents & owners sorted by ratings and reviews)
+  const {
+    featuredListers,
+    isLoading: isListersLoading,
+    refetch: refetchListers,
+  } = useFeaturedListers();
 
   const formatCurrency = (amount: number) =>
     `NGN ${new Intl.NumberFormat("en-NG").format(amount || 0)}`;
@@ -78,54 +155,162 @@ const Discover = () => {
     });
   };
 
-  const featuredSpacesList = useMemo(() => {
-    const available = properties.filter(
+  const availableProperties = useMemo(() => {
+    return properties.filter(
       (p) =>
         p.status === "available" ||
         p.status === "approved" ||
-        p.status === "active",
+        p.status === "active" ||
+        p.status === "pending",
     );
-    const filtered = available.filter(
+  }, [properties]);
+
+  const featuredSpacesList = useMemo(() => {
+    const filtered = availableProperties.filter(
       (p) => p.is_verified || p.listing_type !== "normal",
     );
-    return (filtered.length > 0 ? filtered : available).map(mapToCardProps);
-  }, [properties]);
-
-  const discountedSpacesList = useMemo(() => {
-    const available = properties.filter(
-      (p) =>
-        p.status === "available" ||
-        p.status === "approved" ||
-        p.status === "active",
-    );
-    const filtered = [...available].sort((a, b) => a.price - b.price);
-    return (filtered.length > 0 ? filtered : available).map(mapToCardProps);
-  }, [properties]);
-
-  const eventPlacesList = useMemo(() => {
-    const available = properties.filter(
-      (p) =>
-        p.status === "available" ||
-        p.status === "approved" ||
-        p.status === "active",
-    );
-    const filtered = available.filter(
-      (p) => p.property_type === "hall" || p.property_type === "event_centre",
-    );
-    return (filtered.length > 0 ? filtered : available.slice().reverse()).map(
+    return (filtered.length > 0 ? filtered : availableProperties).map(
       mapToCardProps,
     );
-  }, [properties]);
+  }, [availableProperties]);
+
+  const discountedSpacesList = useMemo(() => {
+    const sorted = [...availableProperties].sort(
+      (a, b) => (a.price || 0) - (b.price || 0),
+    );
+    return sorted.map(mapToCardProps);
+  }, [availableProperties]);
+
+  const eventPlacesList = useMemo(() => {
+    const filtered = availableProperties.filter(
+      (p) => p.property_type === "hall" || p.property_type === "event_centre",
+    );
+    return (filtered.length > 0 ? filtered : availableProperties).map(
+      mapToCardProps,
+    );
+  }, [availableProperties]);
+
+  // Bottom sheet handlers
+  const cities = ["Abuja", "Port Harcourt", "Lagos", "Owerri"];
+
+  const openCity = () => {
+    setShowFilterModal(false);
+    setShowCityModal(true);
+  };
+
+  const handleCityBack = () => {
+    setShowCityModal(false);
+    setShowFilterModal(true);
+  };
+
+  const handleCityClose = () => {
+    setShowCityModal(false);
+    setShowFilterModal(false);
+  };
+
+  const handleSelectCity = (city: string) => {
+    setSelectedCity(city);
+    setShowCityModal(false);
+    setShowFilterModal(true);
+  };
+
+  const clear = () => {
+    setType("Any");
+    setRooms(0);
+    setBaths(0);
+    setMinBudget(DEFAULT_MIN_BUDGET);
+    setMaxBudget(DEFAULT_MAX_BUDGET);
+    setSelectedAmenities([]);
+    setSelectedCity(null);
+    setSelectedCategory(null);
+    setAppliedFilters(searchText.trim() ? { q: searchText.trim() } : {});
+  };
+
+  const handleAddFilter = () => setShowFilterModal(true);
+
+  const buildFilterParams = (): ListPropertiesParams => {
+    const trimmedSearch = searchText.trim();
+    const params: ListPropertiesParams = {};
+    const mappedType = FILTER_TYPE_MAP[type];
+
+    if (trimmedSearch) params.q = trimmedSearch;
+    if (selectedCity) params.city = selectedCity;
+    if (mappedType) params.property_type = mappedType;
+    if (minBudget > DEFAULT_MIN_BUDGET) params.min_price = minBudget;
+    if (maxBudget < DEFAULT_MAX_BUDGET && maxBudget >= minBudget) {
+      params.max_price = maxBudget;
+    }
+    if (selectedAmenities.length > 0) {
+      params.amenities_contain = selectedAmenities.join(",");
+    }
+
+    return params;
+  };
+
+  const apply = () => {
+    setAppliedFilters(buildFilterParams());
+    setShowFilterModal(false);
+  };
+
+  const handleSearchSubmit = (value: string) => {
+    const trimmedSearch = value.trim();
+    setAppliedFilters((prev) => {
+      const next = { ...prev };
+      if (trimmedSearch) {
+        next.q = trimmedSearch;
+      } else {
+        delete next.q;
+      }
+      return next;
+    });
+  };
+
+  const handleCategoryPress = (categoryName: string) => {
+    const catMap: Record<string, string> = {
+      apartment: "apartment",
+      shops: "shop",
+      offices: "office",
+      "event center": "event_centre",
+    };
+    const propType = catMap[categoryName.toLowerCase()];
+    router.push({
+      pathname: "/views/apartments",
+      params: propType ? { type: propType } : undefined,
+    });
+  };
+
+  const handleRefresh = () => {
+    refetchProperties();
+    refetchListers();
+  };
 
   return (
     <SafeAreaViewContainer disableBottom className="flex-1">
       <AppHeader title={"Discover"} />
-      <View className="py-3">
-        <Filter size="large" />
+      <View className="py-2">
+        <Filter
+          size="small"
+          value={searchText}
+          onChangeText={setSearchText}
+          onSubmit={handleSearchSubmit}
+          showFilter
+          onFilterPress={handleAddFilter}
+        />
       </View>
 
-      <ScrollView nestedScrollEnabled>
-        <View className="flex flex-col gap-3 mt-5 mb-7">
+      <ScrollView
+        nestedScrollEnabled
+        showsVerticalScrollIndicator={false}
+        refreshControl={
+          <RefreshControl
+            refreshing={isPropertiesFetching}
+            onRefresh={handleRefresh}
+            tintColor={colors.slate[650]}
+          />
+        }
+      >
+        {/* Categories */}
+        <View className="flex flex-col gap-3 mt-4 mb-6">
           <Text style={homeStyles.title} className="font-semibold">
             Categories
           </Text>
@@ -136,7 +321,7 @@ const Discover = () => {
             showsHorizontalScrollIndicator={false}
             renderItem={({ item }) => (
               <Pressable
-                onPress={() => router.push("/views/apartments")}
+                onPress={() => handleCategoryPress(item.name)}
                 className={`flex flex-col items-center border rounded-2xl p-4 min-w-[108px] ${
                   item.name === "apartment"
                     ? "bg-blue-50 border-blue-500"
@@ -157,6 +342,7 @@ const Discover = () => {
           />
         </View>
 
+        {/* Neighborhoods */}
         <View className="flex flex-col w-full gap-3">
           <Text style={homeStyles.title} className="font-semibold">
             Neighborhoods
@@ -242,8 +428,9 @@ const Discover = () => {
           </View>
         </View>
 
+        {/* Featured Listers */}
         <View className="flex flex-col gap-3 my-5">
-          <View className="flex flex-row justify-between ">
+          <View className="flex flex-row justify-between items-center">
             <Text style={homeStyles.title} className="font-semibold">
               Featured Listers
             </Text>
@@ -265,58 +452,80 @@ const Discover = () => {
               )}
             </Pressable>
           </View>
-          <FlatList
-            data={featuredLister}
-            horizontal
-            showsHorizontalScrollIndicator={false}
-            contentContainerStyle={{ gap: 16 }}
-            renderItem={({ item }) => (
-              <View
-                style={homeStyles.border}
-                className="flex flex-row gap-3 items-center border rounded-2xl p-3 min-w-[170px] "
-              >
-                <Image source={item.imageSource} />
-                <View>
-                  <View className="flex flex-row items-center gap-1">
-                    <Text
-                      style={homeStyles.text}
-                      className="font-medium capitalize"
-                    >
-                      {item.name}
-                    </Text>
-                    <Image
-                      source={require("@/assets/icons/badge-check-green.png")}
-                    />
-                  </View>
+          {isListersLoading ? (
+            <View className="py-6 items-center justify-center">
+              <ActivityIndicator color={colors.slate[650]} size="small" />
+            </View>
+          ) : (
+            <FlatList
+              data={featuredListers}
+              horizontal
+              showsHorizontalScrollIndicator={false}
+              contentContainerStyle={{ gap: 16 }}
+              renderItem={({ item }) => (
+                <View
+                  style={homeStyles.border}
+                  className="flex flex-row gap-3 items-center border rounded-2xl p-3 min-w-[170px]"
+                >
+                  <Image
+                    source={item.imageSource}
+                    className="w-10 h-10 rounded-full"
+                  />
+                  <View>
+                    <View className="flex flex-row items-center gap-1">
+                      <Text
+                        style={homeStyles.text}
+                        className="font-medium capitalize"
+                        numberOfLines={1}
+                      >
+                        {item.name}
+                      </Text>
+                      {item.isVerified && (
+                        <Image
+                          source={require("@/assets/icons/badge-check-green.png")}
+                        />
+                      )}
+                    </View>
 
-                  <View className="flex flex-row items-center gap-1">
-                    <Image
-                      source={require("@/assets/icons/star.png")}
-                      className="size-[20px]"
-                    />
-                    <Text style={homeStyles.small} className="">
-                      {item.rating}
-                    </Text>
+                    <View className="flex flex-row items-center gap-1">
+                      <Image
+                        source={require("@/assets/icons/star.png")}
+                        className="size-[16px]"
+                      />
+                      <Text style={homeStyles.small}>{item.rating}</Text>
+                      {item.reviews > 0 && (
+                        <Text
+                          style={homeStyles.small}
+                          className="text-blue-500"
+                        >
+                          ({item.reviews})
+                        </Text>
+                      )}
+                    </View>
                   </View>
                 </View>
-              </View>
-            )}
-            keyExtractor={(item) => item.id}
-          />
+              )}
+              keyExtractor={(item) => item.id}
+            />
+          )}
         </View>
 
-        {/*  Featured spaces */}
+        {/* Featured Spaces */}
         <View className="flex flex-col gap-3 my-5">
-          <View className="flex flex-row justify-between ">
+          <View className="flex flex-row justify-between items-center">
             <Text style={homeStyles.title} className="font-semibold">
               Featured Space 🔥
             </Text>
             <Pressable
-              onPress={() => router.push("/views/apartments")}
+              onPress={() =>
+                router.push({
+                  pathname: "/views/apartments",
+                  params: { section: "featured" },
+                })
+              }
               className="flex-row items-center gap-2"
             >
               <Text style={homeStyles.text}>View More</Text>
-
               {isDarkMode ? (
                 <Image
                   source={require("@/assets/icons/arrow-right-light.png")}
@@ -331,9 +540,12 @@ const Discover = () => {
             </Pressable>
           </View>
           {isPropertiesLoading ? (
-            <View className="py-10 items-center justify-center">
-              <ActivityIndicator color={colors.slate[650]} size="small" />
+            <View className="flex-row gap-4 py-2">
+              <SkeletonBlock width={260} height={200} borderRadius={16} />
+              <SkeletonBlock width={260} height={200} borderRadius={16} />
             </View>
+          ) : featuredSpacesList.length === 0 ? (
+            <Text style={homeStyles.subTitle}>No featured spaces found.</Text>
           ) : (
             <FlatList
               data={featuredSpacesList}
@@ -351,13 +563,19 @@ const Discover = () => {
           )}
         </View>
 
+        {/* Discounted */}
         <View className="flex flex-col gap-3 my-5">
-          <View className="flex flex-row justify-between">
+          <View className="flex flex-row justify-between items-center">
             <Text style={homeStyles.title} className="font-semibold">
               Discounted 🏷️
             </Text>
             <Pressable
-              onPress={() => router.push("/views/apartments")}
+              onPress={() =>
+                router.push({
+                  pathname: "/views/apartments",
+                  params: { section: "discounted" },
+                })
+              }
               className="flex-row items-center gap-2"
             >
               <Text style={homeStyles.text}>View More</Text>
@@ -375,9 +593,12 @@ const Discover = () => {
             </Pressable>
           </View>
           {isPropertiesLoading ? (
-            <View className="py-10 items-center justify-center">
-              <ActivityIndicator color={colors.slate[650]} size="small" />
+            <View className="flex-row gap-4 py-2">
+              <SkeletonBlock width={260} height={200} borderRadius={16} />
+              <SkeletonBlock width={260} height={200} borderRadius={16} />
             </View>
+          ) : discountedSpacesList.length === 0 ? (
+            <Text style={homeStyles.subTitle}>No discounted spaces found.</Text>
           ) : (
             <FlatList
               data={discountedSpacesList}
@@ -395,13 +616,19 @@ const Discover = () => {
           )}
         </View>
 
-        <View className="flex flex-col gap-3 my-5">
-          <View className="flex flex-row justify-between">
+        {/* Top Event Places */}
+        <View className="flex flex-col gap-3 my-5 mb-10">
+          <View className="flex flex-row justify-between items-center">
             <Text style={homeStyles.title} className="font-semibold">
               Top Event Places 🎉
             </Text>
             <Pressable
-              onPress={() => router.push("/views/apartments")}
+              onPress={() =>
+                router.push({
+                  pathname: "/views/apartments",
+                  params: { type: "event_centre" },
+                })
+              }
               className="flex-row items-center gap-2"
             >
               <Text style={homeStyles.text}>View More</Text>
@@ -419,9 +646,12 @@ const Discover = () => {
             </Pressable>
           </View>
           {isPropertiesLoading ? (
-            <View className="py-10 items-center justify-center">
-              <ActivityIndicator color={colors.slate[650]} size="small" />
+            <View className="flex-row gap-4 py-2">
+              <SkeletonBlock width={260} height={200} borderRadius={16} />
+              <SkeletonBlock width={260} height={200} borderRadius={16} />
             </View>
+          ) : eventPlacesList.length === 0 ? (
+            <Text style={homeStyles.subTitle}>No event places found.</Text>
           ) : (
             <FlatList
               data={eventPlacesList}
@@ -439,6 +669,94 @@ const Discover = () => {
           )}
         </View>
       </ScrollView>
+
+      {/* Filter Bottom Sheet Modal */}
+      <FilterBottomSheets
+        visible={showFilterModal}
+        onClose={() => setShowFilterModal(false)}
+        type={type}
+        setType={setType}
+        rooms={rooms}
+        setRooms={setRooms}
+        baths={baths}
+        setBaths={setBaths}
+        minBudget={minBudget}
+        setMinBudget={setMinBudget}
+        maxBudget={maxBudget}
+        setMaxBudget={setMaxBudget}
+        selectedAmenities={selectedAmenities}
+        setSelectedAmenities={setSelectedAmenities}
+        selectedCity={selectedCity}
+        openCity={openCity}
+        openNeighborhood={() => {}}
+        clear={clear}
+        apply={apply}
+      />
+
+      {/* City Selection Modal */}
+      <Modal
+        visible={showCityModal}
+        transparent
+        animationType="slide"
+        onRequestClose={handleCityClose}
+      >
+        <View style={homeStyles.cityModalOverlay}>
+          <View style={homeStyles.cityModalSheet}>
+            <View style={homeStyles.cityModalHeader}>
+              <Pressable
+                onPress={handleCityBack}
+                style={homeStyles.cityModalBack}
+              >
+                <Image
+                  source={require("@/assets/icons/arrow-left-dark.png")}
+                  style={{ width: 20, height: 20 }}
+                />
+              </Pressable>
+              <Text style={homeStyles.cityModalTitle}>City</Text>
+              <Pressable
+                onPress={handleCityClose}
+                style={homeStyles.cityModalClose}
+              >
+                <Image
+                  source={require("@/assets/icons/close-contained.png")}
+                  style={{ width: 14, height: 14 }}
+                />
+              </Pressable>
+            </View>
+
+            <View style={homeStyles.cityModalList}>
+              {cities.map((city) => {
+                const isSelected = selectedCity === city;
+                return (
+                  <Pressable
+                    key={city}
+                    onPress={() => handleSelectCity(city)}
+                    style={[
+                      homeStyles.cityOption,
+                      isSelected && homeStyles.cityOptionSelected,
+                    ]}
+                  >
+                    <Text
+                      style={[
+                        homeStyles.cityOptionText,
+                        isSelected && homeStyles.cityOptionTextSelected,
+                      ]}
+                    >
+                      {city}
+                    </Text>
+                    {isSelected && (
+                      <Image
+                        source={require("@/assets/icons/badge-check-green.png")}
+                        style={{ width: 18, height: 18 }}
+                      />
+                    )}
+                  </Pressable>
+                );
+              })}
+            </View>
+          </View>
+        </View>
+      </Modal>
     </SafeAreaViewContainer>
   );
 };
@@ -472,5 +790,66 @@ const styles = (colors: ColorScheme) =>
       fontSize: RFValue(12),
       lineHeight: RFValue(16),
       color: colors.slate[600],
+    },
+    cityModalOverlay: {
+      flex: 1,
+      backgroundColor: "rgba(0, 0, 0, 0.4)",
+      justifyContent: "flex-end",
+    },
+    cityModalSheet: {
+      backgroundColor: colors.background,
+      borderTopLeftRadius: 24,
+      borderTopRightRadius: 24,
+      paddingHorizontal: 20,
+      paddingTop: 16,
+      paddingBottom: 36,
+      minHeight: 280,
+    },
+    cityModalHeader: {
+      flexDirection: "row",
+      alignItems: "center",
+      justifyContent: "space-between",
+      paddingBottom: 16,
+      borderBottomWidth: 1,
+      borderBottomColor: colors.slate[200] || "#E2E8F0",
+    },
+    cityModalBack: {
+      padding: 6,
+    },
+    cityModalTitle: {
+      fontSize: RFValue(16),
+      fontWeight: "700",
+      color: colors.slate[650],
+    },
+    cityModalClose: {
+      padding: 6,
+    },
+    cityModalList: {
+      paddingTop: 16,
+      gap: 10,
+    },
+    cityOption: {
+      flexDirection: "row",
+      alignItems: "center",
+      justifyContent: "space-between",
+      paddingVertical: 14,
+      paddingHorizontal: 16,
+      borderRadius: 12,
+      borderWidth: 1,
+      borderColor: colors.slate[200] || "#E2E8F0",
+      backgroundColor: colors.background,
+    },
+    cityOptionSelected: {
+      borderColor: "#3B82F6",
+      backgroundColor: "rgba(59, 130, 246, 0.06)",
+    },
+    cityOptionText: {
+      fontSize: RFValue(14),
+      fontWeight: "500",
+      color: colors.slate[650],
+    },
+    cityOptionTextSelected: {
+      color: "#3B82F6",
+      fontWeight: "700",
     },
   });
