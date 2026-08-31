@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
+import { CustomCheck } from "@/assets/icons";
 import Filter from "@/components/filter";
 import FilterBottomSheets from "@/components/filterBS";
 import { AppHeader } from "@/components/header";
@@ -10,7 +12,7 @@ import { ListPropertiesParams, PropertyListItem, PropertyType } from "@/types";
 import { ColorScheme } from "@/utils";
 import { BlurView } from "expo-blur";
 import { router } from "expo-router";
-import React, { useMemo, useState } from "react";
+import React, { useCallback, useMemo, useState } from "react";
 import {
   ActivityIndicator,
   Dimensions,
@@ -115,38 +117,50 @@ const Discover = () => {
     refetch: refetchListers,
   } = useFeaturedListers();
 
-  const formatCurrency = (amount: number) =>
-    `NGN ${new Intl.NumberFormat("en-NG").format(amount || 0)}`;
+  const formatCurrency = useCallback(
+    (amount: number) =>
+      `NGN ${new Intl.NumberFormat("en-NG").format(amount || 0)}`,
+    [],
+  );
 
-  const formatCostFrequency = (value: string) =>
-    value ? value.replace(/^per_/, "").replace(/_/g, " ") : "";
+  const formatCostFrequency = useCallback(
+    (value: string) =>
+      value ? value.replace(/^per_/, "").replace(/_/g, " ") : "",
+    [],
+  );
 
-  const mapBadgeType = (item: PropertyListItem): string | undefined => {
-    if (item.is_verified) return "verified";
-    if (item.listing_type === "sponsored") return "hot";
-    if (item.status === "booked") return "reserved";
-    return undefined;
-  };
+  const mapBadgeType = useCallback(
+    (item: PropertyListItem): string | undefined => {
+      if (item.is_verified) return "verified";
+      if (item.listing_type === "sponsored") return "hot";
+      if (item.status === "booked") return "reserved";
+      return undefined;
+    },
+    [],
+  );
 
-  const mapToCardProps = (item: PropertyListItem) => ({
-    id: item.public_id,
-    imageSource: item.media?.[0]?.file_url
-      ? { uri: item.media[0].file_url }
-      : require("@/assets/images/featuredSpaceImage1.png"),
-    title: item.title,
-    location:
-      [
-        item.address?.street,
-        item.address?.city,
-        item.address?.state,
-        item.address?.country,
-      ]
-        .filter(Boolean)
-        .join(", ") || "Unknown location",
-    price: formatCurrency(item.price),
-    badgeType: mapBadgeType(item),
-    duration: formatCostFrequency(item.cost_frequency),
-  });
+  const mapToCardProps = useCallback(
+    (item: PropertyListItem) => ({
+      id: item.public_id,
+      imageSource: item.media?.[0]?.file_url
+        ? { uri: item.media[0].file_url }
+        : require("@/assets/images/featuredSpaceImage1.png"),
+      title: item.title,
+      location:
+        [
+          item.address?.street,
+          item.address?.city,
+          item.address?.state,
+          item.address?.country,
+        ]
+          .filter(Boolean)
+          .join(", ") || "Unknown location",
+      price: formatCurrency(item.price),
+      badgeType: mapBadgeType(item),
+      duration: formatCostFrequency(item.cost_frequency),
+    }),
+    [formatCurrency, formatCostFrequency, mapBadgeType],
+  );
 
   const handleOpenProperty = (propertyId: string) => {
     router.push({
@@ -172,14 +186,14 @@ const Discover = () => {
     return (filtered.length > 0 ? filtered : availableProperties).map(
       mapToCardProps,
     );
-  }, [availableProperties]);
+  }, [availableProperties, mapToCardProps]);
 
   const discountedSpacesList = useMemo(() => {
     const sorted = [...availableProperties].sort(
       (a, b) => (a.price || 0) - (b.price || 0),
     );
     return sorted.map(mapToCardProps);
-  }, [availableProperties]);
+  }, [availableProperties, mapToCardProps]);
 
   const eventPlacesList = useMemo(() => {
     const filtered = availableProperties.filter(
@@ -188,7 +202,7 @@ const Discover = () => {
     return (filtered.length > 0 ? filtered : availableProperties).map(
       mapToCardProps,
     );
-  }, [availableProperties]);
+  }, [availableProperties, mapToCardProps]);
 
   // Bottom sheet handlers
   const cities = ["Abuja", "Port Harcourt", "Lagos", "Owerri"];
@@ -296,6 +310,10 @@ const Discover = () => {
           showFilter
           onFilterPress={handleAddFilter}
         />
+      </View>
+
+      <View>
+        <CustomCheck />
       </View>
 
       <ScrollView
