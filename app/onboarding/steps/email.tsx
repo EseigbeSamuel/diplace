@@ -1,14 +1,20 @@
 import AppButton from "@/components/button";
 import OTPInput from "@/components/otp";
 import { useTheme } from "@/contexts/themeContext";
-import { ColorScheme } from "@/utils";
-import React, { useRef, useState } from "react";
 import {
+  useCompleteVerification,
+  useGetCurrentUser,
+  useInitiateVerification,
+  useResendVerificationOtp,
+} from "@/hooks";
+import { ColorScheme } from "@/utils";
+import React, { useEffect, useRef, useState } from "react";
+import {
+  ActivityIndicator,
   Alert,
   Image,
   StyleSheet,
   Text,
-  TextInput,
   TouchableOpacity,
   View,
 } from "react-native";
@@ -18,48 +24,130 @@ type EmailVerificationProps = {
   onNext: () => void;
 };
 
+const OTP_LENGTH = 6;
+const RESEND_SECONDS = 600;
+
+const maskEmail = (email: string) => {
+  const [name, domain] = email.split("@");
+  if (!name || !domain) return email || "your registered email";
+
+  const visibleName = name.slice(0, 5);
+  const hiddenLength = Math.max(name.length - visibleName.length, 4);
+  return `${visibleName}${"*".repeat(hiddenLength)}@${domain}`;
+};
+
+const formatCountdown = (seconds: number) => {
+  const minutes = Math.floor(seconds / 60);
+  const remainingSeconds = seconds % 60;
+  return `${minutes}:${remainingSeconds.toString().padStart(2, "0")}`;
+};
+
 const EmailVerificationStep = ({ onNext }: EmailVerificationProps) => {
   const { colors } = useTheme();
   const Styles = styles(colors);
-
-  // Mock email - replace with actual user email from store
-  const userEmail = "user***********@gmail.com";
+  const { currentUser, isCurrentUserLoading } = useGetCurrentUser();
+  const { initiateVerificationMutation, initiateVerificationPending } =
+    useInitiateVerification();
+  const { completeVerificationMutation, completeVerificationPending } =
+    useCompleteVerification();
+  const { resendVerificationOtpMutation, resendVerificationOtpPending } =
+    useResendVerificationOtp();
 
   const [otp, setOtp] = useState("");
-  const [isResending, setIsResending] = useState(false);
-  const inputRefs = useRef<(TextInput | null)[]>([]);
+  const [verificationId, setVerificationId] = useState("");
+  const [secondsLeft, setSecondsLeft] = useState(0);
+  const initiatedEmailRef = useRef<string | null>(null);
+  const userEmail = currentUser?.email || "";
+  const maskedEmail = maskEmail(userEmail);
+  const isSending =
+    isCurrentUserLoading ||
+    initiateVerificationPending ||
+    resendVerificationOtpPending;
+  const isVerifying = completeVerificationPending;
+  const isOtpComplete = otp.length === OTP_LENGTH;
+  const resendDisabled = secondsLeft > 0 || isSending || isVerifying;
+
+  const startTimer = () => {
+    setSecondsLeft(RESEND_SECONDS);
+  };
+
+  useEffect(() => {
+    if (secondsLeft <= 0) return;
+
+    const timer = setInterval(() => {
+      setSecondsLeft((currentSeconds) => Math.max(currentSeconds - 1, 0));
+    }, 1000);
+
+    return () => clearInterval(timer);
+  }, [secondsLeft]);
+
+  useEffect(() => {
+    if (!userEmail || initiatedEmailRef.current === userEmail) return;
+
+    initiatedEmailRef.current = userEmail;
+    const sendInitialOtp = async () => {
+      try {
+        const response = await initiateVerificationMutation({
+          verification_type: "email",
+          value: userEmail,
+        });
+        setVerificationId(response.public_id);
+        startTimer();
+      } catch {
+        initiatedEmailRef.current = null;
+      }
+    };
+
+    sendInitialOtp();
+  }, [initiateVerificationMutation, userEmail]);
 
   const handleResendCode = async () => {
-    setIsResending(true);
-    // Simulate API call
-    setTimeout(() => {
-      setIsResending(false);
-      Alert.alert("Success", "OTP code has been resent to your email");
-    }, 1500);
+    if (resendDisabled || !userEmail) return;
+
+    try {
+      if (!verificationId) {
+        const response = await initiateVerificationMutation({
+          verification_type: "email",
+          value: userEmail,
+        });
+        setVerificationId(response.public_id);
+      } else {
+        await resendVerificationOtpMutation({ verification_type: "email" });
+      }
+
+      setOtp("");
+      startTimer();
+    } catch {}
   };
 
   const handleVerifyEmail = async () => {
-    if (otp.length !== 5) {
+    if (otp.length !== OTP_LENGTH) {
       Alert.alert("Error", "Please enter the complete OTP code");
       return;
     }
 
-    if (otp.length === 5) {
+    if (!verificationId) {
+      Alert.alert(
+        "OTP Not Ready",
+        "We are still preparing your verification. Please try again.",
+      );
+      return;
+    }
+
+    try {
+      await completeVerificationMutation({
+        verification_id: verificationId,
+        otp_code: otp,
+      });
       onNext();
-    } else {
-      Alert.alert("Error", "Invalid OTP code. Please try again.");
+    } catch {
       setOtp("");
-      inputRefs.current[0]?.focus();
     }
   };
 
-  const isOtpComplete = otp.length === 5;
-
   return (
     <View style={Styles.container}>
-      {/* Content */}
       <View style={Styles.contentContainer}>
-        {/* Email Icon */}
         <View style={Styles.iconContainer}>
           <Image
             source={require("@/assets/icons/mail-outline-light.png")}
@@ -68,40 +156,55 @@ const EmailVerificationStep = ({ onNext }: EmailVerificationProps) => {
           />
         </View>
 
-        {/* Title and Description */}
         <View style={Styles.textContainer}>
           <Text style={Styles.headText}>Verify your email address</Text>
           <Text style={Styles.descriptionText}>
             Please input the OTP sent to your registered email address{" "}
-            <Text style={Styles.emailText}>{userEmail}</Text>
+            <Text style={Styles.emailText}>{maskedEmail}</Text>
           </Text>
+          {isSending ? (
+            <View style={Styles.sendingContainer}>
+              <ActivityIndicator size="small" color={colors.slate[600]} />
+              <Text style={Styles.sendingText}>Sending verification code...</Text>
+            </View>
+          ) : null}
         </View>
 
-        {/* OTP Input */}
-        <OTPInput length={5} onComplete={(code) => setOtp(code)} />
+        <OTPInput
+          length={OTP_LENGTH}
+          onChangeCode={setOtp}
+          onComplete={setOtp}
+        />
 
         <View style={Styles.buttonContainer}>
           <AppButton
-            title="Verify email"
+            title={isVerifying ? "Verifying..." : "Verify email"}
             onPress={handleVerifyEmail}
             fullwidth
             size="large"
-            disabled={!isOtpComplete}
+            disabled={!isOtpComplete || isVerifying || isSending}
           />
         </View>
-        {/* Resend Link */}
+
         <View style={Styles.resendContainer}>
           <Text style={Styles.resendText}>Didn&apos;t receive OTP? </Text>
-          <TouchableOpacity onPress={handleResendCode} disabled={isResending}>
-            <Text style={Styles.resendLink}>
-              {isResending ? "Sending..." : "Resend code"}
+          <TouchableOpacity onPress={handleResendCode} disabled={resendDisabled}>
+            <Text
+              style={[
+                Styles.resendLink,
+                resendDisabled && Styles.resendLinkDisabled,
+              ]}
+            >
+              {initiateVerificationPending || resendVerificationOtpPending
+                ? "Sending..."
+                : "Resend code"}
             </Text>
           </TouchableOpacity>
-          <Text style={Styles.resendText}> 8:58</Text>
+          {secondsLeft > 0 ? (
+            <Text style={Styles.resendText}> {formatCountdown(secondsLeft)}</Text>
+          ) : null}
         </View>
       </View>
-
-      {/* Verify Button */}
     </View>
   );
 };
@@ -120,7 +223,6 @@ const styles = (colors: ColorScheme) =>
     iconContainer: {
       marginBottom: RFValue(16),
     },
-
     emailIcon: {
       width: RFValue(40),
       height: RFValue(40),
@@ -145,27 +247,15 @@ const styles = (colors: ColorScheme) =>
       fontWeight: "600",
       color: colors.slate[650],
     },
-    otpContainer: {
+    sendingContainer: {
+      alignItems: "center",
       flexDirection: "row",
-      gap: RFValue(12),
-      marginBottom: RFValue(12),
-      justifyContent: "center",
+      gap: RFValue(8),
+      marginTop: RFValue(8),
     },
-    otpInput: {
-      width: RFValue(50),
-      height: RFValue(50),
-      borderRadius: RFValue(12),
-      borderWidth: 1.5,
-      borderColor: colors.slate[300],
-      backgroundColor: colors.background,
-      fontSize: RFValue(24),
-      fontWeight: "600",
-      color: colors.slate[650],
-      textAlign: "center",
-    },
-    otpInputFilled: {
-      borderColor: colors.slate[650],
-      backgroundColor: colors.slate[100],
+    sendingText: {
+      color: colors.slate[600],
+      fontSize: RFValue(13),
     },
     resendContainer: {
       flexDirection: "row",
@@ -182,13 +272,8 @@ const styles = (colors: ColorScheme) =>
       color: colors.info[200],
       fontWeight: "600",
     },
-    avatarContainer: {
-      marginTop: RFValue(20),
-    },
-    avatar: {
-      width: RFValue(80),
-      height: RFValue(80),
-      borderRadius: RFValue(40),
+    resendLinkDisabled: {
+      color: colors.slate[450],
     },
     buttonContainer: {
       marginVertical: RFValue(20),

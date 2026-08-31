@@ -1,21 +1,21 @@
+import AppButton from "@/components/button";
+import SafeAreaViewContainer from "@/components/safeareaview";
+import { useTheme } from "@/contexts/themeContext";
+import { useCreateBooking } from "@/hooks";
+import { BookingPropertyType } from "@/types";
+import { ColorScheme } from "@/utils";
+import { useLocalSearchParams, useRouter } from "expo-router";
 import React, { useState } from "react";
 import {
   Image,
+  Modal,
   Pressable,
   ScrollView,
   StyleSheet,
   Text,
   View,
-  Modal,
 } from "react-native";
 import { RFValue } from "react-native-responsive-fontsize";
-import SafeAreaViewContainer from "@/components/safeareaview";
-import { useTheme } from "@/contexts/themeContext";
-import { ColorScheme } from "@/utils";
-import { useRouter, useLocalSearchParams } from "expo-router";
-import AppButton from "@/components/button";
-import { useCreateBooking } from "@/hooks";
-import { BookingPropertyType } from "@/types";
 
 const BookingSummary = () => {
   const router = useRouter();
@@ -99,7 +99,7 @@ const BookingSummary = () => {
             : bookingData.totalAmount,
         amountValue: String(paymentAmount),
         relatedId: booking.public_id,
-        purpose: type === "reserve" ? "reservation_fee" : "booking_fee",
+        purpose: type === "reserve" ? "booking_deposit" : "booking_rent",
       },
     });
   };
@@ -140,7 +140,13 @@ const BookingSummary = () => {
             <Text style={styles.sectionTitle}>Property Info</Text>
             <View style={styles.propertyCard}>
               <Image
-                source={bookingData.propertyImage}
+                source={
+                  bookingData.propertyImage.uri.length > 8
+                    ? bookingData.propertyImage
+                    : {
+                        uri: require("@/assets/images/diplace.jpg"),
+                      }
+                }
                 style={styles.propertyImage}
               />
               <View style={styles.propertyInfo}>
@@ -261,12 +267,20 @@ const BookingSummary = () => {
       <View style={styles.footer}>
         <AppButton
           onPress={handleConfirmPayment}
-          title={isCreateBookingPending ? "Creating Booking..." : "Confirm & Pay in Full"}
+          title={
+            isCreateBookingPending
+              ? "Creating Booking..."
+              : "Confirm & Pay in Full"
+          }
           disabled={isCreateBookingPending}
         />
         <AppButton
           onPress={handleReserveNow}
-          title={isCreateBookingPending ? "Creating Booking..." : "Reserve with Partial Payment"}
+          title={
+            isCreateBookingPending
+              ? "Creating Booking..."
+              : "Reserve with Partial Payment"
+          }
           variant="secondary"
           disabled={isCreateBookingPending}
         />
@@ -338,7 +352,11 @@ const BookingSummary = () => {
                   setShowReserveModal(false);
                   handlePaymentRoute("reserve");
                 }}
-                title={isCreateBookingPending ? "Creating Booking..." : "Make Payment"}
+                title={
+                  isCreateBookingPending
+                    ? "Creating Booking..."
+                    : "Make Payment"
+                }
                 disabled={!agreedToTerms || isCreateBookingPending}
               />
             </View>
@@ -369,7 +387,11 @@ const BookingSummary = () => {
                   setShowFullPaymentModal(false);
                   handlePaymentRoute("full");
                 }}
-                title={isCreateBookingPending ? "Creating Booking..." : "Confirm with Full Payment"}
+                title={
+                  isCreateBookingPending
+                    ? "Creating Booking..."
+                    : "Confirm with Full Payment"
+                }
                 disabled={isCreateBookingPending}
               />
               <AppButton

@@ -1,7 +1,36 @@
 import { showToast } from "@/lib";
 import { deleteRequest, getRequest, postRequest, putRequest } from "@/services";
-import { BankDetails, BankPayload } from "@/types";
+import { BankDetails, BankPayload, SupportedBank } from "@/types";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+
+export function useSupportedBanks({
+  query = "",
+  enabled = true,
+}: {
+  query?: string;
+  enabled?: boolean;
+} = {}) {
+  const searchTerm = query.trim();
+  const bankQuery = useQuery({
+    queryKey: ["supported-banks", searchTerm],
+    enabled,
+    queryFn: async () => {
+      return await getRequest<SupportedBank[]>({
+        url: "/bankRoute/supported",
+        params: searchTerm ? { query: searchTerm } : undefined,
+        protectedRoute: true,
+      });
+    },
+  });
+
+  return {
+    supportedBanks: bankQuery.data ?? [],
+    isSupportedBanksLoading: bankQuery.isLoading,
+    isSupportedBanksFetching: bankQuery.isFetching,
+    supportedBanksError: bankQuery.error,
+    refetchSupportedBanks: bankQuery.refetch,
+  };
+}
 
 export function useGetUserBanks({ enabled = true }: { enabled?: boolean } = {}) {
   const query = useQuery({

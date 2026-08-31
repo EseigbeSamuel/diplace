@@ -132,7 +132,7 @@ export const Tabs = [
   },
   {
     id: "2",
-    name: "Appartment",
+    name: "Apartment",
     icon: "",
     isActive: false,
   },

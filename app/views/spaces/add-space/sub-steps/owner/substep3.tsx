@@ -2,7 +2,9 @@ import AppButton from "@/components/button";
 import SafeAreaViewContainer from "@/components/safeareaview";
 import TextField from "@/components/textfield";
 import { useTheme } from "@/contexts/themeContext";
+import { useBankNameInquiry, useSupportedBanks } from "@/hooks";
 import { useSpaceStore } from "@/store/useSpace";
+import { SupportedBank } from "@/types";
 import { ColorScheme } from "@/utils";
 import React, { useEffect, useState } from "react";
 import {
@@ -18,11 +20,6 @@ import {
 } from "react-native";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import { RFValue } from "react-native-responsive-fontsize";
-
-interface Bank {
-  id: number;
-  name: string;
-}
 
 interface Props {
   onComplete: (bankDetails: {
@@ -48,81 +45,78 @@ const AddBankDetails = ({
   const { colors } = useTheme();
   const { setValue } = useSpaceStore();
   const addBankStyles = styles(colors);
+  const { bankNameInquiryMutation, bankNameInquiryPending } =
+    useBankNameInquiry();
 
-  const [selectedBank, setSelectedBank] = useState<string>("");
-  const [accountNumber, setAccountNumber] = useState("");
-  const [accountName, setAccountName] = useState("");
+  const [selectedBank, setSelectedBank] = useState<SupportedBank | null>(
+    initialBankDetails?.bank
+      ? { name: initialBankDetails.bank, code: "" }
+      : null,
+  );
+  const [accountNumber, setAccountNumber] = useState(
+    initialBankDetails?.accountNumber || "",
+  );
+  const [accountName, setAccountName] = useState(
+    initialBankDetails?.accountName || "",
+  );
   const [showBankModal, setShowBankModal] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
-  const [isVerifying, setIsVerifying] = useState(false);
-
-  const banks: Bank[] = [
-    { id: 1, name: "Access Bank Plc" },
-    { id: 2, name: "First Bank of Nigeria Plc" },
-    { id: 3, name: "OPAY" },
-    { id: 4, name: "Moniepoint MFB" },
-    { id: 5, name: "United Bank of Africa (UBA)" },
-    { id: 6, name: "Guarantee Trust Bank (GTB)" },
-    { id: 7, name: "Union Bank" },
-    { id: 8, name: "Keystone Bank" },
-    { id: 9, name: "Eco Bank" },
-    { id: 10, name: "Wema Bank" },
-    { id: 11, name: "Fidelity Bank" },
-    { id: 12, name: "Kuda MFB" },
-  ];
-
-  const filteredBanks = banks.filter((bank) =>
-    bank.name.toLowerCase().includes(searchQuery.toLowerCase()),
-  );
+  const {
+    supportedBanks,
+    isSupportedBanksLoading,
+    isSupportedBanksFetching,
+    supportedBanksError,
+    refetchSupportedBanks,
+  } = useSupportedBanks({ query: searchQuery, enabled: showBankModal });
+  const isVerifying = bankNameInquiryPending;
 
   // Auto-verify account when 10 digits are entered
   useEffect(() => {
-    if (accountNumber.length === 10 && selectedBank) {
+    if (accountNumber.length === 10 && selectedBank?.code) {
       verifyAccountNumber();
     } else if (accountNumber.length < 10) {
       setAccountName("");
     }
-  }, [accountNumber, selectedBank]);
+  }, [accountNumber, selectedBank?.code]);
 
   const verifyAccountNumber = async () => {
-    setIsVerifying(true);
     setAccountName("");
+    if (!selectedBank?.code || accountNumber.length !== 10) return;
 
-    // Simulate API call to verify account
-    setTimeout(() => {
-      // Mock response - replace with actual API call
-      setAccountName("IBE X ALEX");
-      setIsVerifying(false);
-    }, 2000);
+    try {
+      const response = await bankNameInquiryMutation({
+        bankCode: selectedBank.code,
+        accountNumber,
+      });
+      setAccountName(response.account_name || "");
+    } catch {
+      setAccountName("");
+    }
   };
 
-  const handleSelectBank = (bankName: string) => {
-    setSelectedBank(bankName);
+  const handleSelectBank = (bank: SupportedBank) => {
+    setSelectedBank(bank);
     setShowBankModal(false);
     setSearchQuery("");
-    // Reset account name when bank changes
     setAccountName("");
   };
 
   const handleComplete = () => {
     if (selectedBank && accountNumber.length === 10 && accountName) {
-      // Handle form submission
-      console.log("Bank:", selectedBank);
-      console.log("Account Number:", accountNumber);
-      console.log("Account Name:", accountName);
+      const bankDetails = {
+        accountName,
+        accountNumber,
+        bank: selectedBank.name,
+      };
       ownerAcct
         ? setValue({
-            ownerAccountDetails: {
-              accountName,
-              accountNumber,
-              bank: selectedBank,
-            },
+            ownerAccountDetails: bankDetails,
           })
         : setValue({
-            accountDetails: { accountName, accountNumber, bank: selectedBank },
+            accountDetails: bankDetails,
           });
+      onComplete(bankDetails);
       onClose();
-      // Navigate back or show success message
     }
   };
 
@@ -179,7 +173,7 @@ const AddBankDetails = ({
                 <View style={addBankStyles.bankSection}>
                   <Text style={addBankStyles.bankLabel}>Bank</Text>
                   <Text style={addBankStyles.bankName}>
-                    {selectedBank || "UNAVAILABLE"}
+                    {selectedBank?.name || "UNAVAILABLE"}
                   </Text>
                 </View>
               </View>
@@ -197,9 +191,9 @@ const AddBankDetails = ({
                 <TextField
                   label="Bank Name"
                   type="dropdown"
-                  value={selectedBank}
+                  value={selectedBank?.name || ""}
                   onDropdownPress={() => setShowBankModal(true)}
-                  onChange={(value) => setSelectedBank(value.toString())}
+                  onChange={() => {}}
                 />
 
                 {/* Account Number Input */}
@@ -207,7 +201,9 @@ const AddBankDetails = ({
                 <TextField
                   label="Account Number"
                   value={accountNumber}
-                  onChange={(value) => setAccountNumber(value.toString())}
+                  onChange={(value) =>
+                    setAccountNumber(value.toString().replace(/\D/g, ""))
+                  }
                   keyboardType="numeric"
                   maxLength={10}
                   editable={!!selectedBank}
@@ -288,26 +284,50 @@ const AddBankDetails = ({
 
               {/* Bank List */}
               <ScrollView style={addBankStyles.bankList}>
-                {filteredBanks.map((bank) => (
+                {isSupportedBanksLoading || isSupportedBanksFetching ? (
+                  <View style={addBankStyles.bankState}>
+                    <ActivityIndicator size="small" color={colors.slate[500]} />
+                    <Text style={addBankStyles.bankStateText}>
+                      Loading banks...
+                    </Text>
+                  </View>
+                ) : supportedBanksError ? (
                   <Pressable
-                    key={bank.id}
+                    style={addBankStyles.bankState}
+                    onPress={() => refetchSupportedBanks()}
+                  >
+                    <Text style={addBankStyles.bankStateText}>
+                      Unable to load banks. Tap to retry.
+                    </Text>
+                  </Pressable>
+                ) : supportedBanks.length > 0 ? (
+                  supportedBanks.map((bank) => (
+                  <Pressable
+                    key={bank.code}
                     style={addBankStyles.bankItem}
-                    onPress={() => handleSelectBank(bank.name)}
+                    onPress={() => handleSelectBank(bank)}
                   >
                     <View
                       style={[
                         addBankStyles.radioButton,
-                        selectedBank === bank.name &&
+                        selectedBank?.code === bank.code &&
                           addBankStyles.radioButtonSelected,
                       ]}
                     >
-                      {selectedBank === bank.name && (
+                      {selectedBank?.code === bank.code && (
                         <View style={addBankStyles.radioButtonInner} />
                       )}
                     </View>
                     <Text style={addBankStyles.bankItemText}>{bank.name}</Text>
                   </Pressable>
-                ))}
+                  ))
+                ) : (
+                  <View style={addBankStyles.bankState}>
+                    <Text style={addBankStyles.bankStateText}>
+                      No banks found.
+                    </Text>
+                  </View>
+                )}
               </ScrollView>
             </View>
           </View>
@@ -569,6 +589,19 @@ const styles = (colors: ColorScheme) =>
     },
     bankList: {
       marginTop: RFValue(8),
+    },
+    bankState: {
+      alignItems: "center",
+      flexDirection: "row",
+      gap: RFValue(8),
+      justifyContent: "center",
+      paddingHorizontal: RFValue(20),
+      paddingVertical: RFValue(20),
+    },
+    bankStateText: {
+      color: colors.slate[500],
+      fontSize: RFValue(14),
+      textAlign: "center",
     },
     bankItem: {
       flexDirection: "row",

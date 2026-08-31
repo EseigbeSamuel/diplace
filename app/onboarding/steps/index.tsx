@@ -1,6 +1,6 @@
 import { useTheme } from "@/contexts/themeContext";
 import { ColorScheme } from "@/utils";
-import React, { useState } from "react";
+import React, { useMemo, useState } from "react";
 import { Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { RFValue } from "react-native-responsive-fontsize";
 import SelfieVerificationStep from "./capture-selfie";
@@ -11,7 +11,11 @@ import Info2 from "./info2";
 import PhoneVerificationStep from "./phone";
 import Selfie from "./selfie";
 import SafeAreaViewContainer from "@/components/safeareaview";
-import { useGetCurrentUser } from "@/hooks";
+import {
+  isCompletedVerification,
+  useGetCurrentUser,
+  useGetMyVerificationStatus,
+} from "@/hooks";
 import PersonalDataStep from "./personal";
 import AddBankDetails from "./bank";
 import { router } from "expo-router";
@@ -21,11 +25,63 @@ const Renter = () => {
   const Styles = styles(colors);
   const [current, setCurrent] = useState(1);
   const { currentUser } = useGetCurrentUser();
+  const { verificationStatus } = useGetMyVerificationStatus();
+  const maxStep = currentUser?.user_type === "renter" ? 7 : 9;
+  const completedVerifications = useMemo(() => {
+    const isTypeCompleted = (...types: string[]) =>
+      verificationStatus.some(
+        (item) =>
+          types.includes(item.verification_type) &&
+          isCompletedVerification(item),
+      );
+
+    return {
+      face: isTypeCompleted("face"),
+      email: isTypeCompleted("email"),
+      phone: isTypeCompleted("phone"),
+      identity: isTypeCompleted("nin", "bvn"),
+    };
+  }, [verificationStatus]);
+
+  const isStepCompleted = (step: number) => {
+    switch (step) {
+      case 2:
+      case 3:
+        return completedVerifications.face;
+      case 4:
+        return completedVerifications.email;
+      case 5:
+        return completedVerifications.phone;
+      case 6:
+        return completedVerifications.identity;
+      default:
+        return false;
+    }
+  };
+
+  const getNextStep = (fromStep: number) => {
+    for (let step = fromStep + 1; step <= maxStep; step += 1) {
+      if (!isStepCompleted(step)) return step;
+    }
+    return fromStep;
+  };
+
+  const getPreviousStep = (fromStep: number) => {
+    for (let step = fromStep - 1; step >= 1; step -= 1) {
+      if (!isStepCompleted(step)) return step;
+    }
+    return 1;
+  };
 
   const renderStep = () => {
     switch (current) {
       case 1:
-        return <Info onNext={handleNext} />;
+        return (
+          <Info
+            onNext={handleNext}
+            completedVerifications={completedVerifications}
+          />
+        );
       case 2:
         return <Selfie onNext={handleNext} />;
       case 3:
@@ -54,17 +110,14 @@ const Renter = () => {
   };
 
   const handleNext = () => {
-    if (
-      (currentUser?.user_type === "renter" && current < 7) ||
-      (currentUser?.user_type === "agent" && current < 9)
-    ) {
-      setCurrent(current + 1);
+    if (current < maxStep) {
+      setCurrent(getNextStep(current));
     }
   };
 
   const handleBack = () => {
     if (current > 1) {
-      setCurrent(current - 1);
+      setCurrent(getPreviousStep(current));
     } else {
       // Optionally, you can handle the case when the user is on the first step and presses back
       // For example, you might want to exit the onboarding flow or show a confirmation dialog
@@ -82,7 +135,7 @@ const Renter = () => {
 
   return (
     <SafeAreaViewContainer>
-      {current < (currentUser?.user_type === "renter" ? 7 : 9) && (
+      {current < maxStep && (
         <View className="flex-row items-center justify-between w-full">
           <View>
             <TouchableOpacity

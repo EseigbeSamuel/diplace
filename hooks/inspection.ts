@@ -6,9 +6,7 @@ import {
   ScheduleInspectionPayload,
 } from "@/types";
 import {
-  CreateInspectionResponse,
   InspectionHistoryResponse,
-  InspectionPayload,
   InspectionQueryParams,
 } from "@/types/screens/inspection";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
@@ -25,8 +23,8 @@ export const useCreateInspection = () => {
     error: createInspectionError,
     isSuccess: isCreateInspectionSuccess,
   } = useMutation({
-    mutationFn: async (payload: InspectionPayload) => {
-      return await postRequest<CreateInspectionResponse, InspectionPayload>({
+    mutationFn: async (payload: ScheduleInspectionPayload) => {
+      return await postRequest<InspectionResponse, ScheduleInspectionPayload>({
         url: `/inspection/inspections`,
         payload,
         protectedRoute: true,
@@ -75,7 +73,8 @@ export const useTransactionHistory = (params: InspectionQueryParams = {}) => {
   });
 
   return {
-    transactionHistory: data,
+    transactionHistory: data?.items ?? [],
+    transactionHistoryPagination: data?.pagination,
     isTransactionHistoryLoading: isLoading,
     transactionHistoryError: error,
     refetchTransactionHistory: refetch,

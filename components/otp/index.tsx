@@ -1,6 +1,6 @@
 import { useTheme } from "@/contexts/themeContext";
 import { ColorScheme } from "@/utils";
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import {
   NativeSyntheticEvent,
   StyleSheet,
@@ -12,15 +12,28 @@ import { RFValue } from "react-native-responsive-fontsize";
 
 interface OTPInputProps {
   length?: number;
+  onChangeCode?: (code: string) => void;
   onComplete?: (code: string) => void;
+  resetKey?: number | string;
 }
 
-export default function OTPInput({ length = 6, onComplete }: OTPInputProps) {
+export default function OTPInput({
+  length = 6,
+  onChangeCode,
+  onComplete,
+  resetKey,
+}: OTPInputProps) {
   const [otp, setOtp] = useState<string[]>(Array(length).fill(""));
   const inputRefs = useRef<(TextInput | null)[]>([]);
 
   const { colors } = useTheme();
   const styles = styleSheet(colors);
+
+  useEffect(() => {
+    setOtp(Array(length).fill(""));
+    onChangeCode?.("");
+    inputRefs.current[0]?.focus();
+  }, [length, onChangeCode, resetKey]);
 
   const handleOtpChange = (value: string, index: number) => {
     // If user pressed backspace on Android: value becomes ""
@@ -28,6 +41,7 @@ export default function OTPInput({ length = 6, onComplete }: OTPInputProps) {
       const newOtp = [...otp];
       newOtp[index] = "";
       setOtp(newOtp);
+      onChangeCode?.(newOtp.join(""));
 
       if (index > 0) {
         inputRefs.current[index - 1]?.focus();
@@ -41,6 +55,8 @@ export default function OTPInput({ length = 6, onComplete }: OTPInputProps) {
     const newOtp = [...otp];
     newOtp[index] = value;
     setOtp(newOtp);
+    const nextCode = newOtp.join("");
+    onChangeCode?.(nextCode);
 
     // Move to next input
     if (index < length - 1) {
@@ -49,7 +65,7 @@ export default function OTPInput({ length = 6, onComplete }: OTPInputProps) {
 
     // Trigger onComplete if filled
     if (index === length - 1 && onComplete) {
-      onComplete(newOtp.join(""));
+      onComplete(nextCode);
     }
   };
 

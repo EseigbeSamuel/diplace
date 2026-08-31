@@ -28,14 +28,6 @@ const Profile = () => {
   const profileStyles = styles(colors);
   const [showMediaModal, setShowMediaModal] = useState(false);
 
-  const normalizeImageUrl = (url?: string) => {
-    if (!url) return null;
-    if (url.startsWith("http://") || url.startsWith("https://")) return url;
-    if (url.startsWith("/")) return `https://diplace.api.elsoft.ng${url}`;
-    return `https://diplace.api.elsoft.ng/${url}`;
-  };
-
-  const profileImageUrl = normalizeImageUrl(currentUser?.profile_picture);
   const profileName =
     currentUser?.full_name?.trim() ||
     `${currentUser?.first_name || ""} ${currentUser?.last_name || ""}`.trim() ||
@@ -244,9 +236,10 @@ const Profile = () => {
           <View style={profileStyles.avatarContainer}>
             <Image
               source={
-                profileImageUrl
-                  ? { uri: profileImageUrl }
-                  : require("@/assets/images/user.png")
+                currentUser?.profile_picture &&
+                currentUser?.profile_picture?.length > 6
+                  ? { uri: currentUser?.profile_picture }
+                  : require("@/assets/images/sammy.jpg")
               }
               style={profileStyles.avatar}
             />
@@ -289,7 +282,10 @@ const Profile = () => {
         </View>
 
         {/* Upgrade Banner */}
-        <Pressable style={profileStyles.upgradeBanner}>
+        <Pressable
+          style={profileStyles.upgradeBanner}
+          onPress={() => router.push("/onboarding/welcome")}
+        >
           <View style={profileStyles.upgradeContent}>
             <Text style={profileStyles.upgradeTitle}>
               {userType === "agent"

@@ -1096,7 +1096,9 @@ const Placedetails = () => {
                     <Text style={styles.inspectionFeeLabel}>
                       Inspection fee:
                     </Text>
-                    <Text style={styles.inspectionFeeAmount}>₦1,000</Text>
+                    <Text style={styles.inspectionFeeAmount}>
+                      {formatMoneyParam(selectedTime?.price ?? 0)}
+                    </Text>
                   </View>
 
                   {/* Security Note */}

@@ -54,6 +54,12 @@
       "expo-web-browser",
       "expo-maps",
       [
+        "expo-camera",
+        {
+          "cameraPermission": "Allow Di Place to access your camera for selfie verification."
+        }
+      ],
+      [
         "expo-build-properties",
         {
           "android": {
