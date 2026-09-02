@@ -1,4 +1,9 @@
-import { checkTokenExpiry, clearAll, getFromLocalStore, showToast } from "@/lib";
+import {
+  checkTokenExpiry,
+  clearAll,
+  getFromLocalStore,
+  showToast,
+} from "@/lib";
 import axios, { AxiosResponse, Method } from "axios";
 
 let lastToastMessage = "";
@@ -33,13 +38,12 @@ export const apiService = async <TResponse, TRequest = undefined>(
   protectedRoute: boolean = false,
   params?: Record<string, string | number | boolean>,
   headers: Record<string, string> = {},
-  baseURL: string = "https://diplace.api.elsoft.ng/api/v1",
+  baseURL: string = "https://api-diplace.elsoft.ng/api/v1",
   responseType: "json" | "blob" = "json",
   notifyOnError?: boolean,
 ): Promise<TResponse> => {
   const token = await getFromLocalStore("access_token");
-  const shouldNotify =
-    notifyOnError ?? String(method).toUpperCase() !== "GET";
+  const shouldNotify = notifyOnError ?? String(method).toUpperCase() !== "GET";
 
   if (protectedRoute && token) {
     if (await checkTokenExpiry(token)) {
@@ -111,7 +115,10 @@ export const apiService = async <TResponse, TRequest = undefined>(
 
         showApiToast("Request Failed", message);
       } else {
-        showApiToast("Unexpected Error", "Something went wrong. Please try again.");
+        showApiToast(
+          "Unexpected Error",
+          "Something went wrong. Please try again.",
+        );
         console.error("Unknown error:", error);
       }
     }

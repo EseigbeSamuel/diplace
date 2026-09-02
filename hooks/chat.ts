@@ -4,9 +4,9 @@ import {
   ConversationListResponse,
   ConversationParams,
   ConversationPayload,
-  ConversationResponse,
   MessagePayload,
   MessageResponse,
+  StartConversationResponse,
 } from "@/types";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
@@ -60,7 +60,7 @@ export function useStartConversation() {
   const queryClient = useQueryClient();
   const { mutateAsync, isPending } = useMutation({
     mutationFn: async (payload: ConversationPayload) => {
-      return await postRequest<ConversationResponse, ConversationPayload>({
+      return await postRequest<StartConversationResponse, ConversationPayload>({
         url: "/chats/conversations",
         payload,
         notifyOnError: false,

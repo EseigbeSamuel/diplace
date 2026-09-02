@@ -152,7 +152,7 @@ const Placedetails = () => {
         property_id: propId || undefined,
         message_content: `Hi ${listedByName}, I'm inquiring about "${displayTitle}".`,
       });
-      return newConv?.public_id || null;
+      return newConv?.conversation_id || null;
     } catch (err) {
       console.warn("Failed to create conversation:", err);
       return null;

@@ -233,6 +233,7 @@ const Call = () => {
   );
   const [livekitToken, setLivekitToken] = useState<string | undefined>();
   const [livekitUrl, setLivekitUrl] = useState<string | undefined>();
+  const [callAttempt, setCallAttempt] = useState(0);
 
   const { startCallMutation, isStartCallPending } = useStartCall();
   const { joinCallMutation, isJoinCallPending } = useJoinCall();
@@ -240,6 +241,7 @@ const Call = () => {
   const { currentUser } = useGetCurrentUser();
 
   const ringTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const activeCallIdRef = useRef<string | undefined>(paramCallId);
 
   // Start audio session on mount
   useEffect(() => {
@@ -265,6 +267,7 @@ const Call = () => {
 
         if (cancelled) return;
         setActiveCallId(callItem.public_id);
+        activeCallIdRef.current = callItem.public_id;
 
         // Immediately get a token to join our own room
         const joinData = await joinCallMutation(callItem.public_id);
@@ -274,8 +277,15 @@ const Call = () => {
         setLivekitUrl(joinData.server_url);
 
         // Give the other side 30s to answer
-        ringTimeoutRef.current = setTimeout(() => {
-          if (!cancelled) setCallState("not_answered");
+        ringTimeoutRef.current = setTimeout(async () => {
+          if (cancelled) return;
+          try {
+            await endCallMutation(callItem.public_id);
+          } catch {
+            // Keep the local timeout state even if cleanup fails remotely.
+          }
+          activeCallIdRef.current = undefined;
+          setCallState("not_answered");
         }, RING_TIMEOUT_MS);
       } catch {
         if (!cancelled) router.back();
@@ -287,9 +297,13 @@ const Call = () => {
     return () => {
       cancelled = true;
       if (ringTimeoutRef.current) clearTimeout(ringTimeoutRef.current);
+      const callId = activeCallIdRef.current;
+      if (callId) {
+        endCallMutation(callId).catch(() => undefined);
+      }
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [callMode, conversationId]);
+  }, [callAttempt, callMode, conversationId]);
 
   // Incoming: accept or decline
   const handleAcceptIncoming = useCallback(async () => {
@@ -326,8 +340,14 @@ const Call = () => {
         // ignore
       }
     }
+    activeCallIdRef.current = undefined;
     setCallState("not_answered");
   }, [activeCallId, endCallMutation]);
+
+  const handleLeaveCall = useCallback(async () => {
+    await handleEndCall();
+    router.back();
+  }, [handleEndCall, router]);
 
   //  LiveKit connected callback
   const handleRoomConnected = useCallback(() => {
@@ -375,7 +395,7 @@ const Call = () => {
 
       {/* Header */}
       <View style={styles.header}>
-        <TouchableOpacity style={styles.backBtn} onPress={() => router.back()}>
+        <TouchableOpacity style={styles.backBtn} onPress={handleLeaveCall}>
           <Image
             source={
               isDarkMode
@@ -435,7 +455,7 @@ const Call = () => {
             {/* Chat bubble placeholder */}
             <TouchableOpacity
               style={styles.controlBtn}
-              onPress={() => router.back()}
+              onPress={handleLeaveCall}
             >
               <Image
                 source={require("@/assets/icons/Chat - Iconly Pro-1.png")}
@@ -535,11 +555,12 @@ const Call = () => {
             <TouchableOpacity
               style={[styles.notAnsweredBtn, { backgroundColor: "#22C55E" }]}
               onPress={() => {
-                // Reset state and try again
                 setCallState("calling");
                 setActiveCallId(undefined);
+                activeCallIdRef.current = undefined;
                 setLivekitToken(undefined);
                 setLivekitUrl(undefined);
+                setCallAttempt((attempt) => attempt + 1);
               }}
               disabled={isStartCallPending}
             >

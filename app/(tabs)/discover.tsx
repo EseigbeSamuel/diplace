@@ -313,7 +313,7 @@ const Discover = () => {
       </View>
 
       <View>
-        <CustomCheck />
+        <CustomCheck size={30} color={colors.slate[650]} />
       </View>
 
       <ScrollView
@@ -689,27 +689,60 @@ const Discover = () => {
       </ScrollView>
 
       {/* Filter Bottom Sheet Modal */}
-      <FilterBottomSheets
+      <Modal
         visible={showFilterModal}
-        onClose={() => setShowFilterModal(false)}
-        type={type}
-        setType={setType}
-        rooms={rooms}
-        setRooms={setRooms}
-        baths={baths}
-        setBaths={setBaths}
-        minBudget={minBudget}
-        setMinBudget={setMinBudget}
-        maxBudget={maxBudget}
-        setMaxBudget={setMaxBudget}
-        selectedAmenities={selectedAmenities}
-        setSelectedAmenities={setSelectedAmenities}
-        selectedCity={selectedCity}
-        openCity={openCity}
-        openNeighborhood={() => {}}
-        clear={clear}
-        apply={apply}
-      />
+        transparent
+        animationType="slide"
+        onRequestClose={() => setShowFilterModal(false)}
+      >
+        <Pressable
+          style={{
+            flex: 1,
+            justifyContent: "flex-end",
+            backgroundColor: "rgba(0, 0, 0, 0.4)",
+          }}
+          onPress={() => setShowFilterModal(false)}
+        >
+          <Pressable
+            style={{
+              maxHeight: "90%",
+              backgroundColor: colors.background,
+              borderTopLeftRadius: 24,
+              borderTopRightRadius: 24,
+              overflow: "hidden",
+            }}
+            onPress={(event) => event.stopPropagation()}
+          >
+            <FilterBottomSheets
+              selectedType={type}
+              onSelectType={setType}
+              rooms={rooms}
+              setRooms={setRooms}
+              baths={baths}
+              setBaths={setBaths}
+              minBudget={minBudget}
+              maxBudget={maxBudget}
+              onBudgetChange={(min, max) => {
+                setMinBudget(min);
+                setMaxBudget(max);
+              }}
+              selectedAmenities={selectedAmenities}
+              onToggleAmenity={(amenity) =>
+                setSelectedAmenities((previous) =>
+                  previous.includes(amenity)
+                    ? previous.filter((item) => item !== amenity)
+                    : [...previous, amenity],
+                )
+              }
+              onPressCity={openCity}
+              onPressNeighborhood={() => {}}
+              onClear={clear}
+              onApply={apply}
+              selectedCity={selectedCity}
+            />
+          </Pressable>
+        </Pressable>
+      </Modal>
 
       {/* City Selection Modal */}
       <Modal

@@ -31,8 +31,6 @@ export interface ConversationPayload {
   booking_id?: string;
   inspection_booking_id?: string;
   message_content?: string;
-  recipient_id?: string;
-  participant_id?: string;
 }
 
 export interface ConversationResponse {
@@ -45,6 +43,15 @@ export interface ConversationResponse {
   last_message_at: string;
   participants: ChatUser[];
   unread_count: number;
+}
+
+export interface StartConversationResponse {
+  public_id: string;
+  status: ChatStatus;
+  conversation_id: string;
+  sender_id: string;
+  content: string;
+  sender: ChatUser;
 }
 
 export interface ConversationParams {
