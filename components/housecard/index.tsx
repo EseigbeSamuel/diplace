@@ -39,6 +39,17 @@ const HouseCard = ({
 }) => {
   const { colors, isDarkMode } = useTheme();
   const homeStyles = styles(colors);
+  const remoteImageUri =
+    imageSource &&
+    typeof imageSource === "object" &&
+    "uri" in imageSource &&
+    typeof imageSource.uri === "string"
+      ? imageSource.uri
+      : "";
+  const cardImageSource =
+    remoteImageUri.length >= 7
+      ? imageSource
+      : require("@/assets/images/diplace.jpg");
 
   const renderBadge = () => {
     switch (badgeType) {
@@ -172,11 +183,7 @@ const HouseCard = ({
       <View className="flex-1 gap-0.5">
         <View className="rounded-2xl">
           <Image
-            source={
-              !(imageSource as any) || (imageSource as any)["uri"].length < 7
-                ? require("@/assets/images/diplace.jpg")
-                : imageSource
-            }
+            source={cardImageSource}
             style={{
               height: RFValue(155),
               width: "100%",

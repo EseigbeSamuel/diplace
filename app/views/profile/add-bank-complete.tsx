@@ -2,16 +2,18 @@ import AppButton from "@/components/button";
 import SafeAreaViewContainer from "@/components/safeareaview";
 import SectionHeader from "@/components/sectionheader";
 import TextField from "@/components/textfield";
-import { NIGERIAN_BANKS, NigerianBank } from "@/constants/banks";
 import { useTheme } from "@/contexts/themeContext";
-import { useBankNameInquiry, useCreateBank } from "@/hooks";
+import { useBankNameInquiry, useCreateBank, useSupportedBanks } from "@/hooks";
+import { SupportedBank } from "@/types";
 import { ColorScheme } from "@/utils";
 import { router } from "expo-router";
 import React, { useEffect, useState } from "react";
 import {
   ActivityIndicator,
   Image,
+  KeyboardAvoidingView,
   Modal,
+  Platform,
   Pressable,
   ScrollView,
   StyleSheet,
@@ -29,18 +31,24 @@ const AddBankDetails = () => {
     useBankNameInquiry();
   const { createBankMutation, createBankPending } = useCreateBank();
 
-  const [selectedBank, setSelectedBank] = useState<NigerianBank | null>(null);
+  const [selectedBank, setSelectedBank] = useState<SupportedBank | null>(null);
   const [accountNumber, setAccountNumber] = useState("");
   const [accountName, setAccountName] = useState("");
   const [accountType, setAccountType] = useState("savings");
   const [showBankModal, setShowBankModal] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
+  const {
+    supportedBanks,
+    isSupportedBanksLoading,
+    isSupportedBanksFetching,
+    supportedBanksError,
+    refetchSupportedBanks,
+  } = useSupportedBanks({
+    query: searchQuery,
+    enabled: showBankModal && searchQuery.trim().length >= 2,
+  });
   const isSubmitting = createBankPending;
   const isVerifying = bankNameInquiryPending;
-
-  const filteredBanks = NIGERIAN_BANKS.filter((bank) =>
-    bank.name.toLowerCase().includes(searchQuery.toLowerCase()),
-  );
 
   // Auto-verify account when 10 digits are entered
   useEffect(() => {
@@ -67,7 +75,7 @@ const AddBankDetails = () => {
     }
   };
 
-  const handleSelectBank = (bank: NigerianBank) => {
+  const handleSelectBank = (bank: SupportedBank) => {
     setSelectedBank(bank);
     setShowBankModal(false);
     setSearchQuery("");
@@ -159,11 +167,13 @@ const AddBankDetails = () => {
 
               <TextField
                 label="Account Number"
-                onChange={(text) => setAccountNumber(text.toString())}
+                onChange={(text) =>
+                  setAccountNumber(text.toString().replace(/\D/g, ""))
+                }
                 value={accountNumber}
                 keyboardType="numeric"
                 maxLength={10}
-                editable={!!selectedBank}
+                editable={!!selectedBank && !isSubmitting}
               />
               {isVerifying && (
                 <View style={addBankStyles.verificationSection}>
@@ -207,7 +217,10 @@ const AddBankDetails = () => {
         animationType="slide"
         onRequestClose={() => setShowBankModal(false)}
       >
-        <View style={addBankStyles.modalOverlay}>
+        <KeyboardAvoidingView
+          behavior={Platform.OS === "ios" ? "padding" : "height"}
+          style={addBankStyles.modalOverlay}
+        >
           <Pressable
             style={addBankStyles.modalBackdrop}
             onPress={() => setShowBankModal(false)}
@@ -237,29 +250,59 @@ const AddBankDetails = () => {
 
             {/* Bank List */}
             <ScrollView style={addBankStyles.bankList}>
-              {filteredBanks.map((bank) => (
+              {searchQuery.trim().length < 2 ? (
+                <View style={addBankStyles.bankState}>
+                  <Text style={addBankStyles.bankStateText}>
+                    Type at least 2 letters to search banks.
+                  </Text>
+                </View>
+              ) : isSupportedBanksLoading || isSupportedBanksFetching ? (
+                <View style={addBankStyles.bankState}>
+                  <ActivityIndicator size="small" color={colors.slate[500]} />
+                  <Text style={addBankStyles.bankStateText}>
+                    Loading banks...
+                  </Text>
+                </View>
+              ) : supportedBanksError ? (
                 <Pressable
-                  key={bank.code}
-                  style={addBankStyles.bankItem}
-                  onPress={() => handleSelectBank(bank)}
+                  style={addBankStyles.bankState}
+                  onPress={() => refetchSupportedBanks()}
                 >
-                  <View
-                    style={[
-                      addBankStyles.radioButton,
-                      selectedBank?.code === bank.code &&
-                        addBankStyles.radioButtonSelected,
-                    ]}
-                  >
-                    {selectedBank?.code === bank.code && (
-                      <View style={addBankStyles.radioButtonInner} />
-                    )}
-                  </View>
-                  <Text style={addBankStyles.bankItemText}>{bank.name}</Text>
+                  <Text style={addBankStyles.bankStateText}>
+                    Unable to load banks. Tap to retry.
+                  </Text>
                 </Pressable>
-              ))}
+              ) : supportedBanks.length > 0 ? (
+                supportedBanks.map((bank) => (
+                  <Pressable
+                    key={bank.code}
+                    style={addBankStyles.bankItem}
+                    onPress={() => handleSelectBank(bank)}
+                  >
+                    <View
+                      style={[
+                        addBankStyles.radioButton,
+                        selectedBank?.code === bank.code &&
+                          addBankStyles.radioButtonSelected,
+                      ]}
+                    >
+                      {selectedBank?.code === bank.code && (
+                        <View style={addBankStyles.radioButtonInner} />
+                      )}
+                    </View>
+                    <Text style={addBankStyles.bankItemText}>{bank.name}</Text>
+                  </Pressable>
+                ))
+              ) : (
+                <View style={addBankStyles.bankState}>
+                  <Text style={addBankStyles.bankStateText}>
+                    No banks found.
+                  </Text>
+                </View>
+              )}
             </ScrollView>
           </View>
-        </View>
+        </KeyboardAvoidingView>
       </Modal>
     </SafeAreaViewContainer>
   );
@@ -445,6 +488,7 @@ const styles = (colors: ColorScheme) =>
       backgroundColor: colors.background,
       borderTopLeftRadius: RFValue(24),
       borderTopRightRadius: RFValue(24),
+      minHeight: RFValue(360),
       maxHeight: "80%",
       paddingBottom: RFValue(20),
     },
@@ -490,6 +534,20 @@ const styles = (colors: ColorScheme) =>
     },
     bankList: {
       marginTop: RFValue(8),
+      minHeight: RFValue(220),
+    },
+    bankState: {
+      alignItems: "center",
+      flexDirection: "row",
+      gap: RFValue(8),
+      justifyContent: "center",
+      paddingHorizontal: RFValue(20),
+      paddingVertical: RFValue(20),
+    },
+    bankStateText: {
+      color: colors.slate[500],
+      fontSize: RFValue(14),
+      textAlign: "center",
     },
     bankItem: {
       flexDirection: "row",

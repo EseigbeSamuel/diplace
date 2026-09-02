@@ -1,129 +1,165 @@
-import React, { useState } from "react";
-import {
-  View,
-  Text,
-  StyleSheet,
-  TouchableOpacity,
-  Image,
-  TextInput,
-  Modal,
-  ActivityIndicator,
-  ScrollView,
-} from "react-native";
-import { RFValue } from "react-native-responsive-fontsize";
 import AppButton from "@/components/button";
-import SafeAreaViewContainer from "@/components/safeareaview";
-import { useTheme } from "@/contexts/themeContext";
-import { ColorScheme } from "@/utils";
-import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
-import TextField from "@/components/textfield";
 import { SimpleSelector } from "@/components/selector";
+import TextField from "@/components/textfield";
+import { useTheme } from "@/contexts/themeContext";
+import { useCompleteVerification, useInitiateVerification } from "@/hooks";
+import { ColorScheme } from "@/utils";
+import React, { useEffect, useRef, useState } from "react";
+import {
+  ActivityIndicator,
+  Alert,
+  Image,
+  Modal,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
+import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
+import { RFValue } from "react-native-responsive-fontsize";
 
 type IdentityVerificationProps = {
   onNext: () => void;
 };
 
-type IDType = "NIN" | "BVN" | "PASSPORT" | null;
+type IDType = "nin" | "bvn" | null;
+type ConfirmationData = Record<string, unknown>;
 
-interface PersonalInfo {
-  surname: string;
-  firstName: string;
-  middleName: string;
-  dateOfBirth: string;
-}
+const idTypes: { id: Exclude<IDType, null>; label: string }[] = [
+  { id: "nin", label: "Nat'l Identification No. (NIN)" },
+  { id: "bvn", label: "Bank Verification No. (BVN)" },
+];
+
+const formatValue = (value: unknown): string => {
+  if (value === null || value === undefined || value === "") return "N/A";
+  if (typeof value === "object") return JSON.stringify(value);
+  return String(value);
+};
+
+const prettifyKey = (key: string) =>
+  key
+    .replace(/_/g, " ")
+    .replace(/\b\w/g, (character) => character.toUpperCase());
 
 const IdentityVerificationStep = ({ onNext }: IdentityVerificationProps) => {
   const { colors } = useTheme();
   const Styles = styles(colors);
+  const { initiateVerificationMutation, initiateVerificationPending } =
+    useInitiateVerification();
+  const { completeVerificationMutation, completeVerificationPending } =
+    useCompleteVerification();
 
   const [selectedIDType, setSelectedIDType] = useState<IDType>(null);
   const [showIDTypeModal, setShowIDTypeModal] = useState(false);
   const [documentNumber, setDocumentNumber] = useState("");
-  const [isFetching, setIsFetching] = useState(false);
-  const [personalInfo, setPersonalInfo] = useState<PersonalInfo | null>(null);
-
-  const idTypes = [
-    { id: "NIN", label: "Nat'l Identification No. (NIN)" },
-    { id: "BVN", label: "Bank Verification No. (BVN)" },
-    { id: "PASSPORT", label: "Int'l Passport" },
-  ];
+  const [verificationId, setVerificationId] = useState("");
+  const [confirmationData, setConfirmationData] =
+    useState<ConfirmationData | null>(null);
+  const lastFetchedRef = useRef("");
+  const isFetching = initiateVerificationPending;
+  const isCompleting = completeVerificationPending;
+  const confirmationEntries = Object.entries(confirmationData ?? {});
 
   const getIDTypeLabel = (type: IDType) => {
     const idType = idTypes.find((item) => item.id === type);
     return idType ? idType.label : "";
   };
 
+  const resetVerification = () => {
+    setVerificationId("");
+    setConfirmationData(null);
+    lastFetchedRef.current = "";
+  };
+
   const handleSelectIDType = (type: IDType) => {
     setSelectedIDType(type);
     setShowIDTypeModal(false);
     setDocumentNumber("");
-    setPersonalInfo(null);
+    resetVerification();
   };
 
   const handleFetchData = async () => {
-    if (!documentNumber) return;
+    if (!selectedIDType || documentNumber.length !== 11) return;
 
-    setIsFetching(true);
+    const requestKey = `${selectedIDType}:${documentNumber}`;
+    if (lastFetchedRef.current === requestKey || isFetching) return;
 
-    // Simulate API call to fetch personal info
-    setTimeout(() => {
-      // Mock data - replace with actual API response
-      setPersonalInfo({
-        surname: "KALU",
-        firstName: "SABHMY",
-        middleName: "UKO",
-        dateOfBirth: "28-10-1995",
+    lastFetchedRef.current = requestKey;
+    setVerificationId("");
+    setConfirmationData(null);
+
+    try {
+      const response = await initiateVerificationMutation({
+        verification_type: selectedIDType,
+        value: documentNumber,
       });
-      setIsFetching(false);
-    }, 2000);
+      const data =
+        response.data_to_confirm ??
+        (response.fetched_data ? { fetched_data: response.fetched_data } : {});
+
+      setVerificationId(response.public_id);
+      setConfirmationData(data);
+    } catch {
+      lastFetchedRef.current = "";
+    }
   };
 
-  const handleDocumentNumberChange = (text: string) => {
-    // Only allow numbers
-    const cleaned = text.replace(/[^0-9]/g, "");
-    setDocumentNumber(cleaned);
-    if (text.length == 11) {
+  useEffect(() => {
+    if (documentNumber.length === 11 && selectedIDType) {
       handleFetchData();
     }
+  }, [documentNumber, selectedIDType]);
+
+  const handleDocumentNumberChange = (text: string) => {
+    setDocumentNumber(text.replace(/\D/g, "").slice(0, 11));
+    setVerificationId("");
+    setConfirmationData(null);
+    lastFetchedRef.current = "";
   };
 
-  const handleComplete = () => {
-    if (selectedIDType && documentNumber && personalInfo) {
-      // Save to store if needed
+  const handleComplete = async () => {
+    if (!selectedIDType || !verificationId || !confirmationData) return;
+
+    try {
+      await completeVerificationMutation({
+        verification_id: verificationId,
+        confirm_data: true,
+      });
       onNext();
-    }
+    } catch {}
   };
 
-  const isComplete = selectedIDType && documentNumber && personalInfo;
+  const isComplete =
+    !!selectedIDType &&
+    documentNumber.length === 11 &&
+    !!verificationId &&
+    !!confirmationData &&
+    !isFetching &&
+    !isCompleting;
 
   return (
-    <View>
+    <View style={Styles.root}>
       <KeyboardAwareScrollView
         showsVerticalScrollIndicator={false}
         contentContainerStyle={Styles.scrollContent}
         extraScrollHeight={30}
       >
         <View style={Styles.container}>
-          {/* Content */}
           <View style={Styles.contentContainer}>
-            {/* ID Icon */}
-
             <Image
               source={require("@/assets/icons/identification 2.png")}
               style={Styles.idIcon}
               resizeMode="contain"
             />
 
-            {/* Title and Description */}
             <View style={Styles.textContainer}>
               <Text style={Styles.headText}>Verify your identity</Text>
               <Text style={Styles.descriptionText}>
-                Please select any means of identification to verify your
-                account. We only crosscheck your data to be sure you are real.
+                Select NIN or BVN. We will fetch your details for confirmation
+                before completing verification.
               </Text>
             </View>
-
-            {/* Select ID Type */}
 
             <TextField
               label="Select means of ID"
@@ -133,18 +169,17 @@ const IdentityVerificationStep = ({ onNext }: IdentityVerificationProps) => {
               type="dropdown"
             />
 
-            {/* Document Number Input */}
             {selectedIDType && (
               <TextField
-                label="Document Number"
+                label={`${selectedIDType.toUpperCase()} Number`}
                 value={documentNumber}
                 onChange={(text) => handleDocumentNumberChange(text.toString())}
                 keyboardType="numeric"
                 maxLength={11}
+                editable={!isFetching && !isCompleting}
               />
             )}
 
-            {/* Fetching Indicator */}
             {isFetching && (
               <View style={Styles.fetchingContainer}>
                 <ActivityIndicator size="small" color={colors.slate[650]} />
@@ -152,57 +187,35 @@ const IdentityVerificationStep = ({ onNext }: IdentityVerificationProps) => {
               </View>
             )}
 
-            {/* Personal Information */}
-            {personalInfo && !isFetching && (
+            {confirmationData && !isFetching && (
               <View style={Styles.personalInfoContainer}>
-                <Text style={Styles.sectionTitle}>Personal Information</Text>
-
-                <View style={Styles.infoGrid}>
-                  {/* Row 1 */}
-                  <View style={Styles.infoRow}>
-                    <View style={Styles.infoField}>
-                      <Text style={Styles.infoLabel}>Surname</Text>
-                      <Text style={Styles.infoValue}>
-                        {personalInfo.surname}
-                      </Text>
-                    </View>
-
-                    <View style={Styles.infoField}>
-                      <Text style={Styles.infoLabel}>First Name</Text>
-                      <Text style={Styles.infoValue}>
-                        {personalInfo.firstName}
-                      </Text>
-                    </View>
+                <Text style={Styles.sectionTitle}>Confirm your information</Text>
+                {confirmationEntries.length > 0 ? (
+                  <View style={Styles.infoGrid}>
+                    {confirmationEntries.map(([key, value]) => (
+                      <View key={key} style={Styles.infoField}>
+                        <Text style={Styles.infoLabel}>{prettifyKey(key)}</Text>
+                        <Text style={Styles.infoValue}>
+                          {formatValue(value)}
+                        </Text>
+                      </View>
+                    ))}
                   </View>
-
-                  {/* Row 2 */}
-                  <View style={Styles.infoRow}>
-                    <View style={Styles.infoField}>
-                      <Text style={Styles.infoLabel}>Middle Name</Text>
-                      <Text style={Styles.infoValue}>
-                        {personalInfo.middleName}
-                      </Text>
-                    </View>
-
-                    <View style={Styles.infoField}>
-                      <Text style={Styles.infoLabel}>Date of birth</Text>
-                      <Text style={Styles.infoValue}>
-                        {personalInfo.dateOfBirth}
-                      </Text>
-                    </View>
-                  </View>
-                </View>
+                ) : (
+                  <Text style={Styles.infoValue}>
+                    Your details were fetched successfully. Please confirm to
+                    continue.
+                  </Text>
+                )}
               </View>
             )}
           </View>
-
-          {/* Complete Button */}
         </View>
       </KeyboardAwareScrollView>
 
       <View style={Styles.buttonContainer}>
         <AppButton
-          title="Complete"
+          title={isCompleting ? "Confirming..." : "Confirm and continue"}
           onPress={handleComplete}
           fullwidth
           size="large"
@@ -210,7 +223,6 @@ const IdentityVerificationStep = ({ onNext }: IdentityVerificationProps) => {
         />
       </View>
 
-      {/* ID Type Selection Modal */}
       <Modal
         visible={showIDTypeModal}
         transparent
@@ -225,14 +237,14 @@ const IdentityVerificationStep = ({ onNext }: IdentityVerificationProps) => {
           <TouchableOpacity
             activeOpacity={1}
             style={Styles.modalContent}
-            onPress={(e) => e.stopPropagation()}
+            onPress={(event) => event.stopPropagation()}
           >
             <View style={Styles.modalHandle} />
             <Text style={Styles.modalTitle}>
               Choose means of identification
             </Text>
             <Text style={Styles.modalDescription}>
-              Select any means of identification to verify your account.
+              Select NIN or BVN to verify your account.
             </Text>
 
             <View style={Styles.idTypeOptions}>
@@ -240,17 +252,16 @@ const IdentityVerificationStep = ({ onNext }: IdentityVerificationProps) => {
                 <SimpleSelector
                   key={type.id}
                   isChecked={selectedIDType === type.id}
-                  onChange={() => handleSelectIDType(type.id as IDType)}
+                  onChange={() => handleSelectIDType(type.id)}
                   title={type.label}
                 />
               ))}
             </View>
 
-            {/* Security Note in Modal */}
             <View style={Styles.modalSecurityNote}>
               <Text style={Styles.modalSecurityText}>
-                🔐 Your data is 100% safe. We only crosscheck your data to be
-                sure you are real.
+                Your data is safe. We only crosscheck your data to be sure you
+                are real.
               </Text>
             </View>
           </TouchableOpacity>
@@ -264,6 +275,9 @@ export default IdentityVerificationStep;
 
 const styles = (colors: ColorScheme) =>
   StyleSheet.create({
+    root: {
+      flex: 1,
+    },
     scrollContent: {
       flexGrow: 1,
     },
@@ -295,49 +309,6 @@ const styles = (colors: ColorScheme) =>
       lineHeight: RFValue(22),
       color: colors.slate[600],
     },
-    inputContainer: {
-      gap: RFValue(8),
-    },
-    inputLabel: {
-      fontSize: RFValue(14),
-      fontWeight: "500",
-      color: colors.slate[650],
-    },
-    selectorButton: {
-      flexDirection: "row",
-      alignItems: "center",
-      justifyContent: "space-between",
-      paddingVertical: RFValue(16),
-      paddingHorizontal: RFValue(16),
-      backgroundColor: colors.slate[200],
-      borderRadius: RFValue(12),
-      borderWidth: 1,
-      borderColor: colors.slate[300],
-    },
-    selectorText: {
-      fontSize: RFValue(15),
-      color: colors.slate[650],
-      fontWeight: "500",
-    },
-    selectorPlaceholder: {
-      color: colors.slate[500],
-    },
-    arrowIcon: {
-      width: RFValue(16),
-      height: RFValue(16),
-      tintColor: colors.slate[600],
-    },
-    textInput: {
-      paddingVertical: RFValue(16),
-      paddingHorizontal: RFValue(16),
-      backgroundColor: colors.slate[200],
-      borderRadius: RFValue(12),
-      borderWidth: 1,
-      borderColor: colors.slate[300],
-      fontSize: RFValue(15),
-      color: colors.slate[650],
-      fontWeight: "500",
-    },
     fetchingContainer: {
       flexDirection: "row",
       alignItems: "center",
@@ -350,7 +321,7 @@ const styles = (colors: ColorScheme) =>
       color: colors.slate[600],
     },
     personalInfoContainer: {
-      gap: RFValue(20),
+      gap: RFValue(16),
       paddingVertical: RFValue(16),
       paddingHorizontal: RFValue(16),
       backgroundColor: colors.slate[150],
@@ -364,14 +335,9 @@ const styles = (colors: ColorScheme) =>
       color: colors.slate[650],
     },
     infoGrid: {
-      gap: RFValue(16),
-    },
-    infoRow: {
-      flexDirection: "row",
-      gap: RFValue(16),
+      gap: RFValue(14),
     },
     infoField: {
-      flex: 1,
       gap: RFValue(6),
     },
     infoLabel: {
@@ -382,33 +348,10 @@ const styles = (colors: ColorScheme) =>
       fontSize: RFValue(15),
       fontWeight: "600",
       color: colors.slate[650],
-    },
-    securityNote: {
-      flexDirection: "row",
-      alignItems: "flex-start",
-      gap: RFValue(8),
-      backgroundColor: colors.success[100],
-      paddingVertical: RFValue(12),
-      paddingHorizontal: RFValue(12),
-      borderRadius: RFValue(8),
-      marginTop: RFValue(8),
-    },
-    shieldIcon: {
-      width: RFValue(16),
-      height: RFValue(16),
-      tintColor: colors.success[300],
-      marginTop: RFValue(2),
-    },
-    securityText: {
-      flex: 1,
-      fontSize: RFValue(12),
-      color: colors.success[300],
-      lineHeight: RFValue(18),
+      lineHeight: RFValue(22),
     },
     buttonContainer: {
-      position: "fixed",
-      bottom: RFValue(16),
-      marginTop: RFValue(32),
+      marginTop: RFValue(24),
     },
     modalOverlay: {
       flex: 1,
@@ -446,59 +389,12 @@ const styles = (colors: ColorScheme) =>
       gap: RFValue(16),
       marginBottom: RFValue(24),
     },
-    idTypeOption: {
-      flexDirection: "row",
-      alignItems: "center",
-      paddingVertical: RFValue(16),
-      paddingHorizontal: RFValue(16),
-      backgroundColor: colors.background,
-      borderRadius: RFValue(12),
-      borderWidth: 1,
-      borderColor: colors.slate[300],
-    },
-    radioContainer: {
-      marginRight: RFValue(12),
-    },
-    radioOuter: {
-      width: RFValue(20),
-      height: RFValue(20),
-      borderRadius: RFValue(10),
-      borderWidth: 2,
-      borderColor: colors.slate[400],
-      alignItems: "center",
-      justifyContent: "center",
-    },
-    radioOuterSelected: {
-      borderColor: colors.slate[650],
-    },
-    radioInner: {
-      width: RFValue(10),
-      height: RFValue(10),
-      borderRadius: RFValue(5),
-      backgroundColor: colors.slate[650],
-    },
-    idTypeOptionText: {
-      fontSize: RFValue(15),
-      fontWeight: "500",
-      color: colors.slate[650],
-      flex: 1,
-    },
     modalSecurityNote: {
-      flexDirection: "row",
-      alignItems: "flex-start",
-      gap: RFValue(8),
       paddingVertical: RFValue(12),
       paddingHorizontal: RFValue(12),
       borderRadius: RFValue(8),
     },
-    shieldIconSmall: {
-      width: RFValue(14),
-      height: RFValue(14),
-      tintColor: colors.success[300],
-      marginTop: RFValue(2),
-    },
     modalSecurityText: {
-      flex: 1,
       fontSize: RFValue(11),
       color: colors.slate[500],
       lineHeight: RFValue(16),

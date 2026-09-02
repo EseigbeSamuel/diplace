@@ -1,11 +1,11 @@
-import React from "react";
-import { View, Text, StyleSheet, Image } from "react-native";
-import { RFValue } from "react-native-responsive-fontsize";
 import AppButton from "@/components/button";
 import { useTheme } from "@/contexts/themeContext";
+import { useGetCurrentUser } from "@/hooks";
 import { ColorScheme } from "@/utils";
 import { useRouter } from "expo-router";
-import { useGetCurrentUser } from "@/hooks";
+import React from "react";
+import { Image, StyleSheet, Text, View } from "react-native";
+import { RFValue } from "react-native-responsive-fontsize";
 
 const VerificationCompleteStep = () => {
   const { currentUser } = useGetCurrentUser();

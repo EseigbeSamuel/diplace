@@ -97,8 +97,7 @@ export interface InspectionProperty {
 }
 
 export interface InspectionPayload {
-  inspection_date: string;
-  time_slot: string;
+  availability_id: string;
   agreed_to_terms: boolean;
 }
 
@@ -129,8 +128,11 @@ export interface InspectionQueryParams {
   status?: string;
 }
 export interface InspectionHistoryResponse {
-  data: CreateInspectionResponse[];
-  total: number;
-  skip: number;
-  limit: number;
+  pagination: {
+    total_items: number;
+    limit: number;
+    skip: number;
+    total_pages: number;
+  };
+  items: CreateInspectionResponse[];
 }

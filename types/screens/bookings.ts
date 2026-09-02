@@ -163,10 +163,21 @@ export interface BookingsListResponse {
   items: BookingResponse[];
 }
 
+export type BookingPaymentPurpose =
+  | "inspection_fee"
+  | "booking_rent"
+  | "booking_deposit"
+  | "booking_balance"
+  | "service_charge"
+  | "promotion_fee"
+  | "subscription_fee";
+
+export type BookingPaymentGateway = "bachs" | "flutterwave" | string;
+
 export interface BookingPaymentInitiatePayload {
   related_id: string;
-  purpose: "inspection_fee" | "booking_fee" | "reservation_fee" | string;
-  gateway: "flutterwave" | string;
+  purpose: BookingPaymentPurpose;
+  gateway: BookingPaymentGateway;
   amount: number;
   currency: string;
 }

@@ -10,9 +10,9 @@ import {
   VerifyOtpPayload,
   VerifyOtpResponse,
 } from "@/types";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { useRouter } from "expo-router";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
+import { useRouter } from "expo-router";
 
 type VerificationType = "phone" | "email" | "nin" | "bvn" | "face";
 
@@ -26,8 +26,27 @@ type InitiateVerificationResponse = {
   status: string;
   verification_type: VerificationType;
   detail?: string | null;
+  message?: string | null;
+  fetched_data?: string | null;
   data_to_confirm?: Record<string, unknown> | null;
   face_verification_params?: Record<string, unknown> | null;
+};
+
+type CompleteVerificationPayload = {
+  verification_id: string;
+  otp_code?: string;
+  confirm_data?: boolean;
+};
+
+type CompleteVerificationResponse = {
+  public_id: string;
+  status: string;
+  verification_type: VerificationType;
+  detail?: string | null;
+};
+
+type ResendVerificationOtpPayload = {
+  verification_type: VerificationType;
 };
 
 type ResendVerificationResponse = {
@@ -35,6 +54,31 @@ type ResendVerificationResponse = {
   detail?: string;
   success?: boolean;
 };
+
+export type VerificationStatusItem = {
+  public_id: string;
+  date_created?: string;
+  date_modified?: string;
+  status: string;
+  verification_type: VerificationType;
+  verified_at?: string | null;
+  identifier_used?: string | null;
+};
+
+export const COMPLETED_VERIFICATION_STATUSES = [
+  "verified",
+  "completed",
+  "approved",
+  "active",
+] as const;
+
+export const isCompletedVerification = (
+  verification?: Pick<VerificationStatusItem, "status"> | null,
+) =>
+  !!verification &&
+  COMPLETED_VERIFICATION_STATUSES.includes(
+    verification.status?.toLowerCase() as (typeof COMPLETED_VERIFICATION_STATUSES)[number],
+  );
 
 const getApiErrorMessage = (error: unknown) => {
   if (!axios.isAxiosError(error)) return null;
@@ -150,6 +194,7 @@ export function useLogin() {
               response?.detail ||
               `A verification email has been sent to ${email}.`,
           });
+          router.push("/auth/verify-otp")
           return;
         } catch (resendError) {
           const resendMessage =
@@ -243,6 +288,7 @@ export function useVerifyOtp() {
 export { useChangePassword } from "./usePassword";
 
 export function useInitiateVerification() {
+  const queryClient = useQueryClient();
   const { mutateAsync, isPending } = useMutation({
     mutationFn: async (payload: InitiateVerificationPayload) => {
       return await postRequest<
@@ -252,6 +298,11 @@ export function useInitiateVerification() {
         url: "/verifications/initiate",
         payload,
         protectedRoute: true,
+      });
+    },
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({
+        queryKey: ["my-verification-status"],
       });
     },
     onError: (error) => {
@@ -270,6 +321,93 @@ export function useInitiateVerification() {
   return {
     initiateVerificationMutation: mutateAsync,
     initiateVerificationPending: isPending,
+  };
+}
+
+export function useCompleteVerification() {
+  const queryClient = useQueryClient();
+  const { mutateAsync, isPending } = useMutation({
+    mutationFn: async (payload: CompleteVerificationPayload) => {
+      return await postRequest<
+        CompleteVerificationResponse,
+        CompleteVerificationPayload
+      >({
+        url: "/verifications/complete",
+        payload,
+        protectedRoute: true,
+      });
+    },
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({
+        queryKey: ["my-verification-status"],
+      });
+      await queryClient.invalidateQueries({ queryKey: ["current-user"] });
+    },
+    onError: (error) => {
+      const message =
+        error instanceof Error
+          ? error.message
+          : "Unable to complete verification.";
+      showToast({
+        type: "error",
+        text1: "Verification Failed",
+        text2: message,
+      });
+    },
+  });
+
+  return {
+    completeVerificationMutation: mutateAsync,
+    completeVerificationPending: isPending,
+  };
+}
+
+export function useResendVerificationOtp() {
+  const { mutateAsync, isPending } = useMutation({
+    mutationFn: async (payload: ResendVerificationOtpPayload) => {
+      return await postRequest<string, ResendVerificationOtpPayload>({
+        url: "/verifications/resend",
+        payload,
+        protectedRoute: true,
+      });
+    },
+    onError: (error) => {
+      const message =
+        error instanceof Error ? error.message : "Unable to resend OTP.";
+      showToast({
+        type: "error",
+        text1: "Resend Failed",
+        text2: message,
+      });
+    },
+  });
+
+  return {
+    resendVerificationOtpMutation: mutateAsync,
+    resendVerificationOtpPending: isPending,
+  };
+}
+
+export function useGetMyVerificationStatus({
+  enabled = true,
+}: { enabled?: boolean } = {}) {
+  const query = useQuery({
+    queryKey: ["my-verification-status"],
+    enabled,
+    queryFn: async () => {
+      return await getRequest<VerificationStatusItem[]>({
+        url: "/verifications/status/me",
+        protectedRoute: true,
+      });
+    },
+  });
+
+  return {
+    verificationStatus: query.data ?? [],
+    isVerificationStatusLoading: query.isLoading,
+    isVerificationStatusFetching: query.isFetching,
+    verificationStatusError: query.error,
+    refetchVerificationStatus: query.refetch,
   };
 }
 

@@ -2,93 +2,157 @@ import {
   GOOGLE_MAPS_API_KEY,
   HAS_GOOGLE_MAPS_API_KEY,
 } from "@/constants/google";
+import SafeAreaViewContainer from "@/components/safeareaview";
+import SectionHeader from "@/components/sectionheader";
+import { useTheme } from "@/contexts/themeContext";
+import { ColorScheme } from "@/utils";
 import { useLocalSearchParams } from "expo-router";
-import React, { useState } from "react";
+import React, { useMemo, useState } from "react";
 import { ActivityIndicator, StyleSheet, Text, View } from "react-native";
 import { WebView } from "react-native-webview";
 
+const parseCoordinate = (value?: string | string[]) => {
+  const rawValue = Array.isArray(value) ? value[0] : value;
+  const coordinate = Number(rawValue);
+  return Number.isFinite(coordinate) ? coordinate : null;
+};
+
 export default function StreetView() {
-  const { lat, lng } = useLocalSearchParams();
+  const { lat, lng } = useLocalSearchParams<{
+    lat?: string;
+    lng?: string;
+  }>();
+  const { colors } = useTheme();
+  const styles = createStyles(colors);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
 
-  const latitude = parseFloat(lat as string);
-  const longitude = parseFloat(lng as string);
-  const hasValidCoordinates =
-    Number.isFinite(latitude) && Number.isFinite(longitude);
+  const latitude = parseCoordinate(lat);
+  const longitude = parseCoordinate(lng);
+  const hasValidCoordinates = latitude !== null && longitude !== null;
 
-  const streetViewUrl =
-    HAS_GOOGLE_MAPS_API_KEY && hasValidCoordinates
-      ? `https://www.google.com/maps/embed/v1/streetview?key=${GOOGLE_MAPS_API_KEY}&location=${latitude},${longitude}&heading=0&pitch=0&fov=90`
-      : `https://www.google.com/maps/@?api=1&map_action=pano&viewpoint=${latitude},${longitude}`;
+  const streetViewUrl = useMemo(() => {
+    if (!hasValidCoordinates) return null;
+
+    if (HAS_GOOGLE_MAPS_API_KEY) {
+      const params = new URLSearchParams({
+        key: GOOGLE_MAPS_API_KEY,
+        location: `${latitude},${longitude}`,
+        heading: "0",
+        pitch: "0",
+        fov: "90",
+      });
+
+      return `https://www.google.com/maps/embed/v1/streetview?${params.toString()}`;
+    }
+
+    const params = new URLSearchParams({
+      api: "1",
+      map_action: "pano",
+      viewpoint: `${latitude},${longitude}`,
+    });
+
+    return `https://www.google.com/maps/@?${params.toString()}`;
+  }, [hasValidCoordinates, latitude, longitude]);
+
+  const showError = error || !streetViewUrl;
 
   return (
-    <View style={{ flex: 1 }}>
-      {loading && hasValidCoordinates && !error && (
-        <View style={styles.loadingContainer}>
-          <ActivityIndicator size="large" color="#0066CC" />
-          <Text style={styles.loadingText}>Loading Street View...</Text>
-        </View>
-      )}
+    <SafeAreaViewContainer disableBottom>
+      <SectionHeader title="Street View" rightIconView={<View />} />
 
-      {(error || !hasValidCoordinates) && (
-        <View style={styles.errorContainer}>
-          <Text style={styles.errorText}>
-            Street View not available for this location.
-          </Text>
-        </View>
-      )}
+      <View style={styles.container}>
+        {loading && !showError && (
+          <View style={styles.loadingContainer}>
+            <ActivityIndicator size="large" color={colors.slate[650]} />
+            <Text style={styles.loadingText}>Loading Street View...</Text>
+          </View>
+        )}
 
-      {hasValidCoordinates && !error && (
-        <WebView
-          source={{ uri: streetViewUrl }}
-          style={{ flex: 1 }}
-          onLoadStart={() => setLoading(true)}
-          onLoadEnd={() => setLoading(false)}
-          onError={() => {
-            setLoading(false);
-            setError(true);
-          }}
-          startInLoadingState={true}
-          javaScriptEnabled={true}
-          domStorageEnabled={true}
-          allowsFullscreenVideo={true}
-          mediaPlaybackRequiresUserAction={false}
-          bounces={false}
-          scrollEnabled={true}
-        />
-      )}
-    </View>
+        {showError ? (
+          <View style={styles.errorContainer}>
+            <Text style={styles.errorTitle}>Street View unavailable</Text>
+            <Text style={styles.errorText}>
+              This location may not have Street View imagery yet.
+            </Text>
+          </View>
+        ) : (
+          <WebView
+            source={{ uri: streetViewUrl }}
+            style={styles.webview}
+            originWhitelist={["https://*", "http://*"]}
+            onLoadStart={() => {
+              setError(false);
+              setLoading(true);
+            }}
+            onLoadEnd={() => setLoading(false)}
+            onError={() => {
+              setLoading(false);
+              setError(true);
+            }}
+            onHttpError={() => {
+              setLoading(false);
+              setError(true);
+            }}
+            startInLoadingState
+            javaScriptEnabled
+            domStorageEnabled
+            geolocationEnabled
+            allowsFullscreenVideo
+            mediaPlaybackRequiresUserAction={false}
+            bounces={false}
+            scrollEnabled
+          />
+        )}
+      </View>
+    </SafeAreaViewContainer>
   );
 }
 
-const styles = StyleSheet.create({
-  loadingContainer: {
-    position: "absolute",
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-    justifyContent: "center",
-    alignItems: "center",
-    backgroundColor: "#FFFFFF",
-    zIndex: 10,
-  },
-  loadingText: {
-    marginTop: 12,
-    fontSize: 16,
-    color: "#666666",
-  },
-  errorContainer: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    padding: 20,
-    backgroundColor: "#F9FAFB",
-  },
-  errorText: {
-    fontSize: 16,
-    color: "#EF4444",
-    textAlign: "center",
-  },
-});
+const createStyles = (colors: ColorScheme) =>
+  StyleSheet.create({
+    container: {
+      flex: 1,
+      backgroundColor: colors.background,
+    },
+    webview: {
+      flex: 1,
+      backgroundColor: colors.background,
+    },
+    loadingContainer: {
+      position: "absolute",
+      top: 0,
+      left: 0,
+      right: 0,
+      bottom: 0,
+      justifyContent: "center",
+      alignItems: "center",
+      backgroundColor: colors.background,
+      zIndex: 10,
+    },
+    loadingText: {
+      marginTop: 12,
+      fontSize: 16,
+      color: colors.slate[600],
+    },
+    errorContainer: {
+      flex: 1,
+      justifyContent: "center",
+      alignItems: "center",
+      padding: 24,
+      backgroundColor: colors.background,
+    },
+    errorTitle: {
+      fontSize: 18,
+      fontWeight: "700",
+      color: colors.slate[650],
+      marginBottom: 8,
+      textAlign: "center",
+    },
+    errorText: {
+      fontSize: 14,
+      color: colors.slate[500],
+      textAlign: "center",
+      lineHeight: 20,
+    },
+  });

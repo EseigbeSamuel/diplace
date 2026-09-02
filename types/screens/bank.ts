@@ -1,3 +1,8 @@
+export interface SupportedBank {
+  name: string;
+  code: string;
+}
+
 export interface BankDetails {
   bank_name: string;
   account_number: string;

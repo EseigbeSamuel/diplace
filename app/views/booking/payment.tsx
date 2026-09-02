@@ -3,6 +3,7 @@ import SafeAreaViewContainer from "@/components/safeareaview";
 import TextField from "@/components/textfield";
 import { useTheme } from "@/contexts/themeContext";
 import { useInitiateBookingPayment } from "@/hooks";
+import { BookingPaymentPurpose } from "@/types";
 import { ColorScheme } from "@/utils";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import React, { useState } from "react";
@@ -20,6 +21,30 @@ import {
 import { RFValue } from "react-native-responsive-fontsize";
 
 type PaymentMethod = "card" | "bank" | "ussd" | null;
+
+const PAYMENT_PURPOSES: BookingPaymentPurpose[] = [
+  "inspection_fee",
+  "booking_rent",
+  "booking_deposit",
+  "booking_balance",
+  "service_charge",
+  "promotion_fee",
+  "subscription_fee",
+];
+
+const resolvePaymentPurpose = (
+  purpose: string | undefined,
+  type: string | undefined
+): BookingPaymentPurpose => {
+  if (purpose && PAYMENT_PURPOSES.includes(purpose as BookingPaymentPurpose)) {
+    return purpose as BookingPaymentPurpose;
+  }
+
+  if (type === "inspection") return "inspection_fee";
+  if (type === "reserve") return "booking_deposit";
+
+  return "booking_rent";
+};
 
 const PaymentScreen = () => {
   const router = useRouter();
@@ -52,8 +77,8 @@ const PaymentScreen = () => {
 
     const payment = await initiateBookingPaymentMutation({
       related_id: params.relatedId,
-      purpose: params.purpose || "booking_fee",
-      gateway: "flutterwave",
+      purpose: resolvePaymentPurpose(params.purpose, params.type),
+      gateway: "bachs",
       amount: amountValue,
       currency: "NGN",
     });

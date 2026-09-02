@@ -1,5 +1,4 @@
 import AppButton from "@/components/button";
-import SafeAreaViewContainer from "@/components/safeareaview";
 import { useTheme } from "@/contexts/themeContext";
 import { useGetCurrentUser } from "@/hooks";
 import { ColorScheme } from "@/utils";
@@ -9,12 +8,46 @@ import { RFValue } from "react-native-responsive-fontsize";
 
 type InfoProps = {
   onNext: () => void;
+  completedVerifications?: {
+    face?: boolean;
+    email?: boolean;
+    phone?: boolean;
+    identity?: boolean;
+  };
 };
 
-const VerifyAccountInfoStep = ({ onNext }: InfoProps) => {
+const VerifyAccountInfoStep = ({
+  onNext,
+  completedVerifications,
+}: InfoProps) => {
   const { currentUser } = useGetCurrentUser();
   const { colors } = useTheme();
   const Styles = styles(colors);
+  const renderVerificationItem = ({
+    icon,
+    label,
+    completed,
+    last,
+  }: {
+    icon: number;
+    label: string;
+    completed?: boolean;
+    last?: boolean;
+  }) => (
+    <View style={[Styles.listItem, last && Styles.lastListItem]}>
+      <View style={Styles.listItemLeft}>
+        <Image source={icon} style={Styles.listIcon} resizeMode="contain" />
+        <Text style={Styles.listText}>{label}</Text>
+      </View>
+      {completed ? (
+        <Image
+          source={require("@/assets/icons/checkbox-circle-fill.png")}
+          style={Styles.completedIcon}
+          resizeMode="contain"
+        />
+      ) : null}
+    </View>
+  );
 
   return (
     <View style={Styles.container}>
@@ -45,69 +78,42 @@ const VerifyAccountInfoStep = ({ onNext }: InfoProps) => {
 
           {/* Verification Items List */}
           <View style={Styles.listContainer}>
-            {/* Selfie */}
-            <View style={Styles.listItem}>
-              <Image
-                source={require("@/assets/icons/Camera - Iconly Pro.png")}
-                style={Styles.listIcon}
-                resizeMode="contain"
-              />
-              <Text style={Styles.listText}>Selfie</Text>
-            </View>
+            {renderVerificationItem({
+              icon: require("@/assets/icons/Camera - Iconly Pro.png"),
+              label: "Selfie",
+              completed: completedVerifications?.face,
+            })}
 
-            {/* Email Address */}
-            <View style={Styles.listItem}>
-              <Image
-                source={require("@/assets/icons/mail-outline-light.png")}
-                style={Styles.listIcon}
-                resizeMode="contain"
-              />
-              <Text style={Styles.listText}>Email Address</Text>
-            </View>
+            {renderVerificationItem({
+              icon: require("@/assets/icons/mail-outline-light.png"),
+              label: "Email Address",
+              completed: completedVerifications?.email,
+            })}
 
-            {/* Phone Number */}
-            <View style={Styles.listItem}>
-              <Image
-                source={require("@/assets/icons/Call - Iconly Pro.png")}
-                style={Styles.listIcon}
-                resizeMode="contain"
-              />
-              <Text style={Styles.listText}>Phone Number</Text>
-            </View>
+            {renderVerificationItem({
+              icon: require("@/assets/icons/Call - Iconly Pro.png"),
+              label: "Phone Number",
+              completed: completedVerifications?.phone,
+            })}
 
-            {/* Identification Document */}
-            <View
-              style={[
-                Styles.listItem,
-                currentUser?.user_type === "agent" && Styles.lastListItem,
-              ]}
-            >
-              <Image
-                source={require("@/assets/icons/identification 2.png")}
-                style={Styles.listIcon}
-                resizeMode="contain"
-              />
-              <Text style={Styles.listText}>Identification Document</Text>
-            </View>
+            {renderVerificationItem({
+              icon: require("@/assets/icons/identification 2.png"),
+              label: "Identification Document",
+              completed: completedVerifications?.identity,
+              last: currentUser?.user_type !== "agent",
+            })}
 
             {currentUser?.user_type === "agent" && (
               <>
-                <View style={[Styles.listItem]}>
-                  <Image
-                    source={require("@/assets/icons/Profile - Iconly Pro.png")}
-                    style={Styles.listIcon}
-                    resizeMode="contain"
-                  />
-                  <Text style={Styles.listText}>Personal Data</Text>
-                </View>
-                <View style={[Styles.listItem, Styles.lastListItem]}>
-                  <Image
-                    source={require("@/assets/icons/bank-light.png")}
-                    style={Styles.listIcon}
-                    resizeMode="contain"
-                  />
-                  <Text style={Styles.listText}>Bank Details</Text>
-                </View>
+                {renderVerificationItem({
+                  icon: require("@/assets/icons/Profile - Iconly Pro.png"),
+                  label: "Personal Data",
+                })}
+                {renderVerificationItem({
+                  icon: require("@/assets/icons/bank-light.png"),
+                  label: "Bank Details",
+                  last: true,
+                })}
               </>
             )}
           </View>
@@ -170,11 +176,17 @@ const styles = (colors: ColorScheme) =>
     listItem: {
       flexDirection: "row",
       alignItems: "center",
-      gap: RFValue(12),
+      justifyContent: "space-between",
       paddingVertical: RFValue(16),
       paddingHorizontal: RFValue(8),
       borderBottomWidth: 1,
       borderBottomColor: colors.slate[300],
+    },
+    listItemLeft: {
+      alignItems: "center",
+      flexDirection: "row",
+      flex: 1,
+      gap: RFValue(12),
     },
     lastListItem: {
       borderBottomWidth: 0,
@@ -185,10 +197,16 @@ const styles = (colors: ColorScheme) =>
       tintColor: colors.slate[600],
     },
     listText: {
+      flex: 1,
       fontSize: RFValue(15),
       lineHeight: RFValue(22),
       color: colors.slate[650],
       fontWeight: "500",
+    },
+    completedIcon: {
+      height: RFValue(22),
+      tintColor: colors.success[300],
+      width: RFValue(22),
     },
     buttonContainer: {
       marginTop: RFValue(20),

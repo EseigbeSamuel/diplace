@@ -7,7 +7,7 @@ import SafeAreaViewContainer from "@/components/safeareaview";
 import { SimpleSelector } from "@/components/selector";
 import { Tabs } from "@/constants/home";
 import { useTheme } from "@/contexts/themeContext";
-import { useListProperties } from "@/hooks";
+import { useGetCurrentUser, useListProperties } from "@/hooks";
 import { ListPropertiesParams, PropertyListItem, PropertyType } from "@/types";
 import { ColorScheme } from "@/utils";
 import { router } from "expo-router";
@@ -41,7 +41,7 @@ const FILTER_TYPE_MAP: Record<string, PropertyType> = {
   "Event center": "event_centre",
 };
 const DEFAULT_MIN_BUDGET = 0;
-const DEFAULT_MAX_BUDGET = 100;
+const DEFAULT_MAX_BUDGET = 999999;
 
 function SkeletonBlock({
   width = "100%",
@@ -75,6 +75,7 @@ export default function RenterHome() {
   const [activeTab, setActiveTab] = useState("All");
   const [showAllNearby, setShowAllNearby] = useState(false);
   const [searchText, setSearchText] = useState("");
+  const { currentUser } = useGetCurrentUser();
 
   //bottom sheet handlers
   const [type, setType] = useState("Any");
@@ -171,7 +172,7 @@ export default function RenterHome() {
     if (activeTab === "All") return availableProperties;
 
     const tabMap: Record<string, PropertyListItem["property_type"]> = {
-      Appartment: "apartment",
+      Apartment: "apartment",
       Shops: "shop",
       Offices: "office",
       "Event centers": "event_centre",
@@ -296,7 +297,7 @@ export default function RenterHome() {
           title={
             <View className="gap-2">
               <Text style={homeStyles.title} className="font-semibold">
-                Welcome Sarhmy!
+                Welcome {currentUser?.first_name}!
               </Text>
               <Pressable
                 onPress={() => router.push("/views/location")}

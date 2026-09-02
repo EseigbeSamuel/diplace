@@ -1,6 +1,6 @@
 // src/components/common/Header.tsx
-import { useGetCurrentUser, useNotificationUnreadCount } from "@/hooks";
 import { useTheme } from "@/contexts/themeContext";
+import { useGetCurrentUser, useNotificationUnreadCount } from "@/hooks";
 import { ColorScheme } from "@/utils";
 import { useRouter } from "expo-router";
 import React from "react";
@@ -17,15 +17,6 @@ export const AppHeader = (props: HeaderProps) => {
   const { unreadCount } = useNotificationUnreadCount();
   const headerStyles = styles(colors);
   const router = useRouter();
-
-  const normalizeImageUrl = (url?: string) => {
-    if (!url) return null;
-    if (url.startsWith("http://") || url.startsWith("https://")) return url;
-    if (url.startsWith("/")) return `https://diplace.api.elsoft.ng${url}`;
-    return `https://diplace.api.elsoft.ng/${url}`;
-  };
-
-  const profileImageUrl = normalizeImageUrl(currentUser?.profile_picture);
 
   return (
     <View style={headerStyles.container} className="flex-row justify-between">
@@ -69,9 +60,10 @@ export const AppHeader = (props: HeaderProps) => {
         >
           <Image
             source={
-              profileImageUrl
-                ? { uri: profileImageUrl }
-                : require("@/assets/images/user.png")
+              currentUser?.profile_picture &&
+              currentUser?.profile_picture?.length > 6
+                ? { uri: currentUser?.profile_picture }
+                : require("@/assets/images/sammy.jpg")
             }
             className="h-[48px] w-[48px] rounded-full"
           />
