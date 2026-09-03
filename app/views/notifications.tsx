@@ -12,17 +12,30 @@ import {
   Text,
   View,
   ActivityIndicator,
+  Linking,
+  Alert,
 } from "react-native";
 import { RFValue } from "react-native-responsive-fontsize";
+import { useRouter } from "expo-router";
+import { showToast } from "@/lib";
 import {
   useMyNotifications,
   useNotificationUnreadCount,
   useMarkNotificationRead,
   useMarkAllNotificationsRead,
+  useDeleteNotification,
 } from "@/hooks";
 import { NotificationItem } from "@/types";
 
+interface ActionMeta {
+  text: string;
+  icon: "download" | "arrow";
+  avatarKind: "d" | "bell";
+  onAction: () => void;
+}
+
 const Notifications = () => {
+  const router = useRouter();
   const { colors, isDarkMode } = useTheme();
   const custom = styles(colors, isDarkMode);
   const [activeTab, setActiveTab] = useState("all");
@@ -43,6 +56,7 @@ const Notifications = () => {
 
   const { markReadMutation } = useMarkNotificationRead();
   const { markAllReadMutation } = useMarkAllNotificationsRead();
+  const { deleteNotificationMutation } = useDeleteNotification();
 
   const handleRefresh = async () => {
     setIsRefreshing(true);
@@ -63,51 +77,286 @@ const Notifications = () => {
     }
   };
 
-  const formatTimeAgo = (dateString: string) => {
-    if (!dateString) return "Recently";
-    const now = Date.now();
-    const then = new Date(dateString).getTime();
-    const diffMs = Math.max(0, now - then);
-    const minMs = 60 * 1000;
-    const hourMs = 60 * minMs;
-    const dayMs = 24 * hourMs;
+  const handleMarkAllRead = async () => {
+    try {
+      await markAllReadMutation();
+    } catch (error) {
+      console.error("Failed to mark all as read:", error);
+    }
+  };
 
-    const days = Math.floor(diffMs / dayMs);
-    if (days >= 1) {
-      if (days < 30) return `${days} day${days === 1 ? "" : "s"} ago`;
-      const months = Math.floor(days / 30);
-      if (months < 12) {
-        return `${months} month${months === 1 ? "" : "s"} ago`;
-      }
-      const years = Math.floor(months / 12);
-      return `${years} year${years === 1 ? "" : "s"} ago`;
+  const handleDeleteNotification = (item: NotificationItem) => {
+    Alert.alert(
+      "Delete Notification",
+      "Are you sure you want to delete this notification?",
+      [
+        { text: "Cancel", style: "cancel" },
+        {
+          text: "Delete",
+          style: "destructive",
+          onPress: async () => {
+            try {
+              await deleteNotificationMutation({ notificationId: item.public_id });
+            } catch (error) {
+              console.error("Failed to delete notification:", error);
+            }
+          },
+        },
+      ]
+    );
+  };
+
+  const formatTime = (dateString?: string) => {
+    if (!dateString) return "Recently";
+
+    if (
+      dateString.includes("ago") ||
+      dateString.toLowerCase().includes("yesterday") ||
+      dateString.includes(",")
+    ) {
+      return dateString;
     }
 
-    const hours = Math.floor(diffMs / hourMs);
-    if (hours >= 1) {
+    const date = new Date(dateString);
+    if (isNaN(date.getTime())) {
+      return dateString;
+    }
+
+    const now = new Date();
+    const diffMs = Math.max(0, now.getTime() - date.getTime());
+
+    if (diffMs < 60 * 1000) {
+      return "Just now";
+    }
+
+    const mins = Math.floor(diffMs / (60 * 1000));
+    if (mins < 60) {
+      return `${mins} mins ago`;
+    }
+
+    const isToday =
+      now.getDate() === date.getDate() &&
+      now.getMonth() === date.getMonth() &&
+      now.getFullYear() === date.getFullYear();
+
+    if (isToday) {
+      const hours = Math.floor(diffMs / (60 * 60 * 1000));
       return `${hours} hr${hours === 1 ? "" : "s"} ago`;
     }
 
-    const mins = Math.floor(diffMs / minMs);
-    if (mins >= 1) {
-      return `${mins} min${mins === 1 ? "" : "s"} ago`;
+    const yesterday = new Date(now);
+    yesterday.setDate(now.getDate() - 1);
+    const isYesterday =
+      yesterday.getDate() === date.getDate() &&
+      yesterday.getMonth() === date.getMonth() &&
+      yesterday.getFullYear() === date.getFullYear();
+
+    if (isYesterday) {
+      return "Yesterday";
     }
 
-    return "Just now";
+    const months = [
+      "Jan",
+      "Feb",
+      "Mar",
+      "Apr",
+      "May",
+      "Jun",
+      "Jul",
+      "Aug",
+      "Sep",
+      "Oct",
+      "Nov",
+      "Dec",
+    ];
+    return `${date.getDate()} ${months[date.getMonth()]}, ${date.getFullYear()}`;
   };
 
-  const getActionText = (item: NotificationItem) => {
-    const type = item.notification_type?.toLowerCase() || "";
-    if (type.includes("payment")) {
-      return "Download receipt";
+  const getNotificationMeta = (item: NotificationItem): ActionMeta => {
+    const type = (item.notification_type || "").toLowerCase();
+    const title = (item.title || "").toLowerCase();
+    const explicitText =
+      item.data?.action_text || (item as any).action;
+
+    const navigateToTarget = (defaultRoute: string, params?: Record<string, any>) => {
+      if (item.action_url) {
+        if (
+          item.action_url.startsWith("http://") ||
+          item.action_url.startsWith("https://")
+        ) {
+          Linking.openURL(item.action_url).catch(() => {});
+          return;
+        }
+        router.push(item.action_url as any);
+        return;
+      }
+      if (params) {
+        router.push({ pathname: defaultRoute as any, params });
+      } else {
+        router.push(defaultRoute as any);
+      }
+    };
+
+    // 1. Payment successful / Receipt
+    if (
+      type.includes("payment") ||
+      title.includes("payment") ||
+      title.includes("receipt") ||
+      title.includes("paid")
+    ) {
+      return {
+        text: explicitText || "Download receipt",
+        icon: "download",
+        avatarKind: "d",
+        onAction: () => {
+          if (item.data?.receipt_url) {
+            Linking.openURL(item.data.receipt_url).catch(() => {});
+            return;
+          }
+          navigateToTarget("/views/inspection/payment-receipt");
+        },
+      };
     }
-    if (type.includes("inspection")) {
-      return "View schedule";
+
+    // 2. Inspection scheduled
+    if (type.includes("inspection") || title.includes("inspection")) {
+      return {
+        text: explicitText || "View schedule",
+        icon: "arrow",
+        avatarKind: "bell",
+        onAction: () => {
+          const scheduleId = item.data?.inspection_id || item.data?.booking_id;
+          if (scheduleId) {
+            navigateToTarget("/views/activities/activity-schedule/[index]", {
+              index: scheduleId,
+              role: "renter",
+              status: "scheduled",
+              title: item.title,
+            });
+          } else {
+            navigateToTarget("/views/activities/todayActivity");
+          }
+        },
+      };
     }
-    if (type.includes("booking")) {
-      return "Complete booking";
+
+    // 3. Booking / Reminder
+    if (
+      type.includes("booking") ||
+      title.includes("reminder") ||
+      title.includes("booking") ||
+      title.includes("space")
+    ) {
+      const isSchedule = title.includes("schedule");
+      return {
+        text: explicitText || (isSchedule ? "View schedule" : "Complete booking"),
+        icon: "arrow",
+        avatarKind: "bell",
+        onAction: () => {
+          if (item.data?.booking_id || item.data?.property_id) {
+            navigateToTarget("/views/booking/booking-summary");
+          } else {
+            navigateToTarget("/(tabs)/spaces");
+          }
+        },
+      };
     }
-    return "View details";
+
+    // 4. Property / Listing Alert
+    if (
+      type.includes("property") ||
+      title.includes("listing") ||
+      title.includes("apartment") ||
+      title.includes("alert")
+    ) {
+      return {
+        text: explicitText || "View listing",
+        icon: "arrow",
+        avatarKind: "d",
+        onAction: () => {
+          const propertyId =
+            item.data?.property_id || item.data?.listing_id || item.data?.id;
+          if (propertyId) {
+            navigateToTarget("/views/place-details/[id]", { id: propertyId });
+          } else {
+            navigateToTarget("/(tabs)/discover");
+          }
+        },
+      };
+    }
+
+    // 5. System / App Update
+    if (type.includes("system") || title.includes("update") || title.includes("app")) {
+      return {
+        text: explicitText || "View update",
+        icon: "arrow",
+        avatarKind: "d",
+        onAction: () => {
+          if (item.action_url) {
+            navigateToTarget(item.action_url);
+            return;
+          }
+          showToast({
+            type: "info",
+            text1: item.title || "App Update",
+            text2: item.message || "You are using the latest version of Diplace.",
+          });
+        },
+      };
+    }
+
+    // 6. Review
+    if (type.includes("review") || title.includes("review")) {
+      return {
+        text: explicitText || "Leave review",
+        icon: "arrow",
+        avatarKind: "bell",
+        onAction: () => {
+          navigateToTarget("/views/reviews/reviews");
+        },
+      };
+    }
+
+    // 7. Agent
+    if (type.includes("agent") || title.includes("agent") || title.includes("message")) {
+      return {
+        text: explicitText || "View message",
+        icon: "arrow",
+        avatarKind: "bell",
+        onAction: () => {
+          if (item.data?.chat_id) {
+            navigateToTarget("/views/chat/[id]", { id: item.data.chat_id });
+          } else {
+            navigateToTarget("/(tabs)/chats");
+          }
+        },
+      };
+    }
+
+    // 8. Promotion
+    if (type.includes("promotion") || title.includes("promo") || title.includes("offer")) {
+      return {
+        text: explicitText || "View offer",
+        icon: "arrow",
+        avatarKind: "d",
+        onAction: () => {
+          navigateToTarget("/(tabs)/discover");
+        },
+      };
+    }
+
+    // Fallback
+    const isBellFallback = (item as any).type === "bell";
+    return {
+      text: explicitText || "View details",
+      icon: "arrow",
+      avatarKind: isBellFallback ? "bell" : "d",
+      onAction: () => {
+        if (item.action_url) {
+          navigateToTarget(item.action_url);
+        }
+      },
+    };
   };
 
   const sortedNotifications = useMemo(() => {
@@ -127,6 +376,7 @@ const Notifications = () => {
       case "previous":
         return sortedNotifications.filter((note) => note.is_read);
 
+      case "dates":
       case "date":
       case "all":
       default:
@@ -137,11 +387,11 @@ const Notifications = () => {
   return (
     <SafeAreaViewContainer disableBottom>
       <SectionHeader
-        title="Notification"
+        title="Notifications"
         rightIconView={
           unreadCount > 0 ? (
             <Pressable
-              onPress={() => markAllReadMutation()}
+              onPress={handleMarkAllRead}
               style={{ backgroundColor: colors.slate[150] }}
               className="px-3 py-1.5 rounded-full"
             >
@@ -165,7 +415,8 @@ const Notifications = () => {
           contentContainerStyle={{ gap: RFValue(8) }}
           renderItem={({ item }) => {
             const isActive = activeTab.toLowerCase() === item.name.toLowerCase();
-            const showBadge = item.name.toLowerCase() === "unread" && unreadCount > 0;
+            const showBadge =
+              item.name.toLowerCase() === "unread" && unreadCount > 0;
 
             return (
               <Pressable onPress={() => setActiveTab(item.name)}>
@@ -202,13 +453,13 @@ const Notifications = () => {
                   {showBadge && (
                     <View
                       style={{
-                        minWidth: RFValue(14),
-                        height: RFValue(14),
-                        borderRadius: RFValue(7),
+                        minWidth: RFValue(15),
+                        height: RFValue(15),
+                        borderRadius: RFValue(7.5),
                         backgroundColor: colors.error[200],
                         alignItems: "center",
                         justifyContent: "center",
-                        paddingHorizontal: 2,
+                        paddingHorizontal: 3,
                         marginLeft: 2,
                       }}
                     >
@@ -248,11 +499,15 @@ const Notifications = () => {
             onRefresh={handleRefresh}
             renderItem={({ item }) => {
               const isUnread = !item.is_read;
-              const isBell = item.notification_type?.toLowerCase().includes("bell") || true;
+              const meta = getNotificationMeta(item);
 
               return (
                 <Pressable
-                  onPress={() => handleNotificationPress(item)}
+                  onPress={() => {
+                    handleNotificationPress(item);
+                    meta.onAction();
+                  }}
+                  onLongPress={() => handleDeleteNotification(item)}
                   style={[
                     {
                       backgroundColor: isDarkMode ? colors.slate[100] : "#FFFFFF",
@@ -261,62 +516,107 @@ const Notifications = () => {
                     },
                     custom.shadow,
                   ]}
-                  className="flex flex-row gap-4 p-4 rounded-2xl"
+                  className="flex flex-row items-start gap-3.5 p-4 rounded-2xl"
                 >
+                  {/* Left Icon / Avatar: 'D' letter badge or Bell icon */}
                   <View
-                    style={{ backgroundColor: isDarkMode ? colors.slate[200] : colors.slate[150] }}
-                    className="size-[44px] flex flex-row items-center justify-center rounded-full"
+                    style={{
+                      backgroundColor: isDarkMode ? colors.slate[200] : colors.slate[150],
+                      width: RFValue(40),
+                      height: RFValue(40),
+                      borderRadius: RFValue(20),
+                    }}
+                    className="items-center justify-center"
                   >
-                    <Image
-                      source={
-                        isBell
-                          ? require("@/assets/icons/notification.png")
-                          : require("@/assets/icons/Lock.png")
-                      }
-                      className="size-5"
-                      style={{ tintColor: colors.slate[650] }}
-                    />
+                    {meta.avatarKind === "d" ? (
+                      <Text
+                        style={{
+                          color: colors.slate[650],
+                          fontSize: RFValue(15),
+                          fontWeight: "700",
+                        }}
+                      >
+                        D
+                      </Text>
+                    ) : (
+                      <Image
+                        source={
+                          isDarkMode
+                            ? require("@/assets/icons/notification-light.png")
+                            : require("@/assets/icons/notification.png")
+                        }
+                        style={{
+                          width: RFValue(18),
+                          height: RFValue(18),
+                          tintColor: colors.slate[650],
+                        }}
+                        resizeMode="contain"
+                      />
+                    )}
                   </View>
 
-                  <View className="flex-1 gap-2.5">
-                    <View>
-                      <View className="flex flex-row items-start justify-between">
-                        <Text style={custom.itemTitle} className="flex-1 mr-2" numberOfLines={1}>
-                          {item.title}
-                        </Text>
-
-                        <View className="flex flex-row items-center gap-1.5 mt-0.5">
-                          <Text style={custom.itemTime}>
-                            {formatTimeAgo(item.date_created)}
-                          </Text>
-                          {isUnread && (
-                            <View className="w-2 h-2 rounded-full bg-red-500" />
-                          )}
-                        </View>
-                      </View>
-
-                      <Text style={custom.itemMessage}>
-                        {item.message || ""}
+                  {/* Body */}
+                  <View className="flex-1">
+                    <View className="flex flex-row items-start justify-between">
+                      <Text
+                        style={custom.itemTitle}
+                        className="flex-1 mr-2"
+                        numberOfLines={1}
+                      >
+                        {item.title}
                       </Text>
+
+                      <View className="flex flex-row items-center gap-1.5 mt-0.5">
+                        <Text style={custom.itemTime}>
+                          {formatTime(item.date_created || (item as any).date)}
+                        </Text>
+                        {isUnread && (
+                          <View
+                            style={{
+                              width: RFValue(6.5),
+                              height: RFValue(6.5),
+                              borderRadius: RFValue(3.5),
+                              backgroundColor: "#EF4444",
+                            }}
+                          />
+                        )}
+                      </View>
                     </View>
 
-                    <View className="flex flex-row items-center gap-1 mt-0.5">
+                    <Text style={custom.itemMessage} className="mt-1">
+                      {item.message || (item as any).desc || ""}
+                    </Text>
+
+                    {/* Action link */}
+                    <Pressable
+                      onPress={(e) => {
+                        e.stopPropagation?.();
+                        handleNotificationPress(item);
+                        meta.onAction();
+                      }}
+                      hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+                      className="flex flex-row items-center gap-1.5 self-start mt-2.5"
+                    >
                       <Text style={custom.itemAction}>
-                        {getActionText(item)}
+                        {meta.text}
                       </Text>
 
                       <Image
                         source={
-                          getActionText(item) === "Download receipt"
+                          meta.icon === "download"
                             ? require("@/assets/icons/Download - Iconly Pro.png")
                             : isDarkMode
                               ? require("@/assets/icons/arrow-right-light.png")
                               : require("@/assets/icons/arrow-right-dark.png")
                         }
-                        className="size-4"
-                        style={{ tintColor: isDarkMode ? colors.info[200] : colors.info[300] }}
+                        style={{
+                          width: RFValue(14),
+                          height: RFValue(14),
+                          tintColor: colors.slate[650],
+                        }}
+                        resizeMode="contain"
                       />
-                    </View>
+                    </Pressable>
                   </View>
                 </Pressable>
               );
@@ -338,21 +638,20 @@ const styles = (colors: ColorScheme, isDarkMode: boolean) =>
       backgroundColor: colors.background,
     },
     itemTitle: {
-      fontSize: RFValue(13.5),
+      fontSize: RFValue(13),
       fontWeight: "600",
       color: colors.slate[650],
       lineHeight: RFValue(18),
     },
     itemMessage: {
-      fontSize: RFValue(12),
+      fontSize: RFValue(11.5),
       color: colors.slate[600],
       lineHeight: RFValue(16.5),
-      marginTop: RFValue(2),
     },
     itemAction: {
-      fontSize: RFValue(12.5),
+      fontSize: RFValue(12),
       fontWeight: "600",
-      color: isDarkMode ? colors.info[200] : colors.info[300],
+      color: colors.slate[650],
     },
     itemTime: {
       fontSize: RFValue(10.5),

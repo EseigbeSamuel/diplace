@@ -1,8 +1,8 @@
 export interface NotificationItem {
   title: string;
   message: string;
-  notification_type: string;
-  priority: string;
+  notification_type: NotificationType;
+  priority: NotificationPriority;
   data?: Record<string, any> | null;
   action_url?: string | null;
   scheduled_for?: string | null;
@@ -65,3 +65,28 @@ export interface DeviceTokenResponse {
   last_seen_at: string;
 }
 
+export type NotificationType =
+  | "system"
+  | "property"
+  | "agent"
+  | "payment"
+  | "booking"
+  | "reviews"
+  | "promotion"
+  | "inspection"
+  | "reminder"
+  | (string & {});
+
+export type NotificationPriority = "low" | "medium" | "high" | "urgent";
+
+export interface CreateNotificationPayload {
+  title: string;
+  message: string;
+  notification_type?: NotificationType;
+  priority?: NotificationPriority;
+  data?: Record<string, any> | null;
+  action_url?: string | null;
+  scheduled_for?: string | null;
+  expires_at?: string | null;
+  user_id?: string;
+}

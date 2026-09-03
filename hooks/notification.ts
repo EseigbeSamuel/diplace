@@ -5,10 +5,12 @@ import {
   putRequest,
 } from "@/services";
 import {
+  CreateNotificationPayload,
   DevicePlatform,
   DeviceTokenPayload,
   DeviceTokenResponse,
   ListNotificationsResponse,
+  NotificationItem,
   NotificationPreferences,
   NotificationStats,
 } from "@/types";
@@ -224,6 +226,64 @@ export function useDeleteNotification() {
   return {
     deleteNotificationMutation: mutateAsync,
     deleteNotificationPending: isPending,
+  };
+}
+
+export function useGetNotification({
+  notificationId,
+  enabled = true,
+}: {
+  notificationId?: string;
+  enabled?: boolean;
+}) {
+  const query = useQuery({
+    queryKey: ["notification-detail", notificationId],
+    enabled: enabled && !!notificationId,
+    queryFn: async () => {
+      return await getRequest<NotificationItem>({
+        url: `/user-notifications/${notificationId}`,
+        protectedRoute: true,
+      });
+    },
+  });
+
+  return {
+    notification: query.data,
+    isNotificationLoading: query.isLoading,
+    notificationError: query.error,
+    refetchNotification: query.refetch,
+  };
+}
+
+export function useCreateNotification() {
+  const queryClient = useQueryClient();
+  const { mutateAsync, isPending } = useMutation({
+    mutationFn: async (payload: CreateNotificationPayload) => {
+      return await postRequest<NotificationItem, CreateNotificationPayload>({
+        url: "/user-notifications/",
+        payload,
+        protectedRoute: true,
+      });
+    },
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey: ["my-notifications"] });
+      await queryClient.invalidateQueries({ queryKey: ["notifications-unread-count"] });
+      await queryClient.invalidateQueries({ queryKey: ["notifications-stats"] });
+    },
+    onError: (error) => {
+      const message =
+        error instanceof Error ? error.message : "Unable to create notification.";
+      showToast({
+        type: "error",
+        text1: "Error",
+        text2: message,
+      });
+    },
+  });
+
+  return {
+    createNotificationMutation: mutateAsync,
+    isCreatingNotification: isPending,
   };
 }
 
