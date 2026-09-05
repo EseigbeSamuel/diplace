@@ -1,6 +1,6 @@
 import { useTheme } from "@/contexts/themeContext";
 import { ColorScheme } from "@/utils";
-import { useNavigation } from "@react-navigation/native";
+import { useRouter } from "expo-router";
 import React from "react";
 import {
   Image,
@@ -28,10 +28,10 @@ const SectionHeader = ({
   onLeftIconPress,
   isTransparent = false,
 }: HeaderComponentProps) => {
-  const navigation = useNavigation();
+  const router = useRouter();
 
   const handleBackPress = () => {
-    navigation.goBack();
+    router.back();
   };
   const { colors, isDarkMode } = useTheme();
   const Styles = styles(colors);

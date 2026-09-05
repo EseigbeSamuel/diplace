@@ -1,5 +1,5 @@
 import { useTheme } from "@/contexts/themeContext";
-import { useNavigation } from "@react-navigation/native";
+import { useRouter } from "expo-router";
 import React, { useState } from "react";
 import { View } from "react-native";
 import { ProgressIndicator } from ".";
@@ -37,8 +37,9 @@ const StepperWithHeader: React.FC<StepperWithHeaderProps> = ({
   rightActionTitle = "Save as Draft",
 }) => {
   const [currentStepIndex, setCurrentStepIndex] = useState(initialStepIndex);
-  const [currentSubstepIndex, setCurrentSubstepIndex] = useState(initialSubstepIndex);
-  const navigation = useNavigation();
+  const [currentSubstepIndex, setCurrentSubstepIndex] =
+    useState(initialSubstepIndex);
+  const router = useRouter();
   const { colors } = useTheme();
 
   // type StepperRouteParams = { searchData?: any };
@@ -60,7 +61,7 @@ const StepperWithHeader: React.FC<StepperWithHeaderProps> = ({
       setCurrentStepIndex(currentStepIndex - 1);
       setCurrentSubstepIndex(steps[currentStepIndex - 1].substeps.length - 1);
     } else if (currentSubstepIndex === 0 && currentStepIndex === 0) {
-      navigation.goBack();
+      router.back();
     }
   };
 

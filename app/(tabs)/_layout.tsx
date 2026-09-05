@@ -1,17 +1,17 @@
-import { useGetConversations } from "@/hooks";
+import { Plus } from "@/assets/icons";
 import { CustomBottomSheet } from "@/components/bottom-sheet";
 import { CustomTabIcon, TabBarLabel } from "@/components/tab";
 import { useTheme } from "@/contexts/themeContext";
 import { useUser } from "@/contexts/user-context";
+import { useGetConversations } from "@/hooks";
 import { tabItems } from "@/utils/permissions";
 import { BottomSheetModal } from "@gorhom/bottom-sheet";
 import { Tabs } from "expo-router";
 import React, { useMemo, useRef } from "react";
-import { Image, Pressable, View } from "react-native";
+import { Pressable, View } from "react-native";
 import { RFValue } from "react-native-responsive-fontsize";
-import { heightPercentageToDP as hp } from "react-native-responsive-screen";
-import AddSpaceBottomSheet from "../views/spaces/components/AddSpacesBottomContainer";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import AddSpaceBottomSheet from "../views/spaces/components/AddSpacesBottomContainer";
 
 const TabLayout = () => {
   const { colors, isDarkMode } = useTheme();
@@ -103,7 +103,7 @@ const TabLayout = () => {
                             elevation: 4,
                           }}
                         >
-                          <Image
+                          {/* <Image
                             source={
                               isDarkMode
                                 ? require("@/assets/icons/plus.png")
@@ -111,7 +111,8 @@ const TabLayout = () => {
                             }
                             style={{ width: RFValue(18), height: RFValue(18) }}
                             resizeMode="contain"
-                          />
+                          /> */}
+                          <Plus size={RFValue(18)} color={colors.slate[650]} />
                         </View>
                       </Pressable>
                     ),
@@ -119,7 +120,9 @@ const TabLayout = () => {
                 : {
                     tabBarLabel: (props) => (
                       <TabBarLabel {...props}>
-                        {item.name === "activity" && userType !== "renter" ? "Bookings" : item.label}
+                        {item.name === "activity" && userType !== "renter"
+                          ? "Bookings"
+                          : item.label}
                       </TabBarLabel>
                     ),
                     tabBarLabelPosition: "below-icon",
@@ -128,7 +131,9 @@ const TabLayout = () => {
                         focused={focused}
                         activeIcon={item.activeIcon}
                         inactiveIcon={item.inactiveIcon}
-                        badge={item.name === "chats" ? unreadChatsCount : undefined}
+                        badge={
+                          item.name === "chats" ? unreadChatsCount : undefined
+                        }
                         showDot={item.name === "activity"}
                       />
                     ),

@@ -1,3 +1,4 @@
+import { Calender } from "@/assets/icons";
 import ActiveActivityCard from "@/components/ActiveActivityCard";
 import { useTheme } from "@/contexts/themeContext";
 import { useGetActiveActivities } from "@/hooks";
@@ -7,7 +8,6 @@ import { router } from "expo-router";
 import React from "react";
 import {
   ActivityIndicator,
-  Image,
   ScrollView,
   StyleSheet,
   Text,
@@ -65,7 +65,7 @@ const ActiveActivity = () => {
         style={s.todayCard}
         className="flex flex-row gap-4 p-4 border rounded-lg m-4"
       >
-        <Image
+        {/* <Image
           source={
             isDarkMode
               ? require("@/assets/icons/calender-white.png")
@@ -73,7 +73,8 @@ const ActiveActivity = () => {
           }
           className="w-9 h-9"
           style={{ tintColor: colors.slate[650] }}
-        />
+        /> */}
+        <Calender color={colors.slate[650]} />
         <View>
           <Text style={s.todayTitle}>Today's Activity</Text>
           <Text style={s.todayBody} className="break-words w-[80%] font-medium">

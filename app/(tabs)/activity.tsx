@@ -1,13 +1,12 @@
 import { AppHeader } from "@/components/header";
 import HeaderTabs from "@/components/headertab";
 import SafeAreaViewContainer from "@/components/safeareaview";
-import { useRef, useState } from "react";
-import { StyleSheet, View } from "react-native";
+import { useUser } from "@/contexts/user-context";
+import React, { useRef, useState } from "react";
+import { View } from "react-native";
 import ActiveActivity from "../views/activities/active";
 import AgentActiveActivity from "../views/activities/agentActive";
 import ActivityHistory from "../views/activities/history";
-import { useUser } from "@/contexts/user-context";
-import React from "react";
 
 const Activity = () => {
   const [activeTab, setActiveTab] = useState("active");
@@ -25,7 +24,11 @@ const Activity = () => {
   const renderContent = (activeTab: string) => {
     switch (activeTab) {
       case "active":
-        return userType === "renter" ? <ActiveActivity /> : <AgentActiveActivity />;
+        return userType === "renter" ? (
+          <ActiveActivity />
+        ) : (
+          <AgentActiveActivity />
+        );
       case "history":
         return <ActivityHistory />;
       default:
