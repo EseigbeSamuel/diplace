@@ -1,7 +1,17 @@
 import { useTheme } from "@/contexts/themeContext";
+import {
+  useGetBookingDetail,
+  useGetInspectionDetail,
+} from "@/hooks";
+import {
+  ActivityDetailUser,
+  BookingDetailResponse,
+  InspectionDetailResponse,
+  PaymentSchedule,
+} from "@/types";
 import { router, useLocalSearchParams } from "expo-router";
 import React from "react";
-import { Pressable, Text, View } from "react-native";
+import { ActivityIndicator, Pressable, Text, View } from "react-native";
 import Animated, {
   useAnimatedScrollHandler,
   useSharedValue,
@@ -9,13 +19,39 @@ import Animated, {
 import { RFValue } from "react-native-responsive-fontsize";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
-import ParallaxHeader from "./components/ParallaxHeader";
+import BottomButtonBar from "./components/BottomButtonBar";
 import BookingDetails from "./components/BookingDetails";
 import ContactCard from "./components/ContactCard";
 import FinancialDetails from "./components/FinancialDetails";
+import ParallaxHeader from "./components/ParallaxHeader";
 import RentersNotes from "./components/RentersNotes";
 import WarningBanner from "./components/WarningBanner";
-import BottomButtonBar from "./components/BottomButtonBar";
+
+// ── Helpers ──────────────────────────────────────────────────────────────────
+
+/** Returns true when status maps to an inspection endpoint */
+const isInspectionStatus = (s: string) =>
+  s === "scheduled" || s === "inspected";
+
+/** Build a full address string from property.address */
+const buildAddress = (
+  data: InspectionDetailResponse | BookingDetailResponse | undefined,
+): string => {
+  const addr = data?.property?.address;
+  if (!addr) return "";
+  return [addr.street, addr.city, addr.state].filter(Boolean).join(", ");
+};
+
+/** Resolve the primary gallery image URI from media array */
+const resolveImageUri = (
+  data: InspectionDetailResponse | BookingDetailResponse | undefined,
+): string | undefined => {
+  const media = data?.property?.media ?? [];
+  const gallery = media.find((m) => m.media_role === "gallery") ?? media[0];
+  return gallery?.file_url;
+};
+
+// ── Screen ───────────────────────────────────────────────────────────────────
 
 const ActivitySchedule = () => {
   const { colors } = useTheme();
@@ -29,19 +65,49 @@ const ActivitySchedule = () => {
 
   const role = (params.role || "agent").toLowerCase();
   const status = (params.status || "scheduled").toLowerCase();
-  const title = params.title || "2 Bedroom in-suite apartment";
-  const isEventCenter = title.toLowerCase().includes("event");
+  const paramTitle = params.title || "";
 
-  // Determine property image
-  const propertyImage = isEventCenter
-    ? require("@/assets/images/halls.png")
-    : require("@/assets/images/SpacesNearbyImage1.png");
+  const isInspection = isInspectionStatus(status);
 
-  // Determine pricing text
-  const priceText = isEventCenter ? "₦400,000/day" : "₦800,000/annum";
-  const locationText = isEventCenter
-    ? "GRA Phase II, Port Harcourt"
-    : "Rumuehwhera, Port Harcourt";
+  // ── Fetch the correct detail based on status ──────────────────────────────
+  const {
+    data: inspectionData,
+    isLoading: inspLoading,
+  } = useGetInspectionDetail(isInspection ? (params.index ?? "") : "");
+
+  const {
+    data: bookingData,
+    isLoading: bookLoading,
+  } = useGetBookingDetail(!isInspection ? (params.index ?? "") : "");
+
+  const isLoading = isInspection ? inspLoading : bookLoading;
+  const data: InspectionDetailResponse | BookingDetailResponse | undefined =
+    isInspection ? inspectionData : bookingData;
+
+  // ── Derived display values ────────────────────────────────────────────────
+  const title = data?.property?.title || paramTitle || "Property";
+  const addressText = buildAddress(data);
+  const imageUri = resolveImageUri(data);
+  const price = data?.property?.price;
+  const costFrequency = data?.property?.cost_frequency;
+
+  // Determine contact to show in ContactCard
+  // Renter sees the lister; Agent sees the renter (user)
+  let contact: ActivityDetailUser | undefined;
+  if (role === "renter") {
+    contact = data?.property?.lister;
+  } else {
+    contact = data?.user;
+  }
+
+  // Payment schedules (only present for bookings)
+  const paymentSchedules: PaymentSchedule[] | undefined =
+    !isInspection
+      ? (data as BookingDetailResponse | undefined)?.payment_schedules
+      : undefined;
+
+  // Fallback property image (local)
+  const propertyImage = require("@/assets/images/SpacesNearbyImage1.png");
 
   const handleBack = () => {
     router.back();
@@ -65,6 +131,7 @@ const ActivitySchedule = () => {
         scrollY={scrollY}
         IMAGE_HEIGHT={IMAGE_HEIGHT}
         propertyImage={propertyImage}
+        imageUri={imageUri}
         handleBack={handleBack}
       />
 
@@ -85,90 +152,132 @@ const ActivitySchedule = () => {
           style={{ backgroundColor: colors.background }}
           className="flex flex-col rounded-t-[28px] px-4 pt-6 pb-24"
         >
-          {/* Title & Info */}
-          <View className="pb-4">
-            <View className="flex flex-row justify-between items-start">
-              <View className="flex-1">
-                <Text
-                  style={{ color: colors.slate[650], fontSize: RFValue(22) }}
-                  className="font-bold"
-                >
-                  {title}
-                </Text>
-                <Text
-                  style={{
-                    color: colors.slate[550],
-                    fontSize: RFValue(15.5),
-                    marginTop: 4,
-                  }}
-                  className="font-medium"
-                >
-                  📍 {locationText}
-                </Text>
-              </View>
-              {role === "renter" && (
-                <View className="ml-4">
-                  <Pressable
-                    style={{
-                      borderColor: colors.slate[200],
-                      borderWidth: 1,
-                      borderRadius: 20,
-                      paddingHorizontal: 16,
-                      paddingVertical: 6,
-                    }}
-                  >
-                    <Text style={{ color: colors.slate[650] }} className="font-medium">
-                      View
+          {isLoading ? (
+            <ActivityIndicator
+              size="large"
+              color={colors.slate[650]}
+              className="my-10"
+            />
+          ) : (
+            <>
+              {/* Title & Info */}
+              <View className="pb-4">
+                <View className="flex flex-row justify-between items-start">
+                  <View className="flex-1">
+                    <Text
+                      style={{ color: colors.slate[650], fontSize: RFValue(22) }}
+                      className="font-bold"
+                    >
+                      {title}
                     </Text>
-                  </Pressable>
+                    {addressText ? (
+                      <Text
+                        style={{
+                          color: colors.slate[550],
+                          fontSize: RFValue(15.5),
+                          marginTop: 4,
+                        }}
+                        className="font-medium"
+                      >
+                        📍 {addressText}
+                      </Text>
+                    ) : null}
+                  </View>
+                  {role === "renter" && (
+                    <View className="ml-4">
+                      <Pressable
+                        style={{
+                          borderColor: colors.slate[200],
+                          borderWidth: 1,
+                          borderRadius: 20,
+                          paddingHorizontal: 16,
+                          paddingVertical: 6,
+                        }}
+                      >
+                        <Text
+                          style={{ color: colors.slate[650] }}
+                          className="font-medium"
+                        >
+                          View
+                        </Text>
+                      </Pressable>
+                    </View>
+                  )}
                 </View>
-              )}
-            </View>
-            {role === "agent" && (
-              <Text
-                style={{
-                  color: colors.slate[650],
-                  fontSize: RFValue(17.5),
-                  marginTop: 8,
-                }}
-                className="font-bold"
-              >
-                {priceText}
-              </Text>
-            )}
-          </View>
 
-          <View
-            style={{ borderTopWidth: 1, borderColor: colors.slate[200] }}
-            className="my-2"
-          />
+                {role === "agent" && price != null && costFrequency && (
+                  <Text
+                    style={{
+                      color: colors.slate[650],
+                      fontSize: RFValue(17.5),
+                      marginTop: 8,
+                    }}
+                    className="font-bold"
+                  >
+                    ₦{price.toLocaleString("en-NG")}
+                    <Text
+                      style={{
+                        color: colors.slate[500],
+                        fontSize: RFValue(14),
+                        fontWeight: "400",
+                      }}
+                    >
+                      /{costFrequency.replace("per_", "")}
+                    </Text>
+                  </Text>
+                )}
+              </View>
 
-          <BookingDetails status={status} isEventCenter={isEventCenter} />
+              <View
+                style={{ borderTopWidth: 1, borderColor: colors.slate[200] }}
+                className="my-2"
+              />
 
-          <View
-            style={{ borderTopWidth: 1, borderColor: colors.slate[200] }}
-            className="my-2"
-          />
+              <BookingDetails status={status} data={data} />
 
-          <ContactCard role={role} status={status} isEventCenter={isEventCenter} />
+              <View
+                style={{ borderTopWidth: 1, borderColor: colors.slate[200] }}
+                className="my-2"
+              />
 
-          <FinancialDetails role={role} status={status} isEventCenter={isEventCenter} />
-          
-          <RentersNotes role={role} status={status} isEventCenter={isEventCenter} />
+              <ContactCard
+                role={role}
+                status={status}
+                contact={contact}
+              />
 
-          <View
-            style={{ borderTopWidth: 1, borderColor: colors.slate[200] }}
-            className="my-2"
-          />
+              <FinancialDetails
+                role={role}
+                status={status}
+                property={data?.property}
+                paymentSchedules={paymentSchedules}
+              />
 
-          <WarningBanner role={role} status={status} />
+              <RentersNotes
+                role={role}
+                status={status}
+                isEventCenter={
+                  data?.property?.property_type === "event_space" ||
+                  data?.property?.event_space != null
+                }
+              />
+
+              <View
+                style={{ borderTopWidth: 1, borderColor: colors.slate[200] }}
+                className="my-2"
+              />
+
+              <WarningBanner role={role} status={status} />
+            </>
+          )}
         </View>
       </Animated.ScrollView>
 
       <BottomButtonBar
         role={role}
         status={status}
-        priceText={priceText}
+        price={price}
+        costFrequency={costFrequency}
         handleBack={handleBack}
       />
     </View>

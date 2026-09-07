@@ -8,6 +8,8 @@ interface ParallaxHeaderProps {
   scrollY: SharedValue<number>;
   IMAGE_HEIGHT: number;
   propertyImage: ImageSourcePropType;
+  /** When provided, overrides propertyImage with a remote URI */
+  imageUri?: string;
   handleBack: () => void;
 }
 
@@ -15,6 +17,7 @@ const ParallaxHeader: React.FC<ParallaxHeaderProps> = ({
   scrollY,
   IMAGE_HEIGHT,
   propertyImage,
+  imageUri,
   handleBack,
 }) => {
   const insets = useSafeAreaInsets();
@@ -29,6 +32,10 @@ const ParallaxHeader: React.FC<ParallaxHeaderProps> = ({
       transform: [{ translateY }],
     };
   });
+
+  const imageSource: ImageSourcePropType = imageUri
+    ? { uri: imageUri }
+    : propertyImage;
 
   return (
     <>
@@ -47,7 +54,7 @@ const ParallaxHeader: React.FC<ParallaxHeaderProps> = ({
         ]}
       >
         <Image
-          source={propertyImage}
+          source={imageSource}
           className="w-full h-full"
           resizeMode="cover"
         />

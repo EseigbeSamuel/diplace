@@ -5,7 +5,7 @@ import { router } from "expo-router";
 import React from "react";
 import { ActivityIndicator, Image, Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 import { RFValue } from "react-native-responsive-fontsize";
-import { useGetTodayActivities } from "@/hooks";
+import { useGetRenterTodayActivities } from "@/hooks";
 import { TodayActivityItem } from "@/types";
 import { ColorScheme } from "@/utils";
 
@@ -93,7 +93,7 @@ const TodayActivityCard = ({ item }: { item: TodayActivityItem }) => {
 // ─── Screen ───────────────────────────────────────────────────────────────────
 
 const TodayActivityScreen = () => {
-  const { data: todayActivities, isLoading } = useGetTodayActivities();
+  const { data: todayActivities, isLoading } = useGetRenterTodayActivities();
   const { colors, isDarkMode } = useTheme();
   const s = styles(colors, isDarkMode);
 

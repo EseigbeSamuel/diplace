@@ -1,7 +1,7 @@
 import HistoryCard from "@/components/HistoryCard";
 import { useTheme } from "@/contexts/themeContext";
 import { useUser } from "@/contexts/user-context";
-import { useGetHistoryActivities } from "@/hooks";
+import { useGetRenterHistoryActivities } from "@/hooks";
 import { HistoryActivityItem } from "@/types";
 import { ColorScheme } from "@/utils";
 import React from "react";
@@ -12,7 +12,7 @@ const ActivityHistory = () => {
   const { colors } = useTheme();
   const s = styles(colors);
   const { userType } = useUser();
-  const { data: historyData, isLoading } = useGetHistoryActivities();
+  const { data: historyData, isLoading } = useGetRenterHistoryActivities();
 
   if (userType !== "renter") {
     return <AgentActivityHistory />;

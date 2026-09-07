@@ -2,51 +2,157 @@ import React from "react";
 import { View, Text } from "react-native";
 import { RFValue } from "react-native-responsive-fontsize";
 import { useTheme } from "@/contexts/themeContext";
+import { ActivityPropertyDetail, PaymentSchedule } from "@/types";
 
 interface FinancialDetailsProps {
-  status: string;
-  isEventCenter: boolean;
   role: string;
+  status: string;
+  property?: ActivityPropertyDetail;
+  paymentSchedules?: PaymentSchedule[];
 }
 
-const FinancialDetails: React.FC<FinancialDetailsProps> = ({ status, isEventCenter, role }) => {
+const formatCurrency = (amount: number): string =>
+  `₦${amount.toLocaleString("en-NG", { minimumFractionDigits: 2 })}`;
+
+const formatDate = (dateStr?: string): string => {
+  if (!dateStr) return "—";
+  const d = new Date(dateStr);
+  if (isNaN(d.getTime())) return dateStr;
+  return d.toLocaleDateString("en-GB", {
+    weekday: "short",
+    day: "numeric",
+    month: "short",
+    year: "numeric",
+  });
+};
+
+const FinancialDetails: React.FC<FinancialDetailsProps> = ({
+  role,
+  status,
+  property,
+  paymentSchedules,
+}) => {
   const { colors } = useTheme();
 
-  if (!isEventCenter || status !== "reserved") {
-    return null;
-  }
+  // Show for reserved/booked statuses that have financial data
+  const hasPaymentSchedules = paymentSchedules && paymentSchedules.length > 0;
+  const hasFees = property?.fees;
+
+  if (!hasPaymentSchedules && !hasFees) return null;
+
+  // For booking statuses only
+  if (status !== "reserved" && status !== "booked") return null;
+
+  const paidSchedules = paymentSchedules?.filter(
+    (s) => s.schedule_status === "paid"
+  ) ?? [];
+  const pendingSchedules = paymentSchedules?.filter(
+    (s) => s.schedule_status === "pending"
+  ) ?? [];
+  const firstPending = pendingSchedules[0];
+  const totalPaid = paidSchedules.reduce((sum, s) => sum + s.amount, 0);
+  const totalPending = pendingSchedules.reduce((sum, s) => sum + s.amount, 0);
 
   return (
     <View
       style={{ borderColor: colors.slate[200] }}
-      className="py-4 border-t gap-3"
+      className="py-4 border-t gap-3.5"
     >
-      <View className="flex flex-row justify-between">
-        <Text style={{ color: colors.slate[550], fontSize: RFValue(15) }}>
-          Initial deposit:
-        </Text>
-        <Text style={{ color: colors.slate[650], fontSize: RFValue(15.5) }} className="font-bold">
-          ₦251,200.00
-        </Text>
-      </View>
-      {role === "agent" && (
-        <View className="flex flex-row justify-between">
-          <Text style={{ color: colors.slate[550], fontSize: RFValue(15) }}>
-            Balance payment:
-          </Text>
-          <Text style={{ color: colors.slate[650], fontSize: RFValue(15.5) }} className="font-bold">
-            ₦1,004,800.00
-          </Text>
-        </View>
+      <Text
+        style={{ color: colors.slate[650], fontSize: RFValue(15) }}
+        className="font-bold"
+      >
+        Financial Details
+      </Text>
+
+      {/* Fees breakdown */}
+      {hasFees && (
+        <>
+          {property!.fees.caution_fee > 0 && (
+            <View className="flex flex-row justify-between">
+              <Text style={{ color: colors.slate[550], fontSize: RFValue(14.5) }}>
+                Caution fee:
+              </Text>
+              <Text
+                style={{ color: colors.slate[650], fontSize: RFValue(14.5) }}
+                className="font-semibold"
+              >
+                {formatCurrency(property!.fees.caution_fee)}
+              </Text>
+            </View>
+          )}
+          {property!.fees.agency_fee_percent > 0 && (
+            <View className="flex flex-row justify-between">
+              <Text style={{ color: colors.slate[550], fontSize: RFValue(14.5) }}>
+                Agency fee:
+              </Text>
+              <Text
+                style={{ color: colors.slate[650], fontSize: RFValue(14.5) }}
+                className="font-semibold"
+              >
+                {property!.fees.agency_fee_percent}%
+              </Text>
+            </View>
+          )}
+          {property!.fees.legal_fee_percent > 0 && (
+            <View className="flex flex-row justify-between">
+              <Text style={{ color: colors.slate[550], fontSize: RFValue(14.5) }}>
+                Legal fee:
+              </Text>
+              <Text
+                style={{ color: colors.slate[650], fontSize: RFValue(14.5) }}
+                className="font-semibold"
+              >
+                {property!.fees.legal_fee_percent}%
+              </Text>
+            </View>
+          )}
+        </>
       )}
-      <View className="flex flex-row justify-between">
-        <Text style={{ color: colors.slate[550], fontSize: RFValue(15) }}>
-          Balance due:
-        </Text>
-        <Text className="text-red-500 font-bold text-base">
-          Thu. 10th Aug, 2025
-        </Text>
-      </View>
+
+      {/* Payment schedules */}
+      {hasPaymentSchedules && (
+        <>
+          {totalPaid > 0 && (
+            <View className="flex flex-row justify-between">
+              <Text style={{ color: colors.slate[550], fontSize: RFValue(14.5) }}>
+                Amount paid:
+              </Text>
+              <Text
+                style={{ color: "#16A34A", fontSize: RFValue(14.5) }}
+                className="font-bold"
+              >
+                {formatCurrency(totalPaid)}
+              </Text>
+            </View>
+          )}
+
+          {role === "agent" && totalPending > 0 && (
+            <View className="flex flex-row justify-between">
+              <Text style={{ color: colors.slate[550], fontSize: RFValue(14.5) }}>
+                Balance payment:
+              </Text>
+              <Text
+                style={{ color: colors.slate[650], fontSize: RFValue(14.5) }}
+                className="font-bold"
+              >
+                {formatCurrency(totalPending)}
+              </Text>
+            </View>
+          )}
+
+          {firstPending && (
+            <View className="flex flex-row justify-between">
+              <Text style={{ color: colors.slate[550], fontSize: RFValue(14.5) }}>
+                Balance due:
+              </Text>
+              <Text className="text-red-500 font-bold text-base">
+                {formatDate(firstPending.due_date)}
+              </Text>
+            </View>
+          )}
+        </>
+      )}
     </View>
   );
 };

@@ -1,7 +1,7 @@
 import { Calender } from "@/assets/icons";
 import ActiveActivityCard from "@/components/ActiveActivityCard";
 import { useTheme } from "@/contexts/themeContext";
-import { useGetActiveActivities } from "@/hooks";
+import { useGetRenterActiveActivities } from "@/hooks";
 import { ActiveActivityItem } from "@/types";
 import { ColorScheme } from "@/utils";
 import { router } from "expo-router";
@@ -17,7 +17,7 @@ import {
 const ActiveActivity = () => {
   const { colors, isDarkMode } = useTheme();
   const s = styles(colors, isDarkMode);
-  const { data: activeActivities, isLoading } = useGetActiveActivities();
+  const { data: activeActivities, isLoading } = useGetRenterActiveActivities();
 
   const renderSection = (
     title: string,
