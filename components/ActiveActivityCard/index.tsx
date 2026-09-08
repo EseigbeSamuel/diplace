@@ -11,6 +11,7 @@ const ActiveActivityCard = ({
   date,
   location,
   title,
+  isNew,
   onPress,
 }: {
   buttonTitle: string;
@@ -18,9 +19,10 @@ const ActiveActivityCard = ({
   date?: string;
   location: string;
   title: string;
+  isNew?: boolean;
   onPress?: () => void;
 }) => {
-  const { colors } = useTheme();
+  const { colors, isDarkMode } = useTheme();
   return (
     <View className="flex flex-row items-center gap-6">
       <Image source={image} className="w-6 h-6" />
@@ -39,12 +41,37 @@ const ActiveActivityCard = ({
               {date}
             </Text>
           </View>
-          <Text
-            style={{ color: colors.slate[650], fontSize: RFValue(16) }}
-            className="font-medium"
-          >
-            {title}
-          </Text>
+          <View className="flex flex-row items-center gap-2">
+            <Text
+              style={{ color: colors.slate[650], fontSize: RFValue(16) }}
+              className="font-medium flex-1"
+              numberOfLines={1}
+            >
+              {title}
+            </Text>
+            {isNew && (
+              <View
+                style={{
+                  backgroundColor: isDarkMode
+                    ? "rgba(239, 68, 68, 0.15)"
+                    : "#FEE2E2",
+                  paddingHorizontal: 8,
+                  paddingVertical: 2,
+                  borderRadius: 20,
+                }}
+              >
+                <Text
+                  style={{
+                    color: "#EF4444",
+                    fontSize: RFValue(10),
+                    fontWeight: "bold",
+                  }}
+                >
+                  NEW
+                </Text>
+              </View>
+            )}
+          </View>
           <Text style={{ color: colors.slate[650], fontSize: RFValue(14) }}>
             {location}
           </Text>

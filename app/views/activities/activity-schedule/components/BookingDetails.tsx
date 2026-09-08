@@ -7,6 +7,7 @@ import { BookingDetailResponse, InspectionDetailResponse } from "@/types";
 interface BookingDetailsProps {
   status: string;
   data?: InspectionDetailResponse | BookingDetailResponse;
+  role?: string;
 }
 
 /** Format a date string like "2026-09-07" → "Mon, 7th Sep, 2026" */
@@ -33,9 +34,9 @@ const STATUS_BADGE: Record<
   },
   inspected: {
     label: "✓ Inspected",
-    textClass: "text-gray-800 font-bold text-[12px]",
+    textClass: "text-emerald-600 font-bold text-[12px]",
     containerClass:
-      "bg-gray-100 px-3 py-1 rounded-full border border-gray-300",
+      "bg-emerald-50 px-3 py-1 rounded-full border border-emerald-200",
   },
   reserved: {
     label: "● Reserved",
@@ -57,8 +58,9 @@ const STATUS_BADGE: Record<
   },
 };
 
-const BookingDetails: React.FC<BookingDetailsProps> = ({ status, data }) => {
+const BookingDetails: React.FC<BookingDetailsProps> = ({ status, data, role }) => {
   const { colors } = useTheme();
+  const isRenter = role === "renter";
 
   // ── Inspection (scheduled / inspected) ─────────────────────────────────────
   const isInspection = status === "scheduled" || status === "inspected";
@@ -68,13 +70,15 @@ const BookingDetails: React.FC<BookingDetailsProps> = ({ status, data }) => {
     const badge = STATUS_BADGE[status] ?? STATUS_BADGE["scheduled"];
 
     return (
-      <View className="gap-3.5">
-        <Text
-          style={{ color: colors.slate[650], fontSize: RFValue(15) }}
-          className="font-bold"
-        >
-          Inspection Details
-        </Text>
+      <View className="gap-3">
+        {!isRenter && (
+          <Text
+            style={{ color: colors.slate[650], fontSize: RFValue(15) }}
+            className="font-bold"
+          >
+            Inspection Details
+          </Text>
+        )}
 
         {/* Date row */}
         <View className="flex flex-row items-center justify-between">
@@ -122,6 +126,66 @@ const BookingDetails: React.FC<BookingDetailsProps> = ({ status, data }) => {
   const booking = data as BookingDetailResponse | undefined;
   const badge = STATUS_BADGE[booking?.status ?? status] ?? STATUS_BADGE["booked"];
   const firstSchedule = booking?.payment_schedules?.[0];
+  const eventType =
+    (booking?.details?.event_type as string) ||
+    (booking?.details?.title as string) ||
+    (status === "reserved" ? "Wedding & Engagement" : "Booking Details");
+  const duration =
+    (booking?.details?.duration as string) ||
+    (booking?.details?.time_slot as string) ||
+    "Full work day (16 hours)";
+
+  if (status === "reserved") {
+    return (
+      <View className="gap-2.5">
+        <Text
+          style={{ color: colors.slate[650], fontSize: RFValue(15) }}
+          className="font-bold"
+        >
+          {eventType}
+        </Text>
+
+        {/* Date row */}
+        <View className="flex flex-row items-center justify-between">
+          <View className="flex flex-row items-center gap-2">
+            <Image
+              source={require("@/assets/icons/calendar.png")}
+              className="w-5 h-5"
+              style={{ tintColor: colors.slate[550] }}
+            />
+            <Text
+              style={{ color: colors.slate[600], fontSize: RFValue(14.5) }}
+              className="font-medium"
+            >
+              {firstSchedule?.due_date
+                ? formatDate(firstSchedule.due_date)
+                : "Thu, 17 Aug - Sat, 19 Aug, 2025"}
+            </Text>
+          </View>
+
+          {/* Status badge */}
+          <View className={badge.containerClass}>
+            <Text className={badge.textClass}>{badge.label}</Text>
+          </View>
+        </View>
+
+        {/* Duration / hours */}
+        <View className="flex flex-row items-center gap-2">
+          <Image
+            source={require("@/assets/icons/Time.png")}
+            className="w-5 h-5"
+            style={{ tintColor: colors.slate[550] }}
+          />
+          <Text
+            style={{ color: colors.slate[600], fontSize: RFValue(14.5) }}
+            className="font-medium"
+          >
+            {duration}
+          </Text>
+        </View>
+      </View>
+    );
+  }
 
   return (
     <View className="gap-3.5">

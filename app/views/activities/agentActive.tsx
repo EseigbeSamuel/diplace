@@ -10,6 +10,7 @@ import {
   FlatList,
   Image,
   Pressable,
+  RefreshControl,
   ScrollView,
   StyleSheet,
   Text,
@@ -25,8 +26,22 @@ const AgentActiveActivity = () => {
   const [activeFilter, setActiveFilter] = useState("all");
   const router = useRouter();
 
-  const { data: activityData, isLoading } = useGetAgentActiveActivities();
-  const { data: todayData } = useGetTodayActivities();
+  const {
+    data: activityData,
+    isLoading,
+    refetch: refetchActivities,
+    isRefetching: isActivitiesRefetching,
+  } = useGetAgentActiveActivities();
+
+  const {
+    data: todayData,
+    refetch: refetchToday,
+    isRefetching: isTodayRefetching,
+  } = useGetTodayActivities();
+
+  const handleRefresh = async () => {
+    await Promise.all([refetchActivities(), refetchToday()]);
+  };
 
   const todayCount = todayData?.length ?? 0;
 
@@ -54,10 +69,16 @@ const AgentActiveActivity = () => {
   );
 
   const handleCardPress = (item: ActiveActivityItem) => {
+    const isInspection =
+      item.category === "scheduled" || item.category === "inspected";
+    const activityId = isInspection
+      ? item.inspection_id || item.booking_id
+      : item.booking_id || item.inspection_id;
+
     router.push({
       pathname: "/views/activities/activity-schedule/[index]",
       params: {
-        index: item.booking_id || item.inspection_id,
+        index: activityId,
         status: item.category,
         title: item.property.title,
         role: "agent",
@@ -90,7 +111,17 @@ const AgentActiveActivity = () => {
     !inspectedList.length;
 
   return (
-    <ScrollView showsVerticalScrollIndicator={false}>
+    <ScrollView
+      showsVerticalScrollIndicator={false}
+      refreshControl={
+        <RefreshControl
+          refreshing={isActivitiesRefetching || isTodayRefetching}
+          onRefresh={handleRefresh}
+          tintColor={colors.slate[650]}
+          colors={[colors.slate[650]]}
+        />
+      }
+    >
       {/* Horizontal Filter Tabs */}
       <View className="my-4">
         <FlatList

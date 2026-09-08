@@ -1,4 +1,5 @@
 import { useTheme } from "@/contexts/themeContext";
+import { useUser } from "@/contexts/user-context";
 import {
   useGetBookingDetail,
   useGetInspectionDetail,
@@ -30,8 +31,10 @@ import WarningBanner from "./components/WarningBanner";
 // ── Helpers ──────────────────────────────────────────────────────────────────
 
 /** Returns true when status maps to an inspection endpoint */
-const isInspectionStatus = (s: string) =>
-  s === "scheduled" || s === "inspected";
+const isInspectionStatus = (s: string) => {
+  const norm = (s || "").toLowerCase();
+  return norm === "scheduled" || norm === "inspected" || norm === "inspection";
+};
 
 /** Build a full address string from property.address */
 const buildAddress = (
@@ -55,6 +58,7 @@ const resolveImageUri = (
 
 const ActivitySchedule = () => {
   const { colors } = useTheme();
+  const { userType } = useUser();
   const insets = useSafeAreaInsets();
   const params = useLocalSearchParams<{
     index?: string;
@@ -63,7 +67,7 @@ const ActivitySchedule = () => {
     role?: string;
   }>();
 
-  const role = (params.role || "agent").toLowerCase();
+  const role = (params.role || userType || "renter").toLowerCase();
   const status = (params.status || "scheduled").toLowerCase();
   const paramTitle = params.title || "";
 
@@ -106,11 +110,33 @@ const ActivitySchedule = () => {
       ? (data as BookingDetailResponse | undefined)?.payment_schedules
       : undefined;
 
+  // Payment calculations
+  const paidSchedules =
+    paymentSchedules?.filter((s) => s.schedule_status === "paid") ?? [];
+  const pendingSchedules =
+    paymentSchedules?.filter((s) => s.schedule_status === "pending") ?? [];
+  const totalPaid = paidSchedules.reduce((sum, s) => sum + s.amount, 0);
+  const totalPending = pendingSchedules.reduce((sum, s) => sum + s.amount, 0);
+  const balance =
+    totalPending > 0
+      ? totalPending
+      : Math.max(0, (price ?? 0) - totalPaid);
+
   // Fallback property image (local)
   const propertyImage = require("@/assets/images/SpacesNearbyImage1.png");
 
   const handleBack = () => {
     router.back();
+  };
+
+  const handleViewProperty = () => {
+    const propId = data?.property?.public_id;
+    if (propId) {
+      router.push({
+        pathname: "/views/place-details/[id]",
+        params: { id: propId },
+      });
+    }
   };
 
   const scrollY = useSharedValue(0);
@@ -186,17 +212,19 @@ const ActivitySchedule = () => {
                   {role === "renter" && (
                     <View className="ml-4">
                       <Pressable
+                        onPress={handleViewProperty}
                         style={{
-                          borderColor: colors.slate[200],
+                          borderColor: colors.slate[300],
                           borderWidth: 1,
                           borderRadius: 20,
                           paddingHorizontal: 16,
                           paddingVertical: 6,
+                          backgroundColor: colors.slate[100],
                         }}
                       >
                         <Text
                           style={{ color: colors.slate[650] }}
-                          className="font-medium"
+                          className="font-semibold text-sm"
                         >
                           View
                         </Text>
@@ -233,7 +261,7 @@ const ActivitySchedule = () => {
                 className="my-2"
               />
 
-              <BookingDetails status={status} data={data} />
+              <BookingDetails status={status} data={data} role={role} />
 
               <View
                 style={{ borderTopWidth: 1, borderColor: colors.slate[200] }}
@@ -251,6 +279,8 @@ const ActivitySchedule = () => {
                 status={status}
                 property={data?.property}
                 paymentSchedules={paymentSchedules}
+                balance={balance}
+                totalPaid={totalPaid}
               />
 
               <RentersNotes
@@ -278,6 +308,18 @@ const ActivitySchedule = () => {
         status={status}
         price={price}
         costFrequency={costFrequency}
+        balance={balance}
+        propertyId={data?.property?.public_id}
+        bookingId={data?.public_id}
+        title={title}
+        location={addressText}
+        imageUri={imageUri}
+        totalPaid={totalPaid}
+        totalAmount={
+          (price ?? 0) +
+          (data?.property?.fees?.platform_fee ?? 0) +
+          (data?.property?.fees?.caution_fee ?? 0)
+        }
         handleBack={handleBack}
       />
     </View>

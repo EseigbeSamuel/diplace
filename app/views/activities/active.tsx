@@ -8,6 +8,7 @@ import { router } from "expo-router";
 import React from "react";
 import {
   ActivityIndicator,
+  RefreshControl,
   ScrollView,
   StyleSheet,
   Text,
@@ -17,7 +18,12 @@ import {
 const ActiveActivity = () => {
   const { colors, isDarkMode } = useTheme();
   const s = styles(colors, isDarkMode);
-  const { data: activeActivities, isLoading } = useGetRenterActiveActivities();
+  const {
+    data: activeActivities,
+    isLoading,
+    refetch,
+    isRefetching,
+  } = useGetRenterActiveActivities();
 
   const renderSection = (
     title: string,
@@ -33,34 +39,52 @@ const ActiveActivity = () => {
       <View style={s.sectionContainer}>
         <Text style={s.sectionTitle}>{title}</Text>
         <View className="gap-4">
-          {data.map((item, index) => (
-            <ActiveActivityCard
-              key={item.booking_id || item.inspection_id || index}
-              buttonTitle={buttonTitle}
-              date={item.due_date ? `${datePrefix}${item.due_date}` : undefined}
-              title={item.property.title}
-              image={icon}
-              location={item.property.location}
-              onPress={() =>
-                router.push({
-                  pathname: "/views/activities/activity-schedule/[index]",
-                  params: {
-                    index: item.booking_id || item.inspection_id,
-                    role: "renter",
-                    status: status,
-                    title: item.property.title,
-                  },
-                })
-              }
-            />
-          ))}
+          {data.map((item, index) => {
+            const isInspection = status === "scheduled" || status === "inspected";
+            const activityId = isInspection
+              ? item.inspection_id || item.booking_id
+              : item.booking_id || item.inspection_id;
+
+            return (
+              <ActiveActivityCard
+                key={activityId || index}
+                buttonTitle={buttonTitle}
+                date={item.due_date ? `${datePrefix}${item.due_date}` : undefined}
+                title={item.property.title}
+                image={icon}
+                location={item.property.location}
+                isNew={item.is_new}
+                onPress={() =>
+                  router.push({
+                    pathname: "/views/activities/activity-schedule/[index]",
+                    params: {
+                      index: activityId,
+                      role: "renter",
+                      status: status,
+                      title: item.property.title,
+                    },
+                  })
+                }
+              />
+            );
+          })}
         </View>
       </View>
     );
   };
 
   return (
-    <ScrollView>
+    <ScrollView
+      showsVerticalScrollIndicator={false}
+      refreshControl={
+        <RefreshControl
+          refreshing={isRefetching}
+          onRefresh={refetch}
+          tintColor={colors.slate[650]}
+          colors={[colors.slate[650]]}
+        />
+      }
+    >
       <View
         style={s.todayCard}
         className="flex flex-row gap-4 p-4 border rounded-lg m-4"

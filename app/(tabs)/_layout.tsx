@@ -3,7 +3,7 @@ import { CustomBottomSheet } from "@/components/bottom-sheet";
 import { CustomTabIcon, TabBarLabel } from "@/components/tab";
 import { useTheme } from "@/contexts/themeContext";
 import { useUser } from "@/contexts/user-context";
-import { useGetConversations } from "@/hooks";
+import { useActivityBadge, useGetConversations } from "@/hooks";
 import { tabItems } from "@/utils/permissions";
 import { BottomSheetModal } from "@gorhom/bottom-sheet";
 import { Tabs } from "expo-router";
@@ -17,6 +17,8 @@ const TabLayout = () => {
   const { colors, isDarkMode } = useTheme();
   const { userType } = useUser();
   const insets = useSafeAreaInsets();
+
+  const { hasUnviewedActivity, markActivitiesAsViewed } = useActivityBadge();
 
   const { conversations } = useGetConversations({ limit: 50, skip: 0 });
   const unreadChatsCount = useMemo(() => {
@@ -69,6 +71,12 @@ const TabLayout = () => {
                     tabPress: (e) => {
                       e.preventDefault();
                       handleAddSpace();
+                    },
+                  }
+                : item.name === "activity"
+                ? {
+                    tabPress: () => {
+                      markActivitiesAsViewed();
                     },
                   }
                 : undefined
@@ -134,7 +142,9 @@ const TabLayout = () => {
                         badge={
                           item.name === "chats" ? unreadChatsCount : undefined
                         }
-                        showDot={item.name === "activity"}
+                        showDot={
+                          item.name === "activity" ? hasUnviewedActivity : false
+                        }
                       />
                     ),
                   }),

@@ -6,6 +6,7 @@ import React from "react";
 import {
   ActivityIndicator,
   Image,
+  RefreshControl,
   ScrollView,
   StyleSheet,
   Text,
@@ -97,7 +98,12 @@ const AgentHistoryCard = ({ item }: { item: HistoryActivityItem }) => {
 const AgentActivityHistory = () => {
   const { colors, isDarkMode } = useTheme();
   const s = styles(colors, isDarkMode);
-  const { data: historyData, isLoading } = useGetAgentHistoryActivities();
+  const {
+    data: historyData,
+    isLoading,
+    refetch,
+    isRefetching,
+  } = useGetAgentHistoryActivities();
 
   if (isLoading) {
     return (
@@ -109,22 +115,39 @@ const AgentActivityHistory = () => {
     );
   }
 
+  const refreshControl = (
+    <RefreshControl
+      refreshing={isRefetching}
+      onRefresh={refetch}
+      tintColor={colors.slate[650]}
+      colors={[colors.slate[650]]}
+    />
+  );
+
   if (!historyData || historyData.length === 0) {
     return (
-      <View className="py-8">
-        <Text style={s.emptyText}>No activity history found.</Text>
-      </View>
+      <ScrollView
+        showsVerticalScrollIndicator={false}
+        refreshControl={refreshControl}
+      >
+        <View className="py-8">
+          <Text style={s.emptyText}>No activity history found.</Text>
+        </View>
+      </ScrollView>
     );
   }
 
   return (
-    <ScrollView showsVerticalScrollIndicator={false}>
+    <ScrollView
+      showsVerticalScrollIndicator={false}
+      refreshControl={refreshControl}
+    >
       {historyData.map(
         (group: HistoryActivitiesResponseItem, index: number) => (
           <View key={group.label || index} className="py-4">
             <Text style={s.groupTitle}>{group.label}</Text>
             <View className="gap-1">
-              {group.items.map((item: HistoryActivityItem) => (
+              {(group.items ?? []).map((item: HistoryActivityItem) => (
                 <AgentHistoryCard
                   key={item.public_id || item.booking_id}
                   item={item}

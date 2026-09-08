@@ -1,28 +1,51 @@
 import SafeAreaViewContainer from "@/components/safeareaview";
 import SectionHeader from "@/components/sectionheader";
 import { useTheme } from "@/contexts/themeContext";
-import { router } from "expo-router";
-import React from "react";
-import { ActivityIndicator, Image, Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
-import { RFValue } from "react-native-responsive-fontsize";
-import { useGetRenterTodayActivities } from "@/hooks";
+import { useUser } from "@/contexts/user-context";
+import { useGetRenterTodayActivities, useGetTodayActivities } from "@/hooks";
 import { TodayActivityItem } from "@/types";
 import { ColorScheme } from "@/utils";
+import { router } from "expo-router";
+import React from "react";
+import {
+  ActivityIndicator,
+  Image,
+  Pressable,
+  RefreshControl,
+  ScrollView,
+  StyleSheet,
+  Text,
+  View,
+} from "react-native";
+import { RFValue } from "react-native-responsive-fontsize";
 
 // ─── Card ─────────────────────────────────────────────────────────────────────
 
-const TodayActivityCard = ({ item }: { item: TodayActivityItem }) => {
+const TodayActivityCard = ({
+  item,
+  userRole,
+}: {
+  item: TodayActivityItem;
+  userRole: "renter" | "agent";
+}) => {
   const { colors, isDarkMode } = useTheme();
   const s = styles(colors, isDarkMode);
+
+  const isInspection =
+    item.activity_type?.toLowerCase().includes("inspection") ||
+    !item.booking_id;
+  const activityId = isInspection
+    ? item.inspection_id || item.booking_id
+    : item.booking_id || item.inspection_id;
 
   const handlePress = () => {
     router.push({
       pathname: "/views/activities/activity-schedule/[index]",
       params: {
-        index: item.booking_id || item.inspection_id,
-        status: "scheduled",
+        index: activityId,
+        status: isInspection ? "scheduled" : "booked",
         title: item.property.title,
-        role: "renter",
+        role: userRole,
       },
     });
   };
@@ -93,7 +116,19 @@ const TodayActivityCard = ({ item }: { item: TodayActivityItem }) => {
 // ─── Screen ───────────────────────────────────────────────────────────────────
 
 const TodayActivityScreen = () => {
-  const { data: todayActivities, isLoading } = useGetRenterTodayActivities();
+  const { userType } = useUser();
+  const isRenter = userType === "renter";
+
+  const renterQuery = useGetRenterTodayActivities({ enabled: isRenter });
+  const agentQuery = useGetTodayActivities({ enabled: !isRenter });
+
+  const {
+    data: todayActivities,
+    isLoading,
+    refetch,
+    isRefetching,
+  } = isRenter ? renterQuery : agentQuery;
+
   const { colors, isDarkMode } = useTheme();
   const s = styles(colors, isDarkMode);
 
@@ -103,7 +138,18 @@ const TodayActivityScreen = () => {
         title="Today's Activity"
         rightIconSource={require("@/assets/icons/plus.png")}
       />
-      <ScrollView className="px-4 flex-1 pt-2" showsVerticalScrollIndicator={false}>
+      <ScrollView
+        className="px-4 flex-1 pt-2"
+        showsVerticalScrollIndicator={false}
+        refreshControl={
+          <RefreshControl
+            refreshing={isRefetching}
+            onRefresh={refetch}
+            tintColor={colors.slate[650]}
+            colors={[colors.slate[650]]}
+          />
+        }
+      >
         <View className="pb-10">
           {isLoading ? (
             <ActivityIndicator size="large" color={colors.slate[650]} className="mt-10" />
@@ -112,6 +158,7 @@ const TodayActivityScreen = () => {
               <TodayActivityCard
                 key={activity.booking_id || activity.inspection_id || index}
                 item={activity}
+                userRole={isRenter ? "renter" : "agent"}
               />
             ))
           ) : (

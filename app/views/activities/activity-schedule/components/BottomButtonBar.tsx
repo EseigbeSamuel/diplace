@@ -28,6 +28,14 @@ interface BottomButtonBarProps {
   costFrequency?: string;
   /** @deprecated Use price + costFrequency instead */
   priceText?: string;
+  balance?: number;
+  propertyId?: string;
+  bookingId?: string;
+  title?: string;
+  location?: string;
+  imageUri?: string;
+  totalPaid?: number;
+  totalAmount?: number;
   handleBack: () => void;
 }
 
@@ -37,6 +45,14 @@ const BottomButtonBar: React.FC<BottomButtonBarProps> = ({
   price,
   costFrequency,
   priceText,
+  balance,
+  propertyId,
+  bookingId,
+  title,
+  location,
+  imageUri,
+  totalPaid,
+  totalAmount,
   handleBack,
 }) => {
   const { colors } = useTheme();
@@ -51,6 +67,46 @@ const BottomButtonBar: React.FC<BottomButtonBarProps> = ({
   const [displayAmount, displayUnit] = displayPrice.includes("/")
     ? displayPrice.split("/")
     : [displayPrice, ""];
+
+  const handlePayBalance = () => {
+    router.push({
+      pathname: "/views/activities/payBalance",
+      params: {
+        bookingId: bookingId ?? "",
+        propertyId: propertyId ?? "",
+        title: title ?? "",
+        location: location ?? "",
+        balance: String(balance ?? 0),
+        totalAmount: String(totalAmount ?? price ?? 0),
+        initialDeposit: String(totalPaid ?? 0),
+        price: String(price ?? 0),
+        costFrequency: costFrequency ?? "per_annum",
+        imageUri: imageUri ?? "",
+      },
+    });
+  };
+
+  const handleBookNow = () => {
+    if (propertyId) {
+      router.push({
+        pathname: "/views/place-details/[id]",
+        params: { id: propertyId },
+      });
+    } else {
+      handleBack();
+    }
+  };
+
+  const handleViewSpace = () => {
+    if (propertyId) {
+      router.push({
+        pathname: "/views/place-details/[id]",
+        params: { id: propertyId },
+      });
+    } else {
+      handleBack();
+    }
+  };
 
   return (
     <View
@@ -80,21 +136,13 @@ const BottomButtonBar: React.FC<BottomButtonBarProps> = ({
                 style={{ color: colors.slate[650], fontSize: RFValue(17.5) }}
                 className="font-bold"
               >
-                {displayAmount}
-                {displayUnit ? (
-                  <Text
-                    style={{ color: colors.slate[500], fontSize: RFValue(13) }}
-                    className="font-normal"
-                  >
-                    /{displayUnit}
-                  </Text>
-                ) : null}
+                ₦{(balance ?? 0).toLocaleString("en-NG")}
               </Text>
             </View>
             <View className="w-[140px]">
               <AppButton
                 title="Pay Balance"
-                onPress={() => router.push("/views/activities/payBalance")}
+                onPress={handlePayBalance}
                 fullwidth
               />
             </View>
@@ -119,7 +167,7 @@ const BottomButtonBar: React.FC<BottomButtonBarProps> = ({
               </Text>
             </View>
             <View className="w-[140px]">
-              <AppButton title="Book Now" onPress={handleBack} fullwidth />
+              <AppButton title="Book Now" onPress={handleBookNow} fullwidth />
             </View>
           </View>
         ) : (
@@ -131,7 +179,7 @@ const BottomButtonBar: React.FC<BottomButtonBarProps> = ({
               </Text>
             </Pressable>
             <View className="flex-[1.5]">
-              <AppButton title="View space" onPress={handleBack} fullwidth />
+              <AppButton title="View space" onPress={handleViewSpace} fullwidth />
             </View>
           </View>
         )
@@ -152,7 +200,7 @@ const BottomButtonBar: React.FC<BottomButtonBarProps> = ({
               </Text>
             </Pressable>
             <View className="flex-[1.5]">
-              <AppButton title="View space" onPress={handleBack} fullwidth />
+              <AppButton title="View space" onPress={handleViewSpace} fullwidth />
             </View>
           </View>
         )

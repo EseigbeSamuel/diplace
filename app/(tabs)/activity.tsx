@@ -2,16 +2,23 @@ import { AppHeader } from "@/components/header";
 import HeaderTabs from "@/components/headertab";
 import SafeAreaViewContainer from "@/components/safeareaview";
 import { useUser } from "@/contexts/user-context";
-import React, { useRef, useState } from "react";
+import { useActivityBadge } from "@/hooks";
+import React, { useEffect, useRef, useState } from "react";
 import { View } from "react-native";
 import ActiveActivity from "../views/activities/active";
 import AgentActiveActivity from "../views/activities/agentActive";
+import AgentActivityHistory from "../views/activities/agentHistory";
 import ActivityHistory from "../views/activities/history";
 
 const Activity = () => {
   const [activeTab, setActiveTab] = useState("active");
   const isInitialMount = useRef(true);
   const { userType } = useUser();
+  const { markActivitiesAsViewed } = useActivityBadge();
+
+  useEffect(() => {
+    markActivitiesAsViewed();
+  }, [markActivitiesAsViewed]);
 
   const handleTabChange = (tabId: string) => {
     if (!isInitialMount.current) {
@@ -21,8 +28,8 @@ const Activity = () => {
     }
   };
 
-  const renderContent = (activeTab: string) => {
-    switch (activeTab) {
+  const renderContent = (tab: string) => {
+    switch (tab) {
       case "active":
         return userType === "renter" ? (
           <ActiveActivity />
@@ -30,7 +37,11 @@ const Activity = () => {
           <AgentActiveActivity />
         );
       case "history":
-        return <ActivityHistory />;
+        return userType === "renter" ? (
+          <ActivityHistory />
+        ) : (
+          <AgentActivityHistory />
+        );
       default:
         return null;
     }

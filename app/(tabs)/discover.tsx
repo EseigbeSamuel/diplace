@@ -1,5 +1,4 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import { CustomCheck } from "@/assets/icons";
 import Filter from "@/components/filter";
 import FilterBottomSheets from "@/components/filterBS";
 import { AppHeader } from "@/components/header";
@@ -310,10 +309,6 @@ const Discover = () => {
           showFilter
           onFilterPress={handleAddFilter}
         />
-      </View>
-
-      <View>
-        <CustomCheck size={30} color={colors.slate[650]} />
       </View>
 
       <ScrollView

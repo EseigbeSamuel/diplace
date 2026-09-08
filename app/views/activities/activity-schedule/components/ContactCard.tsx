@@ -1,8 +1,9 @@
 import React from "react";
-import { View, Text, Image, Pressable } from "react-native";
+import { View, Text, Image, Pressable, Linking } from "react-native";
 import { RFValue } from "react-native-responsive-fontsize";
 import { useTheme } from "@/contexts/themeContext";
 import { ActivityDetailUser } from "@/types";
+import { router } from "expo-router";
 
 interface ContactCardProps {
   role: string;
@@ -13,6 +14,32 @@ interface ContactCardProps {
 
 const ContactCard: React.FC<ContactCardProps> = ({ role, status, contact }) => {
   const { colors } = useTheme();
+
+  const handleChat = () => {
+    if (contact?.public_id) {
+      router.push({
+        pathname: "/(tabs)/chats",
+      });
+    } else {
+      router.push("/(tabs)/chats");
+    }
+  };
+
+  const handleCall = () => {
+    if (contact?.phone_number) {
+      Linking.openURL(`tel:${contact.phone_number}`).catch(() => {
+        router.push({
+          pathname: "/views/call",
+          params: { calleeId: contact?.public_id, name: displayName },
+        });
+      });
+    } else {
+      router.push({
+        pathname: "/views/call",
+        params: { calleeId: contact?.public_id, name: displayName },
+      });
+    }
+  };
 
   const label =
     role === "renter"
@@ -71,6 +98,7 @@ const ContactCard: React.FC<ContactCardProps> = ({ role, status, contact }) => {
 
       <View className="flex flex-row gap-3">
         <Pressable
+          onPress={handleChat}
           style={{ backgroundColor: colors.slate[150] }}
           className="w-12 h-12 rounded-full items-center justify-center"
         >
@@ -81,6 +109,7 @@ const ContactCard: React.FC<ContactCardProps> = ({ role, status, contact }) => {
           />
         </Pressable>
         <Pressable
+          onPress={handleCall}
           style={{ backgroundColor: colors.slate[150] }}
           className="w-12 h-12 rounded-full items-center justify-center"
         >

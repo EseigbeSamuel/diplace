@@ -116,27 +116,16 @@ const FinancialDetails: React.FC<FinancialDetailsProps> = ({
           {totalPaid > 0 && (
             <View className="flex flex-row justify-between">
               <Text style={{ color: colors.slate[550], fontSize: RFValue(14.5) }}>
-                Amount paid:
+                {status === "reserved" ? "Initial deposit:" : "Amount paid:"}
               </Text>
               <Text
-                style={{ color: "#16A34A", fontSize: RFValue(14.5) }}
+                style={{
+                  color: colors.slate[650],
+                  fontSize: RFValue(14.5),
+                }}
                 className="font-bold"
               >
                 {formatCurrency(totalPaid)}
-              </Text>
-            </View>
-          )}
-
-          {role === "agent" && totalPending > 0 && (
-            <View className="flex flex-row justify-between">
-              <Text style={{ color: colors.slate[550], fontSize: RFValue(14.5) }}>
-                Balance payment:
-              </Text>
-              <Text
-                style={{ color: colors.slate[650], fontSize: RFValue(14.5) }}
-                className="font-bold"
-              >
-                {formatCurrency(totalPending)}
               </Text>
             </View>
           )}
@@ -146,8 +135,22 @@ const FinancialDetails: React.FC<FinancialDetailsProps> = ({
               <Text style={{ color: colors.slate[550], fontSize: RFValue(14.5) }}>
                 Balance due:
               </Text>
-              <Text className="text-red-500 font-bold text-base">
+              <Text className="text-red-500 font-bold text-[14.5px]">
                 {formatDate(firstPending.due_date)}
+              </Text>
+            </View>
+          )}
+
+          {totalPending > 0 && (
+            <View className="flex flex-row justify-between">
+              <Text style={{ color: colors.slate[550], fontSize: RFValue(14.5) }}>
+                {role === "renter" ? "Balance:" : "Balance payment:"}
+              </Text>
+              <Text
+                style={{ color: colors.slate[650], fontSize: RFValue(14.5) }}
+                className="font-bold"
+              >
+                {formatCurrency(totalPending)}
               </Text>
             </View>
           )}
