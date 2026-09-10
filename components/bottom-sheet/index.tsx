@@ -4,7 +4,7 @@ import { ColorScheme } from "@/utils";
 import {
   BottomSheetBackdrop,
   BottomSheetModal,
-  BottomSheetScrollView,
+  BottomSheetView,
 } from "@gorhom/bottom-sheet";
 import React from "react";
 import { StyleSheet } from "react-native";
@@ -21,10 +21,13 @@ interface Props {
 export const CustomBottomSheet = ({ bottomSheetProps, children }: Props) => {
   const { colors } = useTheme();
   const style = styles(colors);
+  const { ref: modalRef, ...modalProps } = bottomSheetProps ?? {};
 
   return (
     <BottomSheetModal
-      {...bottomSheetProps}
+      {...modalProps}
+      ref={modalRef}
+      enableDynamicSizing={false}
       handleStyle={style.handleContainer}
       handleIndicatorStyle={style.bottomSheetHandleIndicator}
       backdropComponent={(props) => (
@@ -36,9 +39,7 @@ export const CustomBottomSheet = ({ bottomSheetProps, children }: Props) => {
         />
       )}
     >
-      <BottomSheetScrollView style={style.container}>
-        {children}
-      </BottomSheetScrollView>
+      <BottomSheetView style={style.container}>{children}</BottomSheetView>
     </BottomSheetModal>
   );
 };

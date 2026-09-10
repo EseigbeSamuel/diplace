@@ -97,6 +97,8 @@ export default function OwnersHome() {
   const anim = useSharedValue(0);
 
   const handleAddSpace = () => {
+    console.log("add sheet trigger");
+
     addSpaceRef.current?.present();
   };
 

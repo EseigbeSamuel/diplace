@@ -70,16 +70,15 @@ const TabLayout = () => {
                 ? {
                     tabPress: (e) => {
                       e.preventDefault();
-                      handleAddSpace();
                     },
                   }
                 : item.name === "activity"
-                ? {
-                    tabPress: () => {
-                      markActivitiesAsViewed();
-                    },
-                  }
-                : undefined
+                  ? {
+                      tabPress: () => {
+                        markActivitiesAsViewed();
+                      },
+                    }
+                  : undefined
             }
             options={{
               href: item.grantPermission.includes(userType) ? undefined : null,
@@ -120,7 +119,10 @@ const TabLayout = () => {
                             style={{ width: RFValue(18), height: RFValue(18) }}
                             resizeMode="contain"
                           /> */}
-                          <Plus size={RFValue(18)} color={colors.slate[650]} />
+                          <Plus
+                            size={RFValue(18)}
+                            color={colors.success[300]}
+                          />
                         </View>
                       </Pressable>
                     ),
