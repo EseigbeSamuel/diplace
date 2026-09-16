@@ -103,6 +103,7 @@ const Profile = () => {
                   false: colors.slate[300],
                   true: colors.info[200],
                 }}
+                ios_backgroundColor={colors.slate[650]}
                 thumbColor={colors.background}
               />
             ),

@@ -19,6 +19,7 @@ export type ChatStatus =
 export interface ChatUser {
   public_id: string;
   status: ChatStatus;
+  user_type?: "agent" | "owner" | "renter" | "admin";
   email: string;
   first_name: string | null;
   last_name: string | null;

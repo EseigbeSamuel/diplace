@@ -25,7 +25,6 @@ import {
   Text,
   View,
 } from "react-native";
-import { useSharedValue } from "react-native-reanimated";
 import Carousel from "react-native-reanimated-carousel";
 import { RFValue } from "react-native-responsive-fontsize";
 
@@ -68,9 +67,8 @@ const Discover = () => {
   const { colors, isDarkMode } = useTheme();
   const homeStyles = styles(colors);
   const [activeIndex, setActiveIndex] = useState(0);
-  const anim = useSharedValue(0);
   const { width } = Dimensions.get("window");
-  const CARD_WIDTH = width * 0.88;
+  const CARD_WIDTH = width * 0.88; // Adjusted width for the carousel cards
 
   // Search and filter state
   const [searchText, setSearchText] = useState("");
@@ -179,12 +177,12 @@ const Discover = () => {
   }, [properties]);
 
   const featuredSpacesList = useMemo(() => {
-    const filtered = availableProperties.filter(
+    const featuredProperties = availableProperties.filter(
       (p) => p.is_verified || p.listing_type !== "normal",
     );
-    return (filtered.length > 0 ? filtered : availableProperties).map(
-      mapToCardProps,
-    );
+    return (
+      featuredProperties.length > 0 ? featuredProperties : availableProperties
+    ).map(mapToCardProps);
   }, [availableProperties, mapToCardProps]);
 
   const discountedSpacesList = useMemo(() => {
@@ -195,12 +193,12 @@ const Discover = () => {
   }, [availableProperties, mapToCardProps]);
 
   const eventPlacesList = useMemo(() => {
-    const filtered = availableProperties.filter(
+    const eventProperties = availableProperties.filter(
       (p) => p.property_type === "hall" || p.property_type === "event_centre",
     );
-    return (filtered.length > 0 ? filtered : availableProperties).map(
-      mapToCardProps,
-    );
+    return (
+      eventProperties.length > 0 ? eventProperties : availableProperties
+    ).map(mapToCardProps);
   }, [availableProperties, mapToCardProps]);
 
   // Bottom sheet handlers
@@ -375,18 +373,38 @@ const Discover = () => {
                 setActiveIndex(index);
               }}
               renderItem={({ item }) => (
-                <View key={item.id} className="m-2 overflow-hidden rounded-2xl">
+                <View
+                  key={item.id}
+                  style={{
+                    width: CARD_WIDTH - 16,
+                    height: 154,
+                    margin: 8,
+                    overflow: "hidden",
+                    borderRadius: 16,
+                  }}
+                >
                   <Image
                     source={item.image}
                     resizeMode="cover"
                     className="w-full h-full"
+                    // style={StyleSheet.absoluteFill}
                   />
 
-                  {item.location && (
+                  {item.location ? (
                     <BlurView
                       intensity={20}
                       tint={isDarkMode ? "dark" : "light"}
-                      className="absolute flex-row items-center w-full gap-2 p-4 -bottom-1 rounded-xl"
+                      blurMethod="dimezisBlurViewSdk31Plus"
+                      style={{
+                        position: "absolute",
+                        left: 0,
+                        right: 0,
+                        bottom: 0,
+                        flexDirection: "row",
+                        alignItems: "center",
+                        gap: 8,
+                        padding: 16,
+                      }}
                     >
                       {isDarkMode ? (
                         <Image
@@ -407,7 +425,7 @@ const Discover = () => {
                         {item.location}
                       </Text>
                     </BlurView>
-                  )}
+                  ) : null}
                 </View>
               )}
             />
@@ -586,7 +604,7 @@ const Discover = () => {
               onPress={() =>
                 router.push({
                   pathname: "/views/apartments",
-                  params: { section: "discounted" },
+                  params: { section: "lowest_priced" },
                 })
               }
               className="flex-row items-center gap-2"

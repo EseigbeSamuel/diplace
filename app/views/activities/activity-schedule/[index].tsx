@@ -279,8 +279,6 @@ const ActivitySchedule = () => {
                 status={status}
                 property={data?.property}
                 paymentSchedules={paymentSchedules}
-                balance={balance}
-                totalPaid={totalPaid}
               />
 
               <RentersNotes

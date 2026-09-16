@@ -11,7 +11,10 @@ import {
 } from "@/types";
 import { MediaItem, SpaceType } from "@/types/add-space-types";
 
-export const API_BASE_URL = "https://diplace.api.elsoft.ng/api/v1";
+// Keep uploads on the same API host used by the query client. The previous
+// host has an invalid TLS chain, which prevented newly created properties
+// from being uploaded and consequently from appearing in Discover.
+export const API_BASE_URL = "https://api-diplace.elsoft.ng/api/v1";
 
 const PROPERTY_TYPE_MAP: Record<
   Exclude<SpaceType, null>,

@@ -1,3 +1,4 @@
+import { ArrowLeft, Calling, Flag, More, Send, Star } from "@/assets/icons";
 import { CustomBottomSheet } from "@/components/bottom-sheet";
 import AppButton from "@/components/button";
 import SafeAreaViewContainer from "@/components/safeareaview";
@@ -324,6 +325,9 @@ const ChatPage = () => {
     };
   }, [otherParticipant, recipientName, recipientAvatar]);
 
+  const recipientIsRenter = otherParticipant?.user_type === "renter";
+  const recipientLabel = recipientIsRenter ? "renter" : "lister";
+
   // Map API messages to the local Message shape used by the UI components
   const [localMessages, setLocalMessages] = useState<Message[]>([]);
 
@@ -526,14 +530,12 @@ const ChatPage = () => {
       <View style={styles.starsContainer}>
         {[1, 2, 3, 4, 5].map((star) => (
           <TouchableOpacity key={star} onPress={() => setRating(star)}>
-            <Text
-              style={[
-                styles.starIcon,
-                star > currentRating ? { color: colors.slate[600] } : {},
-              ]}
-            >
-              {star <= currentRating ? "⭐" : "☆"}
-            </Text>
+            <Star
+              size={28}
+              color={
+                star <= currentRating ? colors.warning[200] : colors.slate[400]
+              }
+            />
           </TouchableOpacity>
         ))}
       </View>
@@ -542,7 +544,10 @@ const ChatPage = () => {
 
   return (
     <SafeAreaViewContainer>
-      <StatusBar backgroundColor={colors.background} barStyle="dark-content" />
+      <StatusBar
+        backgroundColor={colors.background}
+        barStyle={isDarkMode ? "light-content" : "dark-content"}
+      />
 
       {/* Header */}
       <View
@@ -558,17 +563,7 @@ const ChatPage = () => {
           style={styles.backButton}
           onPress={() => router.back()}
         >
-          {isDarkMode ? (
-            <Image
-              source={require("@/assets/icons/arrow-left-light.png")}
-              style={{ width: 25, height: 20 }}
-            />
-          ) : (
-            <Image
-              source={require("@/assets/icons/arrow-left-dark.png")}
-              style={{ width: 25, height: 20 }}
-            />
-          )}
+          <ArrowLeft size={24} color={colors.slate[650]} />
         </TouchableOpacity>
 
         <View style={styles.contactInfo}>
@@ -632,27 +627,13 @@ const ChatPage = () => {
               })
             }
           >
-            {isDarkMode ? (
-              <Image
-                source={require("@/assets/icons/calling.png")}
-                style={{ height: 25, width: 25, tintColor: colors.slate[650] }}
-              />
-            ) : (
-              <Image
-                source={require("@/assets/icons/calling.png")}
-                style={{ height: 25, width: 25, tintColor: colors.slate[650] }}
-              />
-            )}
+            <Calling size={24} color={colors.slate[650]} />
           </TouchableOpacity>
           <TouchableOpacity
             style={styles.headerButton}
             onPress={() => setShowMenu(true)}
           >
-            <Text
-              style={[styles.headerButtonIcon, { color: colors.slate[650] }]}
-            >
-              ⋮
-            </Text>
+            <More size={24} color={colors.slate[650]} />
           </TouchableOpacity>
         </View>
       </View>
@@ -733,17 +714,7 @@ const ChatPage = () => {
             onPress={sendMessage}
             disabled={inputText.trim().length === 0 || isSendMessagePending}
           >
-            {isDarkMode ? (
-              <Image
-                source={require("@/assets/icons/send-light.png")}
-                style={{ width: 25, height: 25 }}
-              />
-            ) : (
-              <Image
-                source={require("@/assets/icons/send-dark.png")}
-                style={{ width: 25, height: 25 }}
-              />
-            )}
+            <Send size={22} color={colors.background} />
           </TouchableOpacity>
         </View>
       </KeyboardAvoidingView>
@@ -765,37 +736,20 @@ const ChatPage = () => {
               { backgroundColor: colors.background },
             ]}
           >
-            <TouchableOpacity
-              style={styles.menuItem}
-              onPress={() => {
-                setShowMenu(false);
-                // Handle search
-              }}
-            >
-              <Image
-                source={require("@/assets/icons/search.png")}
-                style={[styles.menuIcon, { tintColor: colors.slate[650] }]}
-              />
-              <Text style={[styles.menuText, { color: colors.slate[650] }]}>
-                Search
-              </Text>
-            </TouchableOpacity>
-
-            <TouchableOpacity
-              style={styles.menuItem}
-              onPress={() => {
-                setShowMenu(false);
-                setShowReviewModal(true);
-              }}
-            >
-              <Image
-                source={require("@/assets/icons/Star - Iconly Pro.png")}
-                style={[styles.menuIcon, { tintColor: colors.slate[650] }]}
-              />
-              <Text style={[styles.menuText, { color: colors.slate[650] }]}>
-                Give a review
-              </Text>
-            </TouchableOpacity>
+            {!recipientIsRenter && (
+              <TouchableOpacity
+                style={styles.menuItem}
+                onPress={() => {
+                  setShowMenu(false);
+                  setShowReviewModal(true);
+                }}
+              >
+                <Star size={20} color={colors.slate[650]} />
+                <Text style={[styles.menuText, { color: colors.slate[650] }]}>
+                  Give a review
+                </Text>
+              </TouchableOpacity>
+            )}
 
             <TouchableOpacity
               style={styles.menuItem}
@@ -805,12 +759,9 @@ const ChatPage = () => {
                 setShowReportModal(true);
               }}
             >
-              <Image
-                source={require("@/assets/icons/flag.png")}
-                style={[styles.menuIcon, { tintColor: colors.slate[650] }]}
-              />
+              <Flag size={20} color={colors.slate[650]} />
               <Text style={[styles.menuText, { color: colors.slate[650] }]}>
-                Report this lister
+                Report {recipientLabel}
               </Text>
             </TouchableOpacity>
           </View>
@@ -898,10 +849,10 @@ const ChatPage = () => {
             <View style={styles.modalHandle} />
 
             <Text style={[styles.modalTitle, { color: colors.slate[650] }]}>
-              Report the lister
+              Report the {recipientLabel}
             </Text>
             <Text style={[styles.modalSubtitle, { color: colors.slate[500] }]}>
-              Let us know what the case is with the agent/space manager.
+              Let us know what the case is with this {recipientLabel}.
             </Text>
 
             <View style={styles.reportList}>
