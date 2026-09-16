@@ -1,15 +1,13 @@
-import { CustomBottomSheet } from "@/components/bottom-sheet";
 import { AppHeader } from "@/components/header";
 import SafeAreaViewContainer from "@/components/safeareaview";
 import { promoData } from "@/constants/ownerHome";
 import { useTheme } from "@/contexts/themeContext";
 import { useGetCurrentUser, useListProperties } from "@/hooks";
 import { ColorScheme } from "@/utils";
-import { BottomSheetModal } from "@gorhom/bottom-sheet";
 import { LinearGradient } from "expo-linear-gradient";
 import { router } from "expo-router";
 import { ArrowUpRight, MapPin } from "lucide-react-native";
-import React, { useMemo, useRef, useState } from "react";
+import React, { useState } from "react";
 import {
   Dimensions,
   DimensionValue,
@@ -25,7 +23,6 @@ import { useSharedValue } from "react-native-reanimated";
 import Carousel from "react-native-reanimated-carousel";
 import { RFValue } from "react-native-responsive-fontsize";
 import MyEarnings from "../profile/my-earnings";
-import AddSpaceBottomSheet from "../spaces/components/AddSpacesBottomContainer";
 
 function SkeletonBlock({
   width = "100%",
@@ -65,7 +62,6 @@ export default function OwnersHome() {
     },
     enabled: !!currentUser,
   });
-  const addSpaceRef = useRef<BottomSheetModal>(null);
   const [hidden, setHidden] = useState(false);
   const [activeIndex, setActiveIndex] = useState(0);
 
@@ -97,12 +93,8 @@ export default function OwnersHome() {
   const anim = useSharedValue(0);
 
   const handleAddSpace = () => {
-    console.log("add sheet trigger");
-
-    addSpaceRef.current?.present();
+    router.push("/views/spaces/add-spaces");
   };
-
-  const snapPoints = useMemo(() => ["25%", "50%", "75%", "90%"], []);
 
   // const [filters, setFilters] = useState({
   //   skip: 0,
@@ -432,22 +424,6 @@ export default function OwnersHome() {
           </View>
         }
       />
-
-      <CustomBottomSheet
-        bottomSheetProps={{
-          ref: addSpaceRef,
-          snapPoints,
-          index: 2,
-          enableContentPanningGesture: true,
-          enableHandlePanningGesture: true,
-          enablePanDownToClose: true,
-        }}
-      >
-        <AddSpaceBottomSheet
-          colors={colors}
-          closeSheet={() => addSpaceRef.current?.close()}
-        />
-      </CustomBottomSheet>
     </SafeAreaViewContainer>
   );
 }
