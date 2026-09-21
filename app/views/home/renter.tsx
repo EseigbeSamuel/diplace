@@ -13,14 +13,14 @@ import { ColorScheme } from "@/utils";
 import { router } from "expo-router";
 import React, { useEffect, useMemo, useState } from "react";
 import {
-  ActivityIndicator,
-  FlatList,
-  Image,
-  Modal,
-  Pressable,
-  StyleSheet,
-  Text,
-  View,
+    ActivityIndicator,
+    FlatList,
+    Image,
+    Modal,
+    Pressable,
+    StyleSheet,
+    Text,
+    View,
 } from "react-native";
 import { RFValue } from "react-native-responsive-fontsize";
 
@@ -150,8 +150,10 @@ export default function RenterHome() {
 
   const availableProperties = useMemo(
     () =>
-      properties.filter(
-        (item) => item.status === "available" || item.status === "pending",
+      properties.filter((item) =>
+        ["available", "approved", "active", "pending", "verified"].includes(
+          item.status,
+        ),
       ),
     [properties],
   );

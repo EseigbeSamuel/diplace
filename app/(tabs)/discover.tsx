@@ -1,4 +1,5 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
+import { ArrowLeft, ArrowRight, BadgeCheck, CloseSquare } from "@/assets/icons";
 import Filter from "@/components/filter";
 import FilterBottomSheets from "@/components/filterBS";
 import { AppHeader } from "@/components/header";
@@ -167,12 +168,10 @@ const Discover = () => {
   };
 
   const availableProperties = useMemo(() => {
-    return properties.filter(
-      (p) =>
-        p.status === "available" ||
-        p.status === "approved" ||
-        p.status === "active" ||
-        p.status === "pending",
+    return properties.filter((p) =>
+      ["available", "approved", "active", "pending", "verified"].includes(
+        p.status,
+      ),
     );
   }, [properties]);
 
@@ -470,7 +469,7 @@ const Discover = () => {
               className="flex-row items-center gap-2"
             >
               <Text style={homeStyles.text}>View more</Text>
-              {isDarkMode ? (
+              {/* {isDarkMode ? (
                 <Image
                   source={require("@/assets/icons/arrow-right-light.png")}
                   className="w-[20px] h-[20px]"
@@ -480,7 +479,8 @@ const Discover = () => {
                   source={require("@/assets/icons/arrow-right-dark.png")}
                   className="w-[20px] h-[20px]"
                 />
-              )}
+              )} */}
+              <ArrowRight color={colors.slate[650]} />
             </Pressable>
           </View>
           {isListersLoading ? (
@@ -771,20 +771,22 @@ const Discover = () => {
                 onPress={handleCityBack}
                 style={homeStyles.cityModalBack}
               >
-                <Image
+                {/* <Image
                   source={require("@/assets/icons/arrow-left-dark.png")}
                   style={{ width: 20, height: 20 }}
-                />
+                /> */}
+                <ArrowLeft color={colors.slate[650]} />
               </Pressable>
               <Text style={homeStyles.cityModalTitle}>City</Text>
               <Pressable
                 onPress={handleCityClose}
                 style={homeStyles.cityModalClose}
               >
-                <Image
+                {/* <Image
                   source={require("@/assets/icons/close-contained.png")}
                   style={{ width: 14, height: 14 }}
-                />
+                /> */}
+                <CloseSquare color={colors.slate[650]} />
               </Pressable>
             </View>
 
@@ -809,10 +811,11 @@ const Discover = () => {
                       {city}
                     </Text>
                     {isSelected && (
-                      <Image
-                        source={require("@/assets/icons/badge-check-green.png")}
-                        style={{ width: 18, height: 18 }}
-                      />
+                      // <Image
+                      //   source={require("@/assets/icons/badge-check-green.png")}
+                      //   style={{ width: 18, height: 18 }}
+                      // />
+                      <BadgeCheck size={18} />
                     )}
                   </Pressable>
                 );

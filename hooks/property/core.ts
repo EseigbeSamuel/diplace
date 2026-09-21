@@ -43,13 +43,18 @@ export function useCreateProperty() {
       let payload: CreatePropertyPayload | undefined;
       try {
         payload = await buildCreatePayload(type, value);
-        return await postRequest<CreatePropertyResponse, CreatePropertyPayload>({
-          url: "/properties/",
-          payload,
-          notifyOnError: false,
-        });
+        return await postRequest<CreatePropertyResponse, CreatePropertyPayload>(
+          {
+            url: "/properties/",
+            payload,
+            notifyOnError: false,
+          },
+        );
       } catch (error) {
-        console.log("CreateProperty: attempted payload before failure", payload);
+        console.log(
+          "CreateProperty: attempted payload before failure",
+          payload,
+        );
         throw error;
       }
     },
@@ -101,7 +106,10 @@ export function useUpdateProperty() {
           notifyOnError: false,
         });
       } catch (error) {
-        console.log("UpdateProperty: attempted payload before failure", payload);
+        console.log(
+          "UpdateProperty: attempted payload before failure",
+          payload,
+        );
         throw error;
       }
     },
@@ -153,10 +161,27 @@ export function useListProperties({
         limit: pageSize,
       });
 
-      return await getRequest<ListPropertiesResponse>({
+      const response = await getRequest<
+        ListPropertiesResponse | PropertyListItem[]
+      >({
         url: "/properties/",
         params: queryParams,
+        protectedRoute: false,
       });
+
+      if (Array.isArray(response)) {
+        return {
+          pagination: {
+            total_items: response.length,
+            limit: pageSize,
+            skip: Number(pageParam) || 0,
+            total_pages: response.length ? 1 : 0,
+          },
+          items: response,
+        };
+      }
+
+      return response;
     },
     getNextPageParam: (lastPage) => {
       const nextSkip = lastPage.pagination.skip + lastPage.pagination.limit;

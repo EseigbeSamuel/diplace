@@ -1,22 +1,22 @@
 // ConfirmDetailsSubstep.tsx
-import React, { useState } from "react";
-import {
-  View,
-  Text,
-  StyleSheet,
-  Pressable,
-  ScrollView,
-  Image,
-  Modal,
-} from "react-native";
-import { RFValue } from "react-native-responsive-fontsize";
+import { Edit } from "@/assets/icons";
 import AppButton from "@/components/button";
 import { useTheme } from "@/contexts/themeContext";
-import { ColorScheme } from "@/utils";
-import AddBankDetails from "./substep3";
+import { useGetCurrentUser } from "@/hooks";
 import { useSpaceStore } from "@/store/useSpace";
 import { BankDetails } from "@/types/add-space-types";
-import { useGetCurrentUser } from "@/hooks";
+import { ColorScheme } from "@/utils";
+import React, { useState } from "react";
+import {
+  Modal,
+  Pressable,
+  ScrollView,
+  StyleSheet,
+  Text,
+  View,
+} from "react-native";
+import { RFValue } from "react-native-responsive-fontsize";
+import AddBankDetails from "./substep3";
 
 interface ConfirmDetailsSubstepProps {
   onNext: () => void;
@@ -38,11 +38,7 @@ const ConfirmDetailsSubstep: React.FC<ConfirmDetailsSubstepProps> = ({
   const [firstName = "", surname = "", middleName = ""] =
     fullName && fullName.length > 0
       ? fullName.split(/\s+/)
-      : [
-          currentUser?.first_name || "",
-          currentUser?.last_name || "",
-          "",
-        ];
+      : [currentUser?.first_name || "", currentUser?.last_name || "", ""];
 
   const personalInfo = {
     surname: surname || currentUser?.last_name || "N/A",
@@ -109,10 +105,11 @@ const ConfirmDetailsSubstep: React.FC<ConfirmDetailsSubstepProps> = ({
                 style={styles.editButton}
                 onPress={handleEditBankDetails}
               >
-                <Image
+                {/* <Image
                   source={require("@/assets/icons/edit-pencil-fill.png")}
                   style={styles.editIcon}
-                />
+                /> */}
+                <Edit size={16} color={colors.slate[650]} />
                 <Text style={styles.editText}>Edit</Text>
               </Pressable>
             </View>
