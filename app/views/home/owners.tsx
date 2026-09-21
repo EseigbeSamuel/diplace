@@ -274,10 +274,11 @@ export default function OwnersHome() {
                       <View
                         style={{
                           backgroundColor: colors.info[200],
-                          width: progressWidth as DimensionValue,
+                          width: (isOverviewLoading
+                            ? "35%"
+                            : progressWidth) as DimensionValue,
                         }}
                         className="rounded-full h-3"
-                        width={isOverviewLoading ? "35%" : progressWidth}
                       ></View>
                     </View>
                   </View>

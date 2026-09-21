@@ -1,3 +1,4 @@
+import { Calling, Chat } from "@/assets/icons";
 import BookmarkButton from "@/components/bookmark";
 import AppButton from "@/components/button";
 import SafeAreaViewContainer from "@/components/safeareaview";
@@ -709,19 +710,21 @@ const Placedetails = () => {
                 onPress={handleStartChat}
                 style={[
                   { opacity: !property?.lister?.public_id ? 0.4 : 1 },
-                  { backgroundColor: colors.slate[600] },
+                  { backgroundColor: colors.slate[200] },
+                  { borderColor: colors.slate[500], borderWidth: 1 },
                 ]}
-                className="flex items-center justify-center w-10 h-10  rounded-full"
+                className="flex items-center justify-center size-12 rounded-full"
                 accessibilityLabel="Chat with lister"
               >
                 {isContactLoading === "chat" ? (
                   <ActivityIndicator size="small" color={colors.slate[650]} />
                 ) : (
-                  <Image
-                    source={require("@/assets/icons/chat-active.png")}
-                    className="w-5 h-5"
-                    style={{ tintColor: colors.slate[650] }}
-                  />
+                  // <Image
+                  //   source={require("@/assets/icons/chat-active.png")}
+                  //   className="w-5 h-5"
+                  //   style={{ tintColor: colors.slate[650] }}
+                  // />
+                  <Chat />
                 )}
               </TouchableOpacity>
               <TouchableOpacity
@@ -731,19 +734,21 @@ const Placedetails = () => {
                 onPress={handleStartCall}
                 style={[
                   { opacity: !property?.lister?.public_id ? 0.4 : 1 },
-                  { backgroundColor: colors.slate[600] },
+                  { backgroundColor: colors.slate[200] },
+                  { borderColor: colors.slate[500], borderWidth: 1 },
                 ]}
-                className="flex items-center justify-center w-10 h-10  rounded-full"
+                className="flex items-center justify-center size-12 rounded-full"
                 accessibilityLabel="Call lister"
               >
                 {isContactLoading === "call" ? (
                   <ActivityIndicator size="small" color={colors.slate[650]} />
                 ) : (
-                  <Image
-                    source={require("@/assets/icons/calling.png")}
-                    className="w-5 h-5"
-                    style={{ tintColor: colors.slate[650] }}
-                  />
+                  // <Image
+                  //   source={require("@/assets/icons/calling.png")}
+                  //   className="w-5 h-5"
+                  //   style={{ tintColor: colors.slate[650] }}
+                  // />
+                  <Calling />
                 )}
               </TouchableOpacity>
             </View>

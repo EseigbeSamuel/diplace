@@ -1,31 +1,32 @@
+import { Notification } from "@/assets/icons";
 import SafeAreaViewContainer from "@/components/safeareaview";
 import SectionHeader from "@/components/sectionheader";
 import { NotesTabs } from "@/constants/mockNotifications";
 import { useTheme } from "@/contexts/themeContext";
+import {
+  useDeleteNotification,
+  useMarkAllNotificationsRead,
+  useMarkNotificationRead,
+  useMyNotifications,
+  useNotificationUnreadCount,
+} from "@/hooks";
+import { showToast } from "@/lib";
+import { NotificationItem } from "@/types";
 import { ColorScheme } from "@/utils";
+import { useRouter } from "expo-router";
 import React, { useMemo, useState } from "react";
 import {
+  ActivityIndicator,
+  Alert,
   FlatList,
   Image,
+  Linking,
   Pressable,
   StyleSheet,
   Text,
   View,
-  ActivityIndicator,
-  Linking,
-  Alert,
 } from "react-native";
 import { RFValue } from "react-native-responsive-fontsize";
-import { useRouter } from "expo-router";
-import { showToast } from "@/lib";
-import {
-  useMyNotifications,
-  useNotificationUnreadCount,
-  useMarkNotificationRead,
-  useMarkAllNotificationsRead,
-  useDeleteNotification,
-} from "@/hooks";
-import { NotificationItem } from "@/types";
 
 interface ActionMeta {
   text: string;
@@ -41,18 +42,12 @@ const Notifications = () => {
   const [activeTab, setActiveTab] = useState("all");
   const [isRefreshing, setIsRefreshing] = useState(false);
 
-  const {
-    notifications,
-    isNotificationsLoading,
-    refetchNotifications,
-  } = useMyNotifications({
-    limit: 100,
-  });
+  const { notifications, isNotificationsLoading, refetchNotifications } =
+    useMyNotifications({
+      limit: 100,
+    });
 
-  const {
-    unreadCount,
-    refetchUnreadCount,
-  } = useNotificationUnreadCount();
+  const { unreadCount, refetchUnreadCount } = useNotificationUnreadCount();
 
   const { markReadMutation } = useMarkNotificationRead();
   const { markAllReadMutation } = useMarkAllNotificationsRead();
@@ -60,10 +55,7 @@ const Notifications = () => {
 
   const handleRefresh = async () => {
     setIsRefreshing(true);
-    await Promise.all([
-      refetchNotifications(),
-      refetchUnreadCount(),
-    ]);
+    await Promise.all([refetchNotifications(), refetchUnreadCount()]);
     setIsRefreshing(false);
   };
 
@@ -96,13 +88,15 @@ const Notifications = () => {
           style: "destructive",
           onPress: async () => {
             try {
-              await deleteNotificationMutation({ notificationId: item.public_id });
+              await deleteNotificationMutation({
+                notificationId: item.public_id,
+              });
             } catch (error) {
               console.error("Failed to delete notification:", error);
             }
           },
         },
-      ]
+      ],
     );
   };
 
@@ -175,10 +169,12 @@ const Notifications = () => {
   const getNotificationMeta = (item: NotificationItem): ActionMeta => {
     const type = (item.notification_type || "").toLowerCase();
     const title = (item.title || "").toLowerCase();
-    const explicitText =
-      item.data?.action_text || (item as any).action;
+    const explicitText = item.data?.action_text || (item as any).action;
 
-    const navigateToTarget = (defaultRoute: string, params?: Record<string, any>) => {
+    const navigateToTarget = (
+      defaultRoute: string,
+      params?: Record<string, any>,
+    ) => {
       if (item.action_url) {
         if (
           item.action_url.startsWith("http://") ||
@@ -249,7 +245,8 @@ const Notifications = () => {
     ) {
       const isSchedule = title.includes("schedule");
       return {
-        text: explicitText || (isSchedule ? "View schedule" : "Complete booking"),
+        text:
+          explicitText || (isSchedule ? "View schedule" : "Complete booking"),
         icon: "arrow",
         avatarKind: "bell",
         onAction: () => {
@@ -286,7 +283,11 @@ const Notifications = () => {
     }
 
     // 5. System / App Update
-    if (type.includes("system") || title.includes("update") || title.includes("app")) {
+    if (
+      type.includes("system") ||
+      title.includes("update") ||
+      title.includes("app")
+    ) {
       return {
         text: explicitText || "View update",
         icon: "arrow",
@@ -299,7 +300,8 @@ const Notifications = () => {
           showToast({
             type: "info",
             text1: item.title || "App Update",
-            text2: item.message || "You are using the latest version of Diplace.",
+            text2:
+              item.message || "You are using the latest version of Diplace.",
           });
         },
       };
@@ -318,7 +320,11 @@ const Notifications = () => {
     }
 
     // 7. Agent
-    if (type.includes("agent") || title.includes("agent") || title.includes("message")) {
+    if (
+      type.includes("agent") ||
+      title.includes("agent") ||
+      title.includes("message")
+    ) {
       return {
         text: explicitText || "View message",
         icon: "arrow",
@@ -334,7 +340,11 @@ const Notifications = () => {
     }
 
     // 8. Promotion
-    if (type.includes("promotion") || title.includes("promo") || title.includes("offer")) {
+    if (
+      type.includes("promotion") ||
+      title.includes("promo") ||
+      title.includes("offer")
+    ) {
       return {
         text: explicitText || "View offer",
         icon: "arrow",
@@ -414,7 +424,8 @@ const Notifications = () => {
           showsHorizontalScrollIndicator={false}
           contentContainerStyle={{ gap: RFValue(8) }}
           renderItem={({ item }) => {
-            const isActive = activeTab.toLowerCase() === item.name.toLowerCase();
+            const isActive =
+              activeTab.toLowerCase() === item.name.toLowerCase();
             const showBadge =
               item.name.toLowerCase() === "unread" && unreadCount > 0;
 
@@ -435,7 +446,11 @@ const Notifications = () => {
                     <Image
                       source={item.icons}
                       className="size-3.5"
-                      style={{ tintColor: isActive ? colors.slate[650] : colors.slate[500] }}
+                      style={{
+                        tintColor: isActive
+                          ? colors.slate[650]
+                          : colors.slate[500],
+                      }}
                     />
                   )}
 
@@ -463,7 +478,13 @@ const Notifications = () => {
                         marginLeft: 2,
                       }}
                     >
-                      <Text style={{ color: "#fff", fontSize: RFValue(8), fontWeight: "bold" }}>
+                      <Text
+                        style={{
+                          color: "#fff",
+                          fontSize: RFValue(8),
+                          fontWeight: "bold",
+                        }}
+                      >
                         {unreadCount}
                       </Text>
                     </View>
@@ -482,19 +503,26 @@ const Notifications = () => {
           </View>
         ) : filteredNotes.length === 0 ? (
           <View className="flex-1 items-center justify-center p-6">
-            <Image
+            {/* <Image
               source={require("@/assets/icons/notification.png")}
               className="size-12 opacity-30 mb-2"
               style={{ tintColor: colors.slate[500] }}
-            />
-            <Text style={{ color: colors.slate[500] }} className="text-center font-medium">
+            /> */}
+            <Notification color={colors.slate[500]} size={48} />
+            <Text
+              style={{ color: colors.slate[500] }}
+              className="text-center font-medium"
+            >
               No notifications found
             </Text>
           </View>
         ) : (
           <FlatList
             data={filteredNotes}
-            contentContainerStyle={{ gap: RFValue(12), paddingBottom: RFValue(30) }}
+            contentContainerStyle={{
+              gap: RFValue(12),
+              paddingBottom: RFValue(30),
+            }}
             refreshing={isRefreshing}
             onRefresh={handleRefresh}
             renderItem={({ item }) => {
@@ -510,9 +538,13 @@ const Notifications = () => {
                   onLongPress={() => handleDeleteNotification(item)}
                   style={[
                     {
-                      backgroundColor: isDarkMode ? colors.slate[100] : "#FFFFFF",
+                      backgroundColor: isDarkMode
+                        ? colors.slate[100]
+                        : "#FFFFFF",
                       borderWidth: 1,
-                      borderColor: isDarkMode ? colors.slate[200] : colors.slate[200],
+                      borderColor: isDarkMode
+                        ? colors.slate[200]
+                        : colors.slate[200],
                     },
                     custom.shadow,
                   ]}
@@ -521,7 +553,9 @@ const Notifications = () => {
                   {/* Left Icon / Avatar: 'D' letter badge or Bell icon */}
                   <View
                     style={{
-                      backgroundColor: isDarkMode ? colors.slate[200] : colors.slate[150],
+                      backgroundColor: isDarkMode
+                        ? colors.slate[200]
+                        : colors.slate[150],
                       width: RFValue(40),
                       height: RFValue(40),
                       borderRadius: RFValue(20),
@@ -539,19 +573,20 @@ const Notifications = () => {
                         D
                       </Text>
                     ) : (
-                      <Image
-                        source={
-                          isDarkMode
-                            ? require("@/assets/icons/notification-light.png")
-                            : require("@/assets/icons/notification.png")
-                        }
-                        style={{
-                          width: RFValue(18),
-                          height: RFValue(18),
-                          tintColor: colors.slate[650],
-                        }}
-                        resizeMode="contain"
-                      />
+                      // <Image
+                      //   source={
+                      //     isDarkMode
+                      //       ? require("@/assets/icons/notification-light.png")
+                      //       : require("@/assets/icons/notification.png")
+                      //   }
+                      //   style={{
+                      //     width: RFValue(18),
+                      //     height: RFValue(18),
+                      //     tintColor: colors.slate[650],
+                      //   }}
+                      //   resizeMode="contain"
+                      // />
+                      <Notification color={colors.slate[650]} size={18} />
                     )}
                   </View>
 
@@ -597,9 +632,7 @@ const Notifications = () => {
                       hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
                       className="flex flex-row items-center gap-1.5 self-start mt-2.5"
                     >
-                      <Text style={custom.itemAction}>
-                        {meta.text}
-                      </Text>
+                      <Text style={custom.itemAction}>{meta.text}</Text>
 
                       <Image
                         source={

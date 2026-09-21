@@ -7,7 +7,7 @@ import {
   useMyBookmarks,
   useTogglePropertyBookmark,
 } from "@/hooks";
-import { PropertyListItem } from "@/types";
+import { PropertyListItem, PropertyType } from "@/types";
 import { router, useLocalSearchParams } from "expo-router";
 import { ActivityIndicator, FlatList, Text, View } from "react-native";
 import React, { useMemo, useState } from "react";
@@ -21,6 +21,7 @@ const Apartments = () => {
   const custom = styles(colors);
   const params = useLocalSearchParams<{
     section?: string;
+    type?: PropertyType;
   }>();
   const section = params.section ?? "apartments";
   const [bookmarkOverrides, setBookmarkOverrides] = useState<
@@ -64,25 +65,45 @@ const Apartments = () => {
   };
 
   const sectionTitle = useMemo(() => {
+    if (params.type) {
+      const typeTitles: Partial<Record<PropertyType, string>> = {
+        apartment: "Apartments",
+        shop: "Shops",
+        office: "Offices",
+        event_centre: "Event centers",
+      };
+      return typeTitles[params.type] ?? "Spaces";
+    }
     if (section === "featured") return "Featured Space";
+    if (section === "lowest_priced") return "Lowest-priced spaces";
     if (section === "recently_added") return "Recently Added";
     if (section === "nearby") return "Spaces Nearby";
     return "Apartments";
-  }, [section]);
+  }, [params.type, section]);
 
   const sectionProperties = useMemo(() => {
     const visibleProperties = properties.filter(
       (item) => item.status === "available" || item.status === "pending",
     );
 
+    if (params.type) {
+      return visibleProperties.filter(
+        (item) => item.property_type === params.type,
+      );
+    }
+
     if (section === "featured") {
-      const featured = visibleProperties.filter(
+      const featuredProperties = visibleProperties.filter(
         (item) => item.is_verified || item.listing_type !== "normal",
       );
-      return featured.length ? featured : visibleProperties;
+      return featuredProperties.length ? featuredProperties : visibleProperties;
+    }
+
+    if (section === "lowest_priced") {
+      return [...visibleProperties].sort((a, b) => a.price - b.price);
     }
     return visibleProperties;
-  }, [properties, section]);
+  }, [params.type, properties, section]);
 
   const cards = useMemo(
     () =>
