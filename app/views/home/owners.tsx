@@ -93,13 +93,7 @@ export default function OwnersHome() {
   const anim = useSharedValue(0);
 
   const handleAddSpace = () => {
-<<<<<<< HEAD
     router.push("/views/spaces/add-spaces");
-=======
-    console.log("add sheet trigger");
-
-    addSpaceRef.current?.present();
->>>>>>> diplacegitea/samuel
   };
 
   // const [filters, setFilters] = useState({
@@ -430,7 +424,6 @@ export default function OwnersHome() {
           </View>
         }
       />
-
     </SafeAreaViewContainer>
   );
 }
