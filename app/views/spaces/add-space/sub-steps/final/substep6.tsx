@@ -1,27 +1,25 @@
-import React, { useMemo, useRef, useState } from "react";
-import {
-  View,
-  Text,
-  StyleSheet,
-  ScrollView,
-  Image,
-  TouchableOpacity,
-  Dimensions,
-  Modal,
-  Pressable,
-} from "react-native";
-import { RFValue } from "react-native-responsive-fontsize";
 import AppButton from "@/components/button";
-import { useTheme } from "@/contexts/themeContext";
-import { ColorScheme } from "@/utils";
-import { useSpaceStore } from "@/store/useSpace";
-import { useGetCurrentUser } from "@/hooks";
-import { useRouter } from "expo-router";
-import { showToast } from "@/lib";
-import MapView, { Marker } from "react-native-maps";
-import { CustomBottomSheet } from "@/components/bottom-sheet";
-import { BottomSheetModal } from "@gorhom/bottom-sheet";
 import { HAS_GOOGLE_MAPS_API_KEY } from "@/constants/google";
+import { useTheme } from "@/contexts/themeContext";
+import { useGetCurrentUser } from "@/hooks";
+import { showToast } from "@/lib";
+import { useSpaceStore } from "@/store/useSpace";
+import { ColorScheme } from "@/utils";
+import { useRouter } from "expo-router";
+import React, { useState } from "react";
+import {
+    Dimensions,
+    Image,
+    Modal,
+    Pressable,
+    ScrollView,
+    StyleSheet,
+    Text,
+    TouchableOpacity,
+    View,
+} from "react-native";
+import MapView, { Marker } from "react-native-maps";
+import { RFValue } from "react-native-responsive-fontsize";
 
 const { width } = Dimensions.get("window");
 
@@ -413,9 +411,7 @@ const SpacePreviewScreen: React.FC<SpacePreviewScreenProps> = ({
           </Text>
 
           <View style={styles.landlordInfo}>
-            <Text style={styles.landlordName}>
-              {previewContact.name}
-            </Text>
+            <Text style={styles.landlordName}>{previewContact.name}</Text>
 
             <TouchableOpacity style={styles.landlordRow}>
               <Image
@@ -423,9 +419,7 @@ const SpacePreviewScreen: React.FC<SpacePreviewScreenProps> = ({
                 style={styles.landlordIcon}
                 resizeMode="contain"
               />
-              <Text style={styles.landlordText}>
-                {previewContact.phone}
-              </Text>
+              <Text style={styles.landlordText}>{previewContact.phone}</Text>
             </TouchableOpacity>
 
             <TouchableOpacity style={styles.landlordRow}>
@@ -518,13 +512,17 @@ const SpacePreviewScreen: React.FC<SpacePreviewScreenProps> = ({
             {costBreakdown.map((item, index) => (
               <View key={index} style={styles.costRow}>
                 <Text style={styles.costLabel}>{item.title}</Text>
-                <Text style={styles.costAmount}>{formatCurrency(item.value)}</Text>
+                <Text style={styles.costAmount}>
+                  {formatCurrency(item.value)}
+                </Text>
               </View>
             ))}
 
             <View style={styles.totalRow}>
               <Text style={styles.totalLabel}>Total Payable</Text>
-              <Text style={styles.totalAmount}>{formatCurrency(totalPackage)}</Text>
+              <Text style={styles.totalAmount}>
+                {formatCurrency(totalPackage)}
+              </Text>
             </View>
           </View>
         </View>
@@ -1159,4 +1157,3 @@ const createStyles = (colors: ColorScheme) =>
   });
 
 export default SpacePreviewScreen;
-

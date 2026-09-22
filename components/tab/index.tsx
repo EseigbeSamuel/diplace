@@ -1,14 +1,14 @@
 import React from "react";
 import {
-  Image,
-  ImageSourcePropType,
-  StyleSheet,
-  Text,
-  View,
+    ColorValue,
+    Image,
+    ImageSourcePropType,
+    StyleSheet,
+    Text,
+    View,
 } from "react-native";
 
 import { useTheme } from "@/contexts/themeContext";
-import { cn } from "@/utils";
 import { RFValue } from "react-native-responsive-fontsize";
 import { heightPercentageToDP as hp } from "react-native-responsive-screen";
 
@@ -18,7 +18,7 @@ export const TabBarLabel = ({
   title,
 }: {
   focused: boolean;
-  color: string;
+  color: ColorValue;
   children: string;
   title?: string;
 }): React.ReactNode => {

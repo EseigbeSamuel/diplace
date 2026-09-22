@@ -1,5 +1,5 @@
 import { ArrowLeft, Calling, Flag, More, Send, Star } from "@/assets/icons";
-import { CustomBottomSheet } from "@/components/bottom-sheet";
+import { BottomSheet } from "@/components/bottom-sheet";
 import AppButton from "@/components/button";
 import SafeAreaViewContainer from "@/components/safeareaview";
 import { SimpleSelector } from "@/components/selector";
@@ -13,7 +13,6 @@ import {
   WsNewMessagePayload,
 } from "@/hooks";
 import { ColorScheme } from "@/utils";
-import { BottomSheetModal } from "@gorhom/bottom-sheet";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import React, {
   useCallback,
@@ -513,10 +512,10 @@ const ChatPage = () => {
     setShowReportModal(false);
     setSelectedReport(null);
   };
-  const reportRef = useRef<BottomSheetModal>(null);
+  const [isReportSheetVisible, setIsReportSheetVisible] = useState(false);
 
   const handleReport = () => {
-    reportRef.current?.present();
+    setIsReportSheetVisible(true);
   };
 
   const snapPoints = useMemo(() => ["25%", "50%", "75%", "90%"], []);
@@ -871,22 +870,17 @@ const ChatPage = () => {
         </Pressable>
       </Modal>
 
-      <CustomBottomSheet
-        bottomSheetProps={{
-          ref: reportRef,
-          snapPoints,
-          index: 2,
-          enableContentPanningGesture: true,
-          enableHandlePanningGesture: true,
-          enablePanDownToClose: true,
-        }}
+      <BottomSheet
+        isVisible={isReportSheetVisible}
+        onClose={() => setIsReportSheetVisible(false)}
+        snapPoints={snapPoints}
       >
         <ReportBottomSheet
           type="lister"
           onSubmit={handleSubmitReport}
-          onCancel={() => reportRef.current?.close()}
+          onCancel={() => setIsReportSheetVisible(false)}
         />
-      </CustomBottomSheet>
+      </BottomSheet>
     </SafeAreaViewContainer>
   );
 };

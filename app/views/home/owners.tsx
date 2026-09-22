@@ -104,6 +104,7 @@ export default function OwnersHome() {
 
   // const { data, isLoading, isError, error, refetch, isFetching } =
   //   useTransactionHistory(filters);
+  const [isPresented, setIsPresented] = useState(false);
 
   return (
     <SafeAreaViewContainer disableBottom className="flex-col gap-5">
@@ -126,7 +127,6 @@ export default function OwnersHome() {
           </View>
         }
       />
-
       <FlatList
         data={[]}
         renderItem={() => null}

@@ -1,5 +1,10 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import { ArrowLeft, ArrowRight, BadgeCheck, CloseSquare } from "@/assets/icons";
+import {
+  ArrowLeft,
+  ArrowRight3,
+  BadgeCheck,
+  CloseSquare
+} from "@/assets/icons";
 import Filter from "@/components/filter";
 import FilterBottomSheets from "@/components/filterBS";
 import { AppHeader } from "@/components/header";
@@ -480,7 +485,7 @@ const Discover = () => {
                   className="w-[20px] h-[20px]"
                 />
               )} */}
-              <ArrowRight color={colors.slate[650]} />
+              <ArrowRight3 color={colors.slate[650]} />
             </Pressable>
           </View>
           {isListersLoading ? (

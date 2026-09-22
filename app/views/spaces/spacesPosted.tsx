@@ -1,24 +1,30 @@
-import { CustomBottomSheet } from "@/components/bottom-sheet";
+import { BottomSheet } from "@/components/bottom-sheet";
 import AppButton from "@/components/button";
 import ConfirmDialog from "@/components/confirm-dialog";
 import Filter from "@/components/filter";
 import HouseCard from "@/components/housecard";
 import HouseCardTile from "@/components/houseCardTile";
-import {
-  useDeleteProperty,
-  useGetCurrentUser,
-  useListProperties,
-  useUpdatePropertyStatus,
-} from "@/hooks";
 import { SimpleSelector } from "@/components/selector";
 import { useTheme } from "@/contexts/themeContext";
+import {
+    useDeleteProperty,
+    useGetCurrentUser,
+    useListProperties,
+    useUpdatePropertyStatus,
+} from "@/hooks";
 import { useSpaceStore } from "@/store/useSpace";
 import { PropertyListItem } from "@/types";
 import { ColorScheme } from "@/utils";
-import { BottomSheetModal } from "@gorhom/bottom-sheet";
 import { router } from "expo-router";
-import React, { useMemo, useRef, useState } from "react";
-import { ActivityIndicator, FlatList, Image, StyleSheet, Text, View } from "react-native";
+import React, { useMemo, useState } from "react";
+import {
+    ActivityIndicator,
+    FlatList,
+    Image,
+    StyleSheet,
+    Text,
+    View,
+} from "react-native";
 
 import { RFValue } from "react-native-responsive-fontsize";
 
@@ -26,8 +32,12 @@ const SpacesPosted = ({ layout }: { layout: "tiles" | "box" }) => {
   const { colors } = useTheme();
   const homeStyles = styles(colors);
   const { setPreviewProperty, setEditingDraft } = useSpaceStore();
-  const { currentUser, isCurrentUserLoading, currentUserError, refetchCurrentUser } =
-    useGetCurrentUser();
+  const {
+    currentUser,
+    isCurrentUserLoading,
+    currentUserError,
+    refetchCurrentUser,
+  } = useGetCurrentUser();
   const {
     properties,
     isPropertiesLoading,
@@ -48,17 +58,21 @@ const SpacesPosted = ({ layout }: { layout: "tiles" | "box" }) => {
   const { deletePropertyMutation, deletePropertyPending } = useDeleteProperty();
   const { updatePropertyStatusMutation, updatePropertyStatusPending } =
     useUpdatePropertyStatus();
-  const viewSpaceref = useRef<BottomSheetModal>(null);
-  const viewUpdateStatus = useRef<BottomSheetModal>(null);
+  const [isViewSpaceSheetVisible, setIsViewSpaceSheetVisible] = useState(false);
+  const [isUpdateStatusSheetVisible, setIsUpdateStatusSheetVisible] =
+    useState(false);
   const [isRemoveDialogVisible, setRemoveDialogVisible] = useState(false);
   const [selectedStatus, setSelectedStatus] = useState<
     "active" | "pending" | "rented" | "sold" | "inactive" | "archived"
   >("active");
-  const [selectedSpace, setSelectedSpace] = useState<PropertyCardItem | null>(null);
+  const [selectedSpace, setSelectedSpace] = useState<PropertyCardItem | null>(
+    null,
+  );
   const snapPoints = useMemo(() => ["62%"], []);
   const statusSnapPoints = useMemo(() => ["56%"], []);
   const prettyStatus = (status?: string) =>
-    (status || "active").charAt(0).toUpperCase() + (status || "active").slice(1);
+    (status || "active").charAt(0).toUpperCase() +
+    (status || "active").slice(1);
   const mapPropertyStatusToSelector = (
     status?: string,
   ): "active" | "pending" | "rented" | "sold" | "inactive" | "archived" => {
@@ -73,18 +87,16 @@ const SpacesPosted = ({ layout }: { layout: "tiles" | "box" }) => {
 
   const handleViewSpace = (space: PropertyCardItem) => {
     setSelectedSpace(space);
-    viewSpaceref.current?.present();
+    setIsViewSpaceSheetVisible(true);
   };
   const handleViewUpdateStatus = () => {
     setSelectedStatus(mapPropertyStatusToSelector(selectedSpace?.raw?.status));
-    viewSpaceref.current?.dismiss();
-    setTimeout(() => {
-      viewUpdateStatus.current?.present();
-    }, 180);
+    setIsViewSpaceSheetVisible(false);
+    setIsUpdateStatusSheetVisible(true);
   };
   const handleEditSpace = () => {
     if (!selectedSpace?.id) return;
-    viewSpaceref.current?.dismiss();
+    setIsViewSpaceSheetVisible(false);
     setEditingDraft(null);
     router.push({
       pathname: "/views/spaces/add-space/form",
@@ -94,7 +106,7 @@ const SpacesPosted = ({ layout }: { layout: "tiles" | "box" }) => {
 
   const handlePreviewSpace = () => {
     if (!selectedSpace?.raw) return;
-    viewSpaceref.current?.dismiss();
+    setIsViewSpaceSheetVisible(false);
     setPreviewProperty(selectedSpace.raw);
     router.push({
       pathname: "/views/spaces/preview-space/[id]",
@@ -103,11 +115,11 @@ const SpacesPosted = ({ layout }: { layout: "tiles" | "box" }) => {
   };
 
   const handlePromoteSpace = () => {
-    viewSpaceref.current?.dismiss();
+    setIsViewSpaceSheetVisible(false);
   };
 
   const handleRemoveSpace = () => {
-    viewSpaceref.current?.dismiss();
+    setIsViewSpaceSheetVisible(false);
     setRemoveDialogVisible(true);
   };
 
@@ -133,7 +145,7 @@ const SpacesPosted = ({ layout }: { layout: "tiles" | "box" }) => {
         status: selectedStatus,
       });
       await refetchProperties();
-      viewUpdateStatus.current?.dismiss();
+      setIsUpdateStatusSheetVisible(false);
     } catch {
       // Toast handled in mutation onError
     }
@@ -141,7 +153,8 @@ const SpacesPosted = ({ layout }: { layout: "tiles" | "box" }) => {
   const formatCurrency = (amount: number) =>
     `NGN ${new Intl.NumberFormat("en-NG").format(amount || 0)}`;
 
-  const formatCostFrequency = (value: string) => value.replace(/^per_/, "").replace(/_/g, " ");
+  const formatCostFrequency = (value: string) =>
+    value.replace(/^per_/, "").replace(/_/g, " ");
 
   const getBadgeType = (item: PropertyListItem): string | undefined => {
     const status = item.status?.toLowerCase?.();
@@ -151,7 +164,8 @@ const SpacesPosted = ({ layout }: { layout: "tiles" | "box" }) => {
   };
 
   const postedSpaces = useMemo(
-    () => properties.filter((item) => !["draft", "deleted"].includes(item.status)),
+    () =>
+      properties.filter((item) => !["draft", "deleted"].includes(item.status)),
     [properties],
   );
 
@@ -262,12 +276,10 @@ const SpacesPosted = ({ layout }: { layout: "tiles" | "box" }) => {
           ) : null
         }
       />
-      <CustomBottomSheet
-        bottomSheetProps={{
-          ref: viewSpaceref,
-          snapPoints,
-          index: 0,
-        }}
+      <BottomSheet
+        isVisible={isViewSpaceSheetVisible}
+        onClose={() => setIsViewSpaceSheetVisible(false)}
+        snapPoints={snapPoints}
       >
         <View style={homeStyles.modalContainer}>
           <View style={homeStyles.modalImageWrap}>
@@ -326,13 +338,11 @@ const SpacesPosted = ({ layout }: { layout: "tiles" | "box" }) => {
             />
           </View>
         </View>
-      </CustomBottomSheet>
-      <CustomBottomSheet
-        bottomSheetProps={{
-          ref: viewUpdateStatus,
-          snapPoints: statusSnapPoints,
-          index: 0,
-        }}
+      </BottomSheet>
+      <BottomSheet
+        isVisible={isUpdateStatusSheetVisible}
+        onClose={() => setIsUpdateStatusSheetVisible(false)}
+        snapPoints={statusSnapPoints}
       >
         <View style={homeStyles.modalContainer}>
           <Text style={homeStyles.title}>Update current status</Text>
@@ -355,7 +365,8 @@ const SpacesPosted = ({ layout }: { layout: "tiles" | "box" }) => {
               {selectedSpace?.location || "Unknown location"}
             </Text>
             <Text style={homeStyles.subTitle}>
-              {selectedSpace?.price || "NGN 0"}/{selectedSpace?.duration || "annum"}
+              {selectedSpace?.price || "NGN 0"}/
+              {selectedSpace?.duration || "annum"}
             </Text>
           </View>
 
@@ -408,7 +419,7 @@ const SpacesPosted = ({ layout }: { layout: "tiles" | "box" }) => {
             />
           </View>
         </View>
-      </CustomBottomSheet>
+      </BottomSheet>
       <ConfirmDialog
         visible={isRemoveDialogVisible}
         onConfirm={handleRemoveConfirm}
@@ -551,4 +562,3 @@ const styles = (colors: ColorScheme) =>
       width: RFValue(140),
     },
   });
-

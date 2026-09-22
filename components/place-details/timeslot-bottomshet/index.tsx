@@ -1,16 +1,15 @@
 import { useTheme } from "@/contexts/themeContext";
 import { ColorScheme } from "@/utils";
-import { BottomSheetModal } from "@gorhom/bottom-sheet";
-import React, { useMemo } from "react";
+import React from "react";
 import {
-  FlatList,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
+    FlatList,
+    StyleSheet,
+    Text,
+    TouchableOpacity,
+    View,
 } from "react-native";
 import { RFValue } from "react-native-responsive-fontsize";
-import { CustomBottomSheet } from "../../bottom-sheet";
+import { BottomSheet } from "../../bottom-sheet";
 
 type timeslot = {
   id: string;
@@ -26,21 +25,20 @@ const timeslotDB: timeslot[] = [
 interface Props {
   selectedTime: timeslot | null;
   setSelectedTime: (time: timeslot) => void;
-  openTimeSlot: React.RefObject<BottomSheetModal | null>;
+  isVisible: boolean;
+  onClose: () => void;
 }
 
 export default function TimeslotBottomSheet(props: Props) {
-  const snapPoints = useMemo(() => ["75%", "90%"], []);
   const { colors, isDarkMode } = useTheme();
 
   const homeStyles = styles(colors);
 
   return (
-    <CustomBottomSheet
-      bottomSheetProps={{
-        ref: props.openTimeSlot,
-        snapPoints,
-      }}
+    <BottomSheet
+      isVisible={props.isVisible}
+      onClose={props.onClose}
+      snapPoints={["75%", "90%"]}
     >
       <View className="flex flex-col gap-10">
         <View>
@@ -66,7 +64,7 @@ export default function TimeslotBottomSheet(props: Props) {
                   className="p-4 border rounded-2xl"
                   onPress={() => {
                     props.setSelectedTime(item);
-                    props.openTimeSlot.current?.dismiss();
+                    props.onClose();
                   }}
                 >
                   <View className="flex-row items-center">
@@ -96,7 +94,7 @@ export default function TimeslotBottomSheet(props: Props) {
           />
         </View>
       </View>
-    </CustomBottomSheet>
+    </BottomSheet>
   );
 }
 

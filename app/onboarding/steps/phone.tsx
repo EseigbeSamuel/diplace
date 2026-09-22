@@ -1,4 +1,4 @@
-import { CustomBottomSheet } from "@/components/bottom-sheet";
+import { BottomSheet } from "@/components/bottom-sheet";
 import AppButton from "@/components/button";
 import OTPInput from "@/components/otp";
 import TextField from "@/components/textfield";
@@ -10,8 +10,7 @@ import {
   useResendVerificationOtp,
 } from "@/hooks";
 import { ColorScheme } from "@/utils";
-import { BottomSheetModal } from "@gorhom/bottom-sheet";
-import React, { useEffect, useMemo, useRef, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import {
   ActivityIndicator,
   Alert,
@@ -55,7 +54,7 @@ const PhoneVerificationStep = ({ onNext }: PhoneVerificationProps) => {
   const [verificationId, setVerificationId] = useState("");
   const [secondsLeft, setSecondsLeft] = useState(0);
   const [goNextAfterDismiss, setGoNextAfterDismiss] = useState(false);
-  const verifyRef = useRef<BottomSheetModal>(null);
+  const [isVerifySheetVisible, setIsVerifySheetVisible] = useState(false);
   const snapPoints = useMemo(() => ["35%", "50%", "75%", "90%"], []);
   const isSending = initiateVerificationPending || resendVerificationOtpPending;
   const isVerifying = completeVerificationPending;
@@ -115,7 +114,7 @@ const PhoneVerificationStep = ({ onNext }: PhoneVerificationProps) => {
       setVerificationId(response.public_id);
       resetOtp();
       startTimer();
-      verifyRef.current?.present();
+      setIsVerifySheetVisible(true);
     } catch {}
   };
 
@@ -158,7 +157,7 @@ const PhoneVerificationStep = ({ onNext }: PhoneVerificationProps) => {
         otp_code: otp,
       });
       setGoNextAfterDismiss(true);
-      verifyRef.current?.dismiss();
+      setIsVerifySheetVisible(false);
     } catch {
       resetOtp();
     }
@@ -214,16 +213,13 @@ const PhoneVerificationStep = ({ onNext }: PhoneVerificationProps) => {
         />
       </View>
 
-      <CustomBottomSheet
-        bottomSheetProps={{
-          ref: verifyRef,
-          snapPoints,
-          index: 1,
-          onDismiss: handleVerifySheetDismiss,
-          enableContentPanningGesture: true,
-          enableHandlePanningGesture: true,
-          enablePanDownToClose: true,
+      <BottomSheet
+        isVisible={isVerifySheetVisible}
+        onClose={() => {
+          setIsVerifySheetVisible(false);
+          handleVerifySheetDismiss();
         }}
+        snapPoints={snapPoints}
       >
         <View style={styles.container}>
           <View>
@@ -281,7 +277,7 @@ const PhoneVerificationStep = ({ onNext }: PhoneVerificationProps) => {
             </View>
           </View>
         </View>
-      </CustomBottomSheet>
+      </BottomSheet>
     </KeyboardAwareScrollView>
   );
 };

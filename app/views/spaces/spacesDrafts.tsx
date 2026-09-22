@@ -1,4 +1,4 @@
-import { CustomBottomSheet } from "@/components/bottom-sheet";
+import { BottomSheet } from "@/components/bottom-sheet";
 import AppButton from "@/components/button";
 import ConfirmDialog from "@/components/confirm-dialog";
 import Filter from "@/components/filter";
@@ -9,16 +9,15 @@ import { useDeleteProperty, useListMyDrafts } from "@/hooks";
 import { useSpaceStore } from "@/store/useSpace";
 import { PropertyListItem } from "@/types";
 import { ColorScheme } from "@/utils";
-import { BottomSheetModal } from "@gorhom/bottom-sheet";
 import { router } from "expo-router";
-import React, { useMemo, useRef } from "react";
+import React, { useMemo } from "react";
 import {
-  ActivityIndicator,
-  FlatList,
-  Image,
-  StyleSheet,
-  Text,
-  View,
+    ActivityIndicator,
+    FlatList,
+    Image,
+    StyleSheet,
+    Text,
+    View,
 } from "react-native";
 import { RFValue } from "react-native-responsive-fontsize";
 
@@ -44,7 +43,8 @@ const SpacesDrafts = ({ layout }: { layout: "tiles" | "box" }) => {
     },
     enabled: true,
   });
-  const addSpaceRef = useRef<BottomSheetModal>(null);
+  const [isAddSpaceSheetVisible, setIsAddSpaceSheetVisible] =
+    React.useState(false);
   const [selectedSpace, setSelectedSpace] =
     React.useState<PropertyCardItem | null>(null);
   const [isRemoveDialogVisible, setRemoveDialogVisible] = React.useState(false);
@@ -52,12 +52,12 @@ const SpacesDrafts = ({ layout }: { layout: "tiles" | "box" }) => {
 
   const handleAddSpace = (space: PropertyCardItem) => {
     setSelectedSpace(space);
-    addSpaceRef.current?.present();
+    setIsAddSpaceSheetVisible(true);
   };
 
   const handleEditSpace = () => {
     if (!selectedSpace?.id || !selectedSpace.raw) return;
-    addSpaceRef.current?.dismiss();
+    setIsAddSpaceSheetVisible(false);
     setEditingDraft(selectedSpace.raw);
     router.push({
       pathname: "/views/spaces/add-space/form",
@@ -66,7 +66,7 @@ const SpacesDrafts = ({ layout }: { layout: "tiles" | "box" }) => {
   };
 
   const handleRemoveSpace = () => {
-    addSpaceRef.current?.dismiss();
+    setIsAddSpaceSheetVisible(false);
     setRemoveDialogVisible(true);
   };
 
@@ -196,12 +196,10 @@ const SpacesDrafts = ({ layout }: { layout: "tiles" | "box" }) => {
           ) : null
         }
       />
-      <CustomBottomSheet
-        bottomSheetProps={{
-          ref: addSpaceRef,
-          snapPoints,
-          index: 2,
-        }}
+      <BottomSheet
+        isVisible={isAddSpaceSheetVisible}
+        onClose={() => setIsAddSpaceSheetVisible(false)}
+        snapPoints={snapPoints}
       >
         <View style={homeStyles.modalContainer}>
           <View style={homeStyles.modalImageWrap}>
@@ -239,7 +237,7 @@ const SpacesDrafts = ({ layout }: { layout: "tiles" | "box" }) => {
             />
           </View>
         </View>
-      </CustomBottomSheet>
+      </BottomSheet>
       <ConfirmDialog
         visible={isRemoveDialogVisible}
         onConfirm={handleRemoveConfirm}
