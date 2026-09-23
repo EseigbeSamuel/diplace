@@ -91,6 +91,7 @@ const AddSpaceForm: React.FC = () => {
     const mappedType = mapPropertyTypeToSpaceType(propertyDetails.property_type);
     const mappedMedia = (propertyDetails.media ?? []).map((item, index) => ({
       id: item.public_id || `${index}`,
+      remoteId: item.public_id,
       uri: item.file_url,
       type: item.file_type === "video" ? ("video" as const) : ("image" as const),
     }));
@@ -140,7 +141,26 @@ const AddSpaceForm: React.FC = () => {
         description: propertyDetails.description,
       },
       amenities: propertyDetails.amenities ?? [],
+      eventSpace:
+        propertyDetails.event_space === "indoor" ||
+        propertyDetails.event_space === "outdoor"
+          ? propertyDetails.event_space
+          : undefined,
+      capacity: propertyDetails.capacity
+        ? {
+            ...propertyDetails.capacity,
+            caps: String(propertyDetails.capacity.caps),
+          }
+        : undefined,
+      rentalAgreement: propertyDetails.rental_agreement
+        ? {
+            uri: propertyDetails.rental_agreement.file_url,
+            name: propertyDetails.rental_agreement.name,
+            size: propertyDetails.rental_agreement.size,
+          }
+        : null,
       media: mappedMedia,
+      existingMedia: mappedMedia,
       location: {
         address: propertyDetails.address?.street ?? "",
         city: propertyDetails.address?.city ?? "",

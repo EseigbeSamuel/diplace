@@ -63,6 +63,7 @@ const TabLayout = () => {
                 ? {
                     tabPress: (e) => {
                       e.preventDefault();
+                      handleAddSpace();
                     },
                   }
                 : item.name === "activity"

@@ -13,7 +13,7 @@ import {
 import { RFValue } from "react-native-responsive-fontsize";
 
 type HouseCardTileProps = {
-  imageSource: ImageSourcePropType;
+  imageSource: ImageSourcePropType | string;
   name: string;
   location?: string;
   price?: string;
@@ -158,18 +158,33 @@ const HouseCardTile = ({
 }: HouseCardTileProps) => {
   const { colors } = useTheme();
   const homeStyles = styles(colors);
+  const remoteImageUri =
+    typeof imageSource === "string"
+      ? imageSource
+      : imageSource &&
+          typeof imageSource === "object" &&
+          "uri" in imageSource &&
+          typeof imageSource.uri === "string"
+        ? imageSource.uri
+        : "";
+  const cardImageSource =
+    remoteImageUri.length >= 7
+      ? typeof imageSource === "string"
+        ? { uri: imageSource }
+        : imageSource
+      : require("@/assets/images/diplace.jpg");
   return (
     <Pressable onPress={onPress}>
       <View className="flex flex-row justify-between gap-2 py-2">
         <View className="flex flex-row gap-2">
           <View className="">
             <Image
-              source={imageSource}
+              source={cardImageSource}
               className="w-[72px] h-[72px] rounded-lg"
             />
           </View>
           <View className="flex gap-1">
-            <Text>{renderBadge(badgeType || "")}</Text>
+            <View>{renderBadge(badgeType || "")}</View>
             <Text
               className="text-xl"
               style={homeStyles.subTitleblack}

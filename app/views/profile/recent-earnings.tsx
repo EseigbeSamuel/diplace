@@ -2,6 +2,8 @@ import SafeAreaViewContainer from "@/components/safeareaview";
 import SectionHeader from "@/components/sectionheader";
 import ViewHeader from "@/components/view-header";
 import { useTheme } from "@/contexts/themeContext";
+import { useMyTransactionHistory } from "@/hooks";
+import { Transaction as ApiTransaction } from "@/types/screens/transaction";
 import { ColorScheme } from "@/utils";
 import { useRouter } from "expo-router";
 import React, { useState } from "react";
@@ -16,7 +18,7 @@ import {
 } from "react-native";
 import { RFValue } from "react-native-responsive-fontsize";
 
-interface Transaction {
+interface MockTransaction {
   id: number;
   type: "reservation" | "inspection" | "booking";
   description: string;
@@ -31,7 +33,7 @@ const RecentEarnings = () => {
   const recentEarningsStyles = styles(colors);
   const [selectedFilter, setSelectedFilter] = useState("All time");
 
-  const transactions: Transaction[] = [
+  const mockTransactions: MockTransaction[] = [
     {
       id: 1,
       type: "reservation",
@@ -97,16 +99,20 @@ const RecentEarnings = () => {
       month: "July, 2025",
     },
   ];
+  const { transactionHistory, isTransactionHistoryLoading } =
+    useMyTransactionHistory({ limit: 100 });
+  const transactions = transactionHistory;
 
-  const getTransactionIcon = (type: string) => {
-    switch (type) {
-      case "reservation":
+  const getTransactionIcon = (purpose: ApiTransaction["purpose"]) => {
+    switch (purpose) {
+      case "booking_deposit":
         return require("@/assets/icons/Lock.png");
-      case "inspection":
+      case "inspection_fee":
         return isDarkMode
           ? require("@/assets/icons/calender-white.png")
           : require("@/assets/icons/calendar.png");
-      case "booking":
+      case "booking_rent":
+      case "booking_balance":
         return require("@/assets/icons/success.png");
       default:
         return require("@/assets/icons/success.png");
@@ -121,15 +127,33 @@ const RecentEarnings = () => {
     router.push("/views/profile/payment-receipt");
   };
 
+  const getDescription = (purpose: ApiTransaction["purpose"]) =>
+    purpose.replace(/_/g, " ").replace(/\b\w/g, (letter) => letter.toUpperCase());
+  const formatDate = (value?: string) =>
+    value
+      ? new Date(value).toLocaleDateString("en-NG", {
+          day: "numeric",
+          month: "short",
+          year: "numeric",
+        })
+      : "Recent";
+  const formatMonth = (value?: string) =>
+    value
+      ? new Date(value).toLocaleDateString("en-NG", {
+          month: "long",
+          year: "numeric",
+        })
+      : "Recent";
+
   // Group transactions by month
   const groupedTransactions = transactions.reduce((acc, transaction) => {
-    const month = transaction.month;
+    const month = formatMonth(transaction.date_created);
     if (!acc[month]) {
       acc[month] = [];
     }
     acc[month].push(transaction);
     return acc;
-  }, {} as Record<string, Transaction[]>);
+  }, {} as Record<string, ApiTransaction[]>);
 
   const handleFilterPress = () => {
     // Open filter menu
@@ -158,21 +182,23 @@ const RecentEarnings = () => {
 
         {/* Grouped Transactions */}
         <View style={recentEarningsStyles.container}>
-          {Object.entries(groupedTransactions).map(
+          {isTransactionHistoryLoading ? (
+            <Text style={recentEarningsStyles.transactionDate}>Loading earnings...</Text>
+          ) : Object.entries(groupedTransactions).length ? Object.entries(groupedTransactions).map(
             ([month, monthTransactions]) => (
               <View key={month} style={recentEarningsStyles.monthGroup}>
                 <Text style={recentEarningsStyles.monthTitle}>{month}</Text>
                 <View style={recentEarningsStyles.transactionList}>
                   {monthTransactions.map((transaction) => (
                     <TouchableOpacity
-                      key={transaction.id}
+                      key={transaction.public_id}
                       style={recentEarningsStyles.transactionCard}
                       onPress={handleEarningsClicked}
                     >
                       <View style={recentEarningsStyles.transactionLeft}>
                         <View style={recentEarningsStyles.iconContainer}>
                           <Image
-                            source={getTransactionIcon(transaction.type)}
+                            source={getTransactionIcon(transaction.purpose)}
                             style={recentEarningsStyles.transactionIcon}
                           />
                         </View>
@@ -180,21 +206,23 @@ const RecentEarnings = () => {
                           <Text
                             style={recentEarningsStyles.transactionDescription}
                           >
-                            {transaction.description}
+                            {getDescription(transaction.purpose)}
                           </Text>
                           <Text style={recentEarningsStyles.transactionDate}>
-                            {transaction.date}
+                            {formatDate(transaction.date_created)}
                           </Text>
                         </View>
                       </View>
                       <Text style={recentEarningsStyles.transactionAmount}>
-                        +{formatAmount(transaction.amount)}
+                        NGN {transaction.amount.toLocaleString("en-NG")}
                       </Text>
                     </TouchableOpacity>
                   ))}
                 </View>
               </View>
             )
+          ) : (
+            <Text style={recentEarningsStyles.transactionDate}>No transactions yet.</Text>
           )}
         </View>
       </ScrollView>

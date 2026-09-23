@@ -25,7 +25,7 @@ const HouseCard = ({
   showBookmark = false,
   onPress,
 }: {
-  imageSource: ImageSourcePropType;
+  imageSource: ImageSourcePropType | string;
   title: string;
   location: string;
   price: string;
@@ -40,15 +40,19 @@ const HouseCard = ({
   const { colors, isDarkMode } = useTheme();
   const homeStyles = styles(colors);
   const remoteImageUri =
-    imageSource &&
-    typeof imageSource === "object" &&
-    "uri" in imageSource &&
-    typeof imageSource.uri === "string"
-      ? imageSource.uri
-      : "";
+    typeof imageSource === "string"
+      ? imageSource
+      : imageSource &&
+          typeof imageSource === "object" &&
+          "uri" in imageSource &&
+          typeof imageSource.uri === "string"
+        ? imageSource.uri
+        : "";
   const cardImageSource =
     remoteImageUri.length >= 7
-      ? imageSource
+      ? typeof imageSource === "string"
+        ? { uri: imageSource }
+        : imageSource
       : require("@/assets/images/diplace.jpg");
 
   const renderBadge = () => {

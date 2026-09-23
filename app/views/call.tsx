@@ -6,11 +6,7 @@ import {
   useStartCall,
 } from "@/hooks";
 import { CallScreenMode, CallScreenState } from "@/types";
-import {
-  AudioSession,
-  LiveKitRoom,
-  useRoomContext,
-} from "@livekit/react-native";
+import Constants from "expo-constants";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import {
@@ -27,25 +23,31 @@ import {
 
 // Constants
 const RING_TIMEOUT_MS = 30_000; // 30s before "not answered"
+const liveKit =
+  Constants.appOwnership === "expo" ? null : require("@livekit/react-native");
+const AudioSession = liveKit?.AudioSession;
+const LiveKitRoom = liveKit?.LiveKitRoom as React.ComponentType<any> | undefined;
+const useRoomContext = liveKit?.useRoomContext as (() => any) | undefined;
 
 // Active Room Controls (inside LiveKitRoom)
 function RoomControls({ onEnd, colors }: { onEnd: () => void; colors: any }) {
-  const room = useRoomContext();
+  const room = useRoomContext?.();
   const [isMuted, setIsMuted] = useState(false);
   const [isSpeaker, setIsSpeaker] = useState(true);
 
   const toggleMute = useCallback(async () => {
+    if (!room) return;
     const localParticipant = room.localParticipant;
     const newMuted = !isMuted;
     await localParticipant.setMicrophoneEnabled(!newMuted);
     setIsMuted(newMuted);
-  }, [isMuted, room.localParticipant]);
+  }, [isMuted, room]);
 
   const toggleSpeaker = useCallback(async () => {
     const next = !isSpeaker;
     setIsSpeaker(next);
     if (Platform.OS === "ios") {
-      await AudioSession.setAppleAudioConfiguration({
+      await AudioSession?.setAppleAudioConfiguration({
         audioCategory: "playAndRecord",
         audioCategoryOptions: next ? ["defaultToSpeaker"] : [],
         audioMode: "voiceChat",
@@ -245,15 +247,15 @@ const Call = () => {
 
   // Start audio session on mount
   useEffect(() => {
-    AudioSession.startAudioSession();
+    AudioSession?.startAudioSession();
     return () => {
-      AudioSession.stopAudioSession();
+      AudioSession?.stopAudioSession();
     };
   }, []);
 
   // Outgoing: initiate call then fetch token
   useEffect(() => {
-    if (callMode !== "outgoing" || !conversationId) return;
+    if (!liveKit || callMode !== "outgoing" || !conversationId) return;
 
     let cancelled = false;
 
@@ -307,6 +309,7 @@ const Call = () => {
 
   // Incoming: accept or decline
   const handleAcceptIncoming = useCallback(async () => {
+    if (!liveKit) return;
     if (!activeCallId) return;
     try {
       const joinData = await joinCallMutation(activeCallId);
@@ -386,6 +389,24 @@ const Call = () => {
 
   const isPulsing = callState === "calling" || callState === "ringing";
 
+  if (!liveKit) {
+    return (
+      <View style={[styles.screen, { backgroundColor: colors.background }]}>
+        <View style={styles.avatarSection}>
+          <Text style={[styles.callerName, { color: colors.slate[650] }]}>
+            Calls need a development build
+          </Text>
+          <Text style={[styles.callerStatus, { color: colors.slate[500] }]}>
+            Expo Go cannot load the native LiveKit calling module.
+          </Text>
+          <TouchableOpacity style={styles.backBtn} onPress={() => router.back()}>
+            <Text style={{ color: colors.slate[650] }}>Go back</Text>
+          </TouchableOpacity>
+        </View>
+      </View>
+    );
+  }
+
   return (
     <View style={[styles.screen, { backgroundColor: colors.background }]}>
       <StatusBar
@@ -438,7 +459,7 @@ const Call = () => {
         {/*  Outgoing / Active call controls */}
         {(callState === "calling" || callState === "accepted") &&
         livekitToken &&
-        livekitUrl ? (
+        livekitUrl && LiveKitRoom ? (
           <LiveKitRoom
             serverUrl={livekitUrl}
             token={livekitToken}

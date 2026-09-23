@@ -7,10 +7,10 @@ import HouseCardTile from "@/components/houseCardTile";
 import { SimpleSelector } from "@/components/selector";
 import { useTheme } from "@/contexts/themeContext";
 import {
-    useDeleteProperty,
-    useGetCurrentUser,
-    useListProperties,
-    useUpdatePropertyStatus,
+  useDeleteProperty,
+  useGetCurrentUser,
+  useListProperties,
+  useUpdatePropertyStatus,
 } from "@/hooks";
 import { useSpaceStore } from "@/store/useSpace";
 import { PropertyListItem } from "@/types";
@@ -18,12 +18,12 @@ import { ColorScheme } from "@/utils";
 import { router } from "expo-router";
 import React, { useMemo, useState } from "react";
 import {
-    ActivityIndicator,
-    FlatList,
-    Image,
-    StyleSheet,
-    Text,
-    View,
+  ActivityIndicator,
+  FlatList,
+  Image,
+  StyleSheet,
+  Text,
+  View,
 } from "react-native";
 
 import { RFValue } from "react-native-responsive-fontsize";
@@ -32,6 +32,12 @@ const SpacesPosted = ({ layout }: { layout: "tiles" | "box" }) => {
   const { colors } = useTheme();
   const homeStyles = styles(colors);
   const { setPreviewProperty, setEditingDraft } = useSpaceStore();
+  const {
+    currentUser,
+    isCurrentUserLoading,
+    currentUserError,
+    refetchCurrentUser,
+  } = useGetCurrentUser();
   const {
     currentUser,
     isCurrentUserLoading,
@@ -62,6 +68,8 @@ const SpacesPosted = ({ layout }: { layout: "tiles" | "box" }) => {
   const [isUpdateStatusSheetVisible, setIsUpdateStatusSheetVisible] =
     useState(false);
   const [isRemoveDialogVisible, setRemoveDialogVisible] = useState(false);
+  const [isActionSheetVisible, setActionSheetVisible] = useState(false);
+  const [isStatusSheetVisible, setStatusSheetVisible] = useState(false);
   const [selectedStatus, setSelectedStatus] = useState<
     "active" | "pending" | "rented" | "sold" | "inactive" | "archived"
   >("active");
@@ -73,6 +81,7 @@ const SpacesPosted = ({ layout }: { layout: "tiles" | "box" }) => {
   const prettyStatus = (status?: string) =>
     (status || "active").charAt(0).toUpperCase() +
     (status || "active").slice(1);
+  (status || "active").charAt(0).toUpperCase() + (status || "active").slice(1);
   const mapPropertyStatusToSelector = (
     status?: string,
   ): "active" | "pending" | "rented" | "sold" | "inactive" | "archived" => {
@@ -155,6 +164,8 @@ const SpacesPosted = ({ layout }: { layout: "tiles" | "box" }) => {
 
   const formatCostFrequency = (value: string) =>
     value.replace(/^per_/, "").replace(/_/g, " ");
+  const formatCostFrequency = (value: string) =>
+    value.replace(/^per_/, "").replace(/_/g, " ");
 
   const getBadgeType = (item: PropertyListItem): string | undefined => {
     const status = item.status?.toLowerCase?.();
@@ -166,6 +177,8 @@ const SpacesPosted = ({ layout }: { layout: "tiles" | "box" }) => {
   const postedSpaces = useMemo(
     () =>
       properties.filter((item) => !["draft", "deleted"].includes(item.status)),
+    () =>
+      properties.filter((item) => !["draft", "deleted"].includes(item.status)),
     [properties],
   );
 
@@ -174,7 +187,7 @@ const SpacesPosted = ({ layout }: { layout: "tiles" | "box" }) => {
       postedSpaces.map((item) => ({
         id: item.public_id,
         imageSource: item.media?.[0]?.file_url
-          ? { uri: item.media[0].file_url }
+          ? item.media[0].file_url
           : require("@/assets/images/featuredSpaceImage1.png"),
         title: item.title || "Untitled space",
         location:
@@ -349,10 +362,7 @@ const SpacesPosted = ({ layout }: { layout: "tiles" | "box" }) => {
 
           <View style={homeStyles.modalImageWrap}>
             <Image
-              source={
-                selectedSpace?.imageSource ||
-                require("@/assets/images/featuredSpaceImage1.png")
-              }
+              source={getPropertyImageSource(selectedSpace?.imageSource)}
               style={homeStyles.modalImage}
             />
           </View>
@@ -398,11 +408,11 @@ const SpacesPosted = ({ layout }: { layout: "tiles" | "box" }) => {
               isChecked={selectedStatus === "sold"}
               onChange={() => setSelectedStatus("sold")}
             />
-            <SimpleSelector
-              title="Inactive"
-              isChecked={selectedStatus === "inactive"}
-              onChange={() => setSelectedStatus("inactive")}
-            />
+            {/* <SimpleSelector
+                  title="Inactive"
+                  isChecked={selectedStatus === "inactive"}
+                  onChange={() => setSelectedStatus("inactive")}
+                /> */}
             <SimpleSelector
               title="Archived"
               isChecked={selectedStatus === "archived"}
@@ -440,13 +450,31 @@ export default SpacesPosted;
 
 type PropertyCardItem = {
   id: string;
-  imageSource: { uri: string } | number;
+  imageSource: ImageSourcePropType | string;
   title: string;
   location: string;
   badgeType?: string;
   price: string;
   duration: string;
   raw: PropertyListItem;
+};
+
+const getPropertyImageSource = (
+  imageSource?: ImageSourcePropType | string,
+): ImageSourcePropType => {
+  const remoteImageUri =
+    typeof imageSource === "string"
+      ? imageSource
+      : imageSource &&
+          typeof imageSource === "object" &&
+          "uri" in imageSource &&
+          typeof imageSource.uri === "string"
+        ? imageSource.uri
+        : "";
+
+  return remoteImageUri.length >= 7
+    ? { uri: remoteImageUri }
+    : require("@/assets/images/diplace.jpg");
 };
 
 const styles = (colors: ColorScheme) =>
@@ -481,6 +509,19 @@ const styles = (colors: ColorScheme) =>
       paddingTop: RFValue(10),
       paddingBottom: RFValue(16),
       alignItems: "center",
+    },
+    modalOverlay: {
+      flex: 1,
+      justifyContent: "flex-end",
+      backgroundColor: "rgba(0, 0, 0, 0.4)",
+    },
+    actionSheet: {
+      maxHeight: "88%",
+      paddingHorizontal: RFValue(20),
+      paddingTop: RFValue(18),
+      backgroundColor: colors.background,
+      borderTopLeftRadius: RFValue(24),
+      borderTopRightRadius: RFValue(24),
     },
     modalImageWrap: {
       width: RFValue(112),

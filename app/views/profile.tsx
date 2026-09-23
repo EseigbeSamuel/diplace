@@ -1,4 +1,3 @@
-import MediaPickerModal from "@/components/media-picker-modal";
 import SafeAreaViewContainer from "@/components/safeareaview";
 import SectionHeader from "@/components/sectionheader";
 import { useTheme } from "@/contexts/themeContext";
@@ -6,7 +5,7 @@ import { useUser } from "@/contexts/user-context";
 import { useGetCurrentUser, useLogout } from "@/hooks";
 import { ColorScheme } from "@/utils";
 import { useRouter } from "expo-router";
-import React, { useState } from "react";
+import React from "react";
 import {
   Alert,
   Image,
@@ -26,7 +25,6 @@ const Profile = () => {
   const { logoutMutation, logoutMutationPending } = useLogout();
   const { colors, isDarkMode, toggleTheme } = useTheme();
   const profileStyles = styles(colors);
-  const [showMediaModal, setShowMediaModal] = useState(false);
 
   const profileName =
     currentUser?.full_name?.trim() ||
@@ -246,7 +244,7 @@ const Profile = () => {
             />
             <Pressable
               style={profileStyles.editBadge}
-              onPress={() => setShowMediaModal(true)}
+              onPress={() => router.push("/views/profile/edit-profile")}
             >
               <Image
                 source={require("@/assets/icons/Camera - Iconly Pro.png")}
@@ -347,14 +345,6 @@ const Profile = () => {
             </Pressable>
           ))}
         </View>
-        <MediaPickerModal
-          visible={showMediaModal}
-          onClose={() => setShowMediaModal(false)}
-          onCameraRoll={() => {}}
-          onChoosePhoto={() => {}}
-          onTakePicture={() => {}}
-        />
-
         {/* Switch to Renter Mode Button */}
         {/* <View style={profileStyles.switchButtonContainer}>
           <AppButton

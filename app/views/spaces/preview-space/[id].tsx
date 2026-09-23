@@ -31,6 +31,24 @@ const PreviewSpaces = () => {
         description: previewProperty.description,
       },
       amenities: previewProperty.amenities ?? [],
+      eventSpace:
+        previewProperty.event_space === "indoor" ||
+        previewProperty.event_space === "outdoor"
+          ? previewProperty.event_space
+          : undefined,
+      capacity: previewProperty.capacity
+        ? {
+            ...previewProperty.capacity,
+            caps: String(previewProperty.capacity.caps),
+          }
+        : undefined,
+      rentalAgreement: previewProperty.rental_agreement
+        ? {
+            uri: previewProperty.rental_agreement.file_url,
+            name: previewProperty.rental_agreement.name,
+            size: previewProperty.rental_agreement.size,
+          }
+        : null,
       media: (previewProperty.media ?? []).map((item, index) => ({
         id: item.public_id || `${index}`,
         uri: item.file_url,

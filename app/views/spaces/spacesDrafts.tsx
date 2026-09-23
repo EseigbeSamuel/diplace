@@ -10,14 +10,14 @@ import { useSpaceStore } from "@/store/useSpace";
 import { PropertyListItem } from "@/types";
 import { ColorScheme } from "@/utils";
 import { router } from "expo-router";
-import React, { useMemo } from "react";
+import { default as React, default as React, useMemo } from "react";
 import {
-    ActivityIndicator,
-    FlatList,
-    Image,
-    StyleSheet,
-    Text,
-    View,
+  ActivityIndicator,
+  FlatList,
+  Image,
+  StyleSheet,
+  Text,
+  View,
 } from "react-native";
 import { RFValue } from "react-native-responsive-fontsize";
 
@@ -48,9 +48,9 @@ const SpacesDrafts = ({ layout }: { layout: "tiles" | "box" }) => {
   const [selectedSpace, setSelectedSpace] =
     React.useState<PropertyCardItem | null>(null);
   const [isRemoveDialogVisible, setRemoveDialogVisible] = React.useState(false);
-  const snapPoints = useMemo(() => ["25%", "50%", "75%", "90%"], []);
+  const [isActionSheetVisible, setActionSheetVisible] = React.useState(false);
 
-  const handleAddSpace = (space: PropertyCardItem) => {
+  const handleViewDraft = (space: PropertyCardItem) => {
     setSelectedSpace(space);
     setIsAddSpaceSheetVisible(true);
   };
@@ -97,7 +97,7 @@ const SpacesDrafts = ({ layout }: { layout: "tiles" | "box" }) => {
       properties.map((item: PropertyListItem) => ({
         id: item.public_id,
         imageSource: item.media?.[0]?.file_url
-          ? { uri: item.media[0].file_url }
+          ? item.media[0].file_url
           : require("@/assets/images/featuredSpaceImage1.png"),
         title: item.title || "Untitled draft",
         location:
@@ -168,14 +168,14 @@ const SpacesDrafts = ({ layout }: { layout: "tiles" | "box" }) => {
         data={cardData}
         renderItem={({ item }) =>
           layout === "box" ? (
-            <HouseCard {...item} onPress={() => handleAddSpace(item)} />
+            <HouseCard {...item} onPress={() => handleViewDraft(item)} />
           ) : (
             <HouseCardTile
               imageSource={item.imageSource}
               name={item.title}
               location={item.location}
               badgeType={item.badgeType}
-              onPress={() => handleAddSpace(item)}
+              onPress={() => handleViewDraft(item)}
             />
           )
         }
@@ -204,10 +204,7 @@ const SpacesDrafts = ({ layout }: { layout: "tiles" | "box" }) => {
         <View style={homeStyles.modalContainer}>
           <View style={homeStyles.modalImageWrap}>
             <Image
-              source={
-                selectedSpace?.imageSource ||
-                require("@/assets/images/featuredSpaceImage1.png")
-              }
+              source={getPropertyImageSource(selectedSpace?.imageSource)}
               style={homeStyles.modalImage}
             />
           </View>
@@ -258,13 +255,31 @@ export default SpacesDrafts;
 
 type PropertyCardItem = {
   id: string;
-  imageSource: { uri: string } | number;
+  imageSource: ImageSourcePropType | string;
   title: string;
   location: string;
   badgeType?: string;
   price: string;
   duration: string;
   raw: PropertyListItem;
+};
+
+const getPropertyImageSource = (
+  imageSource?: ImageSourcePropType | string,
+): ImageSourcePropType => {
+  const remoteImageUri =
+    typeof imageSource === "string"
+      ? imageSource
+      : imageSource &&
+          typeof imageSource === "object" &&
+          "uri" in imageSource &&
+          typeof imageSource.uri === "string"
+        ? imageSource.uri
+        : "";
+
+  return remoteImageUri.length >= 7
+    ? { uri: remoteImageUri }
+    : require("@/assets/images/diplace.jpg");
 };
 
 const styles = (colors: ColorScheme) =>
@@ -289,6 +304,18 @@ const styles = (colors: ColorScheme) =>
       paddingTop: RFValue(10),
       paddingBottom: RFValue(16),
       alignItems: "center",
+    },
+    modalOverlay: {
+      flex: 1,
+      justifyContent: "flex-end",
+      backgroundColor: "rgba(0, 0, 0, 0.4)",
+    },
+    actionSheet: {
+      paddingHorizontal: RFValue(20),
+      paddingTop: RFValue(18),
+      backgroundColor: colors.background,
+      borderTopLeftRadius: RFValue(24),
+      borderTopRightRadius: RFValue(24),
     },
     modalImageWrap: {
       width: RFValue(112),

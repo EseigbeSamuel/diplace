@@ -2,7 +2,7 @@ import { AppHeader } from "@/components/header";
 import HeaderTabs from "@/components/headertab";
 import SafeAreaViewContainer from "@/components/safeareaview";
 import React, { useRef, useState } from "react";
-import { Image, Pressable } from "react-native";
+import { Image, Pressable, View } from "react-native";
 import SpacesDrafts from "../views/spaces/spacesDrafts";
 import SpacesPosted from "../views/spaces/spacesPosted";
 
@@ -38,12 +38,11 @@ export default function Spaces() {
           { id: "posted", label: "Posted" },
         ]}
         renderAfterIcon={
-          <Pressable>
+          <View>
             {layout === "box" ? (
               <Pressable
-                onPress={() => {
-                  setLayout("tiles");
-                }}
+                onPress={() => setLayout("tiles")}
+                hitSlop={8}
               >
                 <Image
                   source={require("@/assets/icons/list.png")}
@@ -51,18 +50,14 @@ export default function Spaces() {
                 />
               </Pressable>
             ) : (
-              <Pressable
-                onPress={() => {
-                  setLayout("box");
-                }}
-              >
+              <Pressable onPress={() => setLayout("box")} hitSlop={8}>
                 <Image
-                  source={require("@/assets/icons/flag.png")}
+                  source={require("@/assets/icons/more-1-line.png")}
                   className="w-6 h-6"
                 />
               </Pressable>
             )}
-          </Pressable>
+          </View>
         }
         initialActiveTab={activeTab}
         renderContent={renderContent}

@@ -46,6 +46,22 @@ export interface PropertyMediaPayload {
   file_url: string;
   file_type: "image" | "video";
   description: string;
+  media_role?: "gallery" | "walkthrough_video";
+}
+
+export interface PropertyCapacityPayload {
+  caps: number;
+  bathrooms: number;
+  kitchens: number;
+  rooms: number;
+  roomSize: string;
+  changingRooms: number;
+}
+
+export interface RentalAgreementPayload {
+  file_url: string;
+  name: string;
+  size: number;
 }
 
 export interface PropertyAddressPayload {
@@ -69,6 +85,9 @@ export interface CreatePropertyPayload {
   amenities: string[];
   media: PropertyMediaPayload[];
   address: PropertyAddressPayload;
+  event_space?: "indoor" | "outdoor" | null;
+  capacity?: PropertyCapacityPayload | null;
+  rental_agreement?: RentalAgreementPayload | null;
   metadata?: Record<string, unknown>;
   [key: string]: unknown;
 }
@@ -79,6 +98,8 @@ export type CreatePropertyDraftPayload = Partial<CreatePropertyPayload> & {
 
 export interface CreatePropertyResponse {
   public_id: string;
+  date_created: string;
+  date_modified: string;
   status: string;
   title: string;
   description: string;
@@ -88,6 +109,9 @@ export interface CreatePropertyResponse {
   cost_frequency: CostFrequency;
   fees: PropertyFeesPayload;
   amenities: string[];
+  event_space: "indoor" | "outdoor" | null;
+  capacity: PropertyCapacityPayload | null;
+  rental_agreement: RentalAgreementPayload | null;
   media: Array<
     PropertyMediaPayload & {
       public_id: string;
@@ -98,6 +122,10 @@ export interface CreatePropertyResponse {
   >;
   is_verified: boolean;
   verified_at: string | null;
+  lister: PropertyListUser;
+  address: PropertyListAddress;
+  avg_rating: number;
+  review_count: number;
 }
 
 export type UploadFilesResponse = string[];
@@ -155,6 +183,9 @@ export interface PropertyListItem {
   cost_frequency: CostFrequency;
   fees: PropertyFeesPayload;
   amenities: string[];
+  event_space: "indoor" | "outdoor" | null;
+  capacity: PropertyCapacityPayload | null;
+  rental_agreement: RentalAgreementPayload | null;
   media: Array<
     PropertyMediaPayload & {
       public_id: string;
@@ -362,8 +393,11 @@ export interface UpdatePropertyPayload {
   cost_frequency: CostFrequency;
   fees: PropertyFeesPayload;
   amenities: string[];
-  media: PropertyMediaPayload[];
+  media?: PropertyMediaPayload[];
   address_id: string;
+  event_space?: "indoor" | "outdoor" | null;
+  capacity?: PropertyCapacityPayload | null;
+  rental_agreement?: RentalAgreementPayload | null;
   metadata?: Record<string, unknown>;
   [key: string]: unknown;
 }
@@ -395,8 +429,8 @@ export interface PropertyDraftItem {
   owner_account_details: Record<string, unknown> | null;
   account_details: Record<string, unknown> | null;
   units: number;
-  event_space: string | null;
-  capacity: Record<string, unknown> | null;
+  event_space: "indoor" | "outdoor" | null;
+  capacity: PropertyCapacityPayload | null;
   inspection: {
     fee: number;
     time_slots: Array<{

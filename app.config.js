@@ -38,6 +38,7 @@ const googleMapsApiKey =
 
 module.exports = () => ({
   ...appJson.expo,
+  plugins: [...(appJson.expo.plugins ?? []), "expo-video"],
   android: {
     ...appJson.expo.android,
     config: {
@@ -53,4 +54,3 @@ module.exports = () => ({
     googleMapsApiKey,
   },
 });
-
