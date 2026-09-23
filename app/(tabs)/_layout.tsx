@@ -27,6 +27,10 @@ const TabLayout = () => {
 
   const { isVisible, open, close } = useBottomSheet();
 
+  function handleAddSpace() {
+    throw new Error("Function not implemented.");
+  }
+
   return (
     <View style={{ flex: 1, backgroundColor: colors.background }}>
       <Tabs
