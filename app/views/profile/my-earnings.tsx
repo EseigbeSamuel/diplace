@@ -1,7 +1,8 @@
 import SafeAreaViewContainer from "@/components/safeareaview";
-import SectionHeader from "@/components/sectionheader";
 import ViewHeader from "@/components/view-header";
 import { useTheme } from "@/contexts/themeContext";
+import { useMyTransactionHistory } from "@/hooks";
+import { Transaction } from "@/types/screens/transaction";
 import { ColorScheme } from "@/utils";
 import { useRouter } from "expo-router";
 import React from "react";
@@ -15,68 +16,32 @@ import {
 } from "react-native";
 import { RFValue } from "react-native-responsive-fontsize";
 
-interface Transaction {
-  id: number;
-  type: "reservation" | "inspection" | "booking";
-  description: string;
-  date: string;
-  amount: number;
-}
-
 const MyEarnings = ({ noHeader = false }) => {
   const { colors, isDarkMode } = useTheme();
   const router = useRouter();
   const earningsStyles = styles(colors);
 
-  const recentTransactions: Transaction[] = [
-    {
-      id: 1,
-      type: "reservation",
-      description: "Payment for reservation",
-      date: "Today, 08:00",
-      amount: 400000,
-    },
-    {
-      id: 2,
-      type: "inspection",
-      description: "Payment for inspection",
-      date: "01 Sept' 25, 14:23",
-      amount: 2000,
-    },
-    {
-      id: 3,
-      type: "booking",
-      description: "Payment for booking",
-      date: "29 Aug' 25, 12:58",
-      amount: 140000,
-    },
-    {
-      id: 4,
-      type: "inspection",
-      description: "Payment for inspection",
-      date: "20 Aug' 25, 14:23",
-      amount: 2000,
-    },
-    {
-      id: 5,
-      type: "booking",
-      description: "Payment for booking",
-      date: "20 Aug' 25, 12:58",
-      amount: 175000,
-    },
-  ];
+  const { transactionHistory, isTransactionHistoryLoading } =
+    useMyTransactionHistory({ limit: 100 });
+  const recentTransactions = transactionHistory.slice(0, 5);
+  const totalEarnings = transactionHistory
+    .filter((transaction) =>
+      ["approved", "completed", "verified"].includes(transaction.status),
+    )
+    .reduce((total, transaction) => total + transaction.amount, 0);
 
   const Wrapper = noHeader ? View : SafeAreaViewContainer;
 
-  const getTransactionIcon = (type: string) => {
-    switch (type) {
-      case "reservation":
+  const getTransactionIcon = (purpose: Transaction["purpose"]) => {
+    switch (purpose) {
+      case "booking_deposit":
         return require("@/assets/icons/Lock.png");
-      case "inspection":
+      case "inspection_fee":
         return isDarkMode
           ? require("@/assets/icons/calender-white.png")
           : require("@/assets/icons/calendar.png");
-      case "booking":
+      case "booking_rent":
+      case "booking_balance":
         return require("@/assets/icons/success.png");
       default:
         return require("@/assets/icons/success.png");
@@ -90,6 +55,19 @@ const MyEarnings = ({ noHeader = false }) => {
   const handleSeeAll = () => {
     router.push("/views/profile/recent-earnings");
   };
+
+  const formatCurrency = (amount: number) =>
+    `NGN ${amount.toLocaleString("en-NG")}`;
+  const getDescription = (purpose: Transaction["purpose"]) =>
+    purpose.replace(/_/g, " ").replace(/\b\w/g, (letter) => letter.toUpperCase());
+  const formatDate = (value?: string) =>
+    value
+      ? new Date(value).toLocaleDateString("en-NG", {
+          day: "numeric",
+          month: "short",
+          year: "numeric",
+        })
+      : "Recent";
 
   return (
     <Wrapper>
@@ -105,14 +83,21 @@ const MyEarnings = ({ noHeader = false }) => {
                 source={require("@/assets/icons/password-hide.png")}
                 style={earningsStyles.eyeIcon}
               />
+              <View style={earningsStyles.liveEarningsAmount}>
+                <Text style={earningsStyles.earningsAmount}>
+                  {formatCurrency(totalEarnings)}
+                </Text>
+              </View>
             </View>
             <View style={earningsStyles.earningsStats}>
               <Image
                 source={require("@/assets/icons/trend-up-thin.png")}
                 style={earningsStyles.trendingIcon}
               />
-              <Text style={earningsStyles.statsText}>+5.5%</Text>
-              <Text style={earningsStyles.statsLabel}>All time</Text>
+              <Text style={earningsStyles.statsText}>
+                {transactionHistory.length}
+              </Text>
+              <Text style={earningsStyles.statsLabel}>transactions</Text>
               <Image
                 source={require("@/assets/icons/chevron-down.png")}
                 style={earningsStyles.chevronDownIcon}
@@ -138,29 +123,33 @@ const MyEarnings = ({ noHeader = false }) => {
 
           {/* Transaction List */}
           <View style={earningsStyles.transactionList}>
-            {recentTransactions.map((transaction) => (
-              <View key={transaction.id} style={earningsStyles.transactionCard}>
+            {isTransactionHistoryLoading ? (
+              <Text style={earningsStyles.transactionDate}>Loading earnings...</Text>
+            ) : recentTransactions.length ? recentTransactions.map((transaction) => (
+              <View key={transaction.public_id} style={earningsStyles.transactionCard}>
                 <View style={earningsStyles.transactionLeft}>
                   <View style={earningsStyles.iconContainer}>
                     <Image
-                      source={getTransactionIcon(transaction.type)}
+                      source={getTransactionIcon(transaction.purpose)}
                       style={earningsStyles.transactionIcon}
                     />
                   </View>
                   <View style={earningsStyles.transactionInfo}>
                     <Text style={earningsStyles.transactionDescription}>
-                      {transaction.description}
+                      {getDescription(transaction.purpose)}
                     </Text>
                     <Text style={earningsStyles.transactionDate}>
-                      {transaction.date}
+                      {formatDate(transaction.date_created)}
                     </Text>
                   </View>
                 </View>
                 <Text style={earningsStyles.transactionAmount}>
-                  +{formatAmount(transaction.amount)}
+                  {formatCurrency(transaction.amount)}
                 </Text>
               </View>
-            ))}
+            )) : (
+              <Text style={earningsStyles.transactionDate}>No transactions yet.</Text>
+            )}
           </View>
         </View>
       </ScrollView>
@@ -191,12 +180,22 @@ const styles = (colors: ColorScheme) =>
       flexDirection: "row",
       alignItems: "center",
       marginBottom: RFValue(16),
+      position: "relative",
     },
     earningsAmount: {
       fontSize: RFValue(27),
       fontWeight: "700",
       color: colors.slate[100],
       marginRight: RFValue(12),
+    },
+    liveEarningsAmount: {
+      position: "absolute",
+      left: 0,
+      top: 0,
+      bottom: 0,
+      backgroundColor: colors.slate[650],
+      justifyContent: "center",
+      paddingRight: RFValue(8),
     },
     eyeIcon: {
       width: RFValue(24),

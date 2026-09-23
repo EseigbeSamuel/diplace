@@ -1,6 +1,19 @@
 export interface Transaction {
-  id: string;
+  public_id: string;
+  tx_ref: string;
+  gateway_tx_ref: string | null;
+  payment_gateway: string;
   amount: number;
+  currency: string;
+  purpose:
+    | "inspection_fee"
+    | "booking_rent"
+    | "booking_deposit"
+    | "booking_balance"
+    | "service_charge"
+    | "promotion_fee"
+    | "subscription_fee";
+  related_id: string;
   status:
     | "pending"
     | "approved"
@@ -14,14 +27,17 @@ export interface Transaction {
     | "active"
     | "inactive"
     | "deleted";
-  date_created: string;
+  date_created?: string;
 }
 
 export interface TransactionHistoryResponse {
-  data: Transaction[];
-  total: number;
-  skip: number;
-  limit: number;
+  items: Transaction[];
+  pagination: {
+    total_items: number;
+    limit: number;
+    skip: number;
+    total_pages: number;
+  };
 }
 
 export interface TransactionQueryParams {

@@ -7,7 +7,6 @@ import {
   Image,
   ScrollView,
   Alert,
-  Modal,
 } from "react-native";
 import { RFValue } from "react-native-responsive-fontsize";
 import * as ImagePicker from "expo-image-picker";
@@ -23,6 +22,8 @@ interface MediaUploadSubstepProps {
   onPrev: () => void;
 }
 
+const MAX_MEDIA_ITEMS = 8;
+
 const MediaUploadSubstep: React.FC<MediaUploadSubstepProps> = ({
   onNext,
   onPrev,
@@ -31,85 +32,116 @@ const MediaUploadSubstep: React.FC<MediaUploadSubstepProps> = ({
   const styles = createStyles(colors);
   const { setValue, setType, spaceForm } = useSpaceStore();
   const [showMediaPicker, setShowMediaPicker] = useState(false);
+  const [isPickingMedia, setIsPickingMedia] = useState(false);
   const media = spaceForm.value.media ?? [];
 
-  const requestPermissions = async () => {
-    const { status: cameraStatus } =
-      await ImagePicker.requestCameraPermissionsAsync();
-    const { status: mediaLibraryStatus } =
-      await ImagePicker.requestMediaLibraryPermissionsAsync();
-
-    if (cameraStatus !== "granted" || mediaLibraryStatus !== "granted") {
+  const requestMediaLibraryPermission = async () => {
+    const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+    if (status !== "granted") {
       Alert.alert(
         "Permission Required",
-        "Please grant camera and photo library permissions to upload media"
+        "Please grant photo library access to upload media.",
       );
       return false;
     }
     return true;
   };
 
-  const handleOpenMediaPicker = async () => {
-    const hasPermission = await requestPermissions();
-    if (hasPermission) {
-      setShowMediaPicker(true);
+  const requestCameraPermission = async () => {
+    const { status } = await ImagePicker.requestCameraPermissionsAsync();
+    if (status !== "granted") {
+      Alert.alert("Permission Required", "Please grant camera access to record media.");
+      return false;
     }
+    return true;
+  };
+
+  const handleOpenMediaPicker = () => {
+    if (isPickingMedia) return;
+    if (media.length >= MAX_MEDIA_ITEMS) {
+      Alert.alert("Media limit reached", `You can add up to ${MAX_MEDIA_ITEMS} files.`);
+      return;
+    }
+    setShowMediaPicker(true);
   };
 
   const pickFromGallery = async () => {
     setShowMediaPicker(false);
+    const hasPermission = await requestMediaLibraryPermission();
+    if (!hasPermission || isPickingMedia) return;
 
-    const result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.All,
-      allowsMultipleSelection: true,
-      quality: 0.8,
-      allowsEditing: false,
-    });
+    setIsPickingMedia(true);
+    try {
+      const result = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: ["images", "videos"],
+        allowsMultipleSelection: true,
+        selectionLimit: Math.max(1, MAX_MEDIA_ITEMS - media.length),
+        orderedSelection: true,
+        quality: 0.7,
+        allowsEditing: false,
+      });
 
-    if (!result.canceled) {
-      const newMedia: MediaItem[] = result.assets.map((asset) => ({
-        uri: asset.uri,
-        type: asset.type === "video" ? "video" : "image",
-        id: Math.random().toString(36).substring(7),
-      }));
-      setValue({ media: [...media, ...newMedia] });
+      if (!result.canceled) {
+        const newMedia: MediaItem[] = result.assets.map((asset) => ({
+          uri: asset.uri,
+          type: asset.type === "video" ? "video" : "image",
+          id: Math.random().toString(36).substring(7),
+        }));
+        setValue({ media: [...media, ...newMedia] });
+      }
+    } finally {
+      setIsPickingMedia(false);
     }
   };
 
   const takePicture = async () => {
     setShowMediaPicker(false);
+    const hasPermission = await requestCameraPermission();
+    if (!hasPermission || isPickingMedia) return;
 
-    const result = await ImagePicker.launchCameraAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.Images,
-      quality: 0.8,
-      allowsEditing: true,
-    });
+    setIsPickingMedia(true);
+    try {
+      const result = await ImagePicker.launchCameraAsync({
+        mediaTypes: ["images"],
+        quality: 0.7,
+        allowsEditing: true,
+      });
 
-    if (!result.canceled) {
-      const newMedia: MediaItem = {
-        uri: result.assets[0].uri,
-        type: "image",
-        id: Math.random().toString(36).substring(7),
-      };
-      setValue({ media: [...media, newMedia] });
+      if (!result.canceled) {
+        const newMedia: MediaItem = {
+          uri: result.assets[0].uri,
+          type: "image",
+          id: Math.random().toString(36).substring(7),
+        };
+        setValue({ media: [...media, newMedia] });
+      }
+    } finally {
+      setIsPickingMedia(false);
     }
   };
 
   const recordVideo = async () => {
     setShowMediaPicker(false);
+    const hasPermission = await requestCameraPermission();
+    if (!hasPermission || isPickingMedia) return;
 
-    const result = await ImagePicker.launchCameraAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.Videos,
-      quality: 0.8,
-    });
+    setIsPickingMedia(true);
+    try {
+      const result = await ImagePicker.launchCameraAsync({
+        mediaTypes: ["videos"],
+        quality: 0.7,
+      });
 
-    if (!result.canceled) {
-      const newMedia: MediaItem = {
-        uri: result.assets[0].uri,
-        type: "video",
-        id: Math.random().toString(36).substring(7),
-      };
-      setValue({ media: [...media, newMedia] });
+      if (!result.canceled) {
+        const newMedia: MediaItem = {
+          uri: result.assets[0].uri,
+          type: "video",
+          id: Math.random().toString(36).substring(7),
+        };
+        setValue({ media: [...media, newMedia] });
+      }
+    } finally {
+      setIsPickingMedia(false);
     }
   };
 
@@ -144,6 +176,7 @@ const MediaUploadSubstep: React.FC<MediaUploadSubstepProps> = ({
             <Pressable
               style={styles.gallerySection}
               onPress={handleOpenMediaPicker}
+              disabled={isPickingMedia}
             >
               <View style={styles.galleryHeader}>
                 <Text style={styles.galleryText}>Gallery</Text>
@@ -178,6 +211,7 @@ const MediaUploadSubstep: React.FC<MediaUploadSubstepProps> = ({
               <Pressable
                 style={styles.uploadMoreButton}
                 onPress={handleOpenMediaPicker}
+                disabled={isPickingMedia}
               >
                 <Image
                   source={require("@/assets/icons/Upload - Iconly Pro.png")}
@@ -193,10 +227,20 @@ const MediaUploadSubstep: React.FC<MediaUploadSubstepProps> = ({
             <View style={styles.mediaGrid}>
               {media.map((item) => (
                   <View key={item.id} style={styles.mediaItem}>
-                    <Image
-                      source={{ uri: item.uri }}
-                      style={styles.mediaImage}
-                    />
+                    {item.type === "image" ? (
+                      <Image
+                        source={{ uri: item.uri }}
+                        style={styles.mediaImage}
+                        resizeMode="cover"
+                      />
+                    ) : (
+                      <View style={styles.videoPreview}>
+                        <Image
+                          source={require("@/assets/icons/Video - Iconly Pro.png")}
+                          style={styles.videoPreviewIcon}
+                        />
+                      </View>
+                    )}
                     <Pressable
                       style={styles.removeButton}
                       onPress={() => removeMedia(item.id)}
@@ -342,6 +386,17 @@ const createStyles = (colors: ColorScheme) =>
     mediaImage: {
       width: "100%",
       height: "100%",
+    },
+    videoPreview: {
+      flex: 1,
+      alignItems: "center",
+      justifyContent: "center",
+      backgroundColor: colors.slate[300],
+    },
+    videoPreviewIcon: {
+      width: RFValue(32),
+      height: RFValue(32),
+      tintColor: colors.slate[650],
     },
     removeButton: {
       position: "absolute",

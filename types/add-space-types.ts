@@ -26,6 +26,7 @@ export interface MediaItem {
     uri: string;
     type: "image" | "video";
     id: string;
+    remoteId?: string;
 }
 export interface AgreementFile {
     uri: string;

@@ -5,7 +5,7 @@ import {
 } from "@/types/screens/transaction";
 import { useQuery } from "@tanstack/react-query";
 
-export const useTransactionHistory = (params: TransactionQueryParams = {}) => {
+export const useMyTransactionHistory = (params: TransactionQueryParams = {}) => {
   const { data, isLoading, error, refetch, isFetching } = useQuery({
     queryKey: ["transactions", "me", params],
     queryFn: async () => {
@@ -27,7 +27,8 @@ export const useTransactionHistory = (params: TransactionQueryParams = {}) => {
   });
 
   return {
-    transactionHistory: data,
+    transactionHistory: data?.items ?? [],
+    transactionPagination: data?.pagination,
     isTransactionHistoryLoading: isLoading,
     transactionHistoryError: error,
     refetchTransactionHistory: refetch,

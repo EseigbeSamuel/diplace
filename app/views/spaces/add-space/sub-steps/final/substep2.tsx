@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   View,
   Text,
@@ -12,7 +12,10 @@ import DateTimePickerModal from "react-native-modal-datetime-picker";
 import AppButton from "@/components/button";
 import { useTheme } from "@/contexts/themeContext";
 import { ColorScheme } from "@/utils";
-import { useSpaceStore } from "@/store/useSpace";
+import {
+  createDefaultInspectionTimeSlots,
+  useSpaceStore,
+} from "@/store/useSpace";
 import { SimpleSelector } from "@/components/selector";
 
 interface TimeSlot {
@@ -39,6 +42,11 @@ const InspectionTimeSubstep: React.FC<InspectionTimeSubstepProps> = ({
   const [pickerMode, setPickerMode] = useState<"start" | "end">("start");
   const [tempStartTime, setTempStartTime] = useState(new Date());
   const [tempEndTime, setTempEndTime] = useState(new Date());
+
+  useEffect(() => {
+    if ((spaceForm.value.inspectionTimeSlots?.length ?? 0) > 0) return;
+    setValue({ inspectionTimeSlots: createDefaultInspectionTimeSlots() });
+  }, [setValue, spaceForm.value.inspectionTimeSlots]);
 
   const toggleSlotSelection = (id: string) => {
     const updatedSlots = spaceForm.value.inspectionTimeSlots?.map((slot) =>

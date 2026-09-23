@@ -1,4 +1,4 @@
-import { getFromLocalStore } from "@/lib";
+import { uploadAssets as uploadFiles, type UploadAsset } from "@/services/upload";
 import { SpaceValue } from "@/store/useSpace";
 import {
   CostFrequency,
@@ -7,14 +7,8 @@ import {
   PropertyFeesPayload,
   PropertyMediaPayload,
   UpdatePropertyPayload,
-  UploadFilesResponse,
 } from "@/types";
 import { MediaItem, SpaceType } from "@/types/add-space-types";
-
-// Keep uploads on the same API host used by the query client. The previous
-// host has an invalid TLS chain, which prevented newly created properties
-// from being uploaded and consequently from appearing in Discover.
-export const API_BASE_URL = "https://api-diplace.elsoft.ng/api/v1";
 
 const PROPERTY_TYPE_MAP: Record<
   Exclude<SpaceType, null>,
@@ -126,33 +120,7 @@ const extractFees = (
   return fees;
 };
 
-type UploadAsset = {
-  uri: string;
-  type: string;
-  name?: string;
-};
-
-const UPLOAD_BATCH_SIZE = 2;
-
-const buildUploadFormData = (assets: UploadAsset[]) => {
-  const formData = new FormData();
-
-  assets.forEach((item, index) => {
-    const ext =
-      getExtFromUri(item.uri) ||
-      (item.type.startsWith("video") ? "mp4" : "jpg");
-    const mime = item.type || getMimeFromExt(ext, "application/octet-stream");
-    const name = item.name || `upload-${index}.${ext}`;
-
-    formData.append("files", {
-      uri: item.uri,
-      name,
-      type: mime,
-    } as never);
-  });
-
-  return formData;
-};
+const UPLOAD_BATCH_SIZE = 1;
 
 const uploadAssets = async (
   assets: UploadAsset[],
@@ -163,42 +131,13 @@ const uploadAssets = async (
   console.log(`CreateProperty: ${label} upload input`, assets);
 
   const collectedUrls: string[] = [];
-  const token = await getFromLocalStore("access_token");
-
-  if (!token) {
-    throw new Error("Missing access token for upload.");
-  }
-
   for (let index = 0; index < assets.length; index += UPLOAD_BATCH_SIZE) {
     const batch = assets.slice(index, index + UPLOAD_BATCH_SIZE);
     try {
-      const response = await fetch(`${API_BASE_URL}/uploads/`, {
-        method: "POST",
-        headers: {
-          Accept: "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: buildUploadFormData(batch),
-      });
-
-      const responseText = await response.text();
-      if (!response.ok) {
-        console.log(`CreateProperty: ${label} upload failed response`, {
-          status: response.status,
-          body: responseText,
-        });
-        throw new Error(
-          `Upload failed with status ${response.status}: ${responseText || "No response body"}`,
-        );
-      }
-
-      let batchResponse: UploadFilesResponse = [];
-      try {
-        batchResponse = JSON.parse(responseText) as UploadFilesResponse;
-      } catch {
-        throw new Error(`Invalid upload response: ${responseText}`);
-      }
-
+      const batchResponse = await uploadFiles(
+        batch,
+        `${label} batch ${index / UPLOAD_BATCH_SIZE + 1}`,
+      );
       collectedUrls.push(...batchResponse);
       console.log(
         `CreateProperty: ${label} batch ${index / UPLOAD_BATCH_SIZE + 1} response URLs`,
@@ -245,6 +184,8 @@ const uploadMedia = async (
     file_url: url,
     file_type: media[index]?.type ?? "image",
     description: "",
+    media_role:
+      media[index]?.type === "video" ? "walkthrough_video" : "gallery",
   }));
 };
 
@@ -293,6 +234,21 @@ const uploadTours = async (
     room_name: preparedTours[index]?.roomName || `Room ${index + 1}`,
     duration: preparedTours[index]?.duration || 0,
   }));
+};
+
+const normalizeCapacity = (
+  capacity: SpaceValue["capacity"],
+): CreatePropertyPayload["capacity"] => {
+  if (!capacity) return null;
+
+  return {
+    caps: parseNumber(String(capacity.caps ?? "0")),
+    bathrooms: capacity.bathrooms ?? 0,
+    kitchens: capacity.kitchens ?? 0,
+    rooms: capacity.rooms ?? 0,
+    roomSize: capacity.roomSize ?? "",
+    changingRooms: capacity.changingRooms ?? 0,
+  };
 };
 
 const buildPropertyPayload = async ({
@@ -370,7 +326,7 @@ const buildPropertyPayload = async ({
     account_details: value.accountDetails ?? null,
     units: value.units ?? 0,
     event_space: value.eventSpace ?? null,
-    capacity: value.capacity ?? null,
+    capacity: normalizeCapacity(value.capacity),
     inspection: {
       fee: value.inspectionFee ?? 0,
       time_slots: selectedInspectionSlots,
@@ -378,16 +334,27 @@ const buildPropertyPayload = async ({
     rental_agreement: uploadedRentalAgreement
       ? {
         file_url: uploadedRentalAgreement,
-        name: value.rentalAgreement?.name ?? null,
-        size: value.rentalAgreement?.size ?? null,
+        name: value.rentalAgreement?.name ?? "rental-agreement",
+        size: value.rentalAgreement?.size ?? 0,
       }
       : null,
-    virtual_tour: uploadedTours,
     metadata: {
       max_rent_payout: parseNumber(value.rentalCost?.maxRentPayout),
       other_charges: value.otherCharges ?? [],
     },
   };
+
+  if (uploadedTours.length) {
+    payload.media = [
+      ...uploadedMedia,
+      ...uploadedTours.map((tour) => ({
+        file_url: tour.file_url,
+        file_type: "video" as const,
+        description: tour.room_name,
+        media_role: "walkthrough_video" as const,
+      })),
+    ];
+  }
 
   return payload as CreatePropertyPayload | CreatePropertyDraftPayload;
 };
@@ -446,7 +413,6 @@ export const buildUpdatePayload = async ({
     cost_frequency: costFrequency,
     fees: extractFees(value.otherCharges),
     amenities: value.amenities ?? [],
-    media: await uploadMedia(value.media ?? []),
     address_id: addressId,
     ...(value.location
       ? {
@@ -467,13 +433,20 @@ export const buildUpdatePayload = async ({
     account_details: value.accountDetails ?? null,
     units: value.units ?? 0,
     event_space: value.eventSpace ?? null,
-    capacity: value.capacity ?? null,
+    capacity: normalizeCapacity(value.capacity),
     inspection: {
       fee: value.inspectionFee ?? 0,
       time_slots: (value.inspectionTimeSlots ?? []).filter(
         (slot) => slot.selected,
       ),
     },
+    rental_agreement: value.rentalAgreement
+      ? {
+          file_url: value.rentalAgreement.uri,
+          name: value.rentalAgreement.name,
+          size: value.rentalAgreement.size,
+        }
+      : null,
     metadata: {
       max_rent_payout: parseNumber(value.rentalCost?.maxRentPayout),
       other_charges: value.otherCharges ?? [],

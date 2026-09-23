@@ -17,6 +17,7 @@ import {
   UpdatePropertyPayload,
 } from "@/types";
 import { SpaceType } from "@/types/add-space-types";
+import { MediaItem } from "@/types/add-space-types";
 import {
   useInfiniteQuery,
   useMutation,
@@ -29,6 +30,66 @@ import {
   getApiErrorMessage,
   normalizeListParams,
 } from "./shared";
+
+const getMediaRole = (item: MediaItem) =>
+  item.type === "video" ? "walkthrough_video" : "gallery";
+
+const syncPropertyMedia = async ({
+  propertyId,
+  value,
+}: {
+  propertyId: string;
+  value: SpaceValue;
+}) => {
+  const currentMedia = value.media ?? [];
+  const retainedMediaIds = new Set(
+    currentMedia.map((item) => item.remoteId).filter(Boolean),
+  );
+  const removedMedia = (value.existingMedia ?? []).filter(
+    (item) => item.remoteId && !retainedMediaIds.has(item.remoteId),
+  );
+
+  await Promise.all(
+    removedMedia.map((item) =>
+      deleteRequest<void>({
+        url: `/properties/${propertyId}/media/${item.remoteId}`,
+        notifyOnError: false,
+      }),
+    ),
+  );
+
+  const newMedia = currentMedia.filter((item) => !item.remoteId);
+  const mediaByRole = newMedia.reduce<Record<string, MediaItem[]>>(
+    (groups, item) => {
+      const role = getMediaRole(item);
+      groups[role] = [...(groups[role] ?? []), item];
+      return groups;
+    },
+    {},
+  );
+
+  await Promise.all(
+    Object.entries(mediaByRole).map(async ([role, media]) => {
+      const formData = new FormData();
+      media.forEach((item, index) => {
+        const extension = item.type === "video" ? "mp4" : "jpg";
+        formData.append("files", {
+          uri: item.uri,
+          type: item.type === "video" ? "video/mp4" : "image/jpeg",
+          name: `property-media-${index}.${extension}`,
+        } as never);
+      });
+      formData.append("role", role);
+      formData.append("description", "");
+
+      await postRequest({
+        url: `/properties/${propertyId}/media`,
+        payload: formData,
+        notifyOnError: false,
+      });
+    }),
+  );
+};
 
 export function useCreateProperty() {
   const queryClient = useQueryClient();
@@ -95,11 +156,13 @@ export function useUpdateProperty() {
       let payload: UpdatePropertyPayload | undefined;
       try {
         payload = await buildUpdatePayload({ type, value, addressId });
-        return await putRequest<CreatePropertyResponse, UpdatePropertyPayload>({
+        const response = await putRequest<CreatePropertyResponse, UpdatePropertyPayload>({
           url: `/properties/${propertyId}`,
           payload,
           notifyOnError: false,
         });
+        await syncPropertyMedia({ propertyId, value });
+        return response;
       } catch (error) {
         console.log("UpdateProperty: attempted payload before failure", payload);
         throw error;

@@ -1,24 +1,32 @@
-import { CustomBottomSheet } from "@/components/bottom-sheet";
 import AppButton from "@/components/button";
 import ConfirmDialog from "@/components/confirm-dialog";
 import Filter from "@/components/filter";
 import HouseCard from "@/components/housecard";
 import HouseCardTile from "@/components/houseCardTile";
+import { SimpleSelector } from "@/components/selector";
+import { useTheme } from "@/contexts/themeContext";
 import {
   useDeleteProperty,
   useGetCurrentUser,
   useListProperties,
   useUpdatePropertyStatus,
 } from "@/hooks";
-import { SimpleSelector } from "@/components/selector";
-import { useTheme } from "@/contexts/themeContext";
 import { useSpaceStore } from "@/store/useSpace";
 import { PropertyListItem } from "@/types";
 import { ColorScheme } from "@/utils";
-import { BottomSheetModal } from "@gorhom/bottom-sheet";
 import { router } from "expo-router";
-import React, { useMemo, useRef, useState } from "react";
-import { ActivityIndicator, FlatList, Image, StyleSheet, Text, View } from "react-native";
+import React, { useMemo, useState } from "react";
+import {
+  ActivityIndicator,
+  FlatList,
+  Image,
+  ImageSourcePropType,
+  Modal,
+  Pressable,
+  StyleSheet,
+  Text,
+  View,
+} from "react-native";
 
 import { RFValue } from "react-native-responsive-fontsize";
 
@@ -26,8 +34,12 @@ const SpacesPosted = ({ layout }: { layout: "tiles" | "box" }) => {
   const { colors } = useTheme();
   const homeStyles = styles(colors);
   const { setPreviewProperty, setEditingDraft } = useSpaceStore();
-  const { currentUser, isCurrentUserLoading, currentUserError, refetchCurrentUser } =
-    useGetCurrentUser();
+  const {
+    currentUser,
+    isCurrentUserLoading,
+    currentUserError,
+    refetchCurrentUser,
+  } = useGetCurrentUser();
   const {
     properties,
     isPropertiesLoading,
@@ -48,17 +60,18 @@ const SpacesPosted = ({ layout }: { layout: "tiles" | "box" }) => {
   const { deletePropertyMutation, deletePropertyPending } = useDeleteProperty();
   const { updatePropertyStatusMutation, updatePropertyStatusPending } =
     useUpdatePropertyStatus();
-  const viewSpaceref = useRef<BottomSheetModal>(null);
-  const viewUpdateStatus = useRef<BottomSheetModal>(null);
   const [isRemoveDialogVisible, setRemoveDialogVisible] = useState(false);
+  const [isActionSheetVisible, setActionSheetVisible] = useState(false);
+  const [isStatusSheetVisible, setStatusSheetVisible] = useState(false);
   const [selectedStatus, setSelectedStatus] = useState<
     "active" | "pending" | "rented" | "sold" | "inactive" | "archived"
   >("active");
-  const [selectedSpace, setSelectedSpace] = useState<PropertyCardItem | null>(null);
-  const snapPoints = useMemo(() => ["62%"], []);
-  const statusSnapPoints = useMemo(() => ["56%"], []);
+  const [selectedSpace, setSelectedSpace] = useState<PropertyCardItem | null>(
+    null,
+  );
   const prettyStatus = (status?: string) =>
-    (status || "active").charAt(0).toUpperCase() + (status || "active").slice(1);
+    (status || "active").charAt(0).toUpperCase() +
+    (status || "active").slice(1);
   const mapPropertyStatusToSelector = (
     status?: string,
   ): "active" | "pending" | "rented" | "sold" | "inactive" | "archived" => {
@@ -73,18 +86,16 @@ const SpacesPosted = ({ layout }: { layout: "tiles" | "box" }) => {
 
   const handleViewSpace = (space: PropertyCardItem) => {
     setSelectedSpace(space);
-    viewSpaceref.current?.present();
+    setActionSheetVisible(true);
   };
   const handleViewUpdateStatus = () => {
     setSelectedStatus(mapPropertyStatusToSelector(selectedSpace?.raw?.status));
-    viewSpaceref.current?.dismiss();
-    setTimeout(() => {
-      viewUpdateStatus.current?.present();
-    }, 180);
+    setActionSheetVisible(false);
+    setStatusSheetVisible(true);
   };
   const handleEditSpace = () => {
     if (!selectedSpace?.id) return;
-    viewSpaceref.current?.dismiss();
+    setActionSheetVisible(false);
     setEditingDraft(null);
     router.push({
       pathname: "/views/spaces/add-space/form",
@@ -94,7 +105,7 @@ const SpacesPosted = ({ layout }: { layout: "tiles" | "box" }) => {
 
   const handlePreviewSpace = () => {
     if (!selectedSpace?.raw) return;
-    viewSpaceref.current?.dismiss();
+    setActionSheetVisible(false);
     setPreviewProperty(selectedSpace.raw);
     router.push({
       pathname: "/views/spaces/preview-space/[id]",
@@ -103,11 +114,11 @@ const SpacesPosted = ({ layout }: { layout: "tiles" | "box" }) => {
   };
 
   const handlePromoteSpace = () => {
-    viewSpaceref.current?.dismiss();
+    setActionSheetVisible(false);
   };
 
   const handleRemoveSpace = () => {
-    viewSpaceref.current?.dismiss();
+    setActionSheetVisible(false);
     setRemoveDialogVisible(true);
   };
 
@@ -133,7 +144,7 @@ const SpacesPosted = ({ layout }: { layout: "tiles" | "box" }) => {
         status: selectedStatus,
       });
       await refetchProperties();
-      viewUpdateStatus.current?.dismiss();
+      setStatusSheetVisible(false);
     } catch {
       // Toast handled in mutation onError
     }
@@ -141,7 +152,8 @@ const SpacesPosted = ({ layout }: { layout: "tiles" | "box" }) => {
   const formatCurrency = (amount: number) =>
     `NGN ${new Intl.NumberFormat("en-NG").format(amount || 0)}`;
 
-  const formatCostFrequency = (value: string) => value.replace(/^per_/, "").replace(/_/g, " ");
+  const formatCostFrequency = (value: string) =>
+    value.replace(/^per_/, "").replace(/_/g, " ");
 
   const getBadgeType = (item: PropertyListItem): string | undefined => {
     const status = item.status?.toLowerCase?.();
@@ -151,7 +163,8 @@ const SpacesPosted = ({ layout }: { layout: "tiles" | "box" }) => {
   };
 
   const postedSpaces = useMemo(
-    () => properties.filter((item) => !["draft", "deleted"].includes(item.status)),
+    () =>
+      properties.filter((item) => !["draft", "deleted"].includes(item.status)),
     [properties],
   );
 
@@ -160,7 +173,7 @@ const SpacesPosted = ({ layout }: { layout: "tiles" | "box" }) => {
       postedSpaces.map((item) => ({
         id: item.public_id,
         imageSource: item.media?.[0]?.file_url
-          ? { uri: item.media[0].file_url }
+          ? item.media[0].file_url
           : require("@/assets/images/featuredSpaceImage1.png"),
         title: item.title || "Untitled space",
         location:
@@ -262,153 +275,164 @@ const SpacesPosted = ({ layout }: { layout: "tiles" | "box" }) => {
           ) : null
         }
       />
-      <CustomBottomSheet
-        bottomSheetProps={{
-          ref: viewSpaceref,
-          snapPoints,
-          index: 0,
-        }}
+      <Modal
+        transparent
+        animationType="slide"
+        visible={isActionSheetVisible}
+        onRequestClose={() => setActionSheetVisible(false)}
       >
-        <View style={homeStyles.modalContainer}>
-          <View style={homeStyles.modalImageWrap}>
-            <Image
-              source={
-                selectedSpace?.imageSource ||
-                require("@/assets/images/featuredSpaceImage1.png")
-              }
-              style={homeStyles.modalImage}
-            />
-          </View>
+        <View style={homeStyles.modalOverlay}>
+          <Pressable
+            style={StyleSheet.absoluteFill}
+            onPress={() => setActionSheetVisible(false)}
+          />
+          <View style={homeStyles.actionSheet}>
+            <View style={homeStyles.modalContainer}>
+              <View style={homeStyles.modalImageWrap}>
+                <Image
+                  source={getPropertyImageSource(selectedSpace?.imageSource)}
+                  style={homeStyles.modalImage}
+                />
+              </View>
 
-          <View style={homeStyles.modalCopy}>
-            <Text style={homeStyles.modalTitle}>
-              {selectedSpace?.title || "Untitled space"}
-            </Text>
-            <Text style={homeStyles.modalSubtitle}>
-              {selectedSpace?.location || "Unknown location"}
-            </Text>
-          </View>
+              <View style={homeStyles.modalCopy}>
+                <Text style={homeStyles.modalTitle}>
+                  {selectedSpace?.title || "Untitled space"}
+                </Text>
+                <Text style={homeStyles.modalSubtitle}>
+                  {selectedSpace?.location || "Unknown location"}
+                </Text>
+              </View>
 
-          <View style={homeStyles.actionsWrap}>
-            <AppButton
-              title="Update Status"
-              onPress={handleViewUpdateStatus}
-              afterIcon={require("@/assets/icons/tag.png")}
-              fullwidth
-            />
-            <AppButton
-              title="Edit Space"
-              afterIcon={require("@/assets/icons/edit-pencil.png")}
-              variant="tertiary"
-              onPress={handleEditSpace}
-              fullwidth
-            />
-            <AppButton
-              title="Preview space"
-              afterIcon={require("@/assets/icons/show.png")}
-              variant="tertiary"
-              onPress={handlePreviewSpace}
-              fullwidth
-            />
-            <AppButton
-              title="Promote space"
-              afterIcon={require("@/assets/icons/show.png")}
-              variant="tertiary"
-              onPress={handlePromoteSpace}
-              fullwidth
-            />
-            <AppButton
-              title="Remove Space"
-              onPress={handleRemoveSpace}
-              variant="tertiary"
-              afterIcon={require("@/assets/icons/delete.png")}
-              fullwidth
-            />
+              <View style={homeStyles.actionsWrap}>
+                <AppButton
+                  title="Update Status"
+                  onPress={handleViewUpdateStatus}
+                  afterIcon={require("@/assets/icons/tag.png")}
+                  fullwidth
+                />
+                <AppButton
+                  title="Edit Space"
+                  afterIcon={require("@/assets/icons/edit-pencil.png")}
+                  variant="tertiary"
+                  onPress={handleEditSpace}
+                  fullwidth
+                />
+                <AppButton
+                  title="Preview space"
+                  afterIcon={require("@/assets/icons/show.png")}
+                  variant="tertiary"
+                  onPress={handlePreviewSpace}
+                  fullwidth
+                />
+                <AppButton
+                  title="Promote space"
+                  afterIcon={require("@/assets/icons/show.png")}
+                  variant="tertiary"
+                  onPress={handlePromoteSpace}
+                  fullwidth
+                />
+                <AppButton
+                  title="Remove Space"
+                  onPress={handleRemoveSpace}
+                  variant="tertiary"
+                  afterIcon={require("@/assets/icons/delete.png")}
+                  fullwidth
+                />
+              </View>
+            </View>
           </View>
         </View>
-      </CustomBottomSheet>
-      <CustomBottomSheet
-        bottomSheetProps={{
-          ref: viewUpdateStatus,
-          snapPoints: statusSnapPoints,
-          index: 0,
-        }}
+      </Modal>
+      <Modal
+        transparent
+        animationType="slide"
+        visible={isStatusSheetVisible}
+        onRequestClose={() => setStatusSheetVisible(false)}
       >
-        <View style={homeStyles.modalContainer}>
-          <Text style={homeStyles.title}>Update current status</Text>
+        <View style={homeStyles.modalOverlay}>
+          <Pressable
+            style={StyleSheet.absoluteFill}
+            onPress={() => setStatusSheetVisible(false)}
+          />
+          <View style={homeStyles.actionSheet}>
+            <View style={homeStyles.modalContainer}>
+              <Text style={homeStyles.title}>Update current status</Text>
 
-          <View style={homeStyles.modalImageWrap}>
-            <Image
-              source={
-                selectedSpace?.imageSource ||
-                require("@/assets/images/featuredSpaceImage1.png")
-              }
-              style={homeStyles.modalImage}
-            />
-          </View>
+              <View style={homeStyles.modalImageWrap}>
+                <Image
+                  source={getPropertyImageSource(selectedSpace?.imageSource)}
+                  style={homeStyles.modalImage}
+                />
+              </View>
 
-          <View style={homeStyles.modalCopy}>
-            <Text style={homeStyles.modalTitle}>
-              {selectedSpace?.title || "Untitled space"}
-            </Text>
-            <Text style={homeStyles.modalSubtitle}>
-              {selectedSpace?.location || "Unknown location"}
-            </Text>
-            <Text style={homeStyles.subTitle}>
-              {selectedSpace?.price || "NGN 0"}/{selectedSpace?.duration || "annum"}
-            </Text>
-          </View>
+              <View style={homeStyles.modalCopy}>
+                <Text style={homeStyles.modalTitle}>
+                  {selectedSpace?.title || "Untitled space"}
+                </Text>
+                <Text style={homeStyles.modalSubtitle}>
+                  {selectedSpace?.location || "Unknown location"}
+                </Text>
+                <Text style={homeStyles.subTitle}>
+                  {selectedSpace?.price || "NGN 0"}/
+                  {selectedSpace?.duration || "annum"}
+                </Text>
+              </View>
 
-          <View style={homeStyles.statusSummary}>
-            <Text style={homeStyles.statusSummaryLabel}>Current status:</Text>
-            <Text style={homeStyles.statusSummaryValue}>
-              {prettyStatus(selectedStatus)}
-            </Text>
-          </View>
+              <View style={homeStyles.statusSummary}>
+                <Text style={homeStyles.statusSummaryLabel}>
+                  Current status:
+                </Text>
+                <Text style={homeStyles.statusSummaryValue}>
+                  {prettyStatus(selectedStatus)}
+                </Text>
+              </View>
 
-          <View style={homeStyles.statusActionsWrap}>
-            <SimpleSelector
-              title="Active"
-              isChecked={selectedStatus === "active"}
-              onChange={() => setSelectedStatus("active")}
-            />
-            <SimpleSelector
-              title="Pending"
-              isChecked={selectedStatus === "pending"}
-              onChange={() => setSelectedStatus("pending")}
-            />
-            <SimpleSelector
-              title="Rented"
-              isChecked={selectedStatus === "rented"}
-              onChange={() => setSelectedStatus("rented")}
-            />
-            <SimpleSelector
-              title="Sold"
-              isChecked={selectedStatus === "sold"}
-              onChange={() => setSelectedStatus("sold")}
-            />
-            <SimpleSelector
-              title="Inactive"
-              isChecked={selectedStatus === "inactive"}
-              onChange={() => setSelectedStatus("inactive")}
-            />
-            <SimpleSelector
-              title="Archived"
-              isChecked={selectedStatus === "archived"}
-              onChange={() => setSelectedStatus("archived")}
-            />
-          </View>
+              <View style={homeStyles.statusActionsWrap}>
+                <SimpleSelector
+                  title="Active"
+                  isChecked={selectedStatus === "active"}
+                  onChange={() => setSelectedStatus("active")}
+                />
+                <SimpleSelector
+                  title="Pending"
+                  isChecked={selectedStatus === "pending"}
+                  onChange={() => setSelectedStatus("pending")}
+                />
+                <SimpleSelector
+                  title="Rented"
+                  isChecked={selectedStatus === "rented"}
+                  onChange={() => setSelectedStatus("rented")}
+                />
+                <SimpleSelector
+                  title="Sold"
+                  isChecked={selectedStatus === "sold"}
+                  onChange={() => setSelectedStatus("sold")}
+                />
+                {/* <SimpleSelector
+                  title="Inactive"
+                  isChecked={selectedStatus === "inactive"}
+                  onChange={() => setSelectedStatus("inactive")}
+                /> */}
+                <SimpleSelector
+                  title="Archived"
+                  isChecked={selectedStatus === "archived"}
+                  onChange={() => setSelectedStatus("archived")}
+                />
+              </View>
 
-          <View style={homeStyles.actionsWrap}>
-            <AppButton
-              onPress={handleUpdateStatusPress}
-              title={updatePropertyStatusPending ? "Updating..." : "Update"}
-              fullwidth
-              disabled={updatePropertyStatusPending}
-            />
+              <View style={homeStyles.actionsWrap}>
+                <AppButton
+                  onPress={handleUpdateStatusPress}
+                  title={updatePropertyStatusPending ? "Updating..." : "Update"}
+                  fullwidth
+                  disabled={updatePropertyStatusPending}
+                />
+              </View>
+            </View>
           </View>
         </View>
-      </CustomBottomSheet>
+      </Modal>
       <ConfirmDialog
         visible={isRemoveDialogVisible}
         onConfirm={handleRemoveConfirm}
@@ -429,13 +453,31 @@ export default SpacesPosted;
 
 type PropertyCardItem = {
   id: string;
-  imageSource: { uri: string } | number;
+  imageSource: ImageSourcePropType | string;
   title: string;
   location: string;
   badgeType?: string;
   price: string;
   duration: string;
   raw: PropertyListItem;
+};
+
+const getPropertyImageSource = (
+  imageSource?: ImageSourcePropType | string,
+): ImageSourcePropType => {
+  const remoteImageUri =
+    typeof imageSource === "string"
+      ? imageSource
+      : imageSource &&
+          typeof imageSource === "object" &&
+          "uri" in imageSource &&
+          typeof imageSource.uri === "string"
+        ? imageSource.uri
+        : "";
+
+  return remoteImageUri.length >= 7
+    ? { uri: remoteImageUri }
+    : require("@/assets/images/diplace.jpg");
 };
 
 const styles = (colors: ColorScheme) =>
@@ -470,6 +512,19 @@ const styles = (colors: ColorScheme) =>
       paddingTop: RFValue(10),
       paddingBottom: RFValue(16),
       alignItems: "center",
+    },
+    modalOverlay: {
+      flex: 1,
+      justifyContent: "flex-end",
+      backgroundColor: "rgba(0, 0, 0, 0.4)",
+    },
+    actionSheet: {
+      maxHeight: "88%",
+      paddingHorizontal: RFValue(20),
+      paddingTop: RFValue(18),
+      backgroundColor: colors.background,
+      borderTopLeftRadius: RFValue(24),
+      borderTopRightRadius: RFValue(24),
     },
     modalImageWrap: {
       width: RFValue(112),
@@ -551,4 +606,3 @@ const styles = (colors: ColorScheme) =>
       width: RFValue(140),
     },
   });
-

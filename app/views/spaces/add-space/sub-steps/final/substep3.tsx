@@ -1,21 +1,20 @@
+import AppButton from "@/components/button";
+import { SimpleSelector } from "@/components/selector";
+import { useTheme } from "@/contexts/themeContext";
+import { useSpaceStore } from "@/store/useSpace";
+import { ColorScheme } from "@/utils";
 import React, { useState } from "react";
 import {
-  View,
-  Text,
+  Image,
+  Modal,
   StyleSheet,
+  Text,
   TextInput,
   TouchableOpacity,
-  Modal,
-  ScrollView,
-  Image,
+  View,
 } from "react-native";
-import { RFValue } from "react-native-responsive-fontsize";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
-import AppButton from "@/components/button";
-import { useTheme } from "@/contexts/themeContext";
-import { ColorScheme } from "@/utils";
-import { useSpaceStore } from "@/store/useSpace";
-import { SimpleSelector } from "@/components/selector";
+import { RFValue } from "react-native-responsive-fontsize";
 
 type RentDuration = "per annum" | "per month" | "per day" | "per hour";
 
@@ -120,7 +119,7 @@ const RentalCostSubstep: React.FC<RentalCostSubstepProps> = ({
               placeholder="0"
               placeholderTextColor={colors.slate[400]}
               value={formatCurrency(
-                spaceForm.value.rentalCost?.rentalCost || ""
+                spaceForm.value.rentalCost?.rentalCost || "",
               )}
               onChangeText={handleCostChange}
               keyboardType="numeric"
@@ -159,7 +158,7 @@ const RentalCostSubstep: React.FC<RentalCostSubstepProps> = ({
               <View style={styles.payoutInputWrapper}>
                 <TextInput
                   style={styles.payoutInput}
-                  value={spaceForm.value.rentalCost?.maxRentPayout}
+                  value={spaceForm.value.rentalCost?.maxRentPayout || "1"}
                   onChangeText={handleMaxPayoutChange}
                   keyboardType="numeric"
                   maxLength={3}

@@ -249,6 +249,7 @@ export interface SpaceValue {
   amenities?: string[];
   description?: SpaceDescriptionData;
   media?: MediaItem[];
+  existingMedia?: MediaItem[];
   tour?: TourVideo[];
   owner?: "myself" | "3rdparty";
   accountDetails?: BankDetails;
@@ -260,6 +261,30 @@ export interface SpaceValue {
   otherCharges?: Charge;
   rentalAgreement?: AgreementFile | null;
 }
+
+export const createDefaultInspectionTimeSlots = (): InspectionTime => [
+  {
+    id: "morning",
+    startTime: "10:00",
+    endTime: "12:00",
+    label: "Morning slot",
+    selected: false,
+  },
+  {
+    id: "afternoon",
+    startTime: "13:00",
+    endTime: "15:00",
+    label: "Afternoon slot",
+    selected: false,
+  },
+  {
+    id: "evening",
+    startTime: "16:00",
+    endTime: "18:00",
+    label: "Evening slot",
+    selected: false,
+  },
+];
 
 type PostSpaceState = {
   spaceForm: {
@@ -295,29 +320,7 @@ export const useSpaceStore = create<PostSpaceState>((set) => ({
         accountName: "ALEX IBE",
         bank: "ACCESS BANK PLC",
       },
-      inspectionTimeSlots: [
-        {
-          id: "1",
-          startTime: "10:00",
-          endTime: "12:00",
-          label: "Morning slot",
-          selected: false,
-        },
-        {
-          id: "2",
-          startTime: "13:00",
-          endTime: "15:00",
-          label: "Afternoon slot",
-          selected: false,
-        },
-        {
-          id: "3",
-          startTime: "16:00",
-          endTime: "18:00",
-          label: "Evening slot",
-          selected: false,
-        },
-      ],
+      inspectionTimeSlots: createDefaultInspectionTimeSlots(),
       otherCharges: [
         {
           id: "1",
@@ -443,6 +446,7 @@ export const useSpaceStore = create<PostSpaceState>((set) => ({
         type: null,
         value: {
           media: [],
+          inspectionTimeSlots: createDefaultInspectionTimeSlots(),
         },
       },
       editingDraft: null,

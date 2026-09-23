@@ -1,4 +1,3 @@
-import { CustomBottomSheet } from "@/components/bottom-sheet";
 import AppButton from "@/components/button";
 import ConfirmDialog from "@/components/confirm-dialog";
 import Filter from "@/components/filter";
@@ -9,13 +8,15 @@ import { useDeleteProperty, useListMyDrafts } from "@/hooks";
 import { useSpaceStore } from "@/store/useSpace";
 import { PropertyListItem } from "@/types";
 import { ColorScheme } from "@/utils";
-import { BottomSheetModal } from "@gorhom/bottom-sheet";
 import { router } from "expo-router";
-import React, { useMemo, useRef } from "react";
+import React, { useMemo } from "react";
 import {
   ActivityIndicator,
   FlatList,
   Image,
+  ImageSourcePropType,
+  Modal,
+  Pressable,
   StyleSheet,
   Text,
   View,
@@ -44,20 +45,19 @@ const SpacesDrafts = ({ layout }: { layout: "tiles" | "box" }) => {
     },
     enabled: true,
   });
-  const addSpaceRef = useRef<BottomSheetModal>(null);
   const [selectedSpace, setSelectedSpace] =
     React.useState<PropertyCardItem | null>(null);
   const [isRemoveDialogVisible, setRemoveDialogVisible] = React.useState(false);
-  const snapPoints = useMemo(() => ["25%", "50%", "75%", "90%"], []);
+  const [isActionSheetVisible, setActionSheetVisible] = React.useState(false);
 
-  const handleAddSpace = (space: PropertyCardItem) => {
+  const handleViewDraft = (space: PropertyCardItem) => {
     setSelectedSpace(space);
-    addSpaceRef.current?.present();
+    setActionSheetVisible(true);
   };
 
   const handleEditSpace = () => {
     if (!selectedSpace?.id || !selectedSpace.raw) return;
-    addSpaceRef.current?.dismiss();
+    setActionSheetVisible(false);
     setEditingDraft(selectedSpace.raw);
     router.push({
       pathname: "/views/spaces/add-space/form",
@@ -66,7 +66,7 @@ const SpacesDrafts = ({ layout }: { layout: "tiles" | "box" }) => {
   };
 
   const handleRemoveSpace = () => {
-    addSpaceRef.current?.dismiss();
+    setActionSheetVisible(false);
     setRemoveDialogVisible(true);
   };
 
@@ -97,7 +97,7 @@ const SpacesDrafts = ({ layout }: { layout: "tiles" | "box" }) => {
       properties.map((item: PropertyListItem) => ({
         id: item.public_id,
         imageSource: item.media?.[0]?.file_url
-          ? { uri: item.media[0].file_url }
+          ? item.media[0].file_url
           : require("@/assets/images/featuredSpaceImage1.png"),
         title: item.title || "Untitled draft",
         location:
@@ -168,14 +168,14 @@ const SpacesDrafts = ({ layout }: { layout: "tiles" | "box" }) => {
         data={cardData}
         renderItem={({ item }) =>
           layout === "box" ? (
-            <HouseCard {...item} onPress={() => handleAddSpace(item)} />
+            <HouseCard {...item} onPress={() => handleViewDraft(item)} />
           ) : (
             <HouseCardTile
               imageSource={item.imageSource}
               name={item.title}
               location={item.location}
               badgeType={item.badgeType}
-              onPress={() => handleAddSpace(item)}
+              onPress={() => handleViewDraft(item)}
             />
           )
         }
@@ -196,20 +196,22 @@ const SpacesDrafts = ({ layout }: { layout: "tiles" | "box" }) => {
           ) : null
         }
       />
-      <CustomBottomSheet
-        bottomSheetProps={{
-          ref: addSpaceRef,
-          snapPoints,
-          index: 2,
-        }}
+      <Modal
+        transparent
+        animationType="slide"
+        visible={isActionSheetVisible}
+        onRequestClose={() => setActionSheetVisible(false)}
       >
-        <View style={homeStyles.modalContainer}>
+        <View style={homeStyles.modalOverlay}>
+          <Pressable
+            style={StyleSheet.absoluteFill}
+            onPress={() => setActionSheetVisible(false)}
+          />
+          <View style={homeStyles.actionSheet}>
+            <View style={homeStyles.modalContainer}>
           <View style={homeStyles.modalImageWrap}>
             <Image
-              source={
-                selectedSpace?.imageSource ||
-                require("@/assets/images/featuredSpaceImage1.png")
-              }
+              source={getPropertyImageSource(selectedSpace?.imageSource)}
               style={homeStyles.modalImage}
             />
           </View>
@@ -238,8 +240,10 @@ const SpacesDrafts = ({ layout }: { layout: "tiles" | "box" }) => {
               fullwidth
             />
           </View>
+            </View>
+          </View>
         </View>
-      </CustomBottomSheet>
+      </Modal>
       <ConfirmDialog
         visible={isRemoveDialogVisible}
         onConfirm={handleRemoveConfirm}
@@ -260,13 +264,31 @@ export default SpacesDrafts;
 
 type PropertyCardItem = {
   id: string;
-  imageSource: { uri: string } | number;
+  imageSource: ImageSourcePropType | string;
   title: string;
   location: string;
   badgeType?: string;
   price: string;
   duration: string;
   raw: PropertyListItem;
+};
+
+const getPropertyImageSource = (
+  imageSource?: ImageSourcePropType | string,
+): ImageSourcePropType => {
+  const remoteImageUri =
+    typeof imageSource === "string"
+      ? imageSource
+      : imageSource &&
+          typeof imageSource === "object" &&
+          "uri" in imageSource &&
+          typeof imageSource.uri === "string"
+        ? imageSource.uri
+        : "";
+
+  return remoteImageUri.length >= 7
+    ? { uri: remoteImageUri }
+    : require("@/assets/images/diplace.jpg");
 };
 
 const styles = (colors: ColorScheme) =>
@@ -291,6 +313,18 @@ const styles = (colors: ColorScheme) =>
       paddingTop: RFValue(10),
       paddingBottom: RFValue(16),
       alignItems: "center",
+    },
+    modalOverlay: {
+      flex: 1,
+      justifyContent: "flex-end",
+      backgroundColor: "rgba(0, 0, 0, 0.4)",
+    },
+    actionSheet: {
+      paddingHorizontal: RFValue(20),
+      paddingTop: RFValue(18),
+      backgroundColor: colors.background,
+      borderTopLeftRadius: RFValue(24),
+      borderTopRightRadius: RFValue(24),
     },
     modalImageWrap: {
       width: RFValue(112),

@@ -11,8 +11,12 @@ import {
   View,
 } from "react-native";
 import { RFValue } from "react-native-responsive-fontsize";
-import { CameraView, useCameraPermissions } from "expo-camera";
-import { Audio, Video } from "expo-av";
+import {
+  CameraView,
+  useCameraPermissions,
+  useMicrophonePermissions,
+} from "expo-camera";
+import { VideoView, useVideoPlayer } from "expo-video";
 import AppButton from "@/components/button";
 import { useTheme } from "@/contexts/themeContext";
 import { useSpaceStore } from "@/store/useSpace";
@@ -28,6 +32,26 @@ type StopAction = "next" | "finish";
 
 const MAX_RECORD_SECONDS = 60;
 
+interface VideoPreviewProps {
+  uri: string;
+  style: object;
+}
+
+const VideoPreview: React.FC<VideoPreviewProps> = ({ uri, style }) => {
+  const player = useVideoPlayer(uri, (videoPlayer) => {
+    videoPlayer.loop = true;
+  });
+
+  return (
+    <VideoView
+      player={player}
+      style={style}
+      nativeControls
+      contentFit="cover"
+    />
+  );
+};
+
 const VirtualTourSubstep: React.FC<VirtualTourSubstepProps> = ({
   onNext,
 }) => {
@@ -35,10 +59,15 @@ const VirtualTourSubstep: React.FC<VirtualTourSubstepProps> = ({
   const styles = createStyles(colors);
   const { setValue, spaceForm } = useSpaceStore();
   const [permission, requestPermission] = useCameraPermissions();
+  const [microphonePermission, requestMicrophonePermission] =
+    useMicrophonePermissions();
 
   const cameraRef = useRef<CameraView>(null);
   const recordingPromiseRef = useRef<Promise<{ uri: string } | undefined> | null>(null);
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const recordingStartTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const cameraReadyRef = useRef(false);
+  const recordingStartAttemptsRef = useRef(0);
   const pendingActionRef = useRef<StopAction>("finish");
 
   const [showInstructions, setShowInstructions] = useState(true);
@@ -58,6 +87,9 @@ const VirtualTourSubstep: React.FC<VirtualTourSubstepProps> = ({
       if (timerRef.current) {
         clearInterval(timerRef.current);
       }
+      if (recordingStartTimeoutRef.current) {
+        clearTimeout(recordingStartTimeoutRef.current);
+      }
     };
   }, []);
 
@@ -66,6 +98,26 @@ const VirtualTourSubstep: React.FC<VirtualTourSubstepProps> = ({
       clearInterval(timerRef.current);
       timerRef.current = null;
     }
+  };
+
+  const openCamera = () => {
+    cameraReadyRef.current = false;
+    recordingStartAttemptsRef.current = 0;
+    setIsPreparingCamera(true);
+    setShowCamera(true);
+  };
+
+  const handleCameraReady = () => {
+    cameraReadyRef.current = true;
+    setIsPreparingCamera(false);
+
+    if (recordingStartTimeoutRef.current) {
+      clearTimeout(recordingStartTimeoutRef.current);
+    }
+
+    recordingStartTimeoutRef.current = setTimeout(() => {
+      void startRecording();
+    }, 350);
   };
 
   const addClipToTour = (name: string) => {
@@ -85,7 +137,9 @@ const VirtualTourSubstep: React.FC<VirtualTourSubstepProps> = ({
   };
 
   const startRecording = async () => {
-    if (!cameraRef.current || isRecording) return;
+    if (!cameraRef.current || !cameraReadyRef.current || isRecording) return;
+
+    let shouldRetry = false;
 
     try {
       setIsPreparingCamera(false);
@@ -121,8 +175,28 @@ const VirtualTourSubstep: React.FC<VirtualTourSubstepProps> = ({
       }
     } catch (error) {
       console.log("VirtualTour: record error", error);
+      const isCameraStillPreparing =
+        error instanceof Error && error.message.includes("CameraOutputNotReadyException");
+
+      if (
+        isCameraStillPreparing &&
+        recordingStartAttemptsRef.current < 3
+      ) {
+        recordingStartAttemptsRef.current += 1;
+        shouldRetry = true;
+        clearTimer();
+        setIsRecording(false);
+        setIsPreparingCamera(true);
+        recordingStartTimeoutRef.current = setTimeout(() => {
+          void startRecording();
+        }, 400);
+        return;
+      }
+
       Alert.alert("Recording Error", "Unable to record video. Please try again.");
     } finally {
+      if (shouldRetry) return;
+
       setIsRecording(false);
       clearTimer();
       setShowCamera(false);
@@ -173,7 +247,9 @@ const VirtualTourSubstep: React.FC<VirtualTourSubstepProps> = ({
       }
     }
 
-    const audioPermission = await Audio.requestPermissionsAsync();
+    const audioPermission = microphonePermission?.granted
+      ? microphonePermission
+      : await requestMicrophonePermission();
     if (!audioPermission.granted) {
       Alert.alert(
         "Permission Required",
@@ -183,8 +259,7 @@ const VirtualTourSubstep: React.FC<VirtualTourSubstepProps> = ({
     }
 
     setShowInstructions(false);
-    setShowCamera(true);
-    setIsPreparingCamera(true);
+    openCamera();
   };
 
   const handleProceedToNextRoom = () => {
@@ -200,8 +275,7 @@ const VirtualTourSubstep: React.FC<VirtualTourSubstepProps> = ({
     setCurrentVideoUri("");
     setLastClipDuration(0);
     setShowRoomNameModal(false);
-    setShowCamera(true);
-    setIsPreparingCamera(true);
+    openCamera();
   };
 
   const handleUploadTour = () => {
@@ -224,8 +298,7 @@ const VirtualTourSubstep: React.FC<VirtualTourSubstepProps> = ({
     setLastClipDuration(0);
     setShowRoomNameModal(false);
     setShowFinishModal(false);
-    setShowCamera(true);
-    setIsPreparingCamera(true);
+    openCamera();
   };
 
   const handleRetakeAll = () => {
@@ -252,6 +325,7 @@ const VirtualTourSubstep: React.FC<VirtualTourSubstepProps> = ({
     }
 
     setIsRecording(false);
+    cameraReadyRef.current = false;
     setShowCamera(false);
     setShowRoomNameModal(false);
     setShowFinishModal(false);
@@ -349,50 +423,50 @@ const VirtualTourSubstep: React.FC<VirtualTourSubstepProps> = ({
             ref={cameraRef}
             style={styles.camera}
             facing="back"
+            mode="video"
             videoQuality="1080p"
-            onCameraReady={startRecording}
-          >
-            <Pressable style={styles.exitButton} onPress={handleExitTour}>
-              <Image
-                source={require("@/assets/icons/close-contained.png")}
-                style={styles.exitIcon}
-              />
-              <Text style={styles.exitText}>Exit tour</Text>
-            </Pressable>
+            onCameraReady={handleCameraReady}
+          />
+          <Pressable style={styles.exitButton} onPress={handleExitTour}>
+            <Image
+              source={require("@/assets/icons/close-contained.png")}
+              style={styles.exitIcon}
+            />
+            <Text style={styles.exitText}>Exit tour</Text>
+          </Pressable>
 
-            <View style={styles.cameraOverlay}>
-              <Text style={styles.cameraInstruction}>
-                Rotate slowly and keep your phone steady.
-              </Text>
-              <View style={styles.timerContainer}>
-                <View style={styles.recordingDot} />
-                <Text style={styles.timerText}>{formatTime(recordingTime)}</Text>
-              </View>
+          <View style={styles.cameraOverlay} pointerEvents="none">
+            <Text style={styles.cameraInstruction}>
+              Rotate slowly and keep your phone steady.
+            </Text>
+            <View style={styles.timerContainer}>
+              <View style={styles.recordingDot} />
+              <Text style={styles.timerText}>{formatTime(recordingTime)}</Text>
             </View>
+          </View>
 
-            {isPreparingCamera && (
-              <View style={styles.preparingOverlay}>
-                <ActivityIndicator color="#FFFFFF" />
-                <Text style={styles.preparingText}>Preparing camera...</Text>
-              </View>
-            )}
-
-            <View style={styles.cameraBottomButtons}>
-              <AppButton
-                title="Next Room"
-                onPress={() => handleStopRecording("next")}
-                disabled={!isRecording}
-                afterIcon={require("@/assets/icons/chevron-right.png")}
-                variant="secondary"
-              />
-              <AppButton
-                title="Finish Tour"
-                onPress={() => handleStopRecording("finish")}
-                disabled={!isRecording}
-                variant="primary"
-              />
+          {isPreparingCamera && (
+            <View style={styles.preparingOverlay} pointerEvents="none">
+              <ActivityIndicator color="#FFFFFF" />
+              <Text style={styles.preparingText}>Preparing camera...</Text>
             </View>
-          </CameraView>
+          )}
+
+          <View style={styles.cameraBottomButtons}>
+            <AppButton
+              title="Next Room"
+              onPress={() => handleStopRecording("next")}
+              disabled={!isRecording}
+              afterIcon={require("@/assets/icons/chevron-right.png")}
+              variant="secondary"
+            />
+            <AppButton
+              title="Finish Tour"
+              onPress={() => handleStopRecording("finish")}
+              disabled={!isRecording}
+              variant="primary"
+            />
+          </View>
         </View>
       </Modal>
 
@@ -400,12 +474,7 @@ const VirtualTourSubstep: React.FC<VirtualTourSubstepProps> = ({
         <View style={styles.modalOverlay}>
           <View style={styles.cameraPreview}>
             {currentVideoUri ? (
-              <Video
-                source={{ uri: currentVideoUri }}
-                style={styles.previewImage}
-                shouldPlay={false}
-                isLooping
-              />
+              <VideoPreview uri={currentVideoUri} style={styles.previewImage} />
             ) : (
               <View style={styles.noClipContainer}>
                 <Text style={styles.noClipText}>No clip captured.</Text>
@@ -439,12 +508,7 @@ const VirtualTourSubstep: React.FC<VirtualTourSubstepProps> = ({
         <View style={styles.modalOverlay}>
           <View style={styles.cameraPreview}>
             {currentVideoUri ? (
-              <Video
-                source={{ uri: currentVideoUri }}
-                style={styles.previewImage}
-                shouldPlay={false}
-                isLooping
-              />
+              <VideoPreview uri={currentVideoUri} style={styles.previewImage} />
             ) : (
               <View style={styles.noClipContainer}>
                 <Text style={styles.noClipText}>No clip captured.</Text>

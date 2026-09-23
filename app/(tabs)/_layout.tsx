@@ -1,17 +1,14 @@
 import { Plus } from "@/assets/icons";
-import { CustomBottomSheet } from "@/components/bottom-sheet";
 import { CustomTabIcon, TabBarLabel } from "@/components/tab";
 import { useTheme } from "@/contexts/themeContext";
 import { useUser } from "@/contexts/user-context";
 import { useActivityBadge, useGetConversations } from "@/hooks";
 import { tabItems } from "@/utils/permissions";
-import { BottomSheetModal } from "@gorhom/bottom-sheet";
-import { Tabs } from "expo-router";
-import React, { useMemo, useRef } from "react";
+import { Tabs, router } from "expo-router";
+import React, { useMemo } from "react";
 import { Pressable, View } from "react-native";
 import { RFValue } from "react-native-responsive-fontsize";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import AddSpaceBottomSheet from "../views/spaces/components/AddSpacesBottomContainer";
 
 const TabLayout = () => {
   const { colors, isDarkMode } = useTheme();
@@ -26,13 +23,9 @@ const TabLayout = () => {
     return conversations.conversations.filter((c) => c.unread_count > 0).length;
   }, [conversations]);
 
-  const addSpaceRef = useRef<BottomSheetModal>(null);
-
   const handleAddSpace = () => {
-    addSpaceRef.current?.present();
+    router.push("/views/spaces/add-spaces");
   };
-
-  const snapPoints = useMemo(() => ["25%", "50%", "75%", "90%"], []);
 
   return (
     <View style={{ flex: 1, backgroundColor: colors.background }}>
@@ -70,6 +63,7 @@ const TabLayout = () => {
                 ? {
                     tabPress: (e) => {
                       e.preventDefault();
+                      handleAddSpace();
                     },
                   }
                 : item.name === "activity"
@@ -154,21 +148,6 @@ const TabLayout = () => {
           />
         ))}
       </Tabs>
-      <CustomBottomSheet
-        bottomSheetProps={{
-          ref: addSpaceRef,
-          snapPoints,
-          index: 2,
-          enableContentPanningGesture: true,
-          enableHandlePanningGesture: true,
-          enablePanDownToClose: true,
-        }}
-      >
-        <AddSpaceBottomSheet
-          colors={colors}
-          closeSheet={() => addSpaceRef.current?.close()}
-        />
-      </CustomBottomSheet>
     </View>
   );
 };
