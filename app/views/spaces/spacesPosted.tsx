@@ -21,6 +21,7 @@ import {
   ActivityIndicator,
   FlatList,
   Image,
+  ImageSourcePropType,
   StyleSheet,
   Text,
   View,
@@ -32,12 +33,7 @@ const SpacesPosted = ({ layout }: { layout: "tiles" | "box" }) => {
   const { colors } = useTheme();
   const homeStyles = styles(colors);
   const { setPreviewProperty, setEditingDraft } = useSpaceStore();
-  const {
-    currentUser,
-    isCurrentUserLoading,
-    currentUserError,
-    refetchCurrentUser,
-  } = useGetCurrentUser();
+
   const {
     currentUser,
     isCurrentUserLoading,
@@ -162,8 +158,6 @@ const SpacesPosted = ({ layout }: { layout: "tiles" | "box" }) => {
   const formatCurrency = (amount: number) =>
     `NGN ${new Intl.NumberFormat("en-NG").format(amount || 0)}`;
 
-  const formatCostFrequency = (value: string) =>
-    value.replace(/^per_/, "").replace(/_/g, " ");
   const formatCostFrequency = (value: string) =>
     value.replace(/^per_/, "").replace(/_/g, " ");
 

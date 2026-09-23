@@ -10,11 +10,12 @@ import { useSpaceStore } from "@/store/useSpace";
 import { PropertyListItem } from "@/types";
 import { ColorScheme } from "@/utils";
 import { router } from "expo-router";
-import { default as React, default as React, useMemo } from "react";
+import React, { useMemo } from "react";
 import {
   ActivityIndicator,
   FlatList,
   Image,
+  ImageSourcePropType,
   StyleSheet,
   Text,
   View,
@@ -199,7 +200,7 @@ const SpacesDrafts = ({ layout }: { layout: "tiles" | "box" }) => {
       <BottomSheet
         isVisible={isAddSpaceSheetVisible}
         onClose={() => setIsAddSpaceSheetVisible(false)}
-        snapPoints={snapPoints}
+        snapPoints={[0.5, 0.9]}
       >
         <View style={homeStyles.modalContainer}>
           <View style={homeStyles.modalImageWrap}>
