@@ -73,7 +73,10 @@ const TodayActivityCard = ({
       </View>
 
       {/* Bottom Row */}
-      <View style={s.footerDivider} className="pt-3 flex flex-row items-center justify-between">
+      <View
+        style={s.footerDivider}
+        className="pt-3 flex flex-row items-center justify-between"
+      >
         <View className="flex flex-row items-center gap-2">
           <Image
             source={{
@@ -152,7 +155,11 @@ const TodayActivityScreen = () => {
       >
         <View className="pb-10">
           {isLoading ? (
-            <ActivityIndicator size="large" color={colors.slate[650]} className="mt-10" />
+            <ActivityIndicator
+              size="large"
+              color={colors.slate[650]}
+              className="mt-10"
+            />
           ) : todayActivities && todayActivities.length > 0 ? (
             todayActivities.map((activity, index) => (
               <TodayActivityCard

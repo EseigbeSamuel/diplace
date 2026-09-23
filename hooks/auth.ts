@@ -1,14 +1,13 @@
 import { clearAll, saveToLocalStore, showToast } from "@/lib";
 import { getRequest, postRequest } from "@/services";
 import {
-  ChangePasswordPayload,
-  CurrentUserResponse,
-  LoginPayload,
-  LoginResponse,
-  RegisterPayload,
-  RegisterResponse,
-  VerifyOtpPayload,
-  VerifyOtpResponse,
+    CurrentUserResponse,
+    LoginPayload,
+    LoginResponse,
+    RegisterPayload,
+    RegisterResponse,
+    VerifyOtpPayload,
+    VerifyOtpResponse
 } from "@/types";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
@@ -121,7 +120,7 @@ export function useLogin() {
       body.append("client_id", "string");
       body.append("client_secret", "string");
 
-      console.log(body)
+      console.log(body);
 
       return postRequest<LoginResponse, string>({
         url: "/auth/login",
@@ -140,7 +139,6 @@ export function useLogin() {
       // ✅ Save tokens first
       await saveToLocalStore("access_token", data.access_token);
       await saveToLocalStore("refresh_token", data.refresh_token);
-      router.replace("/(tabs)")
 
       try {
         // ✅ Fetch user immediately
@@ -160,7 +158,10 @@ export function useLogin() {
           user?.status === "approved" ||
           user?.status === "active";
 
-        if (isAlreadyVerified || (user?.verifications && user.verifications.length > 0)) {
+        if (
+          isAlreadyVerified ||
+          (user?.verifications && user.verifications.length > 0)
+        ) {
           router.replace("/(tabs)");
         } else {
           router.replace("/onboarding/welcome");
@@ -194,7 +195,7 @@ export function useLogin() {
               response?.detail ||
               `A verification email has been sent to ${email}.`,
           });
-          router.push("/auth/verify-otp")
+          router.push("/auth/verify-otp");
           return;
         } catch (resendError) {
           const resendMessage =
@@ -244,7 +245,7 @@ export function useRegister() {
     onSuccess: async (data) => {
       router.replace("/auth/verify-otp");
     },
-    onError: () => { },
+    onError: () => {},
   });
 
   return {

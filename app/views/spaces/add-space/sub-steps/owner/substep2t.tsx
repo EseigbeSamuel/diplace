@@ -1,22 +1,22 @@
 // ConfirmOwnerEventDetailsSubstep.tsx
-import React, { useState } from "react";
-import {
-  View,
-  Text,
-  StyleSheet,
-  Pressable,
-  ScrollView,
-  Image,
-  Modal,
-} from "react-native";
-import { RFValue } from "react-native-responsive-fontsize";
+import { Edit } from "@/assets/icons";
 import AppButton from "@/components/button";
 import { useTheme } from "@/contexts/themeContext";
-import { ColorScheme } from "@/utils";
-import AddBankDetails from "./substep3";
+import { useGetCurrentUser } from "@/hooks";
 import { useSpaceStore } from "@/store/useSpace";
 import { BankDetails } from "@/types/add-space-types";
-import { useGetCurrentUser } from "@/hooks";
+import { ColorScheme } from "@/utils";
+import React, { useState } from "react";
+import {
+  Modal,
+  Pressable,
+  ScrollView,
+  StyleSheet,
+  Text,
+  View
+} from "react-native";
+import { RFValue } from "react-native-responsive-fontsize";
+import AddBankDetails from "./substep3";
 
 interface ConfirmOwnerEventDetailsSubstepProps {
   onNext: () => void;
@@ -107,10 +107,11 @@ const ConfirmOwnerEventDetailsSubstep: React.FC<
                 style={styles.editButton}
                 onPress={handleEditBankDetails}
               >
-                <Image
-                  source={require("@/assets/icons/edit-pencil-fill.png")}
-                  style={styles.editIcon}
-                />
+                {/* <Image
+                    source={require("@/assets/icons/edit-pencil-fill.png")}
+                    style={styles.editIcon}
+                  /> */}
+                <Edit size={16} color={colors.slate[650]} />
                 <Text style={styles.editText}>Edit</Text>
               </Pressable>
             </View>
