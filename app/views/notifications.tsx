@@ -1,4 +1,5 @@
 import { Notification } from "@/assets/icons";
+import NotificationDatePicker from "@/components/notification-date-picker";
 import SafeAreaViewContainer from "@/components/safeareaview";
 import SectionHeader from "@/components/sectionheader";
 import { NotesTabs } from "@/constants/mockNotifications";
@@ -40,6 +41,8 @@ const Notifications = () => {
   const { colors, isDarkMode } = useTheme();
   const custom = styles(colors, isDarkMode);
   const [activeTab, setActiveTab] = useState("all");
+  const [selectedDate, setSelectedDate] = useState<string | null>(null);
+  const [isDatePickerVisible, setIsDatePickerVisible] = useState(false);
   const [isRefreshing, setIsRefreshing] = useState(false);
 
   const { notifications, isNotificationsLoading, refetchNotifications } =
@@ -356,11 +359,10 @@ const Notifications = () => {
     }
 
     // Fallback
-    const isBellFallback = (item as any).type === "bell";
     return {
       text: explicitText || "View details",
       icon: "arrow",
-      avatarKind: isBellFallback ? "bell" : "d",
+      avatarKind: "bell",
       onAction: () => {
         if (item.action_url) {
           navigateToTarget(item.action_url);
@@ -379,20 +381,33 @@ const Notifications = () => {
 
   const filteredNotes = useMemo(() => {
     const tab = activeTab.toLowerCase();
+    const dateFilteredNotifications = selectedDate
+      ? sortedNotifications.filter((note) => {
+          if (!note.date_created) return false;
+          const date = new Date(note.date_created);
+          if (isNaN(date.getTime())) return false;
+
+          const year = date.getFullYear();
+          const month = String(date.getMonth() + 1).padStart(2, "0");
+          const day = String(date.getDate()).padStart(2, "0");
+          return `${year}-${month}-${day}` === selectedDate;
+        })
+      : sortedNotifications;
+
     switch (tab) {
       case "unread":
-        return sortedNotifications.filter((note) => !note.is_read);
+        return dateFilteredNotifications.filter((note) => !note.is_read);
 
       case "previous":
-        return sortedNotifications.filter((note) => note.is_read);
+        return dateFilteredNotifications.filter((note) => note.is_read);
 
       case "dates":
       case "date":
       case "all":
       default:
-        return sortedNotifications;
+        return dateFilteredNotifications;
     }
-  }, [activeTab, sortedNotifications]);
+  }, [activeTab, selectedDate, sortedNotifications]);
 
   return (
     <SafeAreaViewContainer disableBottom>
@@ -430,7 +445,17 @@ const Notifications = () => {
               item.name.toLowerCase() === "unread" && unreadCount > 0;
 
             return (
-              <Pressable onPress={() => setActiveTab(item.name)}>
+              <Pressable
+                onPress={() => {
+                  const tabName = item.name.toLowerCase();
+                  setActiveTab(item.name);
+                  if (tabName === "dates") {
+                    setIsDatePickerVisible(true);
+                  } else {
+                    setSelectedDate(null);
+                  }
+                }}
+              >
                 <View
                   style={{
                     borderColor: isActive
@@ -495,6 +520,21 @@ const Notifications = () => {
           }}
         />
       </View>
+
+      <NotificationDatePicker
+        visible={isDatePickerVisible}
+        selectedDate={selectedDate}
+        onSelectDate={(date) => {
+          setSelectedDate(date);
+          setIsDatePickerVisible(false);
+        }}
+        onClear={() => {
+          setSelectedDate(null);
+          setActiveTab("all");
+          setIsDatePickerVisible(false);
+        }}
+        onClose={() => setIsDatePickerVisible(false)}
+      />
 
       <View className="flex-1 w-full">
         {isNotificationsLoading && !isRefreshing ? (
