@@ -1,4 +1,5 @@
 import AppButton from "@/components/button";
+import PrevButton from "@/components/prev-button/prevButton";
 import SafeAreaViewContainer from "@/components/safeareaview";
 import TextField from "@/components/textfield";
 import { useTheme } from "@/contexts/themeContext";
@@ -10,7 +11,8 @@ import { RFValue } from "react-native-responsive-fontsize";
 
 export default function ForgotPassword() {
   const { colors } = useTheme();
-  const { forgotPasswordMutation, isForgotPasswordPending } = useForgotPassword();
+  const { forgotPasswordMutation, isForgotPasswordPending } =
+    useForgotPassword();
 
   const [formData, setFormData] = useState({
     email: "",
@@ -25,6 +27,9 @@ export default function ForgotPassword() {
 
   return (
     <SafeAreaViewContainer className="justify-center flex-1 bg-white">
+      <View className="mb-4">
+        <PrevButton />
+      </View>
       <KeyboardAwareScrollView
         enableOnAndroid={true}
         extraScrollHeight={20}
@@ -60,7 +65,7 @@ export default function ForgotPassword() {
 
           <AppButton
             onPress={handleSubmit}
-            title={isForgotPasswordPending ? "Sending link..." : "Send Reset Link"}
+            title={isForgotPasswordPending ? "Sending code..." : "Send Code"}
             fullwidth
             variant="primary"
             size="large"

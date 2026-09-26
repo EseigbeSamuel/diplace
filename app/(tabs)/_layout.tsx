@@ -1,14 +1,16 @@
 import { Plus } from "@/assets/icons";
+import { BottomSheet, useBottomSheet } from "@/components/bottom-sheet";
 import { CustomTabIcon, TabBarLabel } from "@/components/tab";
 import { useTheme } from "@/contexts/themeContext";
 import { useUser } from "@/contexts/user-context";
 import { useActivityBadge, useGetConversations } from "@/hooks";
 import { tabItems } from "@/utils/permissions";
-import { Tabs, router } from "expo-router";
+import { Tabs } from "expo-router";
 import React, { useMemo } from "react";
 import { Pressable, View } from "react-native";
 import { RFValue } from "react-native-responsive-fontsize";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import AddSpaceBottomSheet from "../views/spaces/components/AddSpacesBottomContainer";
 
 const TabLayout = () => {
   const { colors, isDarkMode } = useTheme();
@@ -23,9 +25,11 @@ const TabLayout = () => {
     return conversations.conversations.filter((c) => c.unread_count > 0).length;
   }, [conversations]);
 
-  const handleAddSpace = () => {
-    router.push("/views/spaces/add-spaces");
-  };
+  const { isVisible, open, close } = useBottomSheet();
+
+  function handleAddSpace() {
+    throw new Error("Function not implemented.");
+  }
 
   return (
     <View style={{ flex: 1, backgroundColor: colors.background }}>
@@ -81,7 +85,8 @@ const TabLayout = () => {
                     tabBarLabel: () => null,
                     tabBarIcon: () => (
                       <Pressable
-                        onPress={handleAddSpace}
+                        // onPress={handleAddSpace}
+                        onPress={open}
                         style={{
                           justifyContent: "center",
                           alignItems: "center",
@@ -148,6 +153,13 @@ const TabLayout = () => {
           />
         ))}
       </Tabs>
+      <BottomSheet
+        isVisible={isVisible}
+        onClose={close}
+        snapPoints={[0.5, 0.9]}
+      >
+        <AddSpaceBottomSheet colors={colors} closeSheet={close} />
+      </BottomSheet>
     </View>
   );
 };

@@ -1,4 +1,5 @@
 import AppButton from "@/components/button";
+import PrevButton from "@/components/prev-button/prevButton";
 import SafeAreaViewContainer from "@/components/safeareaview";
 import TextField from "@/components/textfield";
 import { useTheme } from "@/contexts/themeContext";
@@ -13,16 +14,18 @@ export default function CreatePassword() {
   const { colors } = useTheme();
   const searchParams = useLocalSearchParams<{ token?: string }>();
   const { resetPasswordMutation, isResetPasswordPending } = useResetPassword();
+  const resetToken = Array.isArray(searchParams.token)
+    ? searchParams.token[0]
+    : searchParams.token || "";
 
   const [formData, setFormData] = useState({
-    token: searchParams.token || "",
     password: "",
     confirmPassword: "",
   });
   const [validationError, setValidationError] = useState("");
 
   const handleSubmit = () => {
-    if (!formData.token.trim()) {
+    if (!resetToken.trim()) {
       setValidationError("Reset token is required.");
       return;
     }
@@ -37,13 +40,16 @@ export default function CreatePassword() {
 
     setValidationError("");
     resetPasswordMutation({
-      token: formData.token.trim(),
+      token: resetToken.trim(),
       new_password: formData.password,
     });
   };
 
   return (
     <SafeAreaViewContainer className="justify-center flex-1 bg-white">
+      <View className="mb-4">
+        <PrevButton />
+      </View>
       <KeyboardAwareScrollView
         enableOnAndroid={true}
         extraScrollHeight={20}
@@ -61,24 +67,11 @@ export default function CreatePassword() {
             style={{ fontSize: RFValue(16), color: colors.slate[600] }}
             className="font-normal"
           >
-            Enter your reset token and new password.
+            Enter and confirm your new password.
           </Text>
         </View>
 
         <View className="gap-4">
-          {!searchParams.token && (
-            <TextField
-              label="Reset Token / Code"
-              value={formData.token}
-              onChange={(text) => {
-                setFormData({ ...formData, token: text.toString() });
-                if (validationError) setValidationError("");
-              }}
-              placeholder="Paste your reset token"
-              icon={require("../../assets/icons/password-lock.png")}
-            />
-          )}
-
           <TextField
             label="New Password"
             value={formData.password}
@@ -118,12 +111,16 @@ export default function CreatePassword() {
 
           <AppButton
             onPress={handleSubmit}
-            title={isResetPasswordPending ? "Resetting password..." : "Reset Password"}
+            title={
+              isResetPasswordPending
+                ? "Resetting password..."
+                : "Reset Password"
+            }
             fullwidth
             variant="primary"
             size="large"
             disabled={
-              !formData.token ||
+              !resetToken ||
               !formData.confirmPassword ||
               !formData.password ||
               isResetPasswordPending

@@ -1,3 +1,4 @@
+import { BottomSheet } from "@/components/bottom-sheet";
 import AppButton from "@/components/button";
 import ConfirmDialog from "@/components/confirm-dialog";
 import Filter from "@/components/filter";
@@ -15,8 +16,6 @@ import {
   FlatList,
   Image,
   ImageSourcePropType,
-  Modal,
-  Pressable,
   StyleSheet,
   Text,
   View,
@@ -45,6 +44,8 @@ const SpacesDrafts = ({ layout }: { layout: "tiles" | "box" }) => {
     },
     enabled: true,
   });
+  const [isAddSpaceSheetVisible, setIsAddSpaceSheetVisible] =
+    React.useState(false);
   const [selectedSpace, setSelectedSpace] =
     React.useState<PropertyCardItem | null>(null);
   const [isRemoveDialogVisible, setRemoveDialogVisible] = React.useState(false);
@@ -52,12 +53,12 @@ const SpacesDrafts = ({ layout }: { layout: "tiles" | "box" }) => {
 
   const handleViewDraft = (space: PropertyCardItem) => {
     setSelectedSpace(space);
-    setActionSheetVisible(true);
+    setIsAddSpaceSheetVisible(true);
   };
 
   const handleEditSpace = () => {
     if (!selectedSpace?.id || !selectedSpace.raw) return;
-    setActionSheetVisible(false);
+    setIsAddSpaceSheetVisible(false);
     setEditingDraft(selectedSpace.raw);
     router.push({
       pathname: "/views/spaces/add-space/form",
@@ -66,7 +67,7 @@ const SpacesDrafts = ({ layout }: { layout: "tiles" | "box" }) => {
   };
 
   const handleRemoveSpace = () => {
-    setActionSheetVisible(false);
+    setIsAddSpaceSheetVisible(false);
     setRemoveDialogVisible(true);
   };
 
@@ -196,19 +197,12 @@ const SpacesDrafts = ({ layout }: { layout: "tiles" | "box" }) => {
           ) : null
         }
       />
-      <Modal
-        transparent
-        animationType="slide"
-        visible={isActionSheetVisible}
-        onRequestClose={() => setActionSheetVisible(false)}
+      <BottomSheet
+        isVisible={isAddSpaceSheetVisible}
+        onClose={() => setIsAddSpaceSheetVisible(false)}
+        snapPoints={[0.5, 0.9]}
       >
-        <View style={homeStyles.modalOverlay}>
-          <Pressable
-            style={StyleSheet.absoluteFill}
-            onPress={() => setActionSheetVisible(false)}
-          />
-          <View style={homeStyles.actionSheet}>
-            <View style={homeStyles.modalContainer}>
+        <View style={homeStyles.modalContainer}>
           <View style={homeStyles.modalImageWrap}>
             <Image
               source={getPropertyImageSource(selectedSpace?.imageSource)}
@@ -240,10 +234,8 @@ const SpacesDrafts = ({ layout }: { layout: "tiles" | "box" }) => {
               fullwidth
             />
           </View>
-            </View>
-          </View>
         </View>
-      </Modal>
+      </BottomSheet>
       <ConfirmDialog
         visible={isRemoveDialogVisible}
         onConfirm={handleRemoveConfirm}

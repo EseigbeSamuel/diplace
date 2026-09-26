@@ -1,18 +1,21 @@
 import { showToast } from "@/lib";
 import { postRequest } from "@/services";
 import {
-  ChangePasswordPayload,
-  ChangePasswordResponse,
-  ForgotPasswordPayload,
-  ForgotPasswordResponse,
-  ResetPasswordPayload,
-  ResetPasswordResponse,
+    ChangePasswordPayload,
+    ChangePasswordResponse,
+    ForgotPasswordPayload,
+    ForgotPasswordResponse,
+    ResetPasswordPayload,
+    ResetPasswordResponse,
 } from "@/types";
 import { useMutation } from "@tanstack/react-query";
-import { useRouter } from "expo-router";
 import axios from "axios";
+import { useRouter } from "expo-router";
 
-const getApiErrorMessage = (error: unknown, fallback: string = "Something went wrong"): string => {
+const getApiErrorMessage = (
+  error: unknown,
+  fallback: string = "Something went wrong",
+): string => {
   if (!axios.isAxiosError(error)) {
     return error instanceof Error ? error.message : fallback;
   }
@@ -48,9 +51,10 @@ export function useForgotPassword() {
         text2:
           typeof data === "string"
             ? data
-            : data?.message || "Password reset instructions sent to your email.",
+            : data?.message ||
+              "Password reset instructions sent to your email.",
       });
-      router.push("/auth/create-password");
+      router.push("/auth/verify-otp");
     },
     onError: (err) => {
       showToast({
@@ -88,7 +92,8 @@ export function useResetPassword() {
         text2:
           typeof data === "string"
             ? data
-            : data?.message || "Password reset successfully. You can now log in.",
+            : data?.message ||
+              "Password reset successfully. You can now log in.",
       });
       router.replace("/auth/login");
     },

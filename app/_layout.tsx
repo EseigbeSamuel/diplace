@@ -2,7 +2,6 @@ import ToastHost from "@/components/toast-host";
 import { ThemeProvider } from "@/contexts/themeContext";
 import { UserProvider } from "@/contexts/user-context";
 import { useIncomingCall } from "@/hooks";
-import { BottomSheetModalProvider } from "@gorhom/bottom-sheet";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { useFonts } from "expo-font";
 import { Stack } from "expo-router";
@@ -43,18 +42,16 @@ export default function RootLayout() {
       <QueryClientProvider client={queryClient}>
         <ThemeProvider>
           <GestureHandlerRootView className="flex-1">
-            <BottomSheetModalProvider>
-              <UserProvider>
-                <AppShell>
-                  <Stack screenOptions={{ headerShown: false }}>
-                    <StatusBar style="dark" animated />
-                    <Stack.Screen name="index" />
-                    <Stack.Screen name="(tabs)" />
-                  </Stack>
-                  <ToastHost />
-                </AppShell>
-              </UserProvider>
-            </BottomSheetModalProvider>
+            <UserProvider>
+              <AppShell>
+                <Stack screenOptions={{ headerShown: false }}>
+                  <StatusBar style="dark" animated />
+                  <Stack.Screen name="index" />
+                  <Stack.Screen name="(tabs)" />
+                </Stack>
+                <ToastHost />
+              </AppShell>
+            </UserProvider>
           </GestureHandlerRootView>
         </ThemeProvider>
       </QueryClientProvider>

@@ -1,4 +1,4 @@
-import { CustomBottomSheet } from "@/components/bottom-sheet";
+import { BottomSheet } from "@/components/bottom-sheet";
 import AppButton from "@/components/button";
 import { useCountdown } from "@/components/countdown";
 import SafeAreaViewContainer from "@/components/safeareaview";
@@ -6,18 +6,18 @@ import SectionHeader from "@/components/sectionheader";
 import TextField from "@/components/textfield";
 import { useTheme } from "@/contexts/themeContext";
 import { ColorScheme } from "@/utils";
-import { BottomSheetModal, TouchableOpacity } from "@gorhom/bottom-sheet";
 import { useNavigation, useRouter } from "expo-router";
-import React, { useMemo, useRef, useState } from "react";
+import React, { useMemo, useState } from "react";
 
 import {
-  FlatList,
-  Image,
-  ImageSourcePropType,
-  StyleSheet,
-  Switch,
-  Text,
-  View,
+    FlatList,
+    Image,
+    ImageSourcePropType,
+    StyleSheet,
+    Switch,
+    Text,
+    TouchableOpacity,
+    View,
 } from "react-native";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import { RFValue } from "react-native-responsive-fontsize";
@@ -52,8 +52,8 @@ const InspectionPayment = () => {
   const navigation = useNavigation();
   const router = useRouter();
 
-  const openBank = useRef<BottomSheetModal>(null);
-  const openCard = useRef<BottomSheetModal>(null);
+  const [isBankSheetVisible, setIsBankSheetVisible] = useState(false);
+  const [isCardSheetVisible, setIsCardSheetVisible] = useState(false);
   const snapPoints = useMemo(() => ["75%", "90%"], []);
   const [business, setBusiness] = useState(false);
   const [selectedPayVia, setSelectedPayVia] = useState<string | null>(null);
@@ -69,9 +69,9 @@ const InspectionPayment = () => {
     if (!selectedPayVia) return;
 
     if (selectedPayVia === "card") {
-      openCard.current?.present();
+      setIsCardSheetVisible(true);
     } else if (selectedPayVia === "bank") {
-      openBank.current?.present();
+      setIsBankSheetVisible(true);
     } else if (selectedPayVia === "ussd") {
       // You can add a USSD sheet too
     }
@@ -175,11 +175,10 @@ const InspectionPayment = () => {
         </View>
 
         {/* card transfer bottom sheets */}
-        <CustomBottomSheet
-          bottomSheetProps={{
-            ref: openCard,
-            snapPoints,
-          }}
+        <BottomSheet
+          isVisible={isCardSheetVisible}
+          onClose={() => setIsCardSheetVisible(false)}
+          snapPoints={snapPoints}
         >
           <View className="flex-col w-full gap-5">
             <View>
@@ -250,7 +249,7 @@ const InspectionPayment = () => {
                 title="Confirm & Pay"
                 onPress={() => {
                   router.replace("/views/inspection/payment-receipt");
-                  openCard.current?.dismiss();
+                  setIsCardSheetVisible(false);
                 }}
                 size="large"
               />
@@ -260,14 +259,13 @@ const InspectionPayment = () => {
               </Text>
             </View>
           </View>
-        </CustomBottomSheet>
+        </BottomSheet>
 
         {/* bank bottom sheet */}
-        <CustomBottomSheet
-          bottomSheetProps={{
-            ref: openBank,
-            snapPoints,
-          }}
+        <BottomSheet
+          isVisible={isBankSheetVisible}
+          onClose={() => setIsBankSheetVisible(false)}
+          snapPoints={snapPoints}
         >
           <View className="flex-col gap-5">
             <View>
@@ -320,7 +318,7 @@ const InspectionPayment = () => {
                 title="I’ve sent the money (₦1000)"
                 onPress={() => {
                   router.replace("/views/inspection/payment-receipt");
-                  openBank.current?.dismiss();
+                  setIsBankSheetVisible(false);
                 }}
                 size="large"
               />
@@ -330,7 +328,7 @@ const InspectionPayment = () => {
               </Text>
             </View>
           </View>
-        </CustomBottomSheet>
+        </BottomSheet>
       </KeyboardAwareScrollView>
     </SafeAreaViewContainer>
   );

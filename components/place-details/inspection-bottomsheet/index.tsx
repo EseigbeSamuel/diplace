@@ -1,10 +1,9 @@
-import { CustomBottomSheet } from "@/components/bottom-sheet";
+import { BottomSheet } from "@/components/bottom-sheet";
 import AppButton from "@/components/button";
 import { useTheme } from "@/contexts/themeContext";
 import { ColorScheme } from "@/utils";
-import { BottomSheetModal } from "@gorhom/bottom-sheet";
 import { router } from "expo-router";
-import React, { useMemo } from "react";
+import React from "react";
 import { Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { RFValue } from "react-native-responsive-fontsize";
 
@@ -17,7 +16,8 @@ interface Props {
   showDatePicker: boolean;
   selectedDate: string | null;
   selectedTime: timeslot | null;
-  openInspection: React.RefObject<BottomSheetModal | null>;
+  isVisible: boolean;
+  onClose: () => void;
   setSelectedTime: React.Dispatch<React.SetStateAction<timeslot | null>>;
   setSelectedDate: React.Dispatch<React.SetStateAction<string | null>>;
   setShowDatePicker: React.Dispatch<React.SetStateAction<boolean>>;
@@ -25,12 +25,11 @@ interface Props {
 }
 
 export default function InspectionBottomSheet(props: Props) {
-  const snapPoints = useMemo(() => ["75%", "90%"], []);
   const { colors, isDarkMode } = useTheme();
   const homeStyles = styles(colors);
 
   const formatReadableDate = (
-    dateString: string | Date | null | undefined
+    dateString: string | Date | null | undefined,
   ): string => {
     if (!dateString) return "";
     const date = new Date(dateString);
@@ -42,11 +41,10 @@ export default function InspectionBottomSheet(props: Props) {
   };
 
   return (
-    <CustomBottomSheet
-      bottomSheetProps={{
-        ref: props.openInspection,
-        snapPoints,
-      }}
+    <BottomSheet
+      isVisible={props.isVisible}
+      onClose={props.onClose}
+      snapPoints={["75%", "90%"]}
     >
       <View className="flex flex-col gap-5 ">
         <View>
@@ -115,7 +113,7 @@ export default function InspectionBottomSheet(props: Props) {
               title="Schedule Inspection"
               onPress={() => {
                 router.push("/views/inspection/inspection-payment");
-                props.openInspection.current?.dismiss();
+                props.onClose();
               }}
               size="large"
               disabled={!props.selectedTime}
@@ -126,7 +124,7 @@ export default function InspectionBottomSheet(props: Props) {
           </View>
         </View>
       </View>
-    </CustomBottomSheet>
+    </BottomSheet>
   );
 }
 

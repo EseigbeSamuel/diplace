@@ -165,14 +165,13 @@
 //       textAlign: "center",
 //     },
 //   });
+import { BottomSheet } from "@/components/bottom-sheet";
 import AppButton from "@/components/button";
-import SafeAreaViewContainer from "@/components/safeareaview";
 import { useTheme } from "@/contexts/themeContext";
-import { useVerifyOtp } from "@/hooks";
 import { ColorScheme } from "@/utils";
+import { useRouter } from "expo-router";
 import React, { useEffect, useRef, useState } from "react";
 import {
-  Animated,
   Platform,
   StyleSheet,
   Text,
@@ -180,24 +179,20 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import { RFValue } from "react-native-responsive-fontsize";
 
 const OTP_LENGTH = 6;
 const RESEND_SECONDS = 30;
 
-export default function ForgotPassowrd() {
+export default function VerifyOtp() {
   const [otp, setOtp] = useState("");
   const [timer, setTimer] = useState(RESEND_SECONDS);
-  const [isError, setIsError] = useState(false);
 
   const inputRef = useRef<TextInput>(null);
-  const shakeAnim = useRef(new Animated.Value(0)).current;
 
   const { colors } = useTheme();
   const styles = verifyOtpStyles(colors);
-
-  const { verifyOtpMutation, verifyOtpMutationPending } = useVerifyOtp();
+  const router = useRouter();
 
   // Handle input
   const handleChange = (text: string) => {
@@ -205,59 +200,11 @@ export default function ForgotPassowrd() {
     setOtp(cleaned.slice(0, OTP_LENGTH));
   };
 
-  // Auto submit
-  useEffect(() => {
-    if (otp.length === OTP_LENGTH) {
-      handleSubmit();
-    }
-  }, [otp]);
-
   const handleSubmit = () => {
     if (otp.length !== OTP_LENGTH) return;
-
-    verifyOtpMutation(
-      { token: otp },
-      {
-        onError: () => {
-          triggerError();
-        },
-      },
-    );
-  };
-
-  // Error animation
-  const triggerError = () => {
-    setIsError(true);
-
-    Animated.sequence([
-      Animated.timing(shakeAnim, {
-        toValue: 10,
-        duration: 50,
-        useNativeDriver: true,
-      }),
-      Animated.timing(shakeAnim, {
-        toValue: -10,
-        duration: 50,
-        useNativeDriver: true,
-      }),
-      Animated.timing(shakeAnim, {
-        toValue: 6,
-        duration: 50,
-        useNativeDriver: true,
-      }),
-      Animated.timing(shakeAnim, {
-        toValue: -6,
-        duration: 50,
-        useNativeDriver: true,
-      }),
-      Animated.timing(shakeAnim, {
-        toValue: 0,
-        duration: 50,
-        useNativeDriver: true,
-      }),
-    ]).start(() => {
-      setOtp("");
-      setIsError(false);
+    router.replace({
+      pathname: "/auth/create-password",
+      params: { token: otp },
     });
   };
 
@@ -280,8 +227,12 @@ export default function ForgotPassowrd() {
   };
 
   return (
-    <SafeAreaViewContainer className="justify-center flex-1 bg-white">
-      <KeyboardAwareScrollView contentContainerClassName="flex-1 justify-center">
+    <View style={{ flex: 1, backgroundColor: colors.slate[100] }}>
+      <BottomSheet
+        isVisible
+        onClose={() => router.back()}
+        snapPoints={[0.55, 0.9]}
+      >
         <View className="gap-1 mb-6">
           <Text
             style={{ fontSize: RFValue(24), color: colors.slate[650] }}
@@ -291,10 +242,10 @@ export default function ForgotPassowrd() {
           </Text>
 
           <Text
-            style={{ fontSize: RFValue(16), color: colors.slate[600] }}
+            style={{ fontSize: RFValue(13), color: colors.slate[600] }}
             className="text-center"
           >
-            Enter the code sent to your device
+            Please input the code sent to your email / phone number.
           </Text>
         </View>
 
@@ -316,12 +267,7 @@ export default function ForgotPassowrd() {
           activeOpacity={1}
           onPress={() => inputRef.current?.focus()}
         >
-          <Animated.View
-            style={[
-              styles.container,
-              { transform: [{ translateX: shakeAnim }] },
-            ]}
-          >
+          <View style={styles.container}>
             {Array.from({ length: OTP_LENGTH }).map((_, i) => {
               const digit = otp[i] || "";
               const isFocused = otp.length === i;
@@ -332,14 +278,13 @@ export default function ForgotPassowrd() {
                   style={[
                     styles.box,
                     isFocused && { borderColor: colors.slate[650] },
-                    isError && { borderColor: "red" },
                   ]}
                 >
                   <Text style={styles.text}>{digit}</Text>
                 </View>
               );
             })}
-          </Animated.View>
+          </View>
         </TouchableOpacity>
 
         {/* Resend */}
@@ -355,17 +300,16 @@ export default function ForgotPassowrd() {
           </Text>
         </TouchableOpacity>
 
-        {/* Button (optional since auto-submit exists) */}
         <AppButton
           onPress={handleSubmit}
           title="Verify"
           fullwidth
           variant="primary"
           size="large"
-          disabled={otp.length !== OTP_LENGTH || verifyOtpMutationPending}
+          disabled={otp.length !== OTP_LENGTH}
         />
-      </KeyboardAwareScrollView>
-    </SafeAreaViewContainer>
+      </BottomSheet>
+    </View>
   );
 }
 
