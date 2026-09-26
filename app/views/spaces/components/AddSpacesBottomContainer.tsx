@@ -1,9 +1,10 @@
-import React from "react";
-import { View, Text, StyleSheet, Pressable } from "react-native";
-import { RFValue } from "react-native-responsive-fontsize";
-import { ColorScheme } from "@/utils";
+import { BottomSheet, useBottomSheet } from "@/components/bottom-sheet";
 import AppButton from "@/components/button";
+import { ColorScheme } from "@/utils";
 import { useRouter } from "expo-router";
+import React from "react";
+import { Pressable, StyleSheet, Text, View } from "react-native";
+import { RFValue } from "react-native-responsive-fontsize";
 
 interface AddSpaceBottomSheetProps {
   colors: ColorScheme;
@@ -15,6 +16,7 @@ const AddSpaceBottomSheet: React.FC<AddSpaceBottomSheetProps> = ({
   closeSheet,
 }) => {
   const router = useRouter();
+  const testSheet = useBottomSheet();
   const styles = createStyles(colors);
 
   return (
@@ -24,9 +26,14 @@ const AddSpaceBottomSheet: React.FC<AddSpaceBottomSheetProps> = ({
         {/* Icon Container */}
         <View style={styles.iconContainer}>
           <View style={styles.dashedBorder}>
-            <View style={styles.plusIconWrapper}>
+            <Pressable
+              accessibilityRole="button"
+              accessibilityLabel="Open test bottom sheet"
+              onPress={testSheet.open}
+              style={styles.plusIconWrapper}
+            >
               <Text style={styles.plusIcon}>+</Text>
-            </View>
+            </Pressable>
           </View>
         </View>
 
@@ -49,6 +56,21 @@ const AddSpaceBottomSheet: React.FC<AddSpaceBottomSheetProps> = ({
           fullwidth={true}
         />
       </View>
+      <BottomSheet
+        isVisible={testSheet.isVisible}
+        onClose={testSheet.close}
+        snapPoints={[0.3, 0.6]}
+        title="Test bottom sheet"
+      >
+        <View style={{ padding: RFValue(16) }}>
+          <AppButton
+            title="Close"
+            onPress={testSheet.close}
+            size="large"
+            fullwidth={true}
+          />
+        </View>
+      </BottomSheet>
     </View>
   );
 };
