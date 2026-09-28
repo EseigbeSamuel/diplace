@@ -1,8 +1,8 @@
+import { useTheme } from "@/contexts/themeContext";
+import { ColorScheme } from "@/utils";
 import React from "react";
 import { Image, Modal, Pressable, StyleSheet, Text, View } from "react-native";
 import { RFValue } from "react-native-responsive-fontsize";
-import { useTheme } from "@/contexts/themeContext";
-import { ColorScheme } from "@/utils";
 
 interface MediaPickerModalProps {
   visible: boolean;

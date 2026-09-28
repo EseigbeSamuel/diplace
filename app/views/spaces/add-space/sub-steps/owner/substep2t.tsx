@@ -13,7 +13,7 @@ import {
   ScrollView,
   StyleSheet,
   Text,
-  View
+  View,
 } from "react-native";
 import { RFValue } from "react-native-responsive-fontsize";
 import AddBankDetails from "./substep3";

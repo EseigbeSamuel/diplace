@@ -1,4 +1,5 @@
 import { useTheme } from "@/contexts/themeContext";
+import { imageSourceFilter } from "@/lib/imageSourceFilter";
 import { ColorScheme } from "@/utils";
 import React from "react";
 import {
@@ -39,21 +40,6 @@ const HouseCard = ({
 }) => {
   const { colors, isDarkMode } = useTheme();
   const homeStyles = styles(colors);
-  const remoteImageUri =
-    typeof imageSource === "string"
-      ? imageSource
-      : imageSource &&
-          typeof imageSource === "object" &&
-          "uri" in imageSource &&
-          typeof imageSource.uri === "string"
-        ? imageSource.uri
-        : "";
-  const cardImageSource =
-    remoteImageUri.length >= 7
-      ? typeof imageSource === "string"
-        ? { uri: imageSource }
-        : imageSource
-      : require("@/assets/images/diplace.jpg");
 
   const renderBadge = () => {
     switch (badgeType) {
@@ -187,7 +173,7 @@ const HouseCard = ({
       <View className="flex-1 gap-0.5">
         <View className="rounded-2xl">
           <Image
-            source={cardImageSource}
+            source={imageSourceFilter(imageSource)}
             style={{
               height: RFValue(155),
               width: "100%",

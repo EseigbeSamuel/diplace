@@ -1,20 +1,13 @@
-import React, { useState } from "react";
-import {
-  View,
-  Text,
-  StyleSheet,
-  TextInput,
-  KeyboardAvoidingView,
-  Platform,
-} from "react-native";
-import { RFValue } from "react-native-responsive-fontsize";
-import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import AppButton from "@/components/button";
 import NumericField from "@/components/NumberField";
 import { useTheme } from "@/contexts/themeContext";
-import { ColorScheme } from "@/utils";
-import { useSpaceStore } from "@/store/useSpace";
 import { showToast } from "@/lib";
+import { useSpaceStore } from "@/store/useSpace";
+import { ColorScheme } from "@/utils";
+import React, { useState } from "react";
+import { StyleSheet, Text, TextInput, View } from "react-native";
+import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
+import { RFValue } from "react-native-responsive-fontsize";
 
 interface CapacitySubstepProps {
   onNext: () => void;
@@ -48,11 +41,7 @@ const EventCapacitySubstep: React.FC<CapacitySubstepProps> = ({
   };
 
   return (
-    <KeyboardAvoidingView
-      style={styles.container}
-      behavior={Platform.OS === "ios" ? "padding" : "height"}
-      keyboardVerticalOffset={Platform.OS === "ios" ? 88 : 24}
-    >
+    <View style={styles.container}>
       <KeyboardAwareScrollView
         enableOnAndroid={true}
         extraScrollHeight={90}
@@ -115,7 +104,9 @@ const EventCapacitySubstep: React.FC<CapacitySubstepProps> = ({
               />
             </View>
           </View>
-          {!!roomSizeError && <Text style={styles.errorText}>{roomSizeError}</Text>}
+          {!!roomSizeError && (
+            <Text style={styles.errorText}>{roomSizeError}</Text>
+          )}
 
           {/* Changing Room */}
           <View style={styles.fieldRow}>
@@ -173,7 +164,7 @@ const EventCapacitySubstep: React.FC<CapacitySubstepProps> = ({
           }
         />
       </View>
-    </KeyboardAvoidingView>
+    </View>
   );
 };
 

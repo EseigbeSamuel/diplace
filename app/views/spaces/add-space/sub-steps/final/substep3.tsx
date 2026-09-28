@@ -1,12 +1,12 @@
+import { BottomSheet } from "@/components/bottom-sheet";
 import AppButton from "@/components/button";
 import { SimpleSelector } from "@/components/selector";
 import { useTheme } from "@/contexts/themeContext";
 import { useSpaceStore } from "@/store/useSpace";
 import { ColorScheme } from "@/utils";
-import React, { useState } from "react";
+import React, { useMemo, useState } from "react";
 import {
   Image,
-  Modal,
   StyleSheet,
   Text,
   TextInput,
@@ -158,7 +158,7 @@ const RentalCostSubstep: React.FC<RentalCostSubstepProps> = ({
               <View style={styles.payoutInputWrapper}>
                 <TextInput
                   style={styles.payoutInput}
-                  value={spaceForm.value.rentalCost?.maxRentPayout || "1"}
+                  value={spaceForm.value.rentalCost?.maxRentPayout}
                   onChangeText={handleMaxPayoutChange}
                   keyboardType="numeric"
                   maxLength={3}
@@ -184,43 +184,27 @@ const RentalCostSubstep: React.FC<RentalCostSubstepProps> = ({
       </View>
 
       {/* Duration Selection Modal */}
-      <Modal
-        visible={showDurationModal}
-        transparent
-        animationType="slide"
-        onRequestClose={() => setShowDurationModal(false)}
+      <BottomSheet
+        isVisible={showDurationModal}
+        onClose={() => setShowDurationModal(false)}
+        snapPoints={useMemo(() => ["50%"], [])}
       >
-        <TouchableOpacity
-          style={styles.modalOverlay}
-          activeOpacity={1}
-          onPress={() => setShowDurationModal(false)}
-        >
-          <TouchableOpacity
-            activeOpacity={1}
-            style={styles.modalContent}
-            onPress={(e) => e.stopPropagation()}
-          >
-            <View style={styles.modalHandle} />
-            <Text style={styles.modalTitle}>Rent duration</Text>
-            <Text style={styles.modalDescription}>
-              Select the rent duration of this property.
-            </Text>
+        <Text style={styles.modalTitle}>Rent duration</Text>
+        <Text style={styles.modalDescription}>
+          Select the rent duration of this property.
+        </Text>
 
-            <View style={styles.durationOptions}>
-              {rentDurations.map((duration) => (
-                <SimpleSelector
-                  title={duration}
-                  isChecked={
-                    spaceForm.value.rentalCost?.rentDuration === duration
-                  }
-                  onChange={() => handleSelectDuration(duration)}
-                  key={duration}
-                />
-              ))}
-            </View>
-          </TouchableOpacity>
-        </TouchableOpacity>
-      </Modal>
+        <View style={styles.durationOptions}>
+          {rentDurations.map((duration) => (
+            <SimpleSelector
+              title={duration}
+              isChecked={spaceForm.value.rentalCost?.rentDuration === duration}
+              onChange={() => handleSelectDuration(duration)}
+              key={duration}
+            />
+          ))}
+        </View>
+      </BottomSheet>
     </View>
   );
 };
@@ -344,6 +328,7 @@ const createStyles = (colors: ColorScheme) =>
       fontWeight: "600",
       color: colors.slate[650],
       textAlign: "center",
+      width: RFValue(20),
     },
     payoutUnit: {
       fontSize: RFValue(15),

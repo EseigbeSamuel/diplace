@@ -316,9 +316,9 @@ export const useSpaceStore = create<PostSpaceState>((set) => ({
     value: {
       media: [],
       accountDetails: {
-        accountNumber: "8102934980",
-        accountName: "ALEX IBE",
-        bank: "ACCESS BANK PLC",
+        accountNumber: "",
+        accountName: "",
+        bank: "",
       },
       inspectionTimeSlots: createDefaultInspectionTimeSlots(),
       otherCharges: [

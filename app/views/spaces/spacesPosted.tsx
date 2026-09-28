@@ -12,6 +12,7 @@ import {
   useListProperties,
   useUpdatePropertyStatus,
 } from "@/hooks";
+import { imageSourceFilter } from "@/lib/imageSourceFilter";
 import { useSpaceStore } from "@/store/useSpace";
 import { PropertyListItem } from "@/types";
 import { ColorScheme } from "@/utils";
@@ -72,12 +73,12 @@ const SpacesPosted = ({ layout }: { layout: "tiles" | "box" }) => {
   const [selectedSpace, setSelectedSpace] = useState<PropertyCardItem | null>(
     null,
   );
-  const snapPoints = useMemo(() => ["62%"], []);
+  const snapPoints = useMemo(() => ["68%"], []);
   const statusSnapPoints = useMemo(() => ["56%"], []);
   const prettyStatus = (status?: string) =>
     (status || "active").charAt(0).toUpperCase() +
     (status || "active").slice(1);
-  (status || "active").charAt(0).toUpperCase() + (status || "active").slice(1);
+
   const mapPropertyStatusToSelector = (
     status?: string,
   ): "active" | "pending" | "rented" | "sold" | "inactive" | "archived" => {
@@ -125,7 +126,9 @@ const SpacesPosted = ({ layout }: { layout: "tiles" | "box" }) => {
 
   const handleRemoveSpace = () => {
     setIsViewSpaceSheetVisible(false);
-    setRemoveDialogVisible(true);
+    setTimeout(() => {
+      setRemoveDialogVisible(true);
+    }, 300);
   };
 
   const handleRemoveCancel = () => {
@@ -169,8 +172,6 @@ const SpacesPosted = ({ layout }: { layout: "tiles" | "box" }) => {
   };
 
   const postedSpaces = useMemo(
-    () =>
-      properties.filter((item) => !["draft", "deleted"].includes(item.status)),
     () =>
       properties.filter((item) => !["draft", "deleted"].includes(item.status)),
     [properties],
@@ -291,10 +292,7 @@ const SpacesPosted = ({ layout }: { layout: "tiles" | "box" }) => {
         <View style={homeStyles.modalContainer}>
           <View style={homeStyles.modalImageWrap}>
             <Image
-              source={
-                selectedSpace?.imageSource ||
-                require("@/assets/images/featuredSpaceImage1.png")
-              }
+              source={imageSourceFilter(selectedSpace?.imageSource)}
               style={homeStyles.modalImage}
             />
           </View>
@@ -501,7 +499,7 @@ const styles = (colors: ColorScheme) =>
     },
     modalContainer: {
       paddingTop: RFValue(10),
-      paddingBottom: RFValue(16),
+      paddingBottom: RFValue(20),
       alignItems: "center",
     },
     modalOverlay: {

@@ -32,9 +32,14 @@ const ConfirmDialog: React.FC<ConfirmDialogProps> = ({
 }) => {
   const { colors } = useTheme();
   const Styles = styles(colors);
-  if (!visible) return null;
+
   return (
-    <Modal visible={visible} transparent animationType="fade">
+    <Modal
+      visible={visible}
+      transparent
+      animationType="fade"
+      onRequestClose={onCancel}
+    >
       <View className="flex-1 items-center justify-center bg-black/50">
         <View style={Styles.container}>
           <Text style={Styles.title}>{title}</Text>
