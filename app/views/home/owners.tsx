@@ -3,6 +3,7 @@ import SafeAreaViewContainer from "@/components/safeareaview";
 import { promoData } from "@/constants/ownerHome";
 import { useTheme } from "@/contexts/themeContext";
 import { useGetCurrentUser, useListProperties } from "@/hooks";
+import { imageSourceFilter } from "@/lib/imageSourceFilter";
 import { ColorScheme } from "@/utils";
 import { LinearGradient } from "expo-linear-gradient";
 import { router } from "expo-router";
@@ -112,7 +113,9 @@ export default function OwnersHome() {
         title={
           <View className="gap-2">
             <Text style={custom.subTitle} className="font-semibold">
-              Welcome Ibe! 👋
+              Welcome{" "}
+              {`${(currentUser?.last_name || "J")[0].toUpperCase()}${currentUser?.last_name?.slice(1)?.toLowerCase()} `}
+              ! 👋
             </Text>
             <Pressable
               onPress={() => router.push("/views/location")}
@@ -120,7 +123,7 @@ export default function OwnersHome() {
             >
               <Image source={require("@/assets/icons/location.png")} />
               <Text style={custom.small} className="">
-                14 Amadi Str, Rumuewhera
+                {currentUser?.address?.street}, {currentUser?.address?.city}
               </Text>
               <Image source={require("@/assets/icons/angle.png")} />
             </Pressable>
@@ -143,7 +146,11 @@ export default function OwnersHome() {
                 <View className="rounded-3xl overflow-hidden bg-white shadow-lg shadow-black/20">
                   <View className="w-full h-48 overflow-hidden rounded-3xl">
                     <Image
-                      source={require("@/assets/images/landlord-right.jpg")}
+                      source={imageSourceFilter(
+                        latestProperty?.media?.[0]?.file_url
+                          ? latestProperty?.media[0].file_url
+                          : require("@/assets/images/featuredSpaceImage1.png"),
+                      )}
                       className="w-full h-full rounded-3xl"
                     />
                     <LinearGradient

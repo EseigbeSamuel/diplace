@@ -302,24 +302,26 @@ const AddBankDetails = ({
                   </Pressable>
                 ) : supportedBanks.length > 0 ? (
                   supportedBanks.map((bank) => (
-                  <Pressable
-                    key={bank.code}
-                    style={addBankStyles.bankItem}
-                    onPress={() => handleSelectBank(bank)}
-                  >
-                    <View
-                      style={[
-                        addBankStyles.radioButton,
-                        selectedBank?.code === bank.code &&
-                          addBankStyles.radioButtonSelected,
-                      ]}
+                    <Pressable
+                      key={bank.code}
+                      style={addBankStyles.bankItem}
+                      onPress={() => handleSelectBank(bank)}
                     >
-                      {selectedBank?.code === bank.code && (
-                        <View style={addBankStyles.radioButtonInner} />
-                      )}
-                    </View>
-                    <Text style={addBankStyles.bankItemText}>{bank.name}</Text>
-                  </Pressable>
+                      <View
+                        style={[
+                          addBankStyles.radioButton,
+                          selectedBank?.code === bank.code &&
+                            addBankStyles.radioButtonSelected,
+                        ]}
+                      >
+                        {selectedBank?.code === bank.code && (
+                          <View style={addBankStyles.radioButtonInner} />
+                        )}
+                      </View>
+                      <Text style={addBankStyles.bankItemText}>
+                        {bank.name}
+                      </Text>
+                    </Pressable>
                   ))
                 ) : (
                   <View style={addBankStyles.bankState}>

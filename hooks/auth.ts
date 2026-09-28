@@ -1,13 +1,13 @@
 import { clearAll, saveToLocalStore, showToast } from "@/lib";
 import { getRequest, postRequest } from "@/services";
 import {
-    CurrentUserResponse,
-    LoginPayload,
-    LoginResponse,
-    RegisterPayload,
-    RegisterResponse,
-    VerifyOtpPayload,
-    VerifyOtpResponse
+  CurrentUserResponse,
+  LoginPayload,
+  LoginResponse,
+  RegisterPayload,
+  RegisterResponse,
+  VerifyOtpPayload,
+  VerifyOtpResponse
 } from "@/types";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
@@ -245,7 +245,7 @@ export function useRegister() {
     onSuccess: async (data) => {
       router.replace("/auth/verify-otp");
     },
-    onError: () => {},
+    onError: () => { },
   });
 
   return {

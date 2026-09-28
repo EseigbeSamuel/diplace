@@ -2,11 +2,11 @@
 import { Edit } from "@/assets/icons";
 import AppButton from "@/components/button";
 import { useTheme } from "@/contexts/themeContext";
-import { useGetCurrentUser } from "@/hooks";
+import { useGetCurrentUser, useGetUserBanks } from "@/hooks";
 import { useSpaceStore } from "@/store/useSpace";
 import { BankDetails } from "@/types/add-space-types";
 import { ColorScheme } from "@/utils";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Modal,
   Pressable,
@@ -30,7 +30,24 @@ const ConfirmDetailsSubstep: React.FC<ConfirmDetailsSubstepProps> = ({
   const { colors } = useTheme();
   const { spaceForm, setValue } = useSpaceStore();
   const { currentUser } = useGetCurrentUser();
+  const { banks, isBanksLoading } = useGetUserBanks();
+
   const styles = createStyles(colors);
+
+  useEffect(() => {
+    if (!banks.length) return;
+    if (spaceForm.value.accountDetails?.accountNumber) return;
+
+    const bank = banks[0];
+
+    setValue({
+      accountDetails: {
+        accountNumber: bank.account_number,
+        accountName: bank.account_name,
+        bank: bank.bank_name,
+      },
+    });
+  }, [banks, setValue]);
 
   const [showBankModal, setShowBankModal] = useState(false);
 
@@ -97,46 +114,49 @@ const ConfirmDetailsSubstep: React.FC<ConfirmDetailsSubstepProps> = ({
         </View>
 
         {/* Bank Details */}
-        <View style={styles.section}>
-          <View style={styles.infoContainer}>
-            <View style={styles.sectionHeaderInside}>
-              <Text style={styles.sectionTitle}>Bank Details</Text>
-              <Pressable
-                style={styles.editButton}
-                onPress={handleEditBankDetails}
-              >
-                {/* <Image
+        {!isBanksLoading && (
+          <View style={styles.section}>
+            <View style={styles.infoContainer}>
+              <View style={styles.sectionHeaderInside}>
+                <Text style={styles.sectionTitle}>Bank Details</Text>
+                <Pressable
+                  style={styles.editButton}
+                  onPress={handleEditBankDetails}
+                >
+                  {/* <Image
                   source={require("@/assets/icons/edit-pencil-fill.png")}
                   style={styles.editIcon}
                 /> */}
-                <Edit size={16} color={colors.slate[650]} />
-                <Text style={styles.editText}>Edit</Text>
-              </Pressable>
-            </View>
+                  <Edit size={16} color={colors.slate[650]} />
+                  <Text style={styles.editText}>Edit</Text>
+                </Pressable>
+              </View>
 
-            <View style={styles.infoRow}>
-              <View style={styles.infoField}>
-                <Text style={styles.infoLabel}>Account Number</Text>
+              <View style={styles.infoRow}>
+                <View style={styles.infoField}>
+                  <Text style={styles.infoLabel}>Account Number</Text>
+                  <Text style={styles.infoValue}>
+                    {spaceForm.value.accountDetails?.accountNumber ||
+                      "UNAVAILABLE"}
+                  </Text>
+                </View>
+                <View style={styles.infoField}>
+                  <Text style={styles.infoLabel}>Account Name</Text>
+                  <Text style={styles.infoValue}>
+                    {spaceForm.value.accountDetails?.accountName ||
+                      "UNAVAILABLE"}
+                  </Text>
+                </View>
+              </View>
+              <View style={styles.fullWidthRow}>
+                <Text style={styles.infoLabel}>Bank</Text>
                 <Text style={styles.infoValue}>
-                  {spaceForm.value.accountDetails?.accountNumber ||
-                    "UNAVAILABLE"}
+                  {spaceForm.value.accountDetails?.bank || "N/A"}
                 </Text>
               </View>
-              <View style={styles.infoField}>
-                <Text style={styles.infoLabel}>Account Name</Text>
-                <Text style={styles.infoValue}>
-                  {spaceForm.value.accountDetails?.accountName || "UNAVAILABLE"}
-                </Text>
-              </View>
-            </View>
-            <View style={styles.fullWidthRow}>
-              <Text style={styles.infoLabel}>Bank</Text>
-              <Text style={styles.infoValue}>
-                {spaceForm.value.accountDetails?.bank || "N/A"}
-              </Text>
             </View>
           </View>
-        </View>
+        )}
       </ScrollView>
 
       <View style={styles.buttonContainer}>
