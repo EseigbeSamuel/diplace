@@ -1,5 +1,6 @@
 import { Calling, Chat } from "@/assets/icons";
 import BookmarkButton from "@/components/bookmark";
+import { BottomSheet } from "@/components/bottom-sheet";
 import AppButton from "@/components/button";
 import SafeAreaViewContainer from "@/components/safeareaview";
 import SectionHeader from "@/components/sectionheader";
@@ -63,7 +64,7 @@ const REPORT_REASON_MAP: Record<string, ReportPropertyReason> = {
 };
 
 const Placedetails = () => {
-  const { colors, isDarkMode } = useTheme();
+  const { colors } = useTheme();
   const { spaceForm } = useSpaceStore();
   const styles = createStyles(colors);
   const { id } = useLocalSearchParams<{ id?: string }>();
@@ -73,10 +74,10 @@ const Placedetails = () => {
   const [enlargeMapVisible, setEnlargeMapVisible] = useState(false);
   const [showLocationSheet, setShowLocationSheet] = useState(false);
   const [selectedDate, setSelectedDate] = useState<string | null>(null);
-  const [showDatePicker, setShowDatePicker] = useState(false);
   const [showGalleryModal, setShowGalleryModal] = useState(false);
-  const [showInspectionModal, setShowInspectionModal] = useState(false);
-  const [showTimeSlotModal, setShowTimeSlotModal] = useState(false);
+  const [activeInspectionSheet, setActiveInspectionSheet] = useState<
+    "inspection" | "date" | "time" | null
+  >(null);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [showOptionsMenu, setShowOptionsMenu] = useState(false);
   const [showReportModal, setShowReportModal] = useState(false);
@@ -109,11 +110,12 @@ const Placedetails = () => {
     propertyId: propertyId,
     enabled: !!propertyId,
   });
-  const { propertyAvailability } = useGetPropertyAvailability({
-    propertyId,
-    enabled: !!propertyId,
-    params: { status: "available", limit: 100, sort_order: "asc" },
-  });
+  const { propertyAvailability, isPropertyAvailabilityLoading } =
+    useGetPropertyAvailability({
+      propertyId,
+      enabled: !!propertyId,
+      params: { status: "available", limit: 100, sort_order: "asc" },
+    });
   const { scheduleInspectionMutation, isScheduleInspectionPending } =
     useScheduleInspection();
   const { reportPropertyMutation, reportPropertyPending } = useReportProperty();
@@ -420,7 +422,7 @@ const Placedetails = () => {
       agreed_to_terms: true,
     });
 
-    setShowInspectionModal(false);
+    setActiveInspectionSheet(null);
     router.push({
       pathname: "/views/booking/payment",
       params: {
@@ -724,7 +726,7 @@ const Placedetails = () => {
                   //   className="w-5 h-5"
                   //   style={{ tintColor: colors.slate[650] }}
                   // />
-                  <Chat />
+                  <Chat color={colors.slate[650]} />
                 )}
               </TouchableOpacity>
               <TouchableOpacity
@@ -748,7 +750,7 @@ const Placedetails = () => {
                   //   className="w-5 h-5"
                   //   style={{ tintColor: colors.slate[650] }}
                   // />
-                  <Calling />
+                  <Calling color={colors.slate[650]} />
                 )}
               </TouchableOpacity>
             </View>
@@ -871,7 +873,7 @@ const Placedetails = () => {
           <View style={styles.completeButtonContainer}>
             <AppButton
               title="Book Now"
-              onPress={() => setShowInspectionModal(true)}
+              onPress={() => setActiveInspectionSheet("inspection")}
               size="large"
               fullwidth={true}
             />
@@ -1148,156 +1150,142 @@ const Placedetails = () => {
           </Pressable>
         </Modal>
 
-        {/* Inspection Modal - Bottom Sheet */}
-        <Modal
-          visible={showInspectionModal}
-          transparent
-          animationType="slide"
-          onRequestClose={() => setShowInspectionModal(false)}
+        <BottomSheet
+          isVisible={activeInspectionSheet !== null}
+          onClose={() =>
+            setActiveInspectionSheet((current) =>
+              current === "inspection" ? null : "inspection",
+            )
+          }
+          snapPoints={
+            activeInspectionSheet === "date"
+              ? [0.65]
+              : activeInspectionSheet === "time"
+                ? [0.5]
+                : [0.73]
+          }
         >
-          <Pressable
-            style={styles.inspectionModalOverlay}
-            onPress={() => setShowInspectionModal(false)}
-          >
-            <Pressable
-              style={styles.inspectionBottomSheet}
-              onPress={(e) => e.stopPropagation()}
-            >
-              {/* Handle */}
-              <View style={styles.modalHandle} />
+          {activeInspectionSheet === "inspection" && (
+            <View style={styles.inspectionModalBody}>
+              <Text style={styles.inspectionModalTitle}>
+                Schedule an inspection
+              </Text>
+              <Text style={styles.inspectionModalSubtitle}>
+                Pick a convenient time to inspect this space in person. A small
+                inspection fee may apply, payable before confirmation.
+              </Text>
 
-              <ScrollView showsVerticalScrollIndicator={false}>
-                <View style={styles.inspectionModalBody}>
-                  <Text style={styles.inspectionModalTitle}>
-                    Schedule an inspection
-                  </Text>
-                  <Text style={styles.inspectionModalSubtitle}>
-                    Pick a convenient time to inspect this space in person. A
-                    small inspection fee may apply, payable before confirmation.
-                  </Text>
-
-                  {/* <Text style={styles.inputLabel}>Select inspection date</Text> */}
-                  <TouchableOpacity
-                    style={styles.inspectionInput}
-                    onPress={() => setShowDatePicker(true)}
-                  >
-                    <Text
-                      style={[
-                        styles.inspectionInputText,
-                        !selectedDate && styles.inspectionInputPlaceholder,
-                      ]}
-                    >
-                      {selectedDate
-                        ? formatReadableDate(selectedDate)
-                        : "Select inspection date"}
-                    </Text>
-                    <Image
-                      source={require("@/assets/icons/calendar.png")}
-                      style={styles.inspectionInputIcon}
-                    />
-                  </TouchableOpacity>
-
-                  {/* <Text style={styles.inputLabel}>Choose time slot</Text> */}
-                  <TouchableOpacity
-                    style={styles.inspectionInput}
-                    onPress={() => setShowTimeSlotModal(true)}
-                  >
-                    <Text
-                      style={[
-                        styles.inspectionInputText,
-                        !selectedTime && styles.inspectionInputPlaceholder,
-                      ]}
-                    >
-                      {selectedTime ? selectedTime.label : "Select time"}
-                    </Text>
-                    <Image
-                      source={require("@/assets/icons/chevron-right.png")}
-                      // style={styles.chevronIcon}
-                    />
-                  </TouchableOpacity>
-
-                  <View style={styles.inspectionFeeRow}>
-                    <Text style={styles.inspectionFeeLabel}>
-                      Inspection fee:
-                    </Text>
-                    <Text style={styles.inspectionFeeAmount}>
-                      {formatMoneyParam(selectedTime?.price ?? 0)}
-                    </Text>
-                  </View>
-
-                  {/* Security Note */}
-                  <View style={styles.inspectionNote}>
-                    <Text style={styles.inspectionNoteText}>
-                      🔐 Fee is held by DiPlace and only released after a
-                      successful inspection. Refunded if canceled or not
-                      completed.
-                    </Text>
-                  </View>
-
-                  {/* Buttons */}
-                  <View style={styles.inspectionButtons}>
-                    <AppButton
-                      title={
-                        isScheduleInspectionPending
-                          ? "Scheduling..."
-                          : "Schedule Inspection"
-                      }
-                      onPress={handleScheduleInspection}
-                      disabled={
-                        !selectedTime ||
-                        !selectedDate ||
-                        isScheduleInspectionPending
-                      }
-                    />
-                    <AppButton
-                      title="Skip & Proceed to Book Now"
-                      onPress={() => {
-                        setShowInspectionModal(false);
-                        router.push({
-                          pathname: "/views/booking/renters-info",
-                          params: bookingRouteParams,
-                        });
-                      }}
-                      variant="tertiary"
-                    />
-                  </View>
-                </View>
-              </ScrollView>
-            </Pressable>
-          </Pressable>
-        </Modal>
-
-        {/* Date Picker Modal */}
-        <Modal visible={showDatePicker} transparent animationType="fade">
-          <View className="items-center justify-center flex-1 bg-black/30">
-            <View
-              style={{ backgroundColor: colors.background }}
-              className="w-[88%] rounded-3xl p-5"
-            >
-              <Text
-                style={{ color: colors.slate[600] }}
-                className="mb-2 text-sm"
+              <TouchableOpacity
+                style={styles.inspectionInput}
+                onPress={() => setActiveInspectionSheet("date")}
               >
+                <Text
+                  style={[
+                    styles.inspectionInputText,
+                    !selectedDate && styles.inspectionInputPlaceholder,
+                  ]}
+                >
+                  {selectedDate
+                    ? formatReadableDate(selectedDate)
+                    : "Select inspection date"}
+                </Text>
+                <Image
+                  source={require("@/assets/icons/calendar.png")}
+                  style={styles.inspectionInputIcon}
+                />
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                style={styles.inspectionInput}
+                onPress={() => setActiveInspectionSheet("time")}
+              >
+                <Text
+                  style={[
+                    styles.inspectionInputText,
+                    !selectedTime && styles.inspectionInputPlaceholder,
+                  ]}
+                >
+                  {selectedTime ? selectedTime.label : "Select time"}
+                </Text>
+                <Image source={require("@/assets/icons/chevron-right.png")} />
+              </TouchableOpacity>
+
+              <View style={styles.inspectionFeeRow}>
+                <Text style={styles.inspectionFeeLabel}>Inspection fee:</Text>
+                <Text style={styles.inspectionFeeAmount}>
+                  {formatMoneyParam(selectedTime?.price ?? 0)}
+                </Text>
+              </View>
+
+              <View style={styles.inspectionNote}>
+                <Text style={styles.inspectionNoteText}>
+                  🔐 Fee is held by DiPlace and only released after a successful
+                  inspection. Refunded if canceled or not completed.
+                </Text>
+              </View>
+
+              <View style={styles.inspectionButtons}>
+                <AppButton
+                  title={
+                    isScheduleInspectionPending
+                      ? "Scheduling..."
+                      : "Schedule Inspection"
+                  }
+                  onPress={handleScheduleInspection}
+                  disabled={
+                    !selectedTime ||
+                    !selectedDate ||
+                    isScheduleInspectionPending
+                  }
+                />
+                <AppButton
+                  title="Skip & Proceed to Book Now"
+                  onPress={() => {
+                    setActiveInspectionSheet(null);
+                    router.push({
+                      pathname: "/views/booking/renters-info",
+                      params: bookingRouteParams,
+                    });
+                  }}
+                  variant="tertiary"
+                />
+              </View>
+            </View>
+          )}
+
+          {activeInspectionSheet === "date" && (
+            <>
+              <Text style={{ color: colors.slate[600], marginBottom: 8 }}>
                 Select date
               </Text>
 
               <Text
-                style={{ color: colors.slate[650] }}
-                className="mb-4 text-2xl font-semibold"
+                style={{
+                  color: colors.slate[650],
+                  fontSize: 24,
+                  fontWeight: "600",
+                  marginBottom: 16,
+                }}
               >
                 {selectedDate
                   ? formatReadableDate(selectedDate)
                   : formatReadableDate(new Date())}
               </Text>
 
-              <View className="h-[1px] bg-gray-200 dark:bg-gray-700 mb-4" />
+              <View
+                style={{
+                  height: 1,
+                  backgroundColor: colors.slate[350],
+                  marginBottom: 16,
+                }}
+              />
 
               <Calendar
                 onDayPress={(day) => {
                   setSelectedDate(day.dateString);
                   setSelectedTime(null);
                 }}
-                markingType={"custom"}
+                markingType="custom"
                 markedDates={
                   selectedDate
                     ? {
@@ -1305,11 +1293,12 @@ const Placedetails = () => {
                           customStyles: {
                             container: {
                               borderWidth: 2,
-                              borderColor: "#000",
+                              borderColor: colors.info[200],
+                              backgroundColor: colors.info[100],
                               borderRadius: 999,
                             },
                             text: {
-                              color: "#000",
+                              color: colors.slate[650],
                               fontWeight: "600",
                             },
                           },
@@ -1318,94 +1307,97 @@ const Placedetails = () => {
                     : {}
                 }
                 theme={{
-                  backgroundColor: isDarkMode ? "#181818" : "#FCFCFC",
-                  calendarBackground: isDarkMode ? "#181818" : "#FCFCFC",
-                  textSectionTitleColor: "#9ca3af",
-                  monthTextColor: isDarkMode ? "#ffffff" : "#000000",
+                  backgroundColor: colors.background,
+                  calendarBackground: colors.background,
+                  textSectionTitleColor: colors.slate[500],
+                  monthTextColor: colors.slate[650],
                   textMonthFontWeight: "600",
                   textMonthFontSize: 16,
-                  dayTextColor: isDarkMode ? "#e5e7eb" : "#000000",
+                  dayTextColor: colors.slate[650],
                   textDayFontSize: 15,
-                  arrowColor: "#000",
-                  todayTextColor: "#000",
+                  arrowColor: colors.info[200],
+                  todayTextColor: colors.info[200],
+                  textDisabledColor: colors.slate[450],
                 }}
                 style={{ borderRadius: 20, paddingBottom: 10 }}
               />
 
-              <View className="flex-row justify-end mt-3">
-                <TouchableOpacity onPress={() => setShowDatePicker(false)}>
-                  <Text className="mr-6 text-base text-gray-600 dark:text-gray-300">
+              <View
+                style={{
+                  flexDirection: "row",
+                  justifyContent: "flex-end",
+                  marginTop: 12,
+                }}
+              >
+                <TouchableOpacity
+                  onPress={() => setActiveInspectionSheet("inspection")}
+                >
+                  <Text style={{ color: colors.slate[600], marginRight: 24 }}>
                     Cancel
                   </Text>
                 </TouchableOpacity>
 
                 <TouchableOpacity
-                  onPress={() => {
-                    setShowDatePicker(false);
-                  }}
+                  onPress={() => setActiveInspectionSheet("inspection")}
                 >
-                  <Text className="text-base font-semibold text-blue-600 dark:text-blue-400">
+                  <Text style={{ color: colors.info[200], fontWeight: "600" }}>
                     OK
                   </Text>
                 </TouchableOpacity>
               </View>
-            </View>
-          </View>
-        </Modal>
+            </>
+          )}
 
-        {/* Time Slot Modal */}
-        <Modal
-          visible={showTimeSlotModal}
-          transparent
-          animationType="slide"
-          onRequestClose={() => setShowTimeSlotModal(false)}
-        >
-          <Pressable
-            style={styles.timeSlotModalOverlay}
-            onPress={() => setShowTimeSlotModal(false)}
-          >
-            <Pressable
-              style={styles.timeSlotBottomSheet}
-              onPress={(e) => e.stopPropagation()}
-            >
-              <View style={styles.modalHandle} />
-
+          {activeInspectionSheet === "time" && (
+            <>
               <Text style={styles.timeSlotModalTitle}>Choose time slot</Text>
               <Text style={styles.timeSlotModalSubtitle}>
-                Pick a convenient time for you from the agent's available time
-                slot.
+                Pick a convenient time for you from the agent&apos;s available
+                time slot.
               </Text>
 
-              <View style={styles.timeSlotList}>
-                {inspectionTimeSlots.map((item: timeslot) => {
-                  const isSelected = selectedTime?.id === item.id;
-                  return (
-                    <TouchableOpacity
-                      key={item.id}
-                      style={styles.timeSlotItem}
-                      onPress={() => {
-                        setSelectedTime(item);
-                        setShowTimeSlotModal(false);
-                      }}
-                    >
-                      <View
-                        style={[
-                          styles.timeSlotRadio,
-                          isSelected && styles.timeSlotRadioSelected,
-                        ]}
+              {isPropertyAvailabilityLoading ? (
+                <ActivityIndicator color={colors.info[200]} />
+              ) : inspectionTimeSlots.length > 0 ? (
+                <View style={styles.timeSlotList}>
+                  {inspectionTimeSlots.map((item: timeslot) => {
+                    const isSelected = selectedTime?.id === item.id;
+                    return (
+                      <TouchableOpacity
+                        key={item.id}
+                        style={styles.timeSlotItem}
+                        onPress={() => {
+                          setSelectedTime(item);
+                          setActiveInspectionSheet("inspection");
+                        }}
                       >
-                        {isSelected && (
-                          <View style={styles.timeSlotRadioInner} />
-                        )}
-                      </View>
-                      <Text style={styles.timeSlotItemText}>{item.label}</Text>
-                    </TouchableOpacity>
-                  );
-                })}
-              </View>
-            </Pressable>
-          </Pressable>
-        </Modal>
+                        <View
+                          style={[
+                            styles.timeSlotRadio,
+                            isSelected && styles.timeSlotRadioSelected,
+                          ]}
+                        >
+                          {isSelected && (
+                            <View style={styles.timeSlotRadioInner} />
+                          )}
+                        </View>
+                        <Text style={styles.timeSlotItemText}>
+                          {item.label}
+                        </Text>
+                      </TouchableOpacity>
+                    );
+                  })}
+                </View>
+              ) : (
+                <Text style={styles.timeSlotEmptyText}>
+                  {selectedDate
+                    ? "No available time slots for this date."
+                    : "No inspection time slots are currently available."}
+                </Text>
+              )}
+            </>
+          )}
+        </BottomSheet>
 
         {/* ENLARGED MAP MODAL */}
         <Modal
@@ -2186,6 +2178,13 @@ const createStyles = (colors: ColorScheme) =>
     },
     timeSlotList: {
       gap: RFValue(12),
+    },
+    timeSlotEmptyText: {
+      color: colors.slate[500],
+      fontSize: RFValue(14),
+      minHeight: RFValue(72),
+      textAlign: "center",
+      textAlignVertical: "center",
     },
     timeSlotItem: {
       flexDirection: "row",
