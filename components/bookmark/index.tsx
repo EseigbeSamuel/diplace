@@ -2,16 +2,47 @@ import { useTheme } from "@/contexts/themeContext";
 import { useMyBookmarks, useTogglePropertyBookmark } from "@/hooks";
 import { ColorScheme } from "@/utils";
 import React, { useMemo, useState } from "react";
-import { Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import {
+  GestureResponderEvent,
+  Image,
+  ImageSourcePropType,
+  ImageStyle,
+  StyleProp,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+  ViewStyle,
+} from "react-native";
 import { RFValue } from "react-native-responsive-fontsize";
+
+interface BookmarkButtonProps {
+  id: string;
+  showLabel?: boolean;
+  isBookmarked?: boolean;
+  disabled?: boolean;
+  onToggle?: () => void;
+  size?: number;
+  containerStyle?: StyleProp<ViewStyle>;
+  iconStyle?: StyleProp<ImageStyle>;
+  activeIcon?: ImageSourcePropType;
+  inactiveIcon?: ImageSourcePropType;
+  showToastNotification?: boolean;
+}
 
 const BookmarkButton = ({
   id,
   showLabel = false,
-}: {
-  id: string;
-  showLabel?: boolean;
-}) => {
+  isBookmarked: controlledIsBookmarked,
+  disabled = false,
+  onToggle: controlledOnToggle,
+  size,
+  containerStyle,
+  iconStyle,
+  activeIcon,
+  inactiveIcon,
+  showToastNotification = true,
+}: BookmarkButtonProps) => {
   const [bookmarkOverrides, setBookmarkOverrides] = useState<
     Record<string, boolean>
   >({});
@@ -21,7 +52,9 @@ const BookmarkButton = ({
   const { isDarkMode, colors } = useTheme();
 
   const styles = createStyles(colors);
-  const { bookmarkedPropertyIds } = useMyBookmarks({ enabled: true });
+  const isControlled = controlledIsBookmarked !== undefined;
+
+  const { bookmarkedPropertyIds } = useMyBookmarks({ enabled: !isControlled });
   const { togglePropertyBookmarkMutation } = useTogglePropertyBookmark();
 
   const bookmarkedSet = useMemo(
@@ -29,54 +62,73 @@ const BookmarkButton = ({
     [bookmarkedPropertyIds],
   );
 
-  const isBookmarked = (propertyId: string) =>
-    bookmarkOverrides[propertyId] ?? bookmarkedSet.has(propertyId);
+  const isCurrentBookmarked = isControlled
+    ? controlledIsBookmarked
+    : (bookmarkOverrides[id] ?? bookmarkedSet.has(id));
 
-  const handleToggleBookmark = async (propertyId: string) => {
-    if (bookmarkPendingIds[propertyId]) return;
-    const current = isBookmarked(propertyId);
+  const isPending = !!bookmarkPendingIds[id] || disabled;
 
-    setBookmarkPendingIds((prev) => ({ ...prev, [propertyId]: true }));
-    setBookmarkOverrides((prev) => ({ ...prev, [propertyId]: !current }));
+  const handleToggleBookmark = async (e?: GestureResponderEvent) => {
+    e?.stopPropagation?.();
+    if (isPending) return;
+
+    if (controlledOnToggle) {
+      controlledOnToggle();
+      return;
+    }
+
+    const current = isCurrentBookmarked;
+    setBookmarkPendingIds((prev) => ({ ...prev, [id]: true }));
+    setBookmarkOverrides((prev) => ({ ...prev, [id]: !current }));
 
     try {
-      const response = await togglePropertyBookmarkMutation({ propertyId });
+      const response = await togglePropertyBookmarkMutation({
+        propertyId: id,
+        notify: showToastNotification,
+      });
       const next =
-        response.bookmarked.status === "added"
+        response.bookmarked?.status === "added"
           ? true
-          : response.bookmarked.status === "removed"
+          : response.bookmarked?.status === "removed"
             ? false
             : !current;
-      setBookmarkOverrides((prev) => ({ ...prev, [propertyId]: next }));
+      setBookmarkOverrides((prev) => ({ ...prev, [id]: next }));
     } catch {
-      setBookmarkOverrides((prev) => ({ ...prev, [propertyId]: current }));
+      setBookmarkOverrides((prev) => ({ ...prev, [id]: current }));
     } finally {
-      setBookmarkPendingIds((prev) => ({ ...prev, [propertyId]: false }));
+      setBookmarkPendingIds((prev) => ({ ...prev, [id]: false }));
     }
   };
 
-  const bookmarked = isBookmarked(id);
+  const iconWidth = size ? RFValue(size) : RFValue(17);
+  const iconHeight = size ? RFValue(size * 1.3) : RFValue(22);
+
+  const resolvedActiveIcon =
+    activeIcon ?? require("@/assets/icons/bookmark-light-active.png");
+  const resolvedInactiveIcon =
+    inactiveIcon ??
+    (isDarkMode
+      ? require("@/assets/icons/bookmark-inactive-white.png")
+      : require("@/assets/icons/bookmark-inactive.png"));
 
   return (
     <TouchableOpacity
-      onPress={() => handleToggleBookmark(id)}
-      disabled={!!bookmarkPendingIds[id]}
-      hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+      onPress={handleToggleBookmark}
+      disabled={isPending}
+      hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}
       className="pt-0.5 flex flex-row gap-4 items-center"
+      style={containerStyle}
     >
       <Image
-        source={
-          bookmarked
-            ? require("@/assets/icons/bookmark-light-active.png")
-            : isDarkMode
-              ? require("@/assets/icons/bookmark-inactive-white.png")
-              : require("@/assets/icons/bookmark-inactive.png")
-        }
-        style={{ height: RFValue(22), width: RFValue(17) }}
+        source={isCurrentBookmarked ? resolvedActiveIcon : resolvedInactiveIcon}
+        style={[{ height: iconHeight, width: iconWidth }, iconStyle]}
+        resizeMode="contain"
       />
       {showLabel && (
         <View>
-          <Text style={styles.optionsMenuText}>Bookmark</Text>
+          <Text style={styles.optionsMenuText}>
+            {isCurrentBookmarked ? "Bookmarked" : "Bookmark"}
+          </Text>
         </View>
       )}
     </TouchableOpacity>

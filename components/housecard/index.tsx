@@ -24,6 +24,9 @@ const HouseCard = ({
   duration,
   type,
   showBookmark = false,
+  isBookmarked,
+  bookmarkDisabled,
+  onToggleBookmark,
   onPress,
 }: {
   imageSource: ImageSourcePropType | string;
@@ -34,6 +37,9 @@ const HouseCard = ({
   duration: string;
   type?: "featured" | "nearby";
   showBookmark?: boolean;
+  isBookmarked?: boolean;
+  bookmarkDisabled?: boolean;
+  onToggleBookmark?: () => void;
   id: string;
 
   onPress?: ((event: GestureResponderEvent) => void) | null | undefined;
@@ -191,7 +197,14 @@ const HouseCard = ({
               >
                 {title}
               </Text>
-              {showBookmark ? <BookmarkButton id={id} /> : null}
+              {showBookmark ? (
+                <BookmarkButton
+                  id={id}
+                  isBookmarked={isBookmarked}
+                  disabled={bookmarkDisabled}
+                  onToggle={onToggleBookmark}
+                />
+              ) : null}
             </View>
             <View className="flex flex-row items-center gap-1 pt-1">
               {/* <Image
