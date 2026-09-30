@@ -551,9 +551,11 @@ const Placedetails = () => {
             )}
 
             {/* Bookmark Icon */}
-            <TouchableOpacity style={styles.bookmarkButton}>
-              <BookmarkButton id={propertyId} />
-            </TouchableOpacity>
+            <BookmarkButton
+              id={propertyId}
+              containerStyle={styles.bookmarkButton}
+              size={15}
+            />
           </View>
 
           {/* Gallery and Street View Buttons - Below Image */}
@@ -1523,7 +1525,7 @@ const createStyles = (colors: ColorScheme) =>
       width: RFValue(36),
       height: RFValue(36),
       borderRadius: RFValue(18),
-      backgroundColor: "FFFFFF",
+      backgroundColor: "#FFFFFF",
       alignItems: "center",
       justifyContent: "center",
     },

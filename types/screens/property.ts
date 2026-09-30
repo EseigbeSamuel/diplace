@@ -214,6 +214,15 @@ export interface ListPropertiesResponse {
 
 export type PropertyDetailsResponse = PropertyListItem;
 
+export interface ListBookmarksParams {
+  q?: string | null;
+  skip?: number;
+  limit?: number;
+  sort_by?: string;
+  sort_order?: "asc" | "desc";
+  status?: PropertyStatus | string | null;
+}
+
 export interface BookmarkItem {
   public_id: string;
   date_created: string;
