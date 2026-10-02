@@ -19,6 +19,10 @@ export type ChatStatus =
 export interface ChatUser {
   public_id: string;
   status: ChatStatus;
+  full_name?: string | null;
+  name?: string | null;
+  is_online?: boolean;
+  last_seen_at?: string | null;
   user_type?: "agent" | "owner" | "renter" | "admin";
   email: string;
   first_name: string | null;
@@ -79,6 +83,7 @@ export interface ConversationListResponse {
 export interface MessagePayload {
   conversation_id: string;
   content: string;
+  reply_to_message_id?: string;
 }
 
 export interface MessageResponse {
@@ -90,4 +95,8 @@ export interface MessageResponse {
   sender: ChatUser;
   date_created?: string;
   created_at?: string;
+  delivered_at?: string | null;
+  read_at?: string | null;
+  is_read?: boolean;
+  reply_to_message_id?: string | null;
 }

@@ -1,12 +1,13 @@
 import { showToast } from "@/lib";
 import { getRequest, postRequest } from "@/services";
 import {
-  ConversationListResponse,
-  ConversationParams,
-  ConversationPayload,
-  MessagePayload,
-  MessageResponse,
-  StartConversationResponse,
+    ConversationListResponse,
+    ConversationParams,
+    ConversationPayload,
+    ConversationResponse,
+    MessagePayload,
+    MessageResponse,
+    StartConversationResponse,
 } from "@/types";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
@@ -14,11 +15,27 @@ import axios from "axios";
 export function useGetConversations(params?: Partial<ConversationParams>) {
   const query = useQuery({
     queryKey: ["conversations", params],
-    queryFn: async () =>
-      await getRequest<ConversationListResponse>({
+    queryFn: async () => {
+      const response = await getRequest<
+        ConversationListResponse | ConversationResponse[]
+      >({
         url: "/chats/conversations",
         params,
-      }),
+      });
+
+      if (!Array.isArray(response)) return response;
+
+      return {
+        conversations: response,
+        pagination: {
+          total_items: response.length,
+          skip: params?.skip ?? 0,
+          limit: params?.limit ?? response.length,
+          remaining_items: 0,
+          more_available: false,
+        },
+      };
+    },
   });
 
   return {

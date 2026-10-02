@@ -1,7 +1,8 @@
 import { getFromLocalStore } from "@/lib";
 import { useCallback, useEffect, useRef, useState } from "react";
 
-const HTTP_BASE_URL = process.env.EXPO_PUBLIC_API_URL || "https://diplace.api.elsoft.ng/api/v1";
+const HTTP_BASE_URL =
+  process.env.EXPO_PUBLIC_API_URL || "https://diplace.api.elsoft.ng/api/v1";
 const WS_BASE_URL = HTTP_BASE_URL.replace(/^http/, "ws");
 const RECONNECT_DELAY_MS = 3000;
 
@@ -13,6 +14,7 @@ export interface WsNewMessagePayload {
   sender_id: string;
   content: string;
   date_created: string;
+  reply_to_message_id?: string | null;
 }
 
 export interface WsErrorPayload {
@@ -28,6 +30,7 @@ export type WsServerFrame =
 export interface WsSendMessagePayload {
   conversation_id: string;
   content: string;
+  reply_to_message_id?: string;
 }
 
 export interface WsMarkReadPayload {
@@ -142,26 +145,22 @@ export function useChatWebSocket({
   const sendWsMessage = useCallback(
     (payload: WsSendMessagePayload): boolean => {
       if (wsRef.current?.readyState === WebSocket.OPEN) {
-        wsRef.current.send(
-          JSON.stringify({ type: "send_message", payload })
-        );
+        wsRef.current.send(JSON.stringify({ type: "send_message", payload }));
         return true;
       }
       return false;
     },
-    []
+    [],
   );
 
   /** Mark a conversation as read. No-op if socket is not open. */
   const markConversationRead = useCallback(
     (payload: WsMarkReadPayload): void => {
       if (wsRef.current?.readyState === WebSocket.OPEN) {
-        wsRef.current.send(
-          JSON.stringify({ type: "mark_read", payload })
-        );
+        wsRef.current.send(JSON.stringify({ type: "mark_read", payload }));
       }
     },
-    []
+    [],
   );
 
   return {

@@ -9,11 +9,13 @@ import {
   useGetConversationMessages,
   useGetConversations,
   useGetCurrentUser,
+  useGetPropertyDetails,
   useSendMessage,
   WsNewMessagePayload,
 } from "@/hooks";
 import { ColorScheme } from "@/utils";
 import { useLocalSearchParams, useRouter } from "expo-router";
+import { Check, CheckCheck } from "lucide-react-native";
 import React, {
   useCallback,
   useEffect,
@@ -45,12 +47,16 @@ interface Message {
   id: string;
   text: string;
   timestamp: string;
+  dateKey?: string;
   isUser: boolean;
+  deliveryStatus?: "sent" | "seen" | "read";
   type?: "text" | "property" | "system";
   replyTo?: string;
   propertyData?: {
+    propertyId?: string;
     title: string;
     price: string;
+    frequency: string;
     location: string;
     image: string;
   };
@@ -69,10 +75,32 @@ const reportReasons = [
   "Collected payment outside DiPlace",
 ];
 
+const getDateKey = (date?: string) =>
+  date ? new Date(date).toISOString().slice(0, 10) : "unknown";
+
+const formatDateLabel = (dateKey: string) => {
+  if (dateKey === "unknown") return "Date unavailable";
+  const date = new Date(`${dateKey}T12:00:00`);
+  const today = new Date();
+  const yesterday = new Date();
+  yesterday.setDate(today.getDate() - 1);
+
+  if (date.toDateString() === today.toDateString()) return "Today";
+  if (date.toDateString() === yesterday.toDateString()) return "Yesterday";
+  return date.toLocaleDateString([], {
+    day: "numeric",
+    month: "short",
+    year: "numeric",
+  });
+};
+
 interface MessageItemProps {
   item: Message;
   colors: ColorScheme;
   messages: Message[];
+  onReply?: (messageId: string) => void;
+  showHoldForRenter?: boolean;
+  onViewDetails?: () => void;
 }
 
 // System message (date separator)
@@ -84,9 +112,19 @@ const SystemMessage = ({
   colors: ColorScheme;
 }) => (
   <View style={styles.systemMessageContainer}>
-    <Text style={[styles.systemMessageText, { color: colors.slate[500] }]}>
-      {text}
-    </Text>
+    <View
+      style={[styles.systemMessageLine, { backgroundColor: colors.slate[250] }]}
+    />
+    <View
+      style={[styles.systemMessagePill, { backgroundColor: colors.slate[150] }]}
+    >
+      <Text style={[styles.systemMessageText, { color: colors.slate[500] }]}>
+        {text}
+      </Text>
+    </View>
+    <View
+      style={[styles.systemMessageLine, { backgroundColor: colors.slate[250] }]}
+    />
   </View>
 );
 
@@ -94,9 +132,13 @@ const SystemMessage = ({
 const PropertyMessage = ({
   item,
   colors,
+  showHoldForRenter,
+  onViewDetails,
 }: {
   item: Message;
   colors: ColorScheme;
+  showHoldForRenter: boolean;
+  onViewDetails?: () => void;
 }) => (
   <View style={styles.propertyMessageContainer}>
     <View
@@ -120,12 +162,19 @@ const PropertyMessage = ({
       >
         <View>
           <Image
-            source={{ uri: item.propertyData?.image }}
+            source={
+              item.propertyData?.image
+                ? { uri: item.propertyData.image }
+                : require("@/assets/images/diplace.jpg")
+            }
             style={styles.propertyImage}
           />
         </View>
-        <View>
-          <Text style={[styles.propertyTitle, { color: colors.slate[650] }]}>
+        <View style={styles.propertyDetails}>
+          <Text
+            numberOfLines={2}
+            style={[styles.propertyTitle, { color: colors.slate[650] }]}
+          >
             {item.propertyData?.title}
           </Text>
           <Text style={[styles.propertyLocation, { color: colors.slate[500] }]}>
@@ -136,13 +185,14 @@ const PropertyMessage = ({
             <Text
               style={[styles.propertyPriceUnit, { color: colors.slate[500] }]}
             >
-              / month
+              / {item.propertyData?.frequency}
             </Text>
           </Text>
         </View>
       </View>
       <View style={styles.propertyActions}>
         <TouchableOpacity
+          onPress={onViewDetails}
           style={[
             styles.propertyButton,
             styles.viewDetailsButton,
@@ -158,19 +208,21 @@ const PropertyMessage = ({
             View details
           </Text>
         </TouchableOpacity>
-        <TouchableOpacity
-          style={[
-            styles.propertyButton,
-            styles.rentButton,
-            { borderWidth: 1, backgroundColor: colors.slate[650] },
-          ]}
-        >
-          <Text
-            style={[styles.propertyButtonText, { color: colors.slate[100] }]}
+        {showHoldForRenter && (
+          <TouchableOpacity
+            style={[
+              styles.propertyButton,
+              styles.rentButton,
+              { borderWidth: 1, backgroundColor: colors.slate[650] },
+            ]}
           >
-            Hold for renter
-          </Text>
-        </TouchableOpacity>
+            <Text
+              style={[styles.propertyButtonText, { color: colors.slate[100] }]}
+            >
+              Hold for renter
+            </Text>
+          </TouchableOpacity>
+        )}
       </View>
     </View>
   </View>
@@ -209,14 +261,20 @@ const ReplyPreview = ({
 };
 
 // Regular text message
-const TextMessage = ({ item, colors, messages }: MessageItemProps) => (
+const TextMessage = ({ item, colors, messages, onReply }: MessageItemProps) => (
   <View
     style={[
       styles.messageContainer,
       item.isUser ? styles.userMessageContainer : styles.otherMessageContainer,
     ]}
   >
-    <View style={styles.messageBubbleContainer}>
+    <TouchableOpacity
+      style={styles.messageBubbleContainer}
+      activeOpacity={0.85}
+      onPress={() => onReply?.(item.id)}
+      onLongPress={() => onReply?.(item.id)}
+      delayLongPress={350}
+    >
       <View
         style={[
           styles.messageBubble,
@@ -243,17 +301,36 @@ const TextMessage = ({ item, colors, messages }: MessageItemProps) => (
         >
           {item.text}
         </Text>
-        <Text
-          style={[
-            styles.messageTime,
-            { color: colors.slate[500] },
-            item.isUser ? styles.userMessageTime : styles.otherMessageTime,
-          ]}
+        <View
+          style={[styles.messageMeta, item.isUser && styles.userMessageMeta]}
         >
-          {item.timestamp}
-        </Text>
+          <Text
+            style={[
+              styles.messageTime,
+              { color: item.isUser ? colors.slate[500] : colors.slate[300] },
+            ]}
+          >
+            {item.timestamp}
+          </Text>
+          {item.isUser &&
+            (item.deliveryStatus === "read" ? (
+              <CheckCheck
+                size={15}
+                color={colors.info[200]}
+                strokeWidth={2.5}
+              />
+            ) : item.deliveryStatus === "seen" ? (
+              <CheckCheck
+                size={15}
+                color={colors.slate[500]}
+                strokeWidth={2.5}
+              />
+            ) : (
+              <Check size={15} color={colors.slate[500]} strokeWidth={2.5} />
+            ))}
+        </View>
       </View>
-    </View>
+    </TouchableOpacity>
   </View>
 );
 
@@ -261,16 +338,33 @@ const MessageItem: React.FC<MessageItemProps> = ({
   item,
   colors,
   messages,
+  onReply,
+  showHoldForRenter,
+  onViewDetails,
 }) => {
   if (item.type === "system") {
     return <SystemMessage text={item.text} colors={colors} />;
   }
 
   if (item.type === "property") {
-    return <PropertyMessage item={item} colors={colors} />;
+    return (
+      <PropertyMessage
+        item={item}
+        colors={colors}
+        showHoldForRenter={showHoldForRenter ?? false}
+        onViewDetails={onViewDetails}
+      />
+    );
   }
 
-  return <TextMessage item={item} colors={colors} messages={messages} />;
+  return (
+    <TextMessage
+      item={item}
+      colors={colors}
+      messages={messages}
+      onReply={onReply}
+    />
+  );
 };
 
 const ChatPage = () => {
@@ -279,15 +373,27 @@ const ChatPage = () => {
     id: conversationId,
     recipientName,
     recipientAvatar,
+    propertyId,
   } = useLocalSearchParams<{
     id: string;
     recipientName?: string;
     recipientAvatar?: string;
+    propertyId?: string;
   }>();
 
   // --- API hooks ---
   const { currentUser } = useGetCurrentUser();
   const { conversations } = useGetConversations();
+  const currentConversation = useMemo(() => {
+    return conversations?.conversations?.find(
+      (c) => c.public_id === conversationId,
+    );
+  }, [conversations, conversationId]);
+  const conversationPropertyId = propertyId || currentConversation?.property_id;
+  const { propertyDetails } = useGetPropertyDetails({
+    propertyId: conversationPropertyId,
+    enabled: !!conversationPropertyId,
+  });
   const { messages: apiMessages, isMessagesLoading } =
     useGetConversationMessages({
       conversationId,
@@ -296,21 +402,26 @@ const ChatPage = () => {
   const { sendMessageMutation, isSendMessagePending } = useSendMessage();
 
   // Find other participant details dynamically
-  const currentConversation = useMemo(() => {
-    return conversations?.conversations?.find(
-      (c) => c.public_id === conversationId,
-    );
-  }, [conversations, conversationId]);
-
   const otherParticipant = useMemo(() => {
-    return currentConversation?.participants?.[0];
-  }, [currentConversation]);
+    const participants = currentConversation?.participants ?? [];
+    return (
+      participants.find(
+        (participant) => participant.public_id !== currentUser?.public_id,
+      ) ?? participants[0]
+    );
+  }, [currentConversation, currentUser]);
 
   const contactInfo = useMemo(() => {
-    const displayName = otherParticipant
-      ? `${otherParticipant.first_name ?? ""} ${otherParticipant.last_name ?? ""}`.trim() ||
-        otherParticipant.email
-      : recipientName || "Chat Room";
+    const participantName = otherParticipant
+      ? `${otherParticipant.first_name ?? ""} ${otherParticipant.last_name ?? ""}`.trim()
+      : "";
+    const displayName =
+      otherParticipant?.full_name?.trim() ||
+      otherParticipant?.name?.trim() ||
+      participantName ||
+      otherParticipant?.email ||
+      recipientName ||
+      "Chat Room";
     const avatarUri =
       otherParticipant?.profile_picture ||
       recipientAvatar ||
@@ -326,6 +437,7 @@ const ChatPage = () => {
 
   const recipientIsRenter = otherParticipant?.user_type === "renter";
   const recipientLabel = recipientIsRenter ? "renter" : "lister";
+  const isAgentView = currentUser?.user_type === "agent";
 
   // Map API messages to the local Message shape used by the UI components
   const [localMessages, setLocalMessages] = useState<Message[]>([]);
@@ -343,8 +455,15 @@ const ChatPage = () => {
         return {
           id: m.public_id,
           text: m.content,
+          dateKey: getDateKey(rawDate),
           timestamp: formattedTime,
           isUser: m.sender_id === currentUser.public_id,
+          replyTo: m.reply_to_message_id || undefined,
+          deliveryStatus: (m.is_read || m.read_at
+            ? "read"
+            : m.delivered_at
+              ? "seen"
+              : "sent") as Message["deliveryStatus"],
           type: "text" as const,
         };
       });
@@ -367,6 +486,69 @@ const ChatPage = () => {
   }, [apiMessages, currentUser]);
 
   const messages = localMessages;
+
+  const propertyMessage = useMemo<Message | null>(() => {
+    if (!propertyDetails) return null;
+
+    const location = [
+      propertyDetails.address?.street,
+      propertyDetails.address?.city,
+      propertyDetails.address?.state,
+    ]
+      .filter(Boolean)
+      .join(", ");
+
+    return {
+      id: `property-${propertyDetails.public_id}`,
+      text: "",
+      timestamp: "",
+      isUser: false,
+      type: "property",
+      propertyData: {
+        propertyId: propertyDetails.public_id,
+        title: propertyDetails.title,
+        price: `₦${propertyDetails.price.toLocaleString()}`,
+        frequency: propertyDetails.cost_frequency
+          .replace(/^per_/, "")
+          .replace(/_/g, " "),
+        location:
+          location ||
+          propertyDetails.address?.country ||
+          "Location unavailable",
+        image: propertyDetails.media?.[0]?.file_url || "",
+      },
+    };
+  }, [propertyDetails]);
+
+  const messagesWithDateMarkers = useMemo(() => {
+    const result: Message[] = [];
+    let lastDateKey: string | undefined;
+
+    messages.forEach((message) => {
+      if (message.dateKey !== lastDateKey) {
+        lastDateKey = message.dateKey;
+        result.push({
+          id: `date-${message.dateKey ?? "unknown"}`,
+          text: formatDateLabel(message.dateKey ?? "unknown"),
+          timestamp: "",
+          isUser: false,
+          type: "system",
+        });
+
+        if (propertyMessage && result.length === 1) {
+          result.push(propertyMessage);
+        }
+      }
+      result.push(message);
+    });
+
+    if (propertyMessage && result.length === 0) {
+      result.push(propertyMessage);
+    }
+
+    return result;
+  }, [messages, propertyMessage]);
+
   const [inputText, setInputText] = useState("");
   const [replyTo, setReplyTo] = useState<string | null>(null);
   const flatListRef = useRef<FlatList>(null);
@@ -391,11 +573,14 @@ const ChatPage = () => {
             next[optimisticIndex] = {
               id: payload.public_id,
               text: payload.content,
+              dateKey: getDateKey(payload.date_created),
               timestamp: new Date(payload.date_created).toLocaleTimeString([], {
                 hour: "2-digit",
                 minute: "2-digit",
               }),
               isUser: true,
+              replyTo: prev[optimisticIndex].replyTo,
+              deliveryStatus: "seen",
               type: "text" as const,
             };
             return next;
@@ -408,11 +593,17 @@ const ChatPage = () => {
           {
             id: payload.public_id,
             text: payload.content,
+            dateKey: getDateKey(payload.date_created),
             timestamp: new Date(payload.date_created).toLocaleTimeString([], {
               hour: "2-digit",
               minute: "2-digit",
             }),
             isUser: payload.sender_id === currentUser?.public_id,
+            replyTo: payload.reply_to_message_id || undefined,
+            deliveryStatus:
+              payload.sender_id === currentUser?.public_id
+                ? ("seen" as const)
+                : undefined,
             type: "text" as const,
           },
         ];
@@ -421,12 +612,13 @@ const ChatPage = () => {
     [conversationId, currentUser],
   );
 
-  const { isConnected, isConnecting, sendWsMessage, markConversationRead } =
-    useChatWebSocket({
+  const { isConnected, sendWsMessage, markConversationRead } = useChatWebSocket(
+    {
       conversationId,
       onNewMessage: handleNewMessage,
       enabled: !!conversationId,
-    });
+    },
+  );
 
   // Mark conversation as read when the screen opens and WS is connected
   useEffect(() => {
@@ -449,14 +641,18 @@ const ChatPage = () => {
 
   const router = useRouter();
 
-  // Auto scroll to bottom when new messages are added
+  const scrollToLatest = useCallback(() => {
+    if (!messages.length) return;
+
+    requestAnimationFrame(() => {
+      flatListRef.current?.scrollToEnd({ animated: true });
+    });
+  }, [messages.length]);
+
+  // Scroll after the new message has been laid out, not before FlatList measures it.
   useEffect(() => {
-    if (flatListRef.current && messages.length > 0) {
-      setTimeout(() => {
-        flatListRef.current?.scrollToEnd({ animated: true });
-      }, 100);
-    }
-  }, [messages]);
+    scrollToLatest();
+  }, [messages.length, messagesWithDateMarkers.length, scrollToLatest]);
 
   const sendMessage = async () => {
     if (inputText.trim().length === 0 || !conversationId) return;
@@ -470,7 +666,9 @@ const ChatPage = () => {
         hour: "2-digit",
         minute: "2-digit",
       }),
+      dateKey: getDateKey(new Date().toISOString()),
       isUser: true,
+      deliveryStatus: "sent",
       replyTo: replyTo || undefined,
     };
 
@@ -482,6 +680,7 @@ const ChatPage = () => {
     const sentViaWs = sendWsMessage({
       conversation_id: conversationId,
       content: draft,
+      reply_to_message_id: replyTo || undefined,
     });
 
     if (!sentViaWs) {
@@ -490,6 +689,7 @@ const ChatPage = () => {
         await sendMessageMutation({
           conversation_id: conversationId,
           content: draft,
+          reply_to_message_id: replyTo || undefined,
         });
       } catch {
         // Roll back the optimistic message on HTTP failure too
@@ -521,7 +721,21 @@ const ChatPage = () => {
   const snapPoints = useMemo(() => ["25%", "50%", "75%", "90%"], []);
 
   const renderMessage = ({ item }: { item: Message }) => (
-    <MessageItem item={item} colors={colors} messages={messages} />
+    <MessageItem
+      item={item}
+      colors={colors}
+      messages={messages}
+      onReply={setReplyTo}
+      showHoldForRenter={isAgentView}
+      onViewDetails={() =>
+        propertyMessage?.propertyData?.propertyId
+          ? router.push({
+              pathname: "/views/place-details/[id]",
+              params: { id: propertyMessage.propertyData.propertyId },
+            })
+          : undefined
+      }
+    />
   );
 
   const renderStars = (currentRating: number) => {
@@ -548,7 +762,6 @@ const ChatPage = () => {
         barStyle={isDarkMode ? "light-content" : "dark-content"}
       />
 
-      {/* Header */}
       <View
         style={[
           styles.header,
@@ -583,29 +796,26 @@ const ChatPage = () => {
                 </View>
               )}
             </View>
-            <View
-              style={{ flexDirection: "row", alignItems: "center", gap: 6 }}
-            >
+            <View style={styles.presenceRow}>
               <View
-                style={{
-                  width: 8,
-                  height: 8,
-                  borderRadius: 4,
-                  backgroundColor: isConnecting
-                    ? "#F59E0B"
-                    : isConnected
-                      ? colors.success[200]
-                      : colors.error[200],
-                }}
+                style={[
+                  styles.presenceDot,
+                  {
+                    backgroundColor:
+                      (otherParticipant?.is_online ??
+                      otherParticipant?.status === "active")
+                        ? colors.success[200]
+                        : colors.slate[400],
+                  },
+                ]}
               />
               <Text
                 style={[styles.contactStatus, { color: colors.slate[500] }]}
               >
-                {isConnecting
-                  ? "Connecting..."
-                  : isConnected
-                    ? "Live"
-                    : "Reconnecting..."}
+                {(otherParticipant?.is_online ??
+                otherParticipant?.status === "active")
+                  ? "Active now"
+                  : "Offline"}
               </Text>
             </View>
           </View>
@@ -640,12 +850,14 @@ const ChatPage = () => {
       {/* Messages List */}
       <FlatList
         ref={flatListRef}
-        data={messages}
+        data={messagesWithDateMarkers}
         renderItem={renderMessage}
         keyExtractor={(item) => item.id}
         style={styles.messagesList}
         contentContainerStyle={styles.messagesContent}
         showsVerticalScrollIndicator={false}
+        onContentSizeChange={scrollToLatest}
+        onLayout={scrollToLatest}
       />
 
       {/* Reply Preview */}
@@ -713,7 +925,7 @@ const ChatPage = () => {
             onPress={sendMessage}
             disabled={inputText.trim().length === 0 || isSendMessagePending}
           >
-            <Send size={22} color={colors.background} />
+            <Send size={22} color={colors.slate[500]} />
           </TouchableOpacity>
         </View>
       </KeyboardAvoidingView>
@@ -959,8 +1171,30 @@ const styles = StyleSheet.create({
     paddingVertical: 16,
   },
   systemMessageContainer: {
+    flexDirection: "row",
     alignItems: "center",
+    paddingHorizontal: 16,
     marginVertical: 16,
+  },
+  presenceRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 6,
+  },
+  presenceDot: {
+    width: 8,
+    height: 8,
+    borderRadius: 4,
+  },
+  systemMessageLine: {
+    flex: 1,
+    height: 1,
+  },
+  systemMessagePill: {
+    borderRadius: 12,
+    paddingHorizontal: 12,
+    paddingVertical: 5,
+    marginHorizontal: 10,
   },
   systemMessageText: {
     fontSize: 12,
@@ -968,13 +1202,15 @@ const styles = StyleSheet.create({
   },
   propertyMessageContainer: {
     alignItems: "flex-start",
+    width: "100%",
     marginVertical: 8,
   },
   propertyContainer: {
+    width: "100%",
     borderRadius: 16,
     paddingRight: 4,
     overflow: "hidden",
-    maxWidth: screenWidth * 1.75,
+    maxWidth: "100%",
     borderWidth: 1,
     borderColor: "rgba(0,0,0,0.05)",
   },
@@ -991,6 +1227,11 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     paddingBlock: 5,
     borderRadius: 6,
+  },
+  propertyDetails: {
+    flex: 1,
+    minWidth: 0,
+    paddingRight: 8,
   },
   propertyTitle: {
     fontSize: 14,
@@ -1067,13 +1308,15 @@ const styles = StyleSheet.create({
   },
   messageTime: {
     fontSize: 11,
-    marginTop: 2,
   },
-  userMessageTime: {
-    textAlign: "right",
+  messageMeta: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 4,
+    marginTop: 4,
   },
-  otherMessageTime: {
-    textAlign: "left",
+  userMessageMeta: {
+    justifyContent: "flex-end",
   },
   replyContainer: {
     borderLeftWidth: 3,

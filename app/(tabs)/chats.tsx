@@ -5,8 +5,8 @@ import { useTheme } from "@/contexts/themeContext";
 import { useGetConversations, useGetCurrentUser } from "@/hooks";
 import { ConversationResponse } from "@/types";
 import { ColorScheme } from "@/utils";
-import { useRouter } from "expo-router";
-import React, { useState } from "react";
+import { useFocusEffect, useRouter } from "expo-router";
+import React, { useCallback, useMemo, useState } from "react";
 import {
   ActivityIndicator,
   FlatList,
@@ -42,10 +42,15 @@ const ChatItem: React.FC<ChatItemProps> = ({ item, colors, currentUserId }) => {
   const otherParticipant =
     item.participants?.find((p) => p.public_id !== currentUserId) ||
     item.participants?.[0];
-  const displayName = otherParticipant
-    ? `${otherParticipant.first_name ?? ""} ${otherParticipant.last_name ?? ""}`.trim() ||
-      otherParticipant.email
-    : "Lister";
+  const participantName = otherParticipant
+    ? `${otherParticipant.first_name ?? ""} ${otherParticipant.last_name ?? ""}`.trim()
+    : "";
+  const displayName =
+    otherParticipant?.full_name?.trim() ||
+    otherParticipant?.name?.trim() ||
+    participantName ||
+    otherParticipant?.email ||
+    "Lister";
   const avatarUri = otherParticipant?.profile_picture ?? undefined;
   const isVerified = otherParticipant?.status === "verified";
   const formattedTime = item.last_message_at
@@ -65,6 +70,7 @@ const ChatItem: React.FC<ChatItemProps> = ({ item, colors, currentUserId }) => {
             id: item.public_id,
             recipientName: displayName,
             recipientAvatar: avatarUri || "",
+            propertyId: item.property_id || "",
           },
         })
       }
@@ -76,14 +82,36 @@ const ChatItem: React.FC<ChatItemProps> = ({ item, colors, currentUserId }) => {
           <View
             style={[
               styles.avatar,
-              { backgroundColor: colors.slate[300], justifyContent: "center", alignItems: "center" },
+              {
+                backgroundColor: colors.slate[300],
+                justifyContent: "center",
+                alignItems: "center",
+              },
             ]}
           >
-            <Text style={{ color: colors.slate[650], fontWeight: "700", fontSize: RFValue(16) }}>
+            <Text
+              style={{
+                color: colors.slate[650],
+                fontWeight: "700",
+                fontSize: RFValue(16),
+              }}
+            >
               {displayName.charAt(0).toUpperCase()}
             </Text>
           </View>
         )}
+        {(otherParticipant?.is_online ??
+        otherParticipant?.status === "active") ? (
+          <View
+            style={[
+              styles.onlineIndicator,
+              {
+                backgroundColor: colors.success[200],
+                borderColor: colors.background,
+              },
+            ]}
+          />
+        ) : null}
       </View>
 
       <View style={styles.chatContent}>
@@ -139,15 +167,18 @@ const ChatsPage: React.FC = () => {
   const [activeFilter, setActiveFilter] = useState("All");
   const [isRefreshing, setIsRefreshing] = useState(false);
 
-  const {
-    conversations,
-    isConversationsLoading,
-    refetchConversations,
-  } = useGetConversations({
-    q: searchQuery || undefined,
-    skip: 0,
-    limit: 50,
-  });
+  const { conversations, isConversationsLoading, refetchConversations } =
+    useGetConversations({
+      q: searchQuery || undefined,
+      skip: 0,
+      limit: 50,
+    });
+
+  useFocusEffect(
+    useCallback(() => {
+      void refetchConversations();
+    }, [refetchConversations]),
+  );
 
   const handleRefresh = async () => {
     setIsRefreshing(true);
@@ -155,13 +186,50 @@ const ChatsPage: React.FC = () => {
     setIsRefreshing(false);
   };
 
-  const allConversations = conversations?.conversations ?? [];
+  const agentConversations = useMemo(() => {
+    const allConversations = conversations?.conversations ?? [];
+    const grouped = new Map<string, ConversationResponse>();
 
-  const filteredChats = allConversations.filter((conv) => {
+    allConversations.forEach((conversation) => {
+      const otherParticipant = conversation.participants?.find(
+        (participant) => participant.public_id !== currentUser?.public_id,
+      );
+      const groupKey = otherParticipant?.public_id || conversation.public_id;
+      const existing = grouped.get(groupKey);
+
+      if (!existing) {
+        grouped.set(groupKey, conversation);
+        return;
+      }
+
+      const existingTime = new Date(existing.last_message_at || 0).getTime();
+      const conversationTime = new Date(
+        conversation.last_message_at || 0,
+      ).getTime();
+      const latest = conversationTime > existingTime ? conversation : existing;
+
+      grouped.set(groupKey, {
+        ...latest,
+        unread_count: existing.unread_count + conversation.unread_count,
+      });
+    });
+
+    return Array.from(grouped.values());
+  }, [conversations?.conversations, currentUser?.public_id]);
+
+  const filteredChats = agentConversations.filter((conv) => {
     if (activeFilter === "Unread") return conv.unread_count > 0;
     if (activeFilter === "Read") return conv.unread_count === 0;
     return true;
   });
+  const displayedChats =
+    activeFilter === "Dates"
+      ? [...filteredChats].sort(
+          (first, second) =>
+            new Date(second.last_message_at || 0).getTime() -
+            new Date(first.last_message_at || 0).getTime(),
+        )
+      : filteredChats;
 
   const renderChatItem = ({ item }: { item: ConversationResponse }) => (
     <ChatItem
@@ -198,15 +266,16 @@ const ChatsPage: React.FC = () => {
       >
         {tab}
       </Text>
-      {tab === "Unread" && allConversations.some((c) => c.unread_count > 0) && (
-        <View
-          style={[styles.filterBadge, { backgroundColor: colors.error[200] }]}
-        >
-          <Text style={styles.filterBadgeText}>
-            {allConversations.filter((c) => c.unread_count > 0).length}
-          </Text>
-        </View>
-      )}
+      {tab === "Unread" &&
+        agentConversations.some((c) => c.unread_count > 0) && (
+          <View
+            style={[styles.filterBadge, { backgroundColor: colors.error[200] }]}
+          >
+            <Text style={styles.filterBadgeText}>
+              {agentConversations.filter((c) => c.unread_count > 0).length}
+            </Text>
+          </View>
+        )}
     </TouchableOpacity>
   );
 
@@ -216,7 +285,11 @@ const ChatsPage: React.FC = () => {
 
       <AppHeader title={"Chats"} />
       <View className="py-3">
-        <Filter size="large" />
+        <Filter
+          size="large"
+          value={searchQuery}
+          onChangeText={setSearchQuery}
+        />
       </View>
 
       <View style={styles.filterContainer}>
@@ -225,12 +298,14 @@ const ChatsPage: React.FC = () => {
 
       {/* Chat List */}
       {isConversationsLoading && !isRefreshing ? (
-        <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
+        <View
+          style={{ flex: 1, justifyContent: "center", alignItems: "center" }}
+        >
           <ActivityIndicator size="large" color={colors.slate[650]} />
         </View>
       ) : (
         <FlatList
-          data={filteredChats}
+          data={displayedChats}
           renderItem={renderChatItem}
           keyExtractor={(item) => item.public_id}
           style={styles.chatList}

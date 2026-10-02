@@ -8,14 +8,14 @@ import { SimpleSelector } from "@/components/selector";
 import { HAS_GOOGLE_MAPS_API_KEY } from "@/constants/google";
 import { useTheme } from "@/contexts/themeContext";
 import {
-  useGetConversations,
-  useGetCurrentUser,
-  useGetPropertyAvailability,
-  useGetPropertyDetails,
-  useListPropertyReviews,
-  useReportProperty,
-  useScheduleInspection,
-  useStartConversation,
+    useGetConversations,
+    useGetCurrentUser,
+    useGetPropertyAvailability,
+    useGetPropertyDetails,
+    useListPropertyReviews,
+    useReportProperty,
+    useScheduleInspection,
+    useStartConversation,
 } from "@/hooks";
 import { useSpaceStore } from "@/store/useSpace";
 import type { ReportPropertyReason } from "@/types";
@@ -23,17 +23,17 @@ import { ColorScheme } from "@/utils";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import React, { useMemo, useRef, useState } from "react";
 import {
-  ActivityIndicator,
-  Dimensions,
-  Image,
-  Modal,
-  Pressable,
-  ScrollView,
-  StyleSheet,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  View,
+    ActivityIndicator,
+    Dimensions,
+    Image,
+    Modal,
+    Pressable,
+    ScrollView,
+    StyleSheet,
+    Text,
+    TextInput,
+    TouchableOpacity,
+    View,
 } from "react-native";
 import { Calendar } from "react-native-calendars";
 import MapView, { Marker } from "react-native-maps";
@@ -123,42 +123,61 @@ const Placedetails = () => {
   const [isContactLoading, setIsContactLoading] = useState<
     "chat" | "call" | null
   >(null);
-  const { conversations: conversationsData } = useGetConversations({
-    limit: 100,
-  });
+  const { conversations: conversationsData, refetchConversations } =
+    useGetConversations({
+      limit: 100,
+    });
   const { startConversationMutation } = useStartConversation();
   const { currentUser } = useGetCurrentUser();
+  const conversationRequestRef = useRef<Promise<string | null> | null>(null);
 
   const getOrCreateConversation = async (): Promise<string | null> => {
-    const propId = property?.public_id || propertyId;
-    const listerUserId =
-      property?.lister?.public_id || (property as any)?.lister_id;
-
-    // 1. Check if a conversation already exists for this property or with this lister
-    const existingConv = conversationsData?.conversations?.find((c) => {
-      if (propId && c.property_id === propId) return true;
-      if (
-        listerUserId &&
-        c.participants?.some((p) => p.public_id === listerUserId)
-      )
-        return true;
-      return false;
-    });
-
-    if (existingConv?.public_id) {
-      return existingConv.public_id;
+    if (conversationRequestRef.current) {
+      return conversationRequestRef.current;
     }
 
-    // 2. If no conversation exists yet, start one with the backend
+    const request = (async () => {
+      const propId = property?.public_id || propertyId;
+      const listerUserId =
+        property?.lister?.public_id || (property as any)?.lister_id;
+
+      const latestConversations = await refetchConversations();
+      const availableConversations =
+        latestConversations.data?.conversations ??
+        conversationsData?.conversations ??
+        [];
+
+      // Conversations are shared across all properties owned by the same lister.
+      const existingConv = listerUserId
+        ? availableConversations.find((c) =>
+            c.participants?.some((p) => p.public_id === listerUserId),
+          )
+        : availableConversations.find(
+            (c) => propId && c.property_id === propId,
+          );
+
+      if (existingConv?.public_id) {
+        return existingConv.public_id;
+      }
+
+      // 2. If no conversation exists yet, start one with the backend
+      try {
+        const newConv = await startConversationMutation({
+          property_id: propId || undefined,
+          message_content: `Hi ${listedByName}, I'm inquiring about "${displayTitle}".`,
+        });
+        return newConv?.conversation_id || null;
+      } catch (err) {
+        console.warn("Failed to create conversation:", err);
+        return null;
+      }
+    })();
+
+    conversationRequestRef.current = request;
     try {
-      const newConv = await startConversationMutation({
-        property_id: propId || undefined,
-        message_content: `Hi ${listedByName}, I'm inquiring about "${displayTitle}".`,
-      });
-      return newConv?.conversation_id || null;
-    } catch (err) {
-      console.warn("Failed to create conversation:", err);
-      return null;
+      return await request;
+    } finally {
+      conversationRequestRef.current = null;
     }
   };
 
