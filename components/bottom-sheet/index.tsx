@@ -15,6 +15,7 @@ import {
   GestureDetector,
   GestureHandlerRootView,
 } from "react-native-gesture-handler";
+import type { GestureType } from "react-native-gesture-handler";
 import Animated, {
   runOnJS,
   useAnimatedStyle,
@@ -34,6 +35,8 @@ type BottomSheetContentProps = {
   textColor: string;
   screenHeight: number;
   onHandlePress?: () => void;
+  scrollable: boolean;
+  gesture?: GestureType;
 };
 
 // Component for the bottom sheet content
@@ -48,6 +51,8 @@ const BottomSheetContent = ({
   textColor,
   screenHeight,
   onHandlePress,
+  scrollable,
+  gesture,
 }: BottomSheetContentProps) => {
   const insets = useSafeAreaInsets();
 
@@ -68,24 +73,47 @@ const BottomSheetContent = ({
       ]}
     >
       {/* Handle */}
-      <TouchableWithoutFeedback onPress={onHandlePress}>
-        <View
-          style={{
-            width: "100%",
-            paddingVertical: 12,
-            alignItems: "center",
-          }}
-        >
+      {gesture ? (
+        <GestureDetector gesture={gesture}>
+          <TouchableWithoutFeedback onPress={onHandlePress}>
+            <View
+              style={{
+                width: "100%",
+                paddingVertical: 12,
+                alignItems: "center",
+              }}
+            >
+              <View
+                style={{
+                  width: 64,
+                  height: 6,
+                  backgroundColor: mutedColor,
+                  borderRadius: 999,
+                }}
+              />
+            </View>
+          </TouchableWithoutFeedback>
+        </GestureDetector>
+      ) : (
+        <TouchableWithoutFeedback onPress={onHandlePress}>
           <View
             style={{
-              width: 64,
-              height: 6,
-              backgroundColor: mutedColor,
-              borderRadius: 999,
+              width: "100%",
+              paddingVertical: 12,
+              alignItems: "center",
             }}
-          />
-        </View>
-      </TouchableWithoutFeedback>
+          >
+            <View
+              style={{
+                width: 64,
+                height: 6,
+                backgroundColor: mutedColor,
+                borderRadius: 999,
+              }}
+            />
+          </View>
+        </TouchableWithoutFeedback>
+      )}
 
       {/* Title */}
       {title && (
@@ -109,18 +137,21 @@ const BottomSheetContent = ({
         </View>
       )}
 
-      {/* Content now wrapped in a ScrollView */}
-      <ScrollView
-        style={{ flex: 1 }}
-        contentContainerStyle={{
-          padding: 16,
-          paddingBottom: Math.max(insets.bottom, 16),
-        }}
-        keyboardShouldPersistTaps="handled"
-        showsVerticalScrollIndicator={false}
-      >
-        {children}
-      </ScrollView>
+      {scrollable ? (
+        <ScrollView
+          style={{ flex: 1 }}
+          contentContainerStyle={{
+            padding: 16,
+            paddingBottom: Math.max(insets.bottom, 16),
+          }}
+          keyboardShouldPersistTaps="handled"
+          showsVerticalScrollIndicator={false}
+        >
+          {children}
+        </ScrollView>
+      ) : (
+        <View style={{ flex: 1, minHeight: 0 }}>{children}</View>
+      )}
     </Animated.View>
   );
 };
@@ -134,6 +165,7 @@ type BottomSheetProps = {
   title?: string;
   style?: ViewStyle;
   disablePanGesture?: boolean;
+  scrollable?: boolean;
 };
 
 export function BottomSheet({
@@ -145,6 +177,7 @@ export function BottomSheet({
   title,
   style,
   disablePanGesture = false,
+  scrollable = true,
 }: BottomSheetProps) {
   const { colors } = useTheme();
   const cardColor = colors.background;
@@ -321,33 +354,19 @@ export function BottomSheet({
             <Animated.View style={{ flex: 1 }} />
           </TouchableWithoutFeedback>
 
-          {disablePanGesture ? (
-            <BottomSheetContent
-              children={children}
-              title={title}
-              style={style}
-              rBottomSheetStyle={rBottomSheetStyle}
-              cardColor={cardColor}
-              mutedColor={mutedColor}
-              textColor={textColor}
-              screenHeight={screenHeight}
-              onHandlePress={() => runOnJS(handlePress)()}
-            />
-          ) : (
-            <GestureDetector gesture={gesture}>
-              <BottomSheetContent
-                children={children}
-                title={title}
-                style={style}
-                rBottomSheetStyle={rBottomSheetStyle}
-                cardColor={cardColor}
-                mutedColor={mutedColor}
-                textColor={textColor}
-                screenHeight={screenHeight}
-                onHandlePress={() => runOnJS(handlePress)()}
-              />
-            </GestureDetector>
-          )}
+          <BottomSheetContent
+            children={children}
+            title={title}
+            style={style}
+            rBottomSheetStyle={rBottomSheetStyle}
+            cardColor={cardColor}
+            mutedColor={mutedColor}
+            textColor={textColor}
+            screenHeight={screenHeight}
+            onHandlePress={() => runOnJS(handlePress)()}
+            scrollable={scrollable}
+            gesture={disablePanGesture ? undefined : gesture}
+          />
         </Animated.View>
       </GestureHandlerRootView>
     </Modal>

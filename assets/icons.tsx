@@ -1254,7 +1254,7 @@ export const ResizeBottomRight = ({
     />
   </Svg>
 );
-export const Filter = ({
+export const Filter1 = ({
   size = 24,
   color = "#000000",
   ...props

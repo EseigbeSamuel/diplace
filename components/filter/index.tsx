@@ -1,14 +1,9 @@
+import { Filter1 } from "@/assets/icons";
 import { useTheme } from "@/contexts/themeContext";
 import { cn } from "@/utils";
+import { usePathname, useRouter } from "expo-router";
 import React from "react";
-import {
-  Image,
-  NativeSyntheticEvent,
-  Pressable,
-  TextInput,
-  TextInputFocusEventData,
-  View,
-} from "react-native";
+import { Image, Pressable, TextInput, View } from "react-native";
 import { heightPercentageToDP as hp } from "react-native-responsive-screen";
 
 // interface FilterProps {
@@ -65,7 +60,7 @@ interface FilterProps {
   placeholder?: string;
 
   onChangeText?: (text: string) => void;
-  onFocus?: (e: NativeSyntheticEvent<TextInputFocusEventData>) => void;
+  onFocus?: () => void;
   onSubmit?: (text: string) => void;
 
   showFilter?: boolean;
@@ -85,12 +80,23 @@ export default function Filter(props: FilterProps) {
   } = props;
 
   const { colors, isDarkMode } = useTheme();
+  const router = useRouter();
+  const pathname = usePathname();
   // const custom = styles(colors);
 
   const getSizeStyle = () => {
     return size === "large"
       ? "py-[16px] pr-[8px] pl-[16px]"
       : "py-[10px] pr-[8px] pl-[12px]";
+  };
+
+  const openSearch = () => {
+    if (pathname !== "/views/search/search") {
+      router.push({
+        pathname: "/views/search/search",
+        params: value ? { q: value } : undefined,
+      });
+    }
   };
 
   return (
@@ -105,37 +111,51 @@ export default function Filter(props: FilterProps) {
         "flex-row items-center gap-4 border rounded-full",
       )}
     >
-      <Image
-        source={
-          isDarkMode
-            ? require("@/assets/icons/search-light.png")
-            : require("@/assets/icons/search.png")
-        }
-        className="w-[24px] h-[24px]"
-      />
+      <Pressable
+        onPress={openSearch}
+        className="flex-1 flex-row items-center gap-4"
+      >
+        <Image
+          source={
+            isDarkMode
+              ? require("@/assets/icons/search-light.png")
+              : require("@/assets/icons/search.png")
+          }
+          className="w-[24px] h-[24px]"
+        />
 
-      <TextInput
-        value={value}
-        placeholder={placeholder}
-        placeholderTextColor={colors.slate[400]}
-        onChangeText={onChangeText}
-        // onFocus={onFocus}
-        onSubmitEditing={(e) => onSubmit?.(e.nativeEvent.text)}
-        style={{ color: colors.slate[650] }}
-        className="flex-1"
-      />
+        <TextInput
+          value={value}
+          placeholder={placeholder}
+          placeholderTextColor={colors.slate[400]}
+          onChangeText={onChangeText}
+          onFocus={() => {
+            onFocus?.();
+            openSearch();
+          }}
+          onSubmitEditing={(e) => onSubmit?.(e.nativeEvent.text)}
+          style={{ color: colors.slate[650] }}
+          className="flex-1"
+        />
+      </Pressable>
 
       {/* Optional filter button */}
       {showFilter && (
-        <Pressable onPress={onFilterPress}>
-          <Image
+        <Pressable
+          onPress={onFilterPress}
+          className="rounded-full p-2"
+          style={{ backgroundColor: colors.slate[650] }}
+        >
+          {/* <Image
             source={
               isDarkMode
                 ? require("@/assets/icons/Filter - Iconly Pro.png")
                 : require("@/assets/icons/filter.png")
             }
             className="w-[22px] h-[22px]"
-          />
+          /> */}
+
+          <Filter1 size={22} color={colors.slate[100]} />
         </Pressable>
       )}
     </View>

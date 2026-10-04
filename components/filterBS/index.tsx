@@ -1,5 +1,7 @@
+import { BottomSheet } from "@/components/bottom-sheet";
 import { useTheme } from "@/contexts/themeContext";
 import { ColorScheme } from "@/utils";
+import { X } from "lucide-react-native";
 import React, { useState } from "react";
 import {
   Image,
@@ -55,6 +57,7 @@ const defaultAmenities = [
 
 const MIN_LIMIT = 0;
 const MAX_LIMIT = 100;
+const cities = ["Abuja", "Port Harcourt", "Lagos", "Owerri"];
 
 type FilterBottomSheetsProps = {
   selectedType: string;
@@ -68,11 +71,13 @@ type FilterBottomSheetsProps = {
   onBudgetChange?: (min: number, max: number) => void;
   selectedAmenities?: string[];
   onToggleAmenity?: (amenity: string) => void;
-  onPressCity: () => void;
+  onPressCity?: () => void;
   onPressNeighborhood: () => void;
   onClear: () => void;
   onApply: () => void;
   selectedCity?: string | null;
+  onCitySelect?: (city: string) => void;
+  onClose?: () => void;
 };
 
 const FilterBottomSheets = ({
@@ -92,23 +97,43 @@ const FilterBottomSheets = ({
   onClear,
   onApply,
   selectedCity,
+  onCitySelect,
+  onClose,
 }: FilterBottomSheetsProps) => {
   const { colors } = useTheme();
   const styles = createStyles(colors);
   const [showAllAmenities, setShowAllAmenities] = useState(false);
+  const [cityVisible, setCityVisible] = useState(false);
 
   const visibleAmenities = showAllAmenities
     ? defaultAmenities
     : defaultAmenities.slice(0, 8);
+
+  const openCity = () => {
+    if (onPressCity) {
+      onPressCity();
+      return;
+    }
+    setCityVisible(true);
+  };
 
   return (
     <View style={styles.container}>
       {/* Header */}
       <View style={styles.header}>
         <Text style={styles.headerTitle}>Filters</Text>
+        {onClose ? (
+          <TouchableOpacity
+            onPress={onClose}
+            accessibilityLabel="Close filters"
+          >
+            <X size={RFValue(18)} color={colors.slate[650]} />
+          </TouchableOpacity>
+        ) : null}
       </View>
 
       <ScrollView
+        style={styles.scrollView}
         showsVerticalScrollIndicator={false}
         contentContainerStyle={styles.scrollContent}
       >
@@ -150,7 +175,7 @@ const FilterBottomSheets = ({
         <Text style={[styles.sectionLabel, { marginTop: RFValue(20) }]}>
           Location
         </Text>
-        <TouchableOpacity style={styles.locationRow} onPress={onPressCity}>
+        <TouchableOpacity style={styles.locationRow} onPress={openCity}>
           <Text style={styles.locationRowText}>{selectedCity || "City"}</Text>
           <Image source={require("@/assets/icons/chevron-right.png")} />
         </TouchableOpacity>
@@ -272,6 +297,42 @@ const FilterBottomSheets = ({
           <AppButton title="Apply filter" onPress={onApply} />
         </View>
       </View>
+
+      <BottomSheet
+        isVisible={cityVisible}
+        onClose={() => setCityVisible(false)}
+        snapPoints={[0.52, 0.7]}
+      >
+        <View style={styles.citySheet}>
+          <View style={styles.cityHeader}>
+            <TouchableOpacity onPress={() => setCityVisible(false)}>
+              <Text style={styles.cityIcon}>←</Text>
+            </TouchableOpacity>
+            <Text style={styles.cityTitle}>City</Text>
+            <TouchableOpacity onPress={() => setCityVisible(false)}>
+              <X size={RFValue(18)} color={colors.slate[650]} />
+            </TouchableOpacity>
+          </View>
+          {cities.map((city) => (
+            <TouchableOpacity
+              key={city}
+              style={styles.cityRow}
+              onPress={() => {
+                onCitySelect?.(city);
+                setCityVisible(false);
+              }}
+            >
+              <View
+                style={[
+                  styles.radio,
+                  selectedCity === city && styles.radioSelected,
+                ]}
+              />
+              <Text style={styles.cityText}>{city}</Text>
+            </TouchableOpacity>
+          ))}
+        </View>
+      </BottomSheet>
     </View>
   );
 };
@@ -417,6 +478,50 @@ const createStyles = (colors: ColorScheme) =>
       fontSize: RFValue(18),
       fontWeight: "700",
       color: colors.slate[650],
+    },
+    citySheet: { paddingHorizontal: RFValue(4) },
+    cityHeader: {
+      flexDirection: "row",
+      justifyContent: "space-between",
+      alignItems: "center",
+      paddingBottom: RFValue(16),
+      borderBottomWidth: 1,
+      borderBottomColor: colors.slate[200],
+    },
+    cityIcon: {
+      color: colors.slate[650],
+      fontSize: RFValue(20),
+    },
+    cityTitle: {
+      color: colors.slate[650],
+      fontSize: RFValue(15),
+      fontWeight: "700",
+    },
+    cityRow: {
+      height: RFValue(52),
+      borderBottomWidth: 1,
+      borderBottomColor: colors.slate[150],
+      flexDirection: "row",
+      alignItems: "center",
+      gap: RFValue(12),
+    },
+    radio: {
+      width: RFValue(16),
+      height: RFValue(16),
+      borderRadius: RFValue(8),
+      borderWidth: 1,
+      borderColor: colors.slate[650],
+    },
+    radioSelected: {
+      backgroundColor: colors.slate[650],
+      borderWidth: RFValue(4),
+      borderColor: colors.slate[300],
+    },
+    cityText: { color: colors.slate[650], fontSize: RFValue(13) },
+    scrollView: {
+      flex: 1,
+      minHeight: 0,
+      maxHeight: RFValue(450),
     },
     scrollContent: {
       paddingHorizontal: RFValue(20),
@@ -631,6 +736,7 @@ const createStyles = (colors: ColorScheme) =>
     footer: {
       flexDirection: "row",
       alignItems: "center",
+      flexShrink: 0,
       gap: RFValue(16),
       paddingHorizontal: RFValue(20),
       paddingTop: RFValue(12),

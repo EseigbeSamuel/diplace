@@ -118,10 +118,7 @@ const TabLayout = () => {
                             style={{ width: RFValue(18), height: RFValue(18) }}
                             resizeMode="contain"
                           /> */}
-                          <Plus
-                            size={RFValue(18)}
-                            color={colors.success[300]}
-                          />
+                          <Plus size={RFValue(18)} color={colors.slate[100]} />
                         </View>
                       </Pressable>
                     ),
