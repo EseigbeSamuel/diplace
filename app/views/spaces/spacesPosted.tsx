@@ -214,17 +214,17 @@ const SpacesPosted = ({ layout }: { layout: "tiles" | "box" }) => {
 
   if (isCurrentUserLoading || isPropertiesLoading) {
     return (
-      <View style={homeStyles.centerState}>
+      <View style={homeStyles.centerState} className="flex-1 justify-center items-center">
         <ActivityIndicator size="large" color={colors.slate[650]} />
-        <Text style={homeStyles.centerStateText}>Loading Spaces...</Text>
+        <Text style={homeStyles.centerStateText} className="font-[InstrumentSansSemiBold] text-center">Loading Spaces...</Text>
       </View>
     );
   }
 
   if (currentUserError || propertiesError) {
     return (
-      <View style={homeStyles.centerState}>
-        <Text style={homeStyles.centerStateText}>Unable to load spaces.</Text>
+      <View style={homeStyles.centerState} className="flex-1 justify-center items-center">
+        <Text style={homeStyles.centerStateText} className="font-[InstrumentSansSemiBold] text-center">Unable to load spaces.</Text>
         <View style={homeStyles.retryWrap}>
           <AppButton title="Retry" onPress={handleRefresh} />
         </View>
@@ -238,8 +238,8 @@ const SpacesPosted = ({ layout }: { layout: "tiles" | "box" }) => {
         <View className="py-2">
           <Filter size="large" />
         </View>
-        <View style={homeStyles.centerState}>
-          <Text style={homeStyles.centerStateText}>No Posted Spaces Yet</Text>
+        <View style={homeStyles.centerState} className="flex-1 justify-center items-center">
+          <Text style={homeStyles.centerStateText} className="font-[InstrumentSansSemiBold] text-center">No Posted Spaces Yet</Text>
         </View>
       </View>
     );
@@ -289,24 +289,24 @@ const SpacesPosted = ({ layout }: { layout: "tiles" | "box" }) => {
         onClose={() => setIsViewSpaceSheetVisible(false)}
         snapPoints={snapPoints}
       >
-        <View style={homeStyles.modalContainer}>
+        <View style={homeStyles.modalContainer} className="items-center">
           <View style={homeStyles.modalImageWrap}>
             <Image
               source={imageSourceFilter(selectedSpace?.imageSource)}
               style={homeStyles.modalImage}
-            />
+             className="w-[100%px] h-[100%px]"/>
           </View>
 
-          <View style={homeStyles.modalCopy}>
-            <Text style={homeStyles.modalTitle}>
+          <View style={homeStyles.modalCopy} className="items-center">
+            <Text style={homeStyles.modalTitle} className="font-[InstrumentSansSemiBold] text-center">
               {selectedSpace?.title || "Untitled space"}
             </Text>
-            <Text style={homeStyles.modalSubtitle}>
+            <Text style={homeStyles.modalSubtitle} className="text-center">
               {selectedSpace?.location || "Unknown location"}
             </Text>
           </View>
 
-          <View style={homeStyles.actionsWrap}>
+          <View style={homeStyles.actionsWrap} className="w-[100%px]">
             <AppButton
               title="Update Status"
               onPress={handleViewUpdateStatus}
@@ -349,21 +349,21 @@ const SpacesPosted = ({ layout }: { layout: "tiles" | "box" }) => {
         onClose={() => setIsUpdateStatusSheetVisible(false)}
         snapPoints={statusSnapPoints}
       >
-        <View style={homeStyles.modalContainer}>
+        <View style={homeStyles.modalContainer} className="items-center">
           <Text style={homeStyles.title}>Update current status</Text>
 
           <View style={homeStyles.modalImageWrap}>
             <Image
               source={getPropertyImageSource(selectedSpace?.imageSource)}
               style={homeStyles.modalImage}
-            />
+             className="w-[100%px] h-[100%px]"/>
           </View>
 
-          <View style={homeStyles.modalCopy}>
-            <Text style={homeStyles.modalTitle}>
+          <View style={homeStyles.modalCopy} className="items-center">
+            <Text style={homeStyles.modalTitle} className="font-[InstrumentSansSemiBold] text-center">
               {selectedSpace?.title || "Untitled space"}
             </Text>
-            <Text style={homeStyles.modalSubtitle}>
+            <Text style={homeStyles.modalSubtitle} className="text-center">
               {selectedSpace?.location || "Unknown location"}
             </Text>
             <Text style={homeStyles.subTitle}>
@@ -372,14 +372,14 @@ const SpacesPosted = ({ layout }: { layout: "tiles" | "box" }) => {
             </Text>
           </View>
 
-          <View style={homeStyles.statusSummary}>
+          <View style={homeStyles.statusSummary} className="w-[100%px] flex-row justify-between">
             <Text style={homeStyles.statusSummaryLabel}>Current status:</Text>
-            <Text style={homeStyles.statusSummaryValue}>
+            <Text style={homeStyles.statusSummaryValue} className="font-[InstrumentSansSemiBold]">
               {prettyStatus(selectedStatus)}
             </Text>
           </View>
 
-          <View style={homeStyles.statusActionsWrap}>
+          <View style={homeStyles.statusActionsWrap} className="w-[100%px]">
             <SimpleSelector
               title="Active"
               isChecked={selectedStatus === "active"}
@@ -412,7 +412,7 @@ const SpacesPosted = ({ layout }: { layout: "tiles" | "box" }) => {
             />
           </View>
 
-          <View style={homeStyles.actionsWrap}>
+          <View style={homeStyles.actionsWrap} className="w-[100%px]">
             <AppButton
               onPress={handleUpdateStatusPress}
               title={updatePropertyStatusPending ? "Updating..." : "Update"}
@@ -497,24 +497,14 @@ const styles = (colors: ColorScheme) =>
       lineHeight: RFValue(20),
       color: colors.slate[600],
     },
-    modalContainer: {
-      paddingTop: RFValue(10),
-      paddingBottom: RFValue(20),
-      alignItems: "center",
-    },
-    modalOverlay: {
-      flex: 1,
-      justifyContent: "flex-end",
-      backgroundColor: "rgba(0, 0, 0, 0.4)",
-    },
-    actionSheet: {
-      maxHeight: "88%",
-      paddingHorizontal: RFValue(20),
-      paddingTop: RFValue(18),
-      backgroundColor: colors.background,
-      borderTopLeftRadius: RFValue(24),
-      borderTopRightRadius: RFValue(24),
-    },
+    modalContainer: {paddingTop: RFValue(10),
+paddingBottom: RFValue(20)},
+    modalOverlay: {},
+    actionSheet: {paddingHorizontal: RFValue(20),
+paddingTop: RFValue(18),
+backgroundColor: colors.background,
+borderTopLeftRadius: RFValue(24),
+borderTopRightRadius: RFValue(24)},
     modalImageWrap: {
       width: RFValue(112),
       height: RFValue(112),
@@ -523,71 +513,34 @@ const styles = (colors: ColorScheme) =>
       backgroundColor: colors.slate[150],
       marginBottom: RFValue(16),
     },
-    modalImage: {
-      width: "100%",
-      height: "100%",
-      borderRadius: RFValue(14),
-    },
-    modalCopy: {
-      alignItems: "center",
-      marginBottom: RFValue(20),
-      gap: RFValue(4),
-    },
-    modalTitle: {
-      fontSize: RFValue(18),
-      lineHeight: RFValue(24),
-      color: colors.slate[650],
-      fontFamily: "InstrumentSansSemiBold",
-      textAlign: "center",
-    },
-    modalSubtitle: {
-      fontSize: RFValue(14),
-      lineHeight: RFValue(20),
-      color: colors.slate[600],
-      textAlign: "center",
-    },
-    actionsWrap: {
-      width: "100%",
-      gap: RFValue(10),
-    },
-    statusActionsWrap: {
-      width: "100%",
-      gap: RFValue(10),
-      marginBottom: RFValue(12),
-    },
-    statusSummary: {
-      width: "100%",
-      backgroundColor: colors.slate[150],
-      borderRadius: RFValue(12),
-      paddingHorizontal: RFValue(12),
-      paddingVertical: RFValue(10),
-      marginBottom: RFValue(12),
-      flexDirection: "row",
-      justifyContent: "space-between",
-    },
+    modalImage: {borderRadius: RFValue(14)},
+    modalCopy: {marginBottom: RFValue(20),
+gap: RFValue(4)},
+    modalTitle: {fontSize: RFValue(18),
+lineHeight: RFValue(24),
+color: colors.slate[650]},
+    modalSubtitle: {fontSize: RFValue(14),
+lineHeight: RFValue(20),
+color: colors.slate[600]},
+    actionsWrap: {gap: RFValue(10)},
+    statusActionsWrap: {gap: RFValue(10),
+marginBottom: RFValue(12)},
+    statusSummary: {backgroundColor: colors.slate[150],
+borderRadius: RFValue(12),
+paddingHorizontal: RFValue(12),
+paddingVertical: RFValue(10),
+marginBottom: RFValue(12)},
     statusSummaryLabel: {
       fontSize: RFValue(14),
       color: colors.slate[600],
     },
-    statusSummaryValue: {
-      fontSize: RFValue(14),
-      fontFamily: "InstrumentSansSemiBold",
-      color: colors.slate[650],
-    },
-    centerState: {
-      flex: 1,
-      justifyContent: "center",
-      alignItems: "center",
-      paddingHorizontal: RFValue(20),
-      gap: RFValue(12),
-    },
-    centerStateText: {
-      fontSize: RFValue(20),
-      lineHeight: RFValue(26),
-      fontFamily: "InstrumentSansSemiBold",
-      color: colors.slate[650],
-      textAlign: "center",
-    },
+    statusSummaryValue: {fontSize: RFValue(14),
+color: colors.slate[650]},
+    centerState: {paddingHorizontal: RFValue(20),
+gap: RFValue(12)},
+    centerStateText: {fontSize: RFValue(20),
+lineHeight: RFValue(26),
+color: colors.slate[650]},
     footerLoader: {
       paddingVertical: RFValue(16),
     },

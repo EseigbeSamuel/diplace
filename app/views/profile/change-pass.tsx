@@ -149,10 +149,10 @@ const ChangePassword = () => {
         extraScrollHeight={RFValue(20)}
         contentContainerStyle={passwordStyles.scrollContent}
       >
-        <View style={passwordStyles.container}>
+        <View  className="flex-1">
           {/* Header */}
           <View style={passwordStyles.headerSection}>
-            <Text style={passwordStyles.title}>Change password</Text>
+            <Text style={passwordStyles.title} className="font-bold">Change password</Text>
 
             <Text style={passwordStyles.description}>
               Follow the steps to create new password
@@ -197,7 +197,7 @@ const ChangePassword = () => {
             />
 
             {!!validationError && (
-              <Text style={passwordStyles.errorText}>{validationError}</Text>
+              <Text style={passwordStyles.errorText} className="text-[#EF4444]">{validationError}</Text>
             )}
           </View>
         </View>
@@ -224,19 +224,14 @@ export default ChangePassword;
 
 const styles = (colors: ColorScheme) =>
   StyleSheet.create({
-    container: {
-      flex: 1,
-    },
+    container: {},
     headerSection: {
       paddingTop: RFValue(20),
       marginBottom: RFValue(32),
     },
-    title: {
-      fontSize: RFValue(20),
-      fontWeight: "700",
-      color: colors.slate[650],
-      marginBottom: RFValue(8),
-    },
+    title: {fontSize: RFValue(20),
+color: colors.slate[650],
+marginBottom: RFValue(8)},
     description: {
       fontSize: RFValue(14),
       color: colors.slate[500],
@@ -248,26 +243,18 @@ const styles = (colors: ColorScheme) =>
     inputGroup: {
       gap: RFValue(8),
     },
-    inputContainer: {
-      flexDirection: "row",
-      alignItems: "center",
-      backgroundColor: colors.slate[150],
-      borderRadius: RFValue(12),
-      paddingHorizontal: RFValue(16),
-      paddingVertical: RFValue(16),
-      gap: RFValue(12),
-    },
+    inputContainer: {backgroundColor: colors.slate[150],
+borderRadius: RFValue(12),
+paddingHorizontal: RFValue(16),
+paddingVertical: RFValue(16),
+gap: RFValue(12)},
     inputIcon: {
       width: RFValue(20),
       height: RFValue(20),
       tintColor: colors.slate[500],
     },
-    textInput: {
-      flex: 1,
-      fontSize: RFValue(15),
-      color: colors.slate[650],
-      padding: 0,
-    },
+    textInput: {fontSize: RFValue(15),
+color: colors.slate[650]},
     eyeIcon: {
       width: RFValue(20),
       height: RFValue(20),
@@ -278,17 +265,11 @@ const styles = (colors: ColorScheme) =>
       color: colors.slate[500],
       paddingLeft: RFValue(4),
     },
-    errorText: {
-      fontSize: RFValue(13),
-      color: "#EF4444",
-      paddingLeft: RFValue(4),
-      marginTop: RFValue(4),
-    },
+    errorText: {fontSize: RFValue(13),
+paddingLeft: RFValue(4),
+marginTop: RFValue(4)},
     buttonContainer: {
       paddingVertical: RFValue(20),
     },
-    scrollContent: {
-      flexGrow: 1,
-      paddingBottom: RFValue(40),
-    },
+    scrollContent: {paddingBottom: RFValue(40)},
   });

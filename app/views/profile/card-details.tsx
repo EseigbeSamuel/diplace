@@ -82,23 +82,23 @@ const CardDetailsScreen = () => {
         showsVerticalScrollIndicator={false}
         contentContainerStyle={styles.scrollContent}
       >
-        <View style={styles.container}>
+        <View  className="flex-1">
           {/* Cards List */}
           <View style={styles.cardsList}>
             {cards.map((card) => (
-              <View key={card.id} style={styles.cardItem}>
-                <View style={styles.cardLeft}>
+              <View key={card.id} style={styles.cardItem} className="flex-row items-center justify-between">
+                <View style={styles.cardLeft} className="flex-row items-center flex-1">
                   <Image
                     source={getCardIcon(card.type)}
                     style={styles.cardTypeIcon}
                     resizeMode="contain"
                   />
-                  <Text style={styles.cardNumber}>
+                  <Text style={styles.cardNumber} className="font-medium">
                     {formatCardNumber(card.lastFour)}
                   </Text>
                   {card.active && (
                     <View style={styles.activeBadge}>
-                      <Text style={styles.activeBadgeText}>Active</Text>
+                      <Text style={styles.activeBadgeText} className="font-semibold">Active</Text>
                     </View>
                   )}
                 </View>
@@ -115,7 +115,7 @@ const CardDetailsScreen = () => {
       </ScrollView>
 
       {/* Add New Card Button - Fixed at Bottom */}
-      <View style={styles.footer}>
+      <View style={styles.footer} className="absolute bottom-[0px] left-[0px] right-[0px]">
         <AppButton
           title="Add new card"
           onPress={() => setShowAddCardModal(true)}
@@ -137,17 +137,17 @@ const CardDetailsScreen = () => {
         onRequestClose={() => setShowAddCardModal(false)}
       >
         <Pressable
-          style={styles.addCardOverlay}
+
           onPress={() => setShowAddCardModal(false)}
-        >
+         className="flex-1 bg-[rgba(0, 0, 0, 0.5)] justify-end">
           <Pressable
             style={styles.addCardSheet}
             onPress={(e) => e.stopPropagation()}
           >
-            <View style={styles.modalHandle} />
+            <View style={styles.modalHandle}  className="self-center"/>
 
-            <Text style={styles.modalTitle}>Add new card</Text>
-            <Text style={styles.modalSubtitle}>
+            <Text style={styles.modalTitle} className="font-bold text-center">Add new card</Text>
+            <Text style={styles.modalSubtitle} className="text-center">
               Fill card details to add new card.
             </Text>
 
@@ -163,7 +163,7 @@ const CardDetailsScreen = () => {
               />
 
               {/* Expiry Date and CVV */}
-              <View style={styles.inputRow}>
+              <View style={styles.inputRow} className="flex-row">
                 <View style={[styles.inputContainer, { flex: 1 }]}>
                   <TextField
                     label="Expiry Date"
@@ -192,7 +192,7 @@ const CardDetailsScreen = () => {
               />
 
               {/* Security Note */}
-              <View style={styles.securityNote}>
+              <View style={styles.securityNote} className="flex-row items-center justify-center">
                 <Text style={styles.securityNoteText}>
                   🔐 Your details is 100% secure
                 </Text>
@@ -221,72 +221,41 @@ const getStyles = (colors: ColorScheme) =>
     scrollContent: {
       paddingBottom: RFValue(100),
     },
-    container: {
-      flex: 1,
-    },
-    title: {
-      fontSize: RFValue(24),
-      fontWeight: "700",
-      color: colors.slate[650],
-      marginBottom: RFValue(24),
-    },
+    container: {},
+    title: {fontSize: RFValue(24),
+color: colors.slate[650],
+marginBottom: RFValue(24)},
     cardsList: {
       gap: RFValue(12),
     },
-    cardItem: {
-      flexDirection: "row",
-      alignItems: "center",
-      justifyContent: "space-between",
-      borderRadius: RFValue(12),
-      padding: RFValue(16),
-    },
-    cardLeft: {
-      flexDirection: "row",
-      alignItems: "center",
-      gap: RFValue(4),
-      flex: 1,
-    },
+    cardItem: {borderRadius: RFValue(12),
+padding: RFValue(16)},
+    cardLeft: {gap: RFValue(4)},
     cardTypeIcon: {
       width: RFValue(32),
       height: RFValue(24),
       marginRight: RFValue(4),
     },
-    cardNumber: {
-      fontSize: RFValue(14),
-      fontWeight: "500",
-      color: colors.slate[650],
-    },
+    cardNumber: {fontSize: RFValue(14),
+color: colors.slate[650]},
     activeBadge: {
       backgroundColor: colors.success[100],
       paddingHorizontal: RFValue(8),
       paddingVertical: RFValue(4),
       borderRadius: RFValue(60),
     },
-    activeBadgeText: {
-      fontSize: RFValue(11),
-      fontWeight: "600",
-      color: colors.success[300],
-    },
+    activeBadgeText: {fontSize: RFValue(11),
+color: colors.success[300]},
     deleteIcon: {
       width: RFValue(20),
       height: RFValue(20),
       tintColor: colors.error[200],
     },
-    footer: {
-      position: "absolute",
-      bottom: 0,
-      left: 0,
-      right: 0,
-      paddingHorizontal: RFValue(20),
-      paddingVertical: RFValue(16),
-      backgroundColor: colors.background,
-    },
+    footer: {paddingHorizontal: RFValue(20),
+paddingVertical: RFValue(16),
+backgroundColor: colors.background},
     // Add Card Modal
-    addCardOverlay: {
-      flex: 1,
-      backgroundColor: "rgba(0, 0, 0, 0.5)",
-      justifyContent: "flex-end",
-    },
+    addCardOverlay: {},
     addCardSheet: {
       backgroundColor: colors.background,
       borderTopLeftRadius: RFValue(24),
@@ -294,71 +263,42 @@ const getStyles = (colors: ColorScheme) =>
       paddingHorizontal: RFValue(20),
       paddingBottom: RFValue(32),
     },
-    modalHandle: {
-      width: RFValue(40),
-      height: RFValue(4),
-      backgroundColor: colors.slate[300],
-      borderRadius: RFValue(2),
-      alignSelf: "center",
-      marginVertical: RFValue(12),
-    },
-    modalTitle: {
-      fontSize: RFValue(20),
-      fontWeight: "700",
-      color: colors.slate[650],
-      textAlign: "center",
-      marginBottom: RFValue(4),
-    },
-    modalSubtitle: {
-      fontSize: RFValue(13),
-      color: colors.slate[500],
-      textAlign: "center",
-      lineHeight: RFValue(18),
-      marginBottom: RFValue(24),
-    },
+    modalHandle: {width: RFValue(40),
+height: RFValue(4),
+backgroundColor: colors.slate[300],
+borderRadius: RFValue(2),
+marginVertical: RFValue(12)},
+    modalTitle: {fontSize: RFValue(20),
+color: colors.slate[650],
+marginBottom: RFValue(4)},
+    modalSubtitle: {fontSize: RFValue(13),
+color: colors.slate[500],
+lineHeight: RFValue(18),
+marginBottom: RFValue(24)},
     formContainer: {
       gap: RFValue(16),
     },
     inputContainer: {
       gap: RFValue(8),
     },
-    inputLabel: {
-      fontSize: RFValue(14),
-      fontWeight: "500",
-      color: colors.slate[650],
-    },
-    inputWrapper: {
-      flexDirection: "row",
-      alignItems: "center",
-      backgroundColor: colors.slate[150],
-      borderRadius: RFValue(12),
-      paddingHorizontal: RFValue(16),
-      borderWidth: 1,
-      borderColor: colors.slate[300],
-    },
-    input: {
-      flex: 1,
-      fontSize: RFValue(15),
-      color: colors.slate[650],
-      paddingVertical: RFValue(14),
-    },
+    inputLabel: {fontSize: RFValue(14),
+color: colors.slate[650]},
+    inputWrapper: {backgroundColor: colors.slate[150],
+borderRadius: RFValue(12),
+paddingHorizontal: RFValue(16),
+borderColor: colors.slate[300]},
+    input: {fontSize: RFValue(15),
+color: colors.slate[650],
+paddingVertical: RFValue(14)},
     inputIcon: {
       width: RFValue(20),
       height: RFValue(20),
       tintColor: colors.slate[500],
       marginLeft: RFValue(8),
     },
-    inputRow: {
-      flexDirection: "row",
-      gap: RFValue(12),
-    },
-    securityNote: {
-      flexDirection: "row",
-      alignItems: "center",
-      justifyContent: "center",
-      gap: RFValue(6),
-      paddingTop: RFValue(8),
-    },
+    inputRow: {gap: RFValue(12)},
+    securityNote: {gap: RFValue(6),
+paddingTop: RFValue(8)},
     shieldIcon: {
       width: RFValue(16),
       height: RFValue(16),

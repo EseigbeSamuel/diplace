@@ -61,18 +61,18 @@ export default function StreetView() {
     <SafeAreaViewContainer disableBottom>
       <SectionHeader title="Street View" rightIconView={<View />} />
 
-      <View style={styles.container}>
+      <View style={styles.container} className="flex-1">
         {loading && !showError && (
-          <View style={styles.loadingContainer}>
+          <View style={styles.loadingContainer} className="absolute top-[0px] left-[0px] right-[0px] bottom-[0px] justify-center items-center z-[10]">
             <ActivityIndicator size="large" color={colors.slate[650]} />
-            <Text style={styles.loadingText}>Loading Street View...</Text>
+            <Text style={styles.loadingText} className="mt-[12px] text-[16px]">Loading Street View...</Text>
           </View>
         )}
 
         {showError ? (
-          <View style={styles.errorContainer}>
-            <Text style={styles.errorTitle}>Street View unavailable</Text>
-            <Text style={styles.errorText}>
+          <View style={styles.errorContainer} className="flex-1 justify-center items-center p-[24px]">
+            <Text style={styles.errorTitle} className="text-[18px] font-bold mb-[8px] text-center">Street View unavailable</Text>
+            <Text style={styles.errorText} className="text-[14px] text-center leading-[20px]">
               This location may not have Street View imagery yet.
             </Text>
           </View>
@@ -102,7 +102,7 @@ export default function StreetView() {
             mediaPlaybackRequiresUserAction={false}
             bounces={false}
             scrollEnabled
-          />
+           className="flex-1"/>
         )}
       </View>
     </SafeAreaViewContainer>
@@ -112,47 +112,47 @@ export default function StreetView() {
 const createStyles = (colors: ColorScheme) =>
   StyleSheet.create({
     container: {
-      flex: 1,
+
       backgroundColor: colors.background,
     },
     webview: {
-      flex: 1,
+
       backgroundColor: colors.background,
     },
     loadingContainer: {
-      position: "absolute",
-      top: 0,
-      left: 0,
-      right: 0,
-      bottom: 0,
-      justifyContent: "center",
-      alignItems: "center",
+
+
+
+
+
+
+
       backgroundColor: colors.background,
-      zIndex: 10,
+
     },
     loadingText: {
-      marginTop: 12,
-      fontSize: 16,
+
+
       color: colors.slate[600],
     },
     errorContainer: {
-      flex: 1,
-      justifyContent: "center",
-      alignItems: "center",
-      padding: 24,
+
+
+
+
       backgroundColor: colors.background,
     },
     errorTitle: {
-      fontSize: 18,
-      fontWeight: "700",
+
+
       color: colors.slate[650],
-      marginBottom: 8,
-      textAlign: "center",
+
+
     },
     errorText: {
-      fontSize: 14,
+
       color: colors.slate[500],
-      textAlign: "center",
-      lineHeight: 20,
+
+
     },
   });

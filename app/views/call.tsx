@@ -56,9 +56,9 @@ function RoomControls({ onEnd, colors }: { onEnd: () => void; colors: any }) {
   }, [isSpeaker]);
 
   return (
-    <View style={styles.controlRow}>
+    <View style={styles.controlRow} className="flex-row items-center justify-center gap-[24px]">
       {/* Mute */}
-      <TouchableOpacity style={styles.controlBtn} onPress={toggleMute}>
+      <TouchableOpacity style={styles.controlBtn} onPress={toggleMute} className="bg-[rgba(120,120,120,0.12)] items-center justify-center">
         <Image
           source={
             isMuted
@@ -66,22 +66,22 @@ function RoomControls({ onEnd, colors }: { onEnd: () => void; colors: any }) {
               : require("@/assets/icons/Volume Up - Iconly Pro.png")
           }
           style={[styles.controlIcon, { tintColor: colors.slate[650] }]}
-        />
+         className="object-contain w-[24px] h-[24px]"/>
       </TouchableOpacity>
 
       {/* End call */}
       <TouchableOpacity
         style={[styles.controlBtn, styles.endCallBtn]}
         onPress={onEnd}
-      >
+       className="bg-[rgba(120,120,120,0.12)] items-center justify-center bg-[#EF4444]">
         <Image
           source={require("@/assets/icons/call-down-light.png")}
           style={styles.endCallIcon}
-        />
+         className="object-contain tint-[#fff] w-[28px] h-[28px]"/>
       </TouchableOpacity>
 
       {/* Speaker */}
-      <TouchableOpacity style={styles.controlBtn} onPress={toggleSpeaker}>
+      <TouchableOpacity style={styles.controlBtn} onPress={toggleSpeaker} className="bg-[rgba(120,120,120,0.12)] items-center justify-center">
         <Image
           source={
             isSpeaker
@@ -89,7 +89,7 @@ function RoomControls({ onEnd, colors }: { onEnd: () => void; colors: any }) {
               : require("@/assets/icons/phone-keypad-light.png")
           }
           style={[styles.controlIcon, { tintColor: colors.slate[650] }]}
-        />
+         className="object-contain w-[24px] h-[24px]"/>
       </TouchableOpacity>
     </View>
   );
@@ -108,8 +108,8 @@ function CallTimer({ colors }: { colors: any }) {
   const ss = String(seconds % 60).padStart(2, "0");
 
   return (
-    <View style={[styles.timerBadge, { backgroundColor: colors.success[200] }]}>
-      <Text style={styles.timerText}>
+    <View style={[styles.timerBadge, { backgroundColor: colors.success[200] }]} className="self-center items-center flex-1 px-[16px] py-[6px] rounded-[100px] mx-[8px]">
+      <Text  className="text-[#fff] font-bold text-[14px] tracking-[0.5px]">
         {/* caller name injected by parent via props */}
         {mm}:{ss}
       </Text>
@@ -190,7 +190,7 @@ function PulseRing({ active, colors }: { active: boolean; colors: any }) {
             opacity: opacity1,
           },
         ]}
-      />
+       className="absolute border-[2px]"/>
       <Animated.View
         style={[
           styles.pulseRing,
@@ -200,7 +200,7 @@ function PulseRing({ active, colors }: { active: boolean; colors: any }) {
             opacity: opacity2,
           },
         ]}
-      />
+       className="absolute border-[2px]"/>
     </>
   );
 }
@@ -391,15 +391,15 @@ const Call = () => {
 
   if (!liveKit) {
     return (
-      <View style={[styles.screen, { backgroundColor: colors.background }]}>
-        <View style={styles.avatarSection}>
-          <Text style={[styles.callerName, { color: colors.slate[650] }]}>
+      <View style={[styles.screen, { backgroundColor: colors.background }]} className="flex-1 px-[16px] pb-[48px]">
+        <View style={styles.avatarSection} className="items-center justify-center flex-1 gap-[14px]">
+          <Text style={[styles.callerName, { color: colors.slate[650] }]} className="font-bold text-center text-[20px] mt-[8px]">
             Calls need a development build
           </Text>
-          <Text style={[styles.callerStatus, { color: colors.slate[500] }]}>
+          <Text style={[styles.callerStatus, { color: colors.slate[500] }]} className="font-normal text-center text-[14px]">
             Expo Go cannot load the native LiveKit calling module.
           </Text>
-          <TouchableOpacity style={styles.backBtn} onPress={() => router.back()}>
+          <TouchableOpacity style={styles.backBtn} onPress={() => router.back()} className="p-[8px]">
             <Text style={{ color: colors.slate[650] }}>Go back</Text>
           </TouchableOpacity>
         </View>
@@ -408,54 +408,54 @@ const Call = () => {
   }
 
   return (
-    <View style={[styles.screen, { backgroundColor: colors.background }]}>
+    <View style={[styles.screen, { backgroundColor: colors.background }]} className="flex-1 px-[16px] pb-[48px]">
       <StatusBar
         backgroundColor={colors.background}
         barStyle={isDarkMode ? "light-content" : "dark-content"}
       />
 
       {/* Header */}
-      <View style={styles.header}>
-        <TouchableOpacity style={styles.backBtn} onPress={handleLeaveCall}>
+      <View style={styles.header} className="flex-row items-center justify-between mb-[8px]">
+        <TouchableOpacity style={styles.backBtn} onPress={handleLeaveCall} className="p-[8px]">
           <Image
             source={
               isDarkMode
                 ? require("@/assets/icons/arrow-left-light.png")
                 : require("@/assets/icons/arrow-left-dark.png")
             }
-            style={{ width: 25, height: 20 }}
+            className="w-[25px] h-[20px]"
           />
         </TouchableOpacity>
 
         {callState === "accepted" ? (
           <CallTimer colors={colors} />
         ) : (
-          <Text style={[styles.headerTitle, { color: colors.slate[650] }]}>
+          <Text style={[styles.headerTitle, { color: colors.slate[650] }]} className="font-semibold text-center text-[16px] flex-1">
             {headerLabel}
           </Text>
         )}
 
-        <View style={{ width: 25 }} />
+        <View className="w-[25px]" />
       </View>
 
       {/* Avatar Section */}
-      <View style={styles.avatarSection}>
-        <View style={styles.avatarWrapper}>
+      <View style={styles.avatarSection} className="items-center justify-center flex-1 gap-[14px]">
+        <View style={styles.avatarWrapper} className="items-center justify-center">
           <PulseRing active={isPulsing} colors={colors} />
-          <Image source={displayAvatar} style={styles.avatar} />
+          <Image source={displayAvatar} style={styles.avatar}  className="absolute"/>
         </View>
-        <Text style={[styles.callerName, { color: colors.slate[650] }]}>
+        <Text style={[styles.callerName, { color: colors.slate[650] }]} className="font-bold text-center text-[20px] mt-[8px]">
           {displayName}
         </Text>
         {statusLabel ? (
-          <Text style={[styles.callerStatus, { color: colors.slate[500] }]}>
+          <Text style={[styles.callerStatus, { color: colors.slate[500] }]} className="font-normal text-center text-[14px]">
             {statusLabel}
           </Text>
         ) : null}
       </View>
 
       {/* Controls */}
-      <View style={styles.controlsArea}>
+      <View style={styles.controlsArea} className="items-center pb-[16px]">
         {/*  Outgoing / Active call controls */}
         {(callState === "calling" || callState === "accepted") &&
         livekitToken &&
@@ -472,51 +472,51 @@ const Call = () => {
           </LiveKitRoom>
         ) : callState === "calling" ? (
           // Still waiting for token / connecting
-          <View style={styles.controlRow}>
+          <View style={styles.controlRow} className="flex-row items-center justify-center gap-[24px]">
             {/* Chat bubble placeholder */}
             <TouchableOpacity
               style={styles.controlBtn}
               onPress={handleLeaveCall}
-            >
+             className="bg-[rgba(120,120,120,0.12)] items-center justify-center">
               <Image
                 source={require("@/assets/icons/Chat - Iconly Pro-1.png")}
                 style={[styles.controlIcon, { tintColor: colors.slate[650] }]}
-              />
+               className="object-contain w-[24px] h-[24px]"/>
             </TouchableOpacity>
 
             {/* End call */}
             <TouchableOpacity
               style={[styles.controlBtn, styles.endCallBtn]}
               onPress={handleEndCall}
-            >
+             className="bg-[rgba(120,120,120,0.12)] items-center justify-center bg-[#EF4444]">
               <Image
                 source={require("@/assets/icons/call-down-light.png")}
                 style={styles.endCallIcon}
-              />
+               className="object-contain tint-[#fff] w-[28px] h-[28px]"/>
             </TouchableOpacity>
 
             {/* Mute placeholder */}
-            <TouchableOpacity style={styles.controlBtn}>
+            <TouchableOpacity style={styles.controlBtn} className="bg-[rgba(120,120,120,0.12)] items-center justify-center">
               <Image
                 source={require("@/assets/icons/Volume Up - Iconly Pro.png")}
                 style={[styles.controlIcon, { tintColor: colors.slate[650] }]}
-              />
+               className="object-contain w-[24px] h-[24px]"/>
             </TouchableOpacity>
           </View>
         ) : null}
 
         {/*  Incoming (ringing) controls  */}
         {callState === "ringing" && (
-          <View style={styles.controlRow}>
+          <View style={styles.controlRow} className="flex-row items-center justify-center gap-[24px]">
             {/* Chat (decline) */}
             <TouchableOpacity
               style={styles.controlBtn}
               onPress={handleDeclineIncoming}
-            >
+             className="bg-[rgba(120,120,120,0.12)] items-center justify-center">
               <Image
                 source={require("@/assets/icons/Chat - Iconly Pro-1.png")}
                 style={[styles.controlIcon, { tintColor: colors.slate[650] }]}
-              />
+               className="object-contain w-[24px] h-[24px]"/>
             </TouchableOpacity>
 
             {/* Accept call (green) */}
@@ -524,29 +524,29 @@ const Call = () => {
               style={[styles.controlBtn, styles.acceptCallBtn]}
               onPress={handleAcceptIncoming}
               disabled={isJoinCallPending}
-            >
+             className="bg-[rgba(120,120,120,0.12)] items-center justify-center bg-[#22C55E]">
               <Image
                 source={require("@/assets/icons/call-up-light.png")}
                 style={styles.endCallIcon}
-              />
+               className="object-contain tint-[#fff] w-[28px] h-[28px]"/>
             </TouchableOpacity>
 
             {/* Decline (red) */}
             <TouchableOpacity
               style={[styles.controlBtn, styles.endCallBtn]}
               onPress={handleDeclineIncoming}
-            >
+             className="bg-[rgba(120,120,120,0.12)] items-center justify-center bg-[#EF4444]">
               <Image
                 source={require("@/assets/icons/call-down-light.png")}
                 style={styles.endCallIcon}
-              />
+               className="object-contain tint-[#fff] w-[28px] h-[28px]"/>
             </TouchableOpacity>
           </View>
         )}
 
         {/*  Not answered controls  */}
         {(callState === "not_answered" || callState === "ended") && (
-          <View style={styles.notAnsweredRow}>
+          <View style={styles.notAnsweredRow} className="flex-row gap-[16px]">
             {/* Chat */}
             <TouchableOpacity
               style={[
@@ -557,17 +557,17 @@ const Call = () => {
                 },
               ]}
               onPress={() => router.back()}
-            >
+             className="flex-row items-center border-[transparent] gap-[8px] px-[24px] py-[14px] rounded-[100px] border-[1px]">
               <Image
                 source={require("@/assets/icons/Chat - Iconly Pro-1.png")}
                 style={[styles.controlIcon, { tintColor: colors.slate[650] }]}
-              />
+               className="object-contain w-[24px] h-[24px]"/>
               <Text
                 style={[
                   styles.notAnsweredBtnText,
                   { color: colors.slate[650] },
                 ]}
-              >
+               className="font-semibold text-[15px]">
                 Chat
               </Text>
             </TouchableOpacity>
@@ -584,12 +584,12 @@ const Call = () => {
                 setCallAttempt((attempt) => attempt + 1);
               }}
               disabled={isStartCallPending}
-            >
+             className="flex-row items-center border-[transparent] gap-[8px] px-[24px] py-[14px] rounded-[100px] border-[1px]">
               <Image
                 source={require("@/assets/icons/call-up-light.png")}
                 style={styles.endCallIcon}
-              />
-              <Text style={[styles.notAnsweredBtnText, { color: "#fff" }]}>
+               className="object-contain tint-[#fff] w-[28px] h-[28px]"/>
+              <Text style={[styles.notAnsweredBtnText, { color: "#fff" }]} className="font-semibold text-[15px]">
                 Redial
               </Text>
             </TouchableOpacity>
@@ -610,143 +610,138 @@ const PULSE_SIZE = AVATAR_SIZE + 32;
 
 const styles = StyleSheet.create({
   screen: {
-    flex: 1,
-    paddingHorizontal: 16,
+
+
     paddingTop:
       Platform.OS === "android" ? (StatusBar.currentHeight ?? 24) + 10 : 10,
-    paddingBottom: 48,
+
   },
   header: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    marginBottom: 8,
+
+
+
+
   },
   backBtn: {
-    padding: 8,
+
   },
   headerTitle: {
-    fontSize: 16,
-    fontWeight: "600",
-    textAlign: "center",
-    flex: 1,
+
+
+
+
   },
 
   // Avatar
   avatarSection: {
-    flex: 1,
-    alignItems: "center",
-    justifyContent: "center",
-    gap: 14,
+
+
+
+
   },
   avatarWrapper: {
     width: AVATAR_SIZE,
     height: AVATAR_SIZE,
-    alignItems: "center",
-    justifyContent: "center",
+
+
   },
   avatar: {
     width: AVATAR_SIZE,
     height: AVATAR_SIZE,
     borderRadius: AVATAR_SIZE / 2,
-    position: "absolute",
+
   },
   pulseRing: {
-    position: "absolute",
+
     width: PULSE_SIZE,
     height: PULSE_SIZE,
     borderRadius: PULSE_SIZE / 2,
-    borderWidth: 2,
+
   },
   callerName: {
-    fontSize: 20,
-    fontWeight: "700",
-    marginTop: 8,
-    textAlign: "center",
+
+
+
+
   },
   callerStatus: {
-    fontSize: 14,
-    fontWeight: "400",
-    textAlign: "center",
+
+
+
   },
 
   // Controls
   controlsArea: {
-    paddingBottom: 16,
-    alignItems: "center",
+
+
   },
   controlRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
-    gap: 24,
+
+
+
+
   },
   controlBtn: {
     width: CONTROL_BTN_SIZE,
     height: CONTROL_BTN_SIZE,
     borderRadius: CONTROL_BTN_SIZE / 2,
-    backgroundColor: "rgba(120,120,120,0.12)",
-    alignItems: "center",
-    justifyContent: "center",
+
+
+
   },
   controlIcon: {
-    width: 24,
-    height: 24,
-    resizeMode: "contain",
+
+
+
   },
   endCallBtn: {
     width: END_CALL_BTN_SIZE,
     height: END_CALL_BTN_SIZE,
     borderRadius: END_CALL_BTN_SIZE / 2,
-    backgroundColor: "#EF4444",
+
   },
   acceptCallBtn: {
     width: END_CALL_BTN_SIZE,
     height: END_CALL_BTN_SIZE,
     borderRadius: END_CALL_BTN_SIZE / 2,
-    backgroundColor: "#22C55E",
+
   },
   endCallIcon: {
-    width: 28,
-    height: 28,
-    resizeMode: "contain",
-    tintColor: "#fff",
+
+
+
+
   },
 
   // Not answered
   notAnsweredRow: {
-    flexDirection: "row",
-    gap: 16,
+
+
   },
   notAnsweredBtn: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 8,
-    paddingHorizontal: 24,
-    paddingVertical: 14,
-    borderRadius: 100,
-    borderWidth: 1,
-    borderColor: "transparent",
+
+
+
+
+
+
+
+
   },
   notAnsweredBtnText: {
-    fontSize: 15,
-    fontWeight: "600",
+
+
   },
 
   // Timer badge
   timerBadge: {
-    flex: 1,
-    alignSelf: "center",
-    paddingHorizontal: 16,
-    paddingVertical: 6,
-    borderRadius: 100,
-    alignItems: "center",
-    marginHorizontal: 8,
+
+
+
+
+
+
+
   },
-  timerText: {
-    color: "#fff",
-    fontSize: 14,
-    fontWeight: "700",
-    letterSpacing: 0.5,
-  },
+  timerText: {},
 });

@@ -100,16 +100,16 @@ const AddBankDetails = ({ onNext }: props) => {
   return (
     <View>
       <ScrollView showsVerticalScrollIndicator={false}>
-        <View style={addBankStyles.container}>
+        <View  className="flex-1">
           {/* Header */}
           <View style={addBankStyles.headerSection}>
-            <View style={addBankStyles.iconContainer}>
+            <View style={addBankStyles.iconContainer} className="items-center justify-center">
               <Image
                 source={require("@/assets/icons/bank-light.png")}
                 style={addBankStyles.headIcon}
               />
             </View>
-            <Text style={addBankStyles.title}>Bank Details</Text>
+            <Text style={addBankStyles.title} className="font-bold">Bank Details</Text>
             <Text style={addBankStyles.description}>
               Please link your bank account you will use to collect payments.
             </Text>
@@ -117,32 +117,32 @@ const AddBankDetails = ({ onNext }: props) => {
 
           {/* Preview Card */}
           <View style={addBankStyles.previewCard}>
-            <View style={addBankStyles.cardHeader}>
-              <View style={addBankStyles.bankIconContainer}>
+            <View style={addBankStyles.cardHeader} className="flex-row justify-between items-start">
+              <View style={addBankStyles.bankIconContainer} className="items-center justify-center">
                 <Image
                   source={require("@/assets/icons/bank-emoji.png")}
                   style={addBankStyles.bankIcon}
                 />
               </View>
-              <View style={addBankStyles.accountNumberSection}>
+              <View  className="items-end">
                 <Text style={addBankStyles.accountNumberLabel}>
                   Account Number
                 </Text>
-                <Text style={addBankStyles.accountNumber}>
+                <Text style={addBankStyles.accountNumber} className="font-bold tracking-[1px]">
                   {accountNumber || "N/A"}
                 </Text>
               </View>
             </View>
-            <View style={addBankStyles.cardFooter}>
-              <View style={addBankStyles.accountNameSection}>
+            <View  className="flex-row justify-between">
+              <View  className="flex-1">
                 <Text style={addBankStyles.accountNameLabel}>Account Name</Text>
-                <Text style={addBankStyles.accountName}>
+                <Text style={addBankStyles.accountName} className="font-semibold">
                   {accountName || "UNAVAILABLE"}
                 </Text>
               </View>
-              <View style={addBankStyles.bankSection}>
+              <View  className="items-end">
                 <Text style={addBankStyles.bankLabel}>Bank</Text>
-                <Text style={addBankStyles.bankName}>
+                <Text style={addBankStyles.bankName} className="font-semibold text-right">
                   {selectedBank?.name || "UNAVAILABLE"}
                 </Text>
               </View>
@@ -179,8 +179,8 @@ const AddBankDetails = ({ onNext }: props) => {
                   editable={!!selectedBank && !isSubmitting}
                 />
                 {isVerifying && (
-                  <View style={addBankStyles.verifyingContainer}>
-                    <Text style={addBankStyles.verifyingText}>
+                  <View style={addBankStyles.verifyingContainer} className="flex-row items-center text-right grow">
+                    <Text style={addBankStyles.verifyingText} className="italic">
                       fetching name...
                     </Text>
                     <ActivityIndicator size="small" color={colors.slate[500]} />
@@ -221,21 +221,21 @@ const AddBankDetails = ({ onNext }: props) => {
         animationType="slide"
         onRequestClose={() => setShowBankModal(false)}
       >
-        <View style={addBankStyles.modalOverlay}>
+        <View  className="flex-1 justify-end">
           <Pressable
-            style={addBankStyles.modalBackdrop}
+
             onPress={() => setShowBankModal(false)}
-          />
-          <View style={addBankStyles.modalContent}>
+           className="flex-1 bg-[rgba(0, 0, 0, 0.5)]"/>
+          <View style={addBankStyles.modalContent} className="max-h-[80%px]">
             {/* Modal Handle */}
-            <View style={addBankStyles.modalHandle} />
+            <View style={addBankStyles.modalHandle}  className="self-center"/>
 
             <View style={addBankStyles.modalHeader}>
-              <Text style={addBankStyles.modalTitle}>Select your bank</Text>
+              <Text style={addBankStyles.modalTitle} className="font-semibold text-center">Select your bank</Text>
             </View>
 
             {/* Search Input */}
-            <View style={addBankStyles.searchContainer}>
+            <View style={addBankStyles.searchContainer} className="flex-row items-center">
               <Image
                 source={require("@/assets/icons/search.png")}
                 style={addBankStyles.searchIcon}
@@ -246,15 +246,15 @@ const AddBankDetails = ({ onNext }: props) => {
                 onChangeText={setSearchQuery}
                 placeholder="Search..."
                 placeholderTextColor={colors.slate[450]}
-              />
+               className="flex-1"/>
             </View>
 
             {/* Bank List */}
             <ScrollView style={addBankStyles.bankList}>
               {isSupportedBanksLoading || isSupportedBanksFetching ? (
-                <View style={addBankStyles.bankState}>
+                <View style={addBankStyles.bankState} className="items-center flex-row justify-center">
                   <ActivityIndicator size="small" color={colors.slate[500]} />
-                  <Text style={addBankStyles.bankStateText}>
+                  <Text style={addBankStyles.bankStateText} className="text-center">
                     Loading banks...
                   </Text>
                 </View>
@@ -262,8 +262,8 @@ const AddBankDetails = ({ onNext }: props) => {
                 <Pressable
                   style={addBankStyles.bankState}
                   onPress={() => refetchSupportedBanks()}
-                >
-                  <Text style={addBankStyles.bankStateText}>
+                 className="items-center flex-row justify-center">
+                  <Text style={addBankStyles.bankStateText} className="text-center">
                     Unable to load banks. Tap to retry.
                   </Text>
                 </Pressable>
@@ -273,14 +273,14 @@ const AddBankDetails = ({ onNext }: props) => {
                   key={bank.code}
                   style={addBankStyles.bankItem}
                   onPress={() => handleSelectBank(bank)}
-                >
+                 className="flex-row items-center">
                   <View
                     style={[
                       addBankStyles.radioButton,
                       selectedBank?.code === bank.code &&
                         addBankStyles.radioButtonSelected,
                     ]}
-                  >
+                   className="border-[2px] items-center justify-center">
                     {selectedBank?.code === bank.code && (
                       <View style={addBankStyles.radioButtonInner} />
                     )}
@@ -289,8 +289,8 @@ const AddBankDetails = ({ onNext }: props) => {
                 </Pressable>
                 ))
               ) : (
-                <View style={addBankStyles.bankState}>
-                  <Text style={addBankStyles.bankStateText}>
+                <View style={addBankStyles.bankState} className="items-center flex-row justify-center">
+                  <Text style={addBankStyles.bankStateText} className="text-center">
                     No banks found.
                   </Text>
                 </View>
@@ -307,31 +307,22 @@ export default AddBankDetails;
 
 const styles = (colors: ColorScheme) =>
   StyleSheet.create({
-    container: {
-      flex: 1,
-    },
+    container: {},
     headerSection: {
       paddingTop: RFValue(20),
       marginBottom: RFValue(24),
     },
-    iconContainer: {
-      width: RFValue(60),
-      height: RFValue(60),
-      borderRadius: RFValue(12),
-      alignItems: "center",
-      justifyContent: "center",
-    },
+    iconContainer: {width: RFValue(60),
+height: RFValue(60),
+borderRadius: RFValue(12)},
     headIcon: {
       width: RFValue(60),
       height: RFValue(60),
       tintColor: colors.slate[650],
     },
-    title: {
-      fontSize: RFValue(24),
-      fontWeight: "700",
-      color: colors.slate[650],
-      marginBottom: RFValue(8),
-    },
+    title: {fontSize: RFValue(24),
+color: colors.slate[650],
+marginBottom: RFValue(8)},
     description: {
       fontSize: RFValue(14),
       color: colors.slate[500],
@@ -344,86 +335,50 @@ const styles = (colors: ColorScheme) =>
       marginBottom: RFValue(32),
       minHeight: RFValue(180),
     },
-    cardHeader: {
-      flexDirection: "row",
-      justifyContent: "space-between",
-      alignItems: "flex-start",
-      marginBottom: RFValue(40),
-    },
-    bankIconContainer: {
-      width: RFValue(48),
-      height: RFValue(48),
-      borderRadius: RFValue(12),
-      alignItems: "center",
-      justifyContent: "center",
-    },
+    cardHeader: {marginBottom: RFValue(40)},
+    bankIconContainer: {width: RFValue(48),
+height: RFValue(48),
+borderRadius: RFValue(12)},
     bankIcon: {
       width: RFValue(48),
       height: RFValue(48),
     },
-    accountNumberSection: {
-      alignItems: "flex-end",
-    },
+    accountNumberSection: {},
     accountNumberLabel: {
       fontSize: RFValue(11),
       color: colors.slate[200],
       marginBottom: RFValue(4),
     },
-    accountNumber: {
-      fontSize: RFValue(20),
-      fontWeight: "700",
-      color: colors.slate[100],
-      letterSpacing: 1,
-    },
-    cardFooter: {
-      flexDirection: "row",
-      justifyContent: "space-between",
-    },
-    accountNameSection: {
-      flex: 1,
-    },
+    accountNumber: {fontSize: RFValue(20),
+color: colors.slate[100]},
+    cardFooter: {},
+    accountNameSection: {},
     accountNameLabel: {
       fontSize: RFValue(11),
       color: colors.slate[200],
       marginBottom: RFValue(4),
     },
-    accountName: {
-      fontSize: RFValue(14),
-      fontWeight: "600",
-      color: colors.slate[100],
-    },
-    bankSection: {
-      alignItems: "flex-end",
-    },
+    accountName: {fontSize: RFValue(14),
+color: colors.slate[100]},
+    bankSection: {},
     bankLabel: {
       fontSize: RFValue(11),
       color: colors.slate[200],
       marginBottom: RFValue(4),
     },
-    bankName: {
-      fontSize: RFValue(12),
-      fontWeight: "600",
-      color: colors.slate[100],
-      textAlign: "right",
-    },
+    bankName: {fontSize: RFValue(12),
+color: colors.slate[100]},
 
-    selectorContainer: {
-      paddingVertical: RFValue(16),
-      backgroundColor: colors.slate[200],
-      paddingHorizontal: RFValue(12),
-      borderRadius: RFValue(16),
-      borderWidth: 1,
-      borderColor: colors.slate[300],
-    },
+    selectorContainer: {paddingVertical: RFValue(16),
+backgroundColor: colors.slate[200],
+paddingHorizontal: RFValue(12),
+borderRadius: RFValue(16),
+borderColor: colors.slate[300]},
     selectorLabel: {
       fontSize: RFValue(13),
       color: colors.slate[600],
     },
-    selectorValue: {
-      flexDirection: "row",
-      justifyContent: "space-between",
-      alignItems: "center",
-    },
+    selectorValue: {},
     selectorText: {
       fontSize: RFValue(15),
       color: colors.slate[650],
@@ -440,42 +395,22 @@ const styles = (colors: ColorScheme) =>
       fontSize: RFValue(13),
       color: colors.slate[600],
     },
-    inputContainer: {
-      flexDirection: "column",
-      paddingVertical: RFValue(16),
-      backgroundColor: colors.slate[200],
-      paddingHorizontal: RFValue(12),
-      borderRadius: RFValue(16),
-      borderWidth: 1,
-      borderColor: colors.slate[300],
-    },
-    textInput: {
-      flex: 1,
-      fontSize: RFValue(15),
-      color: colors.slate[650],
-      padding: 0,
-    },
-    verificationSection: {
-      marginTop: RFValue(12),
-      paddingVertical: RFValue(16),
-      backgroundColor: colors.slate[200],
-      paddingHorizontal: RFValue(12),
-      borderRadius: RFValue(16),
-      borderWidth: 1,
-      borderColor: colors.slate[300],
-    },
-    verifyingContainer: {
-      flexDirection: "row",
-      alignItems: "center",
-      marginTop: RFValue(8),
-      textAlign: "right",
-      flexGrow: 1,
-    },
-    verifyingText: {
-      fontSize: RFValue(13),
-      color: colors.slate[600],
-      fontStyle: "italic",
-    },
+    inputContainer: {paddingVertical: RFValue(16),
+backgroundColor: colors.slate[200],
+paddingHorizontal: RFValue(12),
+borderRadius: RFValue(16),
+borderColor: colors.slate[300]},
+    textInput: {fontSize: RFValue(15),
+color: colors.slate[650]},
+    verificationSection: {marginTop: RFValue(12),
+paddingVertical: RFValue(16),
+backgroundColor: colors.slate[200],
+paddingHorizontal: RFValue(12),
+borderRadius: RFValue(16),
+borderColor: colors.slate[300]},
+    verifyingContainer: {marginTop: RFValue(8)},
+    verifyingText: {fontSize: RFValue(13),
+color: colors.slate[600]},
     accountNameDisplay: {
       gap: RFValue(4),
     },
@@ -483,102 +418,59 @@ const styles = (colors: ColorScheme) =>
       fontSize: RFValue(13),
       color: colors.slate[500],
     },
-    accountNameDisplayValue: {
-      fontSize: RFValue(15),
-      color: colors.slate[650],
-      fontWeight: "600",
-    },
+    accountNameDisplayValue: {fontSize: RFValue(15),
+color: colors.slate[650]},
     buttonContainer: {
       marginTop: RFValue(32),
       marginBottom: RFValue(40),
     },
-    modalOverlay: {
-      flex: 1,
-      justifyContent: "flex-end",
-    },
-    modalBackdrop: {
-      flex: 1,
-      backgroundColor: "rgba(0, 0, 0, 0.5)",
-    },
-    modalContent: {
-      backgroundColor: colors.background,
-      borderTopLeftRadius: RFValue(24),
-      borderTopRightRadius: RFValue(24),
-      maxHeight: "80%",
-      paddingBottom: RFValue(20),
-    },
-    modalHandle: {
-      width: RFValue(40),
-      height: RFValue(4),
-      backgroundColor: colors.slate[300],
-      borderRadius: RFValue(2),
-      alignSelf: "center",
-      marginTop: RFValue(12),
-      marginBottom: RFValue(8),
-    },
+    modalOverlay: {},
+    modalBackdrop: {},
+    modalContent: {backgroundColor: colors.background,
+borderTopLeftRadius: RFValue(24),
+borderTopRightRadius: RFValue(24),
+paddingBottom: RFValue(20)},
+    modalHandle: {width: RFValue(40),
+height: RFValue(4),
+backgroundColor: colors.slate[300],
+borderRadius: RFValue(2),
+marginTop: RFValue(12),
+marginBottom: RFValue(8)},
     modalHeader: {
       padding: RFValue(20),
       paddingTop: RFValue(12),
     },
-    modalTitle: {
-      fontSize: RFValue(18),
-      fontWeight: "600",
-      color: colors.slate[650],
-      textAlign: "center",
-    },
-    searchContainer: {
-      flexDirection: "row",
-      alignItems: "center",
-      backgroundColor: colors.slate[150],
-      marginHorizontal: RFValue(16),
-      marginBottom: RFValue(8),
-      paddingHorizontal: RFValue(12),
-      borderRadius: RFValue(8),
-    },
+    modalTitle: {fontSize: RFValue(18),
+color: colors.slate[650]},
+    searchContainer: {backgroundColor: colors.slate[150],
+marginHorizontal: RFValue(16),
+marginBottom: RFValue(8),
+paddingHorizontal: RFValue(12),
+borderRadius: RFValue(8)},
     searchIcon: {
       width: RFValue(20),
       height: RFValue(20),
       tintColor: colors.slate[500],
       marginRight: RFValue(8),
     },
-    searchInput: {
-      flex: 1,
-      fontSize: RFValue(15),
-      color: colors.slate[650],
-      paddingVertical: RFValue(12),
-    },
+    searchInput: {fontSize: RFValue(15),
+color: colors.slate[650],
+paddingVertical: RFValue(12)},
     bankList: {
       marginTop: RFValue(8),
     },
-    bankState: {
-      alignItems: "center",
-      flexDirection: "row",
-      gap: RFValue(8),
-      justifyContent: "center",
-      paddingHorizontal: RFValue(20),
-      paddingVertical: RFValue(20),
-    },
-    bankStateText: {
-      color: colors.slate[500],
-      fontSize: RFValue(14),
-      textAlign: "center",
-    },
-    bankItem: {
-      flexDirection: "row",
-      alignItems: "center",
-      paddingHorizontal: RFValue(20),
-      paddingVertical: RFValue(16),
-    },
-    radioButton: {
-      width: RFValue(20),
-      height: RFValue(20),
-      borderRadius: RFValue(10),
-      borderWidth: 2,
-      borderColor: colors.slate[400],
-      marginRight: RFValue(12),
-      alignItems: "center",
-      justifyContent: "center",
-    },
+    bankState: {gap: RFValue(8),
+paddingHorizontal: RFValue(20),
+paddingVertical: RFValue(20)},
+    bankStateText: {color: colors.slate[500],
+fontSize: RFValue(14)},
+    bankItem: {paddingHorizontal: RFValue(20),
+paddingVertical: RFValue(16)},
+    radioButton: {width: RFValue(20),
+height: RFValue(20),
+borderRadius: RFValue(10),
+borderColor: colors.slate[400],
+marginRight: RFValue(12)},
     radioButtonSelected: {
       borderColor: colors.slate[650],
     },

@@ -57,12 +57,12 @@ const VerificationCompleteStep = () => {
   };
 
   return (
-    <View style={Styles.container}>
+    <View style={Styles.container} className="flex-1 justify-between">
       {/* Content */}
-      <View style={Styles.contentContainer}>
+      <View  className="flex-1 items-center">
         {/* Success Badge */}
         <View>
-          <View style={Styles.successBadge}>
+          <View style={Styles.successBadge} className="items-center justify-center">
             <Image
               source={require("@/assets/icons/success-large.png")}
               style={Styles.checkIcon}
@@ -72,18 +72,18 @@ const VerificationCompleteStep = () => {
         </View>
 
         {/* Title and Description */}
-        <View style={Styles.textContainer}>
-          <Text style={Styles.headText}>
+        <View style={Styles.textContainer} className="items-center">
+          <Text style={Styles.headText} className="font-semibold text-center">
             All set! Your account has been verified. 🎉
           </Text>
-          <Text style={Styles.descriptionText}>
+          <Text style={Styles.descriptionText} className="text-center">
             Your account verification was successful. Enjoy a wonderful
             experience with DRPlace.
           </Text>
         </View>
 
         {/* Verification Checklist */}
-        <View style={Styles.checklistContainer}>
+        <View style={Styles.checklistContainer} className="w-[100%px] border-[1px]">
           {verificationItems.map((item, index) => (
             <View
               key={index}
@@ -93,16 +93,16 @@ const VerificationCompleteStep = () => {
                   borderBottomWidth: 0,
                 },
               ]}
-            >
-              <View style={Styles.checklistIconContainer}>
+             className="flex-row items-center border-b">
+              <View style={Styles.checklistIconContainer} className="items-center justify-center">
                 <Image
                   source={item.icon}
                   style={Styles.checklistIcon}
                   resizeMode="contain"
                 />
               </View>
-              <Text style={Styles.checklistLabel}>{item.label}</Text>
-              <View style={Styles.checkmarkCircle}>
+              <Text style={Styles.checklistLabel} className="flex-1 font-medium">{item.label}</Text>
+              <View style={Styles.checkmarkCircle} className="items-center justify-center">
                 <Image
                   source={require("@/assets/icons/checkbox-circle-fill.png")}
                   style={Styles.checkmarkIcon}
@@ -115,7 +115,7 @@ const VerificationCompleteStep = () => {
       </View>
 
       {/* Proceed Button */}
-      <View style={Styles.buttonContainer}>
+      <View style={Styles.buttonContainer} className="flex-col">
         <AppButton
           title="Post a Space Now"
           onPress={handleProceedToPost}
@@ -138,96 +138,50 @@ export default VerificationCompleteStep;
 
 const styles = (colors: ColorScheme) =>
   StyleSheet.create({
-    container: {
-      flex: 1,
-      justifyContent: "space-between",
-      paddingBottom: RFValue(20),
-    },
-    contentContainer: {
-      flex: 1,
-      alignItems: "center",
-    },
+    container: {paddingBottom: RFValue(20)},
+    contentContainer: {},
 
-    successBadge: {
-      width: RFValue(100),
-      height: RFValue(100),
-      alignItems: "center",
-      justifyContent: "center",
-    },
+    successBadge: {width: RFValue(100),
+height: RFValue(100)},
     checkIcon: {
       width: RFValue(140),
       height: RFValue(140),
     },
-    textContainer: {
-      alignItems: "center",
-      marginBottom: RFValue(8),
-      marginTop: RFValue(8),
-      gap: RFValue(2),
-    },
-    headText: {
-      fontSize: RFValue(24),
-      fontWeight: "600",
-      lineHeight: RFValue(32),
-      color: colors.slate[650],
-      textAlign: "center",
-    },
-    descriptionText: {
-      fontSize: RFValue(14),
-      lineHeight: RFValue(22),
-      color: colors.slate[600],
-      textAlign: "center",
-    },
-    checklistContainer: {
-      width: "100%",
-      paddingHorizontal: RFValue(8),
-      backgroundColor: colors.background,
-      borderRadius: RFValue(16),
-      borderWidth: 1,
-      borderColor: colors.slate[300],
-      paddingVertical: RFValue(2),
-    },
-    checklistItem: {
-      flexDirection: "row",
-      alignItems: "center",
-      gap: RFValue(12),
-      paddingVertical: RFValue(10),
-      paddingHorizontal: RFValue(8),
-      borderBottomWidth: 1,
-      borderBottomColor: colors.slate[300],
-    },
-    checklistIconContainer: {
-      width: RFValue(24),
-      height: RFValue(24),
-      alignItems: "center",
-      justifyContent: "center",
-    },
+    textContainer: {marginBottom: RFValue(8),
+marginTop: RFValue(8),
+gap: RFValue(2)},
+    headText: {fontSize: RFValue(24),
+lineHeight: RFValue(32),
+color: colors.slate[650]},
+    descriptionText: {fontSize: RFValue(14),
+lineHeight: RFValue(22),
+color: colors.slate[600]},
+    checklistContainer: {paddingHorizontal: RFValue(8),
+backgroundColor: colors.background,
+borderRadius: RFValue(16),
+borderColor: colors.slate[300],
+paddingVertical: RFValue(2)},
+    checklistItem: {gap: RFValue(12),
+paddingVertical: RFValue(10),
+paddingHorizontal: RFValue(8),
+borderBottomColor: colors.slate[300]},
+    checklistIconContainer: {width: RFValue(24),
+height: RFValue(24)},
     checklistIcon: {
       width: RFValue(20),
       height: RFValue(20),
       tintColor: colors.slate[650],
     },
-    checklistLabel: {
-      flex: 1,
-      fontSize: RFValue(15),
-      fontWeight: "500",
-      color: colors.slate[650],
-    },
-    checkmarkCircle: {
-      width: RFValue(24),
-      height: RFValue(24),
-      borderRadius: RFValue(12),
-
-      alignItems: "center",
-      justifyContent: "center",
-    },
+    checklistLabel: {fontSize: RFValue(15),
+color: colors.slate[650]},
+    checkmarkCircle: {width: RFValue(24),
+height: RFValue(24),
+borderRadius: RFValue(12)},
     checkmarkIcon: {
       width: RFValue(20),
       height: RFValue(20),
       tintColor: colors.success[200],
     },
-    buttonContainer: {
-      marginTop: RFValue(10),
-      flexDirection: "column",
-      gap: RFValue(12),
-    },
+    buttonContainer: {marginTop: RFValue(10),
+gap: RFValue(12)},
   });

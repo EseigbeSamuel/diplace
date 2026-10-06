@@ -402,18 +402,12 @@ export default function RenterHome() {
                         style={{ backgroundColor: colors.slate[150] }}
                       >
                         <SkeletonBlock height={130} borderRadius={20} />
-                        <SkeletonBlock
-                          width="70%"
-                          height={18}
-                          borderRadius={8}
-                          style={{ marginTop: 14 }}
-                        />
-                        <SkeletonBlock
-                          width="50%"
-                          height={14}
-                          borderRadius={8}
-                          style={{ marginTop: 8 }}
-                        />
+                        <View className="mt-[14px]">
+                          <SkeletonBlock width="70%" height={18} borderRadius={8} />
+                        </View>
+                        <View className="mt-[8px]">
+                          <SkeletonBlock width="50%" height={14} borderRadius={8} />
+                        </View>
                       </View>
                     ))}
                   </View>
@@ -433,21 +427,15 @@ export default function RenterHome() {
                     style={{ backgroundColor: colors.slate[150] }}
                   >
                     <SkeletonBlock height={150} borderRadius={20} />
-                    <SkeletonBlock
-                      width="72%"
-                      height={18}
-                      style={{ marginTop: 12 }}
-                    />
-                    <SkeletonBlock
-                      width="48%"
-                      height={14}
-                      style={{ marginTop: 8 }}
-                    />
-                    <SkeletonBlock
-                      width="38%"
-                      height={14}
-                      style={{ marginTop: 8 }}
-                    />
+                    <View className="mt-[12px]">
+                      <SkeletonBlock width="72%" height={18} />
+                    </View>
+                    <View className="mt-[8px]">
+                      <SkeletonBlock width="48%" height={14} />
+                    </View>
+                    <View className="mt-[8px]">
+                      <SkeletonBlock width="38%" height={14} />
+                    </View>
                   </View>
                 ))
               : (showAllNearby ? nearbyCards : nearbyCardsPreview).map(
@@ -523,16 +511,12 @@ export default function RenterHome() {
                         style={{ backgroundColor: colors.slate[150] }}
                       >
                         <SkeletonBlock height={130} borderRadius={20} />
-                        <SkeletonBlock
-                          width="66%"
-                          height={18}
-                          style={{ marginTop: 14 }}
-                        />
-                        <SkeletonBlock
-                          width="46%"
-                          height={14}
-                          style={{ marginTop: 8 }}
-                        />
+                        <View className="mt-[14px]">
+                          <SkeletonBlock width="66%" height={18} />
+                        </View>
+                        <View className="mt-[8px]">
+                          <SkeletonBlock width="46%" height={14} />
+                        </View>
                       </View>
                     ))}
                   </View>
@@ -565,21 +549,15 @@ export default function RenterHome() {
                     style={{ backgroundColor: colors.slate[150] }}
                   >
                     <SkeletonBlock height={150} borderRadius={20} />
-                    <SkeletonBlock
-                      width="72%"
-                      height={18}
-                      style={{ marginTop: 12 }}
-                    />
-                    <SkeletonBlock
-                      width="48%"
-                      height={14}
-                      style={{ marginTop: 8 }}
-                    />
-                    <SkeletonBlock
-                      width="35%"
-                      height={14}
-                      style={{ marginTop: 8 }}
-                    />
+                    <View className="mt-[12px]">
+                      <SkeletonBlock width="72%" height={18} />
+                    </View>
+                    <View className="mt-[8px]">
+                      <SkeletonBlock width="48%" height={14} />
+                    </View>
+                    <View className="mt-[8px]">
+                      <SkeletonBlock width="35%" height={14} />
+                    </View>
                   </View>
                 ))}
               </View>
@@ -606,14 +584,14 @@ export default function RenterHome() {
         onRequestClose={() => setShowFilterModal(false)}
       >
         <Pressable
-          style={homeStyles.filterModalOverlay}
+
           onPress={() => setShowFilterModal(false)}
-        >
+         className="flex-1 bg-[rgba(0, 0, 0, 0.5)] justify-end">
           <Pressable
             style={homeStyles.filterBottomSheet}
             onPress={(e) => e.stopPropagation()}
-          >
-            <View style={homeStyles.modalHandle} />
+           className="h-[90%px]">
+            <View style={homeStyles.modalHandle}  className="self-center"/>
             <FilterBottomSheets
               selectedType={type}
               onSelectType={setType}
@@ -654,23 +632,23 @@ export default function RenterHome() {
         onRequestClose={handleCityBack}
       >
         <Pressable
-          style={homeStyles.cityModalOverlay}
+
           onPress={handleCityClose}
-        >
+         className="flex-1 bg-[rgba(0, 0, 0, 0.5)] justify-end">
           <Pressable
             style={homeStyles.cityBottomSheet}
             onPress={(e) => e.stopPropagation()}
-          >
-            <View style={homeStyles.modalHandle} />
+           className="h-[50%px]">
+            <View style={homeStyles.modalHandle}  className="self-center"/>
 
-            <View style={homeStyles.cityModalHeader}>
+            <View style={homeStyles.cityModalHeader} className="flex-row items-center justify-between">
               <Pressable onPress={handleCityBack}>
                 <Image
                   source={require("@/assets/icons/arrow-left-light.png")}
                   style={homeStyles.cityBackIcon}
                 />
               </Pressable>
-              <Text style={homeStyles.cityModalTitle}>City</Text>
+              <Text style={homeStyles.cityModalTitle} className="font-bold">City</Text>
               <Pressable onPress={handleCityClose}>
                 <Text style={homeStyles.cityCloseIcon}>✕</Text>
               </Pressable>
@@ -716,53 +694,28 @@ const styles = (colors: ColorScheme) =>
       lineHeight: RFValue(20),
       color: colors.slate[650],
     },
-    filterModalOverlay: {
-      flex: 1,
-      backgroundColor: "rgba(0, 0, 0, 0.5)",
-      justifyContent: "flex-end",
-    },
-    filterBottomSheet: {
-      backgroundColor: colors.background,
-      borderTopLeftRadius: RFValue(24),
-      borderTopRightRadius: RFValue(24),
-      height: "90%",
-    },
-    modalHandle: {
-      width: RFValue(40),
-      height: RFValue(4),
-      backgroundColor: colors.slate[300],
-      borderRadius: RFValue(2),
-      alignSelf: "center",
-      marginVertical: RFValue(12),
-    },
-    cityModalOverlay: {
-      flex: 1,
-      backgroundColor: "rgba(0, 0, 0, 0.5)",
-      justifyContent: "flex-end",
-    },
-    cityBottomSheet: {
-      backgroundColor: colors.background,
-      borderTopLeftRadius: RFValue(24),
-      borderTopRightRadius: RFValue(24),
-      height: "50%",
-    },
-    cityModalHeader: {
-      flexDirection: "row",
-      alignItems: "center",
-      justifyContent: "space-between",
-      paddingHorizontal: RFValue(16),
-      paddingBottom: RFValue(16),
-    },
+    filterModalOverlay: {},
+    filterBottomSheet: {backgroundColor: colors.background,
+borderTopLeftRadius: RFValue(24),
+borderTopRightRadius: RFValue(24)},
+    modalHandle: {width: RFValue(40),
+height: RFValue(4),
+backgroundColor: colors.slate[300],
+borderRadius: RFValue(2),
+marginVertical: RFValue(12)},
+    cityModalOverlay: {},
+    cityBottomSheet: {backgroundColor: colors.background,
+borderTopLeftRadius: RFValue(24),
+borderTopRightRadius: RFValue(24)},
+    cityModalHeader: {paddingHorizontal: RFValue(16),
+paddingBottom: RFValue(16)},
     cityBackIcon: {
       width: RFValue(20),
       height: RFValue(20),
       tintColor: colors.slate[650],
     },
-    cityModalTitle: {
-      fontSize: RFValue(17),
-      fontWeight: "700",
-      color: colors.slate[650],
-    },
+    cityModalTitle: {fontSize: RFValue(17),
+color: colors.slate[650]},
     cityCloseIcon: {
       fontSize: RFValue(18),
       color: colors.slate[650],
@@ -771,29 +724,17 @@ const styles = (colors: ColorScheme) =>
       paddingHorizontal: RFValue(16),
       gap: RFValue(12),
     },
-    cityModalContainer: {
-      flex: 1,
-    },
+    cityModalContainer: {},
 
-    cityRow: {
-      flexDirection: "row",
-      alignItems: "center",
-      padding: RFValue(16),
-      backgroundColor: colors.slate[150],
-      borderRadius: RFValue(12),
-      borderWidth: 1,
-      borderColor: colors.slate[300],
-      gap: RFValue(12),
-    },
-    cityRadio: {
-      width: RFValue(20),
-      height: RFValue(20),
-      borderRadius: RFValue(10),
-      borderWidth: 2,
-      borderColor: colors.slate[400],
-      alignItems: "center",
-      justifyContent: "center",
-    },
+    cityRow: {padding: RFValue(16),
+backgroundColor: colors.slate[150],
+borderRadius: RFValue(12),
+borderColor: colors.slate[300],
+gap: RFValue(12)},
+    cityRadio: {width: RFValue(20),
+height: RFValue(20),
+borderRadius: RFValue(10),
+borderColor: colors.slate[400]},
     cityRadioSelected: {
       borderColor: colors.slate[650],
     },

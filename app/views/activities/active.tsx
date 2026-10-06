@@ -36,8 +36,8 @@ const ActiveActivity = () => {
     if (!data || data.length === 0) return null;
 
     return (
-      <View style={s.sectionContainer}>
-        <Text style={s.sectionTitle}>{title}</Text>
+      <View style={s.sectionContainer} className="p-[16px] border-b">
+        <Text style={s.sectionTitle} className="pb-[16px] text-[18px] font-semibold">{title}</Text>
         <View className="gap-4">
           {data.map((item, index) => {
             const isInspection = status === "scheduled" || status === "inspected";
@@ -100,7 +100,7 @@ const ActiveActivity = () => {
         /> */}
         <Calender color={colors.slate[650]} />
         <View>
-          <Text style={s.todayTitle}>Today's Activity</Text>
+          <Text style={s.todayTitle} className="text-[18px] font-semibold">Today's Activity</Text>
           <Text style={s.todayBody} className="break-words w-[80%] font-medium">
             Check your today's schedule for upcoming events.
           </Text>
@@ -165,7 +165,7 @@ const ActiveActivity = () => {
             !activeActivities.reserved?.length &&
             !activeActivities.booked?.length &&
             !activeActivities.inspected?.length && (
-              <Text style={s.emptyText}>No active activities found.</Text>
+              <Text style={s.emptyText} className="text-center mt-[20px]">No active activities found.</Text>
             )}
         </>
       ) : null}
@@ -183,31 +183,14 @@ const styles = (colors: ColorScheme, isDarkMode: boolean) =>
       borderColor: colors.slate[300],
       backgroundColor: colors.slate[150],
     },
-    todayTitle: {
-      color: colors.slate[650],
-      fontSize: 18,
-      fontWeight: "600",
-    },
+    todayTitle: {color: colors.slate[650]},
     todayBody: {
       color: colors.slate[650],
     },
     viewLink: {
       color: colors.slate[650],
     },
-    sectionContainer: {
-      padding: 16,
-      borderBottomWidth: 1,
-      borderBottomColor: colors.slate[300],
-    },
-    sectionTitle: {
-      color: colors.slate[650],
-      paddingBottom: 16,
-      fontSize: 18,
-      fontWeight: "600",
-    },
-    emptyText: {
-      color: colors.slate[500],
-      textAlign: "center",
-      marginTop: 20,
-    },
+    sectionContainer: {borderBottomColor: colors.slate[300]},
+    sectionTitle: {color: colors.slate[650]},
+    emptyText: {color: colors.slate[500]},
   });

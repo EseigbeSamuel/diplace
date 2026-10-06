@@ -344,10 +344,10 @@ const LocationPickerSubstep: React.FC<LocationPickerSubstepProps> = ({
   };
 
   return (
-    <View style={styles.container}>
+    <View style={styles.container} className="flex-1">
       {/* Map */}
-      <View style={styles.mapContainer}>
-        <Pressable style={styles.searchInput} onPress={handleSearchOpen}>
+      <View  className="flex-1 relative">
+        <Pressable style={styles.searchInput} onPress={handleSearchOpen} className="flex-row items-center w-[95%px] border-[1px] absolute top-[80px] z-[10] self-center shadow-color-[#000] shadow-opacity-[0.05px] shadow-radius-[4px] elevation-[2px]">
           <Image
             source={require("@/assets/icons/location-black.png")}
             style={styles.locationIcon}
@@ -358,14 +358,14 @@ const LocationPickerSubstep: React.FC<LocationPickerSubstepProps> = ({
               selectedLocation && styles.searchInputTextFilled,
             ]}
             numberOfLines={1}
-          >
+           className="flex-1">
             {selectedLocation?.address || "Enter the address"}
           </Text>
         </Pressable>
         {HAS_GOOGLE_MAPS_API_KEY ? (
           <MapView
             ref={mapRef}
-            style={styles.map}
+
             initialRegion={{
               latitude: region.latitude,
               longitude: region.longitude,
@@ -374,7 +374,7 @@ const LocationPickerSubstep: React.FC<LocationPickerSubstepProps> = ({
             }}
             showsUserLocation
             showsMyLocationButton={false}
-          >
+           className="flex-1">
             {selectedLocation && (
               <Marker
                 coordinate={{
@@ -386,16 +386,16 @@ const LocationPickerSubstep: React.FC<LocationPickerSubstepProps> = ({
             )}
           </MapView>
         ) : (
-          <View style={styles.mapFallback}>
-            <Text style={styles.mapFallbackText}>
+          <View style={styles.mapFallback} className="flex-1 items-center justify-center">
+            <Text style={styles.mapFallbackText} className="text-center">
               Map disabled. Add Google API key to enable.
             </Text>
           </View>
         )}
 
         {/* Search Input Overlay */}
-        <View style={styles.searchOverlay}>
-          <Text style={styles.title}>Where is this property located?</Text>
+        <View style={styles.searchOverlay} className="absolute top-[0px] left-[0px] right-[0px]">
+          <Text style={styles.title} className="font-semibold">Where is this property located?</Text>
         </View>
       </View>
 
@@ -419,26 +419,26 @@ const LocationPickerSubstep: React.FC<LocationPickerSubstepProps> = ({
         <KeyboardAvoidingView
           style={styles.modalContainer}
           behavior={Platform.OS === "ios" ? "padding" : "height"}
-        >
+         className="flex-1">
           {/* Modal Header */}
-          <View style={styles.modalHeader}>
+          <View style={styles.modalHeader} className="flex-row items-center w-[75%px] justify-between">
             <Pressable
               onPress={() => setSearchModalVisible(false)}
               style={styles.closeButton}
-            >
+             className="items-center justify-center">
               <Image
                 source={require("@/assets/icons/X-close.png")}
                 style={styles.closeIcon}
               />
             </Pressable>
-            <Text style={styles.modalTitle} className="text-xl font-bold">
+            <Text style={styles.modalTitle} className="text-xl font-bold self-center">
               Your location
             </Text>
           </View>
 
           {/* Search Input */}
           <View style={styles.modalSearchContainer}>
-            <View style={styles.modalSearchInput}>
+            <View style={styles.modalSearchInput} className="flex-row items-center border-[1px]">
               <Image
                 source={require("@/assets/icons/location-black.png")}
                 style={styles.searchIconSmall}
@@ -450,7 +450,7 @@ const LocationPickerSubstep: React.FC<LocationPickerSubstepProps> = ({
                 value={searchQuery}
                 onChangeText={handleSearchQueryChange}
                 autoFocus
-              />
+               className="flex-1"/>
               {searchQuery.length > 0 && (
                 <Pressable onPress={() => setSearchQuery("")}>
                   <Image
@@ -466,17 +466,17 @@ const LocationPickerSubstep: React.FC<LocationPickerSubstepProps> = ({
           <Pressable
             style={styles.liveLocationButton}
             onPress={handleUseLiveLocation}
-          >
+           className="flex-row items-center border-b">
             <Image
               source={require("@/assets/icons/Map.png")}
               style={styles.liveLocationIcon}
             />
-            <Text style={styles.liveLocationText}>Use live location</Text>
+            <Text style={styles.liveLocationText} className="font-medium">Use live location</Text>
           </Pressable>
 
           {!HAS_GOOGLE_MAPS_API_KEY && (
-            <View style={styles.noResultsContainer}>
-              <Text style={styles.noResultsText}>
+            <View style={styles.noResultsContainer} className="items-center">
+              <Text style={styles.noResultsText} className="text-center">
                 Search suggestions unavailable. You can still use live location
                 or enter a full address.
               </Text>
@@ -488,8 +488,8 @@ const LocationPickerSubstep: React.FC<LocationPickerSubstepProps> = ({
             <Pressable
               style={styles.useAddressLink}
               onPress={handleUseAddressEntered}
-            >
-              <Text style={styles.useAddressText}>Use the address entered</Text>
+             className="flex-row items-center border-b">
+              <Text style={styles.useAddressText} className="font-medium">Use the address entered</Text>
               <Image
                 source={require("@/assets/icons/arrow-right-up-outline-dark.png")}
                 style={styles.arrowIcon}
@@ -498,9 +498,9 @@ const LocationPickerSubstep: React.FC<LocationPickerSubstepProps> = ({
           )}
 
           {/* Search Results */}
-          <ScrollView style={styles.resultsContainer}>
+          <ScrollView  className="flex-1">
             {isLoadingSuggestions && (
-              <View style={styles.loadingContainer}>
+              <View style={styles.loadingContainer} className="items-center">
                 <Text style={styles.loadingText}>Searching...</Text>
               </View>
             )}
@@ -511,13 +511,13 @@ const LocationPickerSubstep: React.FC<LocationPickerSubstepProps> = ({
                   key={suggestion.place_id}
                   style={styles.resultItem}
                   onPress={() => handleSelectSearchResult(suggestion)}
-                >
+                 className="flex-row items-center border-b">
                   <Image
                     source={require("@/assets/icons/location.png")}
                     style={styles.resultIcon}
                   />
-                  <View style={styles.resultTextContainer}>
-                    <Text style={styles.resultAddress}>
+                  <View  className="flex-1">
+                    <Text style={styles.resultAddress} className="font-semibold">
                       {suggestion.structured_formatting.main_text}
                     </Text>
                     <Text style={styles.resultDetails}>
@@ -535,8 +535,8 @@ const LocationPickerSubstep: React.FC<LocationPickerSubstepProps> = ({
               suggestions.length === 0 &&
               searchQuery.length >= 3 &&
               HAS_GOOGLE_MAPS_API_KEY && (
-                <View style={styles.noResultsContainer}>
-                  <Text style={styles.noResultsText}>
+                <View style={styles.noResultsContainer} className="items-center">
+                  <Text style={styles.noResultsText} className="text-center">
                     No locations found. Try a different search term.
                   </Text>
                 </View>
@@ -551,64 +551,64 @@ const LocationPickerSubstep: React.FC<LocationPickerSubstepProps> = ({
         animationType="slide"
         onRequestClose={() => setConfirmModalVisible(false)}
       >
-        <View style={styles.confirmModalContainer}>
+        <View style={styles.confirmModalContainer} className="flex-1">
           {/* Close Button */}
 
           <ScrollView contentContainerStyle={styles.confirmContent}>
             <Pressable
               onPress={() => setConfirmModalVisible(false)}
               style={styles.confirmCloseButton}
-            >
+             className="absolute items-center justify-center z-[10]">
               <Image
                 source={require("@/assets/icons/X-close.png")}
                 style={styles.closeIcon}
               />
             </Pressable>
-            <Text style={styles.confirmTitle}>Confirm location</Text>
+            <Text style={styles.confirmTitle} className="font-bold">Confirm location</Text>
 
             {/* Location Details */}
             {tempLocationData && (
-              <View style={styles.detailsContainer}>
-                <View style={styles.detailRow}>
+              <View style={styles.detailsContainer} className="gap-[12px]">
+                <View style={styles.detailRow} className="flex-row items-center justify-between border-[1px]">
                   <View>
                     <Text style={styles.detailLabel}>Country</Text>
-                    <Text style={styles.detailValue}>
+                    <Text style={styles.detailValue} className="font-medium flex-1">
                       {tempLocationData.country}
                     </Text>
                   </View>
                   <Image source={require("@/assets/icons/chevron-right.png")} />
                 </View>
 
-                <View style={styles.detailRow}>
+                <View style={styles.detailRow} className="flex-row items-center justify-between border-[1px]">
                   <View>
                     <Text style={styles.detailLabel}>State / Province</Text>
-                    <Text style={styles.detailValue}>
+                    <Text style={styles.detailValue} className="font-medium flex-1">
                       {tempLocationData.state}
                     </Text>
                   </View>
                 </View>
 
-                <View style={styles.detailRow}>
+                <View style={styles.detailRow} className="flex-row items-center justify-between border-[1px]">
                   <View>
                     <Text style={styles.detailLabel}>Postal Code</Text>
-                    <Text style={styles.detailValue}>
+                    <Text style={styles.detailValue} className="font-medium flex-1">
                       {tempLocationData.postalCode}
                     </Text>
                   </View>
                 </View>
 
-                <View style={styles.detailRow}>
+                <View style={styles.detailRow} className="flex-row items-center justify-between border-[1px]">
                   <View>
                     <Text style={styles.detailLabel}>City / Town</Text>
-                    <Text style={styles.detailValue}>
+                    <Text style={styles.detailValue} className="font-medium flex-1">
                       {tempLocationData.city}
                     </Text>
                   </View>
                 </View>
 
-                <View style={[styles.detailRow, styles.addressRow]}>
+                <View style={[styles.detailRow, styles.addressRow]} className="flex-row items-center justify-between border-[1px] flex-col items-start">
                   <Text style={styles.detailLabel}>Address</Text>
-                  <Text style={styles.addressValue}>
+                  <Text style={styles.addressValue} className="font-medium">
                     {tempLocationData.address}
                   </Text>
                 </View>
@@ -617,10 +617,10 @@ const LocationPickerSubstep: React.FC<LocationPickerSubstepProps> = ({
 
             {/* Map Preview */}
             {tempLocationData && (
-              <View style={styles.mapPreview}>
+              <View style={styles.mapPreview} className="overflow-hidden">
                 {HAS_GOOGLE_MAPS_API_KEY ? (
                   <MapView
-                    style={styles.mapPreviewMap}
+
                     region={{
                       latitude: tempLocationData.latitude,
                       longitude: tempLocationData.longitude,
@@ -629,7 +629,7 @@ const LocationPickerSubstep: React.FC<LocationPickerSubstepProps> = ({
                     }}
                     scrollEnabled={false}
                     zoomEnabled={false}
-                  >
+                   className="flex-1">
                     <Marker
                       coordinate={{
                         latitude: tempLocationData.latitude,
@@ -638,8 +638,8 @@ const LocationPickerSubstep: React.FC<LocationPickerSubstepProps> = ({
                     />
                   </MapView>
                 ) : (
-                  <View style={styles.mapFallback}>
-                    <Text style={styles.mapFallbackText}>
+                  <View style={styles.mapFallback} className="flex-1 items-center justify-center">
+                    <Text style={styles.mapFallbackText} className="text-center">
                       Map disabled. Add Google API key to enable.
                     </Text>
                   </View>
@@ -665,75 +665,33 @@ const LocationPickerSubstep: React.FC<LocationPickerSubstepProps> = ({
 
 const createStyles = (colors: ColorScheme) =>
   StyleSheet.create({
-    container: {
-      flex: 1,
-      backgroundColor: colors.background,
-    },
-    mapContainer: {
-      flex: 1,
-      position: "relative",
-    },
-    map: {
-      flex: 1,
-    },
-    mapFallback: {
-      flex: 1,
-      alignItems: "center",
-      justifyContent: "center",
-      backgroundColor: colors.slate[150],
-      paddingHorizontal: RFValue(16),
-    },
-    mapFallbackText: {
-      fontSize: RFValue(14),
-      color: colors.slate[600],
-      textAlign: "center",
-    },
-    searchOverlay: {
-      position: "absolute",
-      top: 0,
-      left: 0,
-      right: 0,
-      paddingHorizontal: RFValue(4),
-      paddingTop: RFValue(20),
-      backgroundColor: colors.background,
-    },
-    title: {
-      fontSize: RFValue(20),
-      fontWeight: "600",
-      color: colors.slate[650],
-      marginBottom: RFValue(16),
-    },
-    searchInput: {
-      flexDirection: "row",
-      alignItems: "center",
-      width: "95%",
-      alignSelf: "center",
-      paddingVertical: RFValue(14),
-      paddingHorizontal: RFValue(16),
-      backgroundColor: colors.background,
-      borderRadius: RFValue(24),
-      borderWidth: 1,
-      borderColor: colors.slate[300],
-      shadowColor: "#000",
-      shadowOffset: { width: 0, height: 2 },
-      shadowOpacity: 0.05,
-      shadowRadius: 4,
-      elevation: 2,
-      position: "absolute",
-      top: 80,
-      zIndex: 10,
-    },
+    container: {backgroundColor: colors.background},
+    mapContainer: {},
+    map: {},
+    mapFallback: {backgroundColor: colors.slate[150],
+paddingHorizontal: RFValue(16)},
+    mapFallbackText: {fontSize: RFValue(14),
+color: colors.slate[600]},
+    searchOverlay: {paddingHorizontal: RFValue(4),
+paddingTop: RFValue(20),
+backgroundColor: colors.background},
+    title: {fontSize: RFValue(20),
+color: colors.slate[650],
+marginBottom: RFValue(16)},
+    searchInput: {paddingVertical: RFValue(14),
+paddingHorizontal: RFValue(16),
+backgroundColor: colors.background,
+borderRadius: RFValue(24),
+borderColor: colors.slate[300],
+shadowOffset: { width: 0, height: 2 }},
     locationIcon: {
       width: RFValue(18),
       height: RFValue(18),
       tintColor: colors.slate[650],
       marginRight: RFValue(10),
     },
-    searchInputText: {
-      flex: 1,
-      fontSize: RFValue(15),
-      color: colors.slate[500],
-    },
+    searchInputText: {fontSize: RFValue(15),
+color: colors.slate[500]},
     searchInputTextFilled: {
       color: colors.slate[650],
     },
@@ -742,130 +700,78 @@ const createStyles = (colors: ColorScheme) =>
       paddingVertical: RFValue(16),
       backgroundColor: colors.background,
     },
-    modalContainer: {
-      flex: 1,
-      backgroundColor: colors.background,
-    },
-    modalHeader: {
-      flexDirection: "row",
-      alignItems: "center",
-      paddingHorizontal: RFValue(16),
-      paddingVertical: RFValue(16),
-      width: "75%",
-      justifyContent: "space-between",
-    },
-    closeButton: {
-      width: RFValue(32),
-      height: RFValue(32),
-      alignItems: "center",
-      justifyContent: "center",
-      marginRight: RFValue(12),
-    },
+    modalContainer: {backgroundColor: colors.background},
+    modalHeader: {paddingHorizontal: RFValue(16),
+paddingVertical: RFValue(16)},
+    closeButton: {width: RFValue(32),
+height: RFValue(32),
+marginRight: RFValue(12)},
     closeIcon: {
       width: RFValue(24),
       height: RFValue(24),
       tintColor: colors.slate[650],
     },
-    modalTitle: {
-      fontSize: RFValue(20),
-      lineHeight: RFValue(32),
-      color: colors.slate[650],
-      alignSelf: "center",
-    },
+    modalTitle: {fontSize: RFValue(20),
+lineHeight: RFValue(32),
+color: colors.slate[650]},
     modalSearchContainer: {
       paddingHorizontal: RFValue(16),
       paddingVertical: RFValue(16),
     },
-    modalSearchInput: {
-      flexDirection: "row",
-      alignItems: "center",
-      paddingVertical: RFValue(8),
-      paddingHorizontal: RFValue(16),
-      backgroundColor: colors.slate[150],
-      borderRadius: RFValue(30),
-      borderWidth: 1,
-      borderColor: colors.slate[300],
-    },
+    modalSearchInput: {paddingVertical: RFValue(8),
+paddingHorizontal: RFValue(16),
+backgroundColor: colors.slate[150],
+borderRadius: RFValue(30),
+borderColor: colors.slate[300]},
     searchIconSmall: {
       width: RFValue(16),
       height: RFValue(16),
       tintColor: colors.slate[650],
       marginRight: RFValue(10),
     },
-    modalTextInput: {
-      flex: 1,
-      fontSize: RFValue(15),
-      color: colors.slate[650],
-    },
+    modalTextInput: {fontSize: RFValue(15),
+color: colors.slate[650]},
     clearIcon: {
       width: RFValue(18),
       height: RFValue(18),
       tintColor: colors.slate[500],
     },
-    liveLocationButton: {
-      flexDirection: "row",
-      alignItems: "center",
-      paddingHorizontal: RFValue(16),
-      paddingVertical: RFValue(12),
-      borderBottomWidth: 1,
-      borderBottomColor: colors.slate[300],
-    },
+    liveLocationButton: {paddingHorizontal: RFValue(16),
+paddingVertical: RFValue(12),
+borderBottomColor: colors.slate[300]},
     liveLocationIcon: {
       width: RFValue(20),
       height: RFValue(20),
       tintColor: colors.slate[650],
       marginRight: RFValue(12),
     },
-    liveLocationText: {
-      fontSize: RFValue(15),
-      color: colors.slate[650],
-      fontWeight: "500",
-    },
-    useAddressLink: {
-      flexDirection: "row",
-      alignItems: "center",
-      paddingHorizontal: RFValue(16),
-      paddingVertical: RFValue(12),
-      borderBottomWidth: 1,
-      borderBottomColor: colors.slate[300],
-    },
-    useAddressText: {
-      fontSize: RFValue(14),
-      color: colors.info[200],
-      fontWeight: "500",
-      marginRight: RFValue(6),
-    },
+    liveLocationText: {fontSize: RFValue(15),
+color: colors.slate[650]},
+    useAddressLink: {paddingHorizontal: RFValue(16),
+paddingVertical: RFValue(12),
+borderBottomColor: colors.slate[300]},
+    useAddressText: {fontSize: RFValue(14),
+color: colors.info[200],
+marginRight: RFValue(6)},
     arrowIcon: {
       width: RFValue(14),
       height: RFValue(14),
       tintColor: colors.info[200],
     },
-    resultsContainer: {
-      flex: 1,
-    },
-    resultItem: {
-      flexDirection: "row",
-      alignItems: "center",
-      paddingHorizontal: RFValue(16),
-      paddingVertical: RFValue(16),
-      borderBottomWidth: 1,
-      borderBottomColor: colors.slate[300],
-    },
+    resultsContainer: {},
+    resultItem: {paddingHorizontal: RFValue(16),
+paddingVertical: RFValue(16),
+borderBottomColor: colors.slate[300]},
     resultIcon: {
       width: RFValue(18),
       height: RFValue(18),
       tintColor: colors.slate[600],
       marginRight: RFValue(12),
     },
-    resultTextContainer: {
-      flex: 1,
-    },
-    resultAddress: {
-      fontSize: RFValue(15),
-      fontWeight: "600",
-      color: colors.slate[650],
-      marginBottom: RFValue(4),
-    },
+    resultTextContainer: {},
+    resultAddress: {fontSize: RFValue(15),
+color: colors.slate[650],
+marginBottom: RFValue(4)},
     resultDetails: {
       fontSize: RFValue(13),
       color: colors.slate[600],
@@ -875,98 +781,53 @@ const createStyles = (colors: ColorScheme) =>
       height: RFValue(16),
       tintColor: colors.slate[500],
     },
-    loadingContainer: {
-      padding: RFValue(20),
-      alignItems: "center",
-    },
+    loadingContainer: {padding: RFValue(20)},
     loadingText: {
       fontSize: RFValue(14),
       color: colors.slate[600],
     },
-    noResultsContainer: {
-      padding: RFValue(20),
-      alignItems: "center",
-    },
-    noResultsText: {
-      fontSize: RFValue(14),
-      color: colors.slate[600],
-      textAlign: "center",
-    },
-    confirmModalContainer: {
-      flex: 1,
-      backgroundColor: colors.background,
-    },
-    confirmCloseButton: {
-      position: "absolute",
-      top: RFValue(16),
-      left: RFValue(16),
-      width: RFValue(32),
-      height: RFValue(32),
-      alignItems: "center",
-      justifyContent: "center",
-      zIndex: 10,
-      backgroundColor: colors.background,
-      borderRadius: RFValue(16),
-    },
+    noResultsContainer: {padding: RFValue(20)},
+    noResultsText: {fontSize: RFValue(14),
+color: colors.slate[600]},
+    confirmModalContainer: {backgroundColor: colors.background},
+    confirmCloseButton: {top: RFValue(16),
+left: RFValue(16),
+width: RFValue(32),
+height: RFValue(32),
+backgroundColor: colors.background,
+borderRadius: RFValue(16)},
     confirmContent: {
       paddingHorizontal: RFValue(16),
       paddingTop: RFValue(60),
     },
-    confirmTitle: {
-      fontSize: RFValue(24),
-      fontWeight: "700",
-      color: colors.slate[650],
-      marginBottom: RFValue(24),
-    },
-    detailsContainer: {
-      marginBottom: RFValue(24),
-      gap: 12,
-    },
-    detailRow: {
-      flexDirection: "row",
-      alignItems: "center",
-      justifyContent: "space-between",
-      paddingVertical: RFValue(8),
-      backgroundColor: colors.slate[200],
-      paddingHorizontal: RFValue(12),
-      borderRadius: RFValue(16),
-      borderWidth: 1,
-      borderColor: colors.slate[300],
-    },
+    confirmTitle: {fontSize: RFValue(24),
+color: colors.slate[650],
+marginBottom: RFValue(24)},
+    detailsContainer: {marginBottom: RFValue(24)},
+    detailRow: {paddingVertical: RFValue(8),
+backgroundColor: colors.slate[200],
+paddingHorizontal: RFValue(12),
+borderRadius: RFValue(16),
+borderColor: colors.slate[300]},
     detailLabel: {
       fontSize: RFValue(14),
       color: colors.slate[600],
     },
-    detailValue: {
-      fontSize: RFValue(15),
-      fontWeight: "500",
-      color: colors.slate[650],
-      flex: 1,
-      marginRight: RFValue(8),
-    },
+    detailValue: {fontSize: RFValue(15),
+color: colors.slate[650],
+marginRight: RFValue(8)},
     chevronIcon: {
       width: RFValue(16),
       height: RFValue(16),
       tintColor: colors.slate[500],
     },
-    addressRow: {
-      flexDirection: "column",
-      alignItems: "flex-start",
-    },
-    addressValue: {
-      fontSize: RFValue(15),
-      fontWeight: "500",
-      color: colors.slate[650],
-    },
-    mapPreview: {
-      height: RFValue(200),
-      borderRadius: RFValue(12),
-      overflow: "hidden",
-      marginBottom: RFValue(16),
-    },
-    mapPreviewMap: {
-      flex: 1,
-    },
+    addressRow: {},
+    addressValue: {fontSize: RFValue(15),
+color: colors.slate[650]},
+    mapPreview: {height: RFValue(200),
+borderRadius: RFValue(12),
+marginBottom: RFValue(16)},
+    mapPreviewMap: {},
     confirmButtonContainer: {
       paddingHorizontal: RFValue(16),
       paddingVertical: RFValue(16),

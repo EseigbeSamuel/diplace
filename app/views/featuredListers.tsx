@@ -244,13 +244,8 @@ const styles = (colors: ColorScheme) =>
     border: {
       borderColor: colors.slate[300],
     },
-    borderShadow: {
-      shadowColor: colors.slate[650],
-      shadowOffset: { width: 0, height: 2 },
-      shadowOpacity: 0.1,
-      shadowRadius: 4,
-      elevation: 3,
-    },
+    borderShadow: {shadowColor: colors.slate[650],
+shadowOffset: { width: 0, height: 2 }},
     head: {
       fontSize: RFValue(24),
       lineHeight: RFValue(32),

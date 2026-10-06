@@ -56,7 +56,7 @@ const ActivityHistory = () => {
         refreshControl={refreshControl}
       >
         <View className="py-8">
-          <Text style={s.emptyText}>No activity history found.</Text>
+          <Text style={s.emptyText} className="text-center">No activity history found.</Text>
         </View>
       </ScrollView>
     );
@@ -69,7 +69,7 @@ const ActivityHistory = () => {
     >
       {historyData.map((group, groupIndex) => (
         <View key={group.label || groupIndex} className="py-4">
-          <Text style={s.groupLabel}>{group.label}</Text>
+          <Text style={s.groupLabel} className="font-semibold text-[18px] pb-[8px]">{group.label}</Text>
           {(group.items ?? []).map((item: HistoryActivityItem, itemIndex) => {
             const rawDate = item.occurred_at || item.date_created;
             const dateText = rawDate
@@ -106,14 +106,6 @@ export default ActivityHistory;
 
 const styles = (colors: ColorScheme) =>
   StyleSheet.create({
-    groupLabel: {
-      color: colors.slate[650],
-      fontWeight: "600",
-      fontSize: 18,
-      paddingBottom: 8,
-    },
-    emptyText: {
-      color: colors.slate[500],
-      textAlign: "center",
-    },
+    groupLabel: {color: colors.slate[650]},
+    emptyText: {color: colors.slate[500]},
   });

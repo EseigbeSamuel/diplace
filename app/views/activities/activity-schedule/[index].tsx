@@ -165,7 +165,7 @@ const ActivitySchedule = () => {
         onScroll={scrollHandler}
         scrollEventThrottle={16}
         showsVerticalScrollIndicator={false}
-        style={{ zIndex: 10, flex: 1 }}
+        className="z-[10] flex-1"
         contentContainerStyle={{ paddingBottom: insets.bottom + 120 }}
       >
         {/* Transparent Spacer matching image height minus the border overlap */}

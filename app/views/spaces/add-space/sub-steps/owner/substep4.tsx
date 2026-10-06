@@ -46,7 +46,7 @@ const LandlordDetailsForm: React.FC<LandlordDetailsFormProps> = ({
     spaceForm.value.ownerDetails.phoneNumber.trim().length > 0;
 
   return (
-    <View style={styles.container}>
+    <View style={styles.container} className="flex-1">
       <KeyboardAwareScrollView
         enableOnAndroid={true}
         extraScrollHeight={20}
@@ -55,7 +55,7 @@ const LandlordDetailsForm: React.FC<LandlordDetailsFormProps> = ({
         contentContainerStyle={styles.scrollContent}
       >
         {/* Title */}
-        <Text style={styles.title}>
+        <Text style={styles.title} className="font-semibold">
           Tell us about the {spaceForm.type === "event" ? "owner" : "landlord"}
         </Text>
 
@@ -111,76 +111,48 @@ const LandlordDetailsForm: React.FC<LandlordDetailsFormProps> = ({
 
 const createStyles = (colors: ColorScheme) =>
   StyleSheet.create({
-    container: {
-      flex: 1,
-      backgroundColor: colors.background,
-    },
+    container: {backgroundColor: colors.background},
     scrollContent: {
       paddingTop: RFValue(32),
       paddingBottom: RFValue(20),
     },
-    title: {
-      fontSize: RFValue(20),
-      fontWeight: "600",
-      color: colors.slate[650],
-      lineHeight: RFValue(28),
-      marginBottom: RFValue(32),
-    },
+    title: {fontSize: RFValue(20),
+color: colors.slate[650],
+lineHeight: RFValue(28),
+marginBottom: RFValue(32)},
     inputSection: {
       marginBottom: RFValue(24),
     },
-    inputLabel: {
-      fontSize: RFValue(14),
-      fontWeight: "500",
-      color: colors.slate[650],
-      marginBottom: RFValue(8),
-    },
-    textInput: {
-      width: "100%",
-      paddingVertical: RFValue(14),
-      paddingHorizontal: RFValue(16),
-      backgroundColor: colors.background,
-      borderRadius: RFValue(12),
-      borderWidth: 1,
-      borderColor: colors.slate[300],
-      fontSize: RFValue(15),
-      color: colors.slate[650],
-    },
-    phoneInputContainer: {
-      flexDirection: "row",
-      gap: RFValue(8),
-      borderWidth: 1,
-      borderColor: colors.slate[300],
-      borderRadius: RFValue(12),
-      overflow: "hidden",
-    },
-    countryCodeSelector: {
-      flexDirection: "row",
-      alignItems: "center",
-      paddingVertical: RFValue(14),
-      paddingHorizontal: RFValue(12),
-      backgroundColor: colors.slate[150],
-      gap: RFValue(6),
-      borderRightWidth: 1,
-      borderRightColor: colors.slate[300],
-    },
+    inputLabel: {fontSize: RFValue(14),
+color: colors.slate[650],
+marginBottom: RFValue(8)},
+    textInput: {paddingVertical: RFValue(14),
+paddingHorizontal: RFValue(16),
+backgroundColor: colors.background,
+borderRadius: RFValue(12),
+borderColor: colors.slate[300],
+fontSize: RFValue(15),
+color: colors.slate[650]},
+    phoneInputContainer: {gap: RFValue(8),
+borderColor: colors.slate[300],
+borderRadius: RFValue(12)},
+    countryCodeSelector: {paddingVertical: RFValue(14),
+paddingHorizontal: RFValue(12),
+backgroundColor: colors.slate[150],
+gap: RFValue(6),
+borderRightColor: colors.slate[300]},
     flagIcon: {
       width: RFValue(20),
       height: RFValue(20),
     },
-    countryCodeText: {
-      fontSize: RFValue(14),
-      color: colors.slate[650],
-      fontWeight: "500",
-    },
+    countryCodeText: {fontSize: RFValue(14),
+color: colors.slate[650]},
     chevronDownIcon: {
       width: RFValue(8),
       height: RFValue(8),
       tintColor: colors.slate[600],
     },
-    phoneNumberInput: {
-      flex: 1,
-    },
+    phoneNumberInput: {},
     phoneInputField: {
       paddingVertical: RFValue(14),
       paddingHorizontal: RFValue(16),

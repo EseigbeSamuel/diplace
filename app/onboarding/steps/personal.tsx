@@ -125,7 +125,7 @@ const PersonalDataStep = ({ onNext }: PersonalDataProps) => {
         showsVerticalScrollIndicator={false}
         contentContainerStyle={Styles.scrollContent}
       >
-        <View style={Styles.container}>
+        <View style={Styles.container} className="flex-1 justify-between">
           {/* Content */}
           <View style={Styles.contentContainer}>
             {/* User Icon */}
@@ -139,16 +139,16 @@ const PersonalDataStep = ({ onNext }: PersonalDataProps) => {
 
             {/* Title and Description */}
             <View style={Styles.textContainer}>
-              <Text style={Styles.headText}>Personal Data</Text>
+              <Text style={Styles.headText} className="font-semibold">Personal Data</Text>
               <Text style={Styles.descriptionText}>
                 Complete your KYC by providing your location and bank details.
               </Text>
             </View>
 
             {/* Business Name Toggle */}
-            <View style={Styles.toggleContainer}>
-              <View style={Styles.toggleLabelContainer}>
-                <Text style={Styles.toggleLabel}>Use business name</Text>
+            <View style={Styles.toggleContainer} className="flex-row items-center justify-between">
+              <View style={Styles.toggleLabelContainer} className="flex-1">
+                <Text style={Styles.toggleLabel} className="font-medium">Use business name</Text>
                 <Text style={Styles.toggleSubtext}>
                   If you are listing for a business.
                 </Text>
@@ -165,26 +165,26 @@ const PersonalDataStep = ({ onNext }: PersonalDataProps) => {
             </View>
 
             {/* Full Name Input */}
-            <View style={Styles.inputContainer}>
+            <View style={Styles.inputContainer} className="gap-[1px] border-[1px]">
               <Text style={Styles.inputLabel}>Full Name</Text>
               <Text style={Styles.inputText}>Ibe Bassey-Ekong Alex</Text>
             </View>
 
             {/* Location Section */}
             <View style={Styles.sectionContainer}>
-              <View style={Styles.sectionHeader}>
-                <Text style={Styles.sectionTitle}>Location</Text>
+              <View  className="flex-row items-center justify-between">
+                <Text style={Styles.sectionTitle} className="font-semibold">Location</Text>
                 <TouchableOpacity
                   style={Styles.liveLocationButton}
                   onPress={handleUseLiveLocation}
                   disabled={isLoadingLocation}
-                >
+                 className="flex-row items-center">
                   <Image
                     source={require("@/assets/icons/Map.png")}
                     style={Styles.locationIcon}
                     resizeMode="contain"
                   />
-                  <Text style={Styles.liveLocationText}>
+                  <Text style={Styles.liveLocationText} className="font-medium">
                     {isLoadingLocation
                       ? "Getting location..."
                       : "Use live location"}
@@ -233,17 +233,17 @@ const PersonalDataStep = ({ onNext }: PersonalDataProps) => {
         onRequestClose={() => setShowCityModal(false)}
       >
         <TouchableOpacity
-          style={Styles.modalOverlay}
+
           activeOpacity={1}
           onPress={() => setShowCityModal(false)}
-        >
+         className="flex-1 bg-[rgba(0, 0, 0, 0.5)] justify-end">
           <TouchableOpacity
             activeOpacity={1}
             style={Styles.modalContent}
             onPress={(e) => e.stopPropagation()}
           >
-            <View style={Styles.modalHandle} />
-            <Text style={Styles.modalTitle}>City</Text>
+            <View style={Styles.modalHandle}  className="self-center"/>
+            <Text style={Styles.modalTitle} className="font-semibold text-center">City</Text>
 
             <View style={Styles.cityOptions}>
               {cities.map((city) => (
@@ -266,14 +266,8 @@ export default PersonalDataStep;
 
 const styles = (colors: ColorScheme) =>
   StyleSheet.create({
-    scrollContent: {
-      flexGrow: 1,
-    },
-    container: {
-      flex: 1,
-      justifyContent: "space-between",
-      paddingBottom: RFValue(20),
-    },
+    scrollContent: {},
+    container: {paddingBottom: RFValue(20)},
     contentContainer: {
       paddingTop: RFValue(40),
       gap: RFValue(20),
@@ -290,45 +284,27 @@ const styles = (colors: ColorScheme) =>
     textContainer: {
       gap: RFValue(8),
     },
-    headText: {
-      fontSize: RFValue(24),
-      fontWeight: "600",
-      lineHeight: RFValue(32),
-      color: colors.slate[650],
-    },
+    headText: {fontSize: RFValue(24),
+lineHeight: RFValue(32),
+color: colors.slate[650]},
     descriptionText: {
       fontSize: RFValue(14),
       lineHeight: RFValue(22),
       color: colors.slate[600],
     },
-    toggleContainer: {
-      flexDirection: "row",
-      alignItems: "center",
-      justifyContent: "space-between",
-      paddingVertical: RFValue(8),
-    },
-    toggleLabelContainer: {
-      flex: 1,
-      gap: RFValue(4),
-    },
-    toggleLabel: {
-      fontSize: RFValue(15),
-      fontWeight: "500",
-      color: colors.slate[650],
-    },
+    toggleContainer: {paddingVertical: RFValue(8)},
+    toggleLabelContainer: {gap: RFValue(4)},
+    toggleLabel: {fontSize: RFValue(15),
+color: colors.slate[650]},
     toggleSubtext: {
       fontSize: RFValue(12),
       color: colors.slate[500],
     },
-    inputContainer: {
-      gap: 1,
-      paddingVertical: RFValue(8),
-      paddingHorizontal: RFValue(8),
-      backgroundColor: colors.slate[200],
-      borderRadius: RFValue(12),
-      borderWidth: 1,
-      borderColor: colors.slate[300],
-    },
+    inputContainer: {paddingVertical: RFValue(8),
+paddingHorizontal: RFValue(8),
+backgroundColor: colors.slate[200],
+borderRadius: RFValue(12),
+borderColor: colors.slate[300]},
     inputLabel: {
       fontSize: RFValue(14),
 
@@ -348,42 +324,20 @@ const styles = (colors: ColorScheme) =>
     sectionContainer: {
       gap: RFValue(16),
     },
-    sectionHeader: {
-      flexDirection: "row",
-      alignItems: "center",
-      justifyContent: "space-between",
-    },
-    sectionTitle: {
-      fontSize: RFValue(16),
-      fontWeight: "600",
-      color: colors.slate[650],
-    },
-    liveLocationButton: {
-      flexDirection: "row",
-      alignItems: "center",
-      gap: RFValue(6),
-    },
+    sectionHeader: {},
+    sectionTitle: {fontSize: RFValue(16),
+color: colors.slate[650]},
+    liveLocationButton: {gap: RFValue(6)},
     locationIcon: {
       width: RFValue(16),
       height: RFValue(16),
       tintColor: colors.slate[650],
     },
-    liveLocationText: {
-      fontSize: RFValue(14),
-      fontWeight: "500",
-      color: colors.slate[650],
-    },
-    selectorButton: {
-      flexDirection: "row",
-      alignItems: "center",
-      justifyContent: "space-between",
-      paddingVertical: RFValue(16),
-    },
-    selectorText: {
-      fontSize: RFValue(15),
-      color: colors.slate[650],
-      fontWeight: "500",
-    },
+    liveLocationText: {fontSize: RFValue(14),
+color: colors.slate[650]},
+    selectorButton: {paddingVertical: RFValue(16)},
+    selectorText: {fontSize: RFValue(15),
+color: colors.slate[650]},
     selectorPlaceholder: {
       color: colors.slate[500],
     },
@@ -395,11 +349,7 @@ const styles = (colors: ColorScheme) =>
     buttonContainer: {
       marginTop: RFValue(32),
     },
-    modalOverlay: {
-      flex: 1,
-      backgroundColor: "rgba(0, 0, 0, 0.5)",
-      justifyContent: "flex-end",
-    },
+    modalOverlay: {},
     modalContent: {
       backgroundColor: colors.background,
       borderTopLeftRadius: RFValue(24),
@@ -408,46 +358,29 @@ const styles = (colors: ColorScheme) =>
       paddingBottom: RFValue(32),
       paddingHorizontal: RFValue(20),
     },
-    modalHandle: {
-      width: RFValue(40),
-      height: RFValue(4),
-      backgroundColor: colors.slate[300],
-      borderRadius: RFValue(2),
-      alignSelf: "center",
-      marginBottom: RFValue(20),
-    },
-    modalTitle: {
-      fontSize: RFValue(18),
-      fontWeight: "600",
-      color: colors.slate[650],
-      marginBottom: RFValue(24),
-      textAlign: "center",
-    },
+    modalHandle: {width: RFValue(40),
+height: RFValue(4),
+backgroundColor: colors.slate[300],
+borderRadius: RFValue(2),
+marginBottom: RFValue(20)},
+    modalTitle: {fontSize: RFValue(18),
+color: colors.slate[650],
+marginBottom: RFValue(24)},
     cityOptions: {
       gap: RFValue(16),
     },
-    cityOption: {
-      flexDirection: "row",
-      alignItems: "center",
-      paddingVertical: RFValue(16),
-      paddingHorizontal: RFValue(16),
-      backgroundColor: colors.background,
-      borderRadius: RFValue(12),
-      borderWidth: 1,
-      borderColor: colors.slate[300],
-    },
+    cityOption: {paddingVertical: RFValue(16),
+paddingHorizontal: RFValue(16),
+backgroundColor: colors.background,
+borderRadius: RFValue(12),
+borderColor: colors.slate[300]},
     radioContainer: {
       marginRight: RFValue(12),
     },
-    radioOuter: {
-      width: RFValue(20),
-      height: RFValue(20),
-      borderRadius: RFValue(10),
-      borderWidth: 2,
-      borderColor: colors.slate[400],
-      alignItems: "center",
-      justifyContent: "center",
-    },
+    radioOuter: {width: RFValue(20),
+height: RFValue(20),
+borderRadius: RFValue(10),
+borderColor: colors.slate[400]},
     radioOuterSelected: {
       borderColor: colors.slate[650],
     },
@@ -457,10 +390,6 @@ const styles = (colors: ColorScheme) =>
       borderRadius: RFValue(5),
       backgroundColor: colors.slate[650],
     },
-    cityOptionText: {
-      fontSize: RFValue(15),
-      fontWeight: "500",
-      color: colors.slate[650],
-      flex: 1,
-    },
+    cityOptionText: {fontSize: RFValue(15),
+color: colors.slate[650]},
   });

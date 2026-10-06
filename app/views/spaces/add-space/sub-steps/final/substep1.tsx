@@ -46,7 +46,7 @@ const InspectionFeeSubstep: React.FC<InspectionFeeSubstepProps> = ({
   };
 
   return (
-    <View style={styles.container}>
+    <View style={styles.container} className="flex-1">
       <KeyboardAwareScrollView
         enableOnAndroid={true}
         extraScrollHeight={20}
@@ -55,14 +55,14 @@ const InspectionFeeSubstep: React.FC<InspectionFeeSubstepProps> = ({
         contentContainerStyle={styles.scrollContent}
       >
         {/* Title */}
-        <Text style={styles.title}>
+        <Text style={styles.title} className="font-bold">
           What is the inspection fee to view this space physically?
         </Text>
 
         {/* Input Container */}
-        <View style={styles.inputContainer}>
-          <View style={styles.inputWrapper}>
-            <Text style={styles.currencySymbol}>₦</Text>
+        <View style={styles.inputContainer} className="w-[100%px] flex-1 justify-center items-center">
+          <View style={styles.inputWrapper} className="flex-row items-center justify-center">
+            <Text style={styles.currencySymbol} className="font-bold">₦</Text>
             <TextInput
               style={styles.input}
               placeholder="0"
@@ -71,17 +71,17 @@ const InspectionFeeSubstep: React.FC<InspectionFeeSubstepProps> = ({
               onChangeText={handleFeeChange}
               keyboardType="numeric"
               maxLength={10}
-            />
+             className="font-bold text-center p-[0px]"/>
           </View>
 
           {/* Helper Text */}
-          <Text style={styles.helperText}>
+          <Text style={styles.helperText} className="text-center">
             <Image
               source={require("@/assets/icons/Danger - Iconly Pro-1.png")}
               style={styles.cautionIcon}
             />
             This should Not exceed{" "}
-            <Text style={styles.helperTextBold}>₦3000</Text>
+            <Text style={styles.helperTextBold} className="font-semibold">₦3000</Text>
           </Text>
         </View>
       </KeyboardAwareScrollView>
@@ -102,66 +102,31 @@ const InspectionFeeSubstep: React.FC<InspectionFeeSubstepProps> = ({
 
 const createStyles = (colors: ColorScheme) =>
   StyleSheet.create({
-    container: {
-      flex: 1,
-      backgroundColor: colors.background,
-    },
-    scrollContent: {
-      paddingVertical: RFValue(20),
-      alignItems: "center",
-      flexGrow: 1,
-    },
-    title: {
-      fontSize: RFValue(20),
-      fontWeight: "700",
-      color: colors.slate[650],
-      marginBottom: RFValue(20),
-    },
-    inputContainer: {
-      width: "100%",
-      flex: 1,
-      justifyContent: "center",
-      alignItems: "center",
-      marginBottom: RFValue(32),
-    },
-    inputWrapper: {
-      flexDirection: "row",
-      alignItems: "center",
-      justifyContent: "center",
-      marginBottom: RFValue(16),
-      backgroundColor: colors.slate[200],
-      paddingHorizontal: RFValue(16),
-      paddingVertical: RFValue(8),
-    },
-    currencySymbol: {
-      fontSize: RFValue(40),
-      fontWeight: "700",
-      color: colors.slate[650],
-      marginRight: RFValue(8),
-    },
-    input: {
-      fontSize: RFValue(40),
-      fontWeight: "700",
-      color: colors.slate[650],
-      minWidth: RFValue(100),
-      textAlign: "center",
-      padding: 0,
-    },
+    container: {backgroundColor: colors.background},
+    scrollContent: {paddingVertical: RFValue(20)},
+    title: {fontSize: RFValue(20),
+color: colors.slate[650],
+marginBottom: RFValue(20)},
+    inputContainer: {marginBottom: RFValue(32)},
+    inputWrapper: {marginBottom: RFValue(16),
+backgroundColor: colors.slate[200],
+paddingHorizontal: RFValue(16),
+paddingVertical: RFValue(8)},
+    currencySymbol: {fontSize: RFValue(40),
+color: colors.slate[650],
+marginRight: RFValue(8)},
+    input: {fontSize: RFValue(40),
+color: colors.slate[650],
+minWidth: RFValue(100)},
     cautionIcon: {
       width: RFValue(16),
       height: RFValue(16),
       tintColor: colors.warning[200],
       marginRight: RFValue(10),
     },
-    helperText: {
-      fontSize: RFValue(13),
-      color: colors.slate[500],
-      textAlign: "center",
-    },
-    helperTextBold: {
-      fontWeight: "600",
-      color: colors.slate[650],
-    },
+    helperText: {fontSize: RFValue(13),
+color: colors.slate[500]},
+    helperTextBold: {color: colors.slate[650]},
     buttonContainer: {
       paddingVertical: RFValue(16),
       backgroundColor: colors.background,

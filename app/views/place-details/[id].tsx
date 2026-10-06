@@ -492,9 +492,9 @@ const Placedetails = () => {
 
   if (propertyId && isPropertyDetailsLoading) {
     return (
-      <View style={styles.loadingContainer}>
+      <View style={styles.loadingContainer} className="flex-1 items-center justify-center">
         <ActivityIndicator size="large" color={colors.slate[650]} />
-        <Text style={[styles.loadingText, { color: colors.slate[650] }]}>
+        <Text style={[styles.loadingText, { color: colors.slate[650] }]} className="font-semibold text-center">
           Loading property...
         </Text>
       </View>
@@ -503,8 +503,8 @@ const Placedetails = () => {
 
   if (propertyId && (propertyDetailsError || !property)) {
     return (
-      <View style={styles.loadingContainer}>
-        <Text style={[styles.loadingText, { color: colors.slate[650] }]}>
+      <View style={styles.loadingContainer} className="flex-1 items-center justify-center">
+        <Text style={[styles.loadingText, { color: colors.slate[650] }]} className="font-semibold text-center">
           Failed to load property details.
         </Text>
         <View style={{ width: RFValue(140), marginTop: RFValue(8) }}>
@@ -515,7 +515,7 @@ const Placedetails = () => {
   }
 
   return (
-    <View style={styles.mainContainer}>
+    <View style={styles.mainContainer} className="flex-1">
       <SectionHeader
         title=""
         rightIconSource={require("@/assets/icons/more-2-line.png")}
@@ -527,29 +527,29 @@ const Placedetails = () => {
           contentContainerStyle={styles.scrollContent}
         >
           {/* Main Image */}
-          <View style={styles.imageContainer}>
+          <View style={styles.imageContainer} className="w-[100%px] relative">
             {spaceForm.value.media && spaceForm.value.media.length > 0 ? (
               <Image
                 source={{ uri: spaceForm.value.media[0]?.uri }}
                 style={styles.mainImage}
                 resizeMode="cover"
-              />
+               className="w-[100%px] h-[100%px]"/>
             ) : (
               <View>
                 <Image
                   source={require("@/assets/images/diplace.jpg")}
                   style={styles.mainImage}
                   resizeMode="cover"
-                />
-                <View style={styles.actionButtons}>
+                 className="w-[100%px] h-[100%px]"/>
+                <View style={styles.actionButtons} className="flex-row absolute bg-[rgba(0, 0, 0, 0.5)] text-[#FFFFFF]">
                   <TouchableOpacity
                     style={styles.actionButton}
                     onPress={() => setShowGalleryModal(true)}
-                  >
-                    <Text style={styles.actionButtonText}>GALLERY</Text>
+                   className="flex-1 flex-row items-center justify-center">
+                    <Text style={styles.actionButtonText} className="font-semibold text-[#FFFFFF] tracking-[0.5px]">GALLERY</Text>
                   </TouchableOpacity>
 
-                  <View style={styles.divider} />
+                  <View style={styles.divider}  className="w-[2px] bg-[rgba(255, 255, 255, 0.5)]"/>
 
                   <TouchableOpacity
                     style={styles.actionButton}
@@ -562,8 +562,8 @@ const Placedetails = () => {
                         },
                       })
                     }
-                  >
-                    <Text style={styles.actionButtonText}>STREET VIEW</Text>
+                   className="flex-1 flex-row items-center justify-center">
+                    <Text style={styles.actionButtonText} className="font-semibold text-[#FFFFFF] tracking-[0.5px]">STREET VIEW</Text>
                   </TouchableOpacity>
                 </View>
               </View>
@@ -581,22 +581,22 @@ const Placedetails = () => {
 
           {/* Property Info Card */}
           <View style={styles.propertyCard}>
-            <View style={styles.propertyTitleRow}>
-              <View style={styles.propertyTitleContainer}>
-                <Text style={styles.propertyTitle}>{displayTitle}</Text>
-                <View style={styles.locationRow}>
+            <View style={styles.propertyTitleRow} className="flex-row justify-between items-start">
+              <View style={styles.propertyTitleContainer} className="flex-1">
+                <Text style={styles.propertyTitle} className="font-bold flex-1">{displayTitle}</Text>
+                <View style={styles.locationRow} className="flex-row items-center">
                   <Image
                     source={require("@/assets/icons/location.png")}
                     style={styles.locationIcon}
                     resizeMode="contain"
                   />
-                  <Text style={styles.addressText}>{displayAddress}</Text>
+                  <Text style={styles.addressText} className="flex-1">{displayAddress}</Text>
                 </View>
               </View>
-              <View style={styles.badgeContainer}>
-                <Text style={styles.priceText}>₦{displayPrice}</Text>
+              <View  className="flex-col items-end">
+                <Text style={styles.priceText} className="font-bold">₦{displayPrice}</Text>
 
-                <Text style={styles.priceUnit}>/{displayDuration}</Text>
+                <Text style={styles.priceUnit} className="font-normal">/{displayDuration}</Text>
               </View>
             </View>
 
@@ -611,8 +611,8 @@ const Placedetails = () => {
             </View>
 
             {/* Property Features */}
-            <View style={styles.featuresRow}>
-              <View style={styles.featureItem}>
+            <View style={styles.featuresRow} className="flex-row justify-content-[space-around] border-t">
+              <View style={styles.featureItem} className="items-center">
                 <Image
                   source={
                     spaceForm.type === "event"
@@ -622,7 +622,7 @@ const Placedetails = () => {
                   style={styles.featureIcon}
                   resizeMode="contain"
                 />
-                <Text style={styles.featureText}>
+                <Text style={styles.featureText} className="font-medium">
                   {spaceForm.type === "event"
                     ? toProperCase(spaceForm.value.eventSpace)
                     : spaceForm.value.capacity?.rooms || "2"}{" "}
@@ -630,7 +630,7 @@ const Placedetails = () => {
                 </Text>
               </View>
 
-              <View style={styles.featureItem}>
+              <View style={styles.featureItem} className="items-center">
                 <Image
                   source={
                     spaceForm.type === "event"
@@ -640,20 +640,20 @@ const Placedetails = () => {
                   style={styles.featureIcon}
                   resizeMode="contain"
                 />
-                <Text style={styles.featureText}>
+                <Text style={styles.featureText} className="font-medium">
                   {spaceForm.type === "event"
                     ? "Generator"
                     : `${spaceForm.value.capacity?.bathrooms || "2"} Baths`}
                 </Text>
               </View>
 
-              <View style={styles.featureItem}>
+              <View style={styles.featureItem} className="items-center">
                 <Image
                   source={require("@/assets/icons/size.png")}
                   style={styles.featureIcon}
                   resizeMode="contain"
                 />
-                <Text style={styles.featureText}>
+                <Text style={styles.featureText} className="font-medium">
                   {spaceForm.type === "event"
                     ? spaceForm.value.capacity?.caps
                     : spaceForm.value.capacity?.roomSize || "10 by 12ft"}
@@ -664,10 +664,10 @@ const Placedetails = () => {
 
           {/* Listed by Section */}
           <View
-            className="flex flex-row items-center justify-between py-3"
+            className="flex flex-row items-center justify-between py-3 border-t"
             style={styles.section}
           >
-            <Text style={styles.sectionTitle}>Listed by</Text>
+            <Text style={styles.sectionTitle} className="font-semibold">Listed by</Text>
             <Text style={{ color: colors.slate[500] }} className="">
               {postedAtLabel}
             </Text>
@@ -683,7 +683,7 @@ const Placedetails = () => {
                     ? { uri: listedByAvatar }
                     : require("@/assets/images/user.png")
                 }
-                style={{ height: "100%", width: "100%" }}
+                className="h-[100%] w-[100%]"
                 resizeMode="cover"
               />
             </View>
@@ -778,31 +778,31 @@ const Placedetails = () => {
           </View>
 
           {/* About Section */}
-          <View style={styles.section}>
-            <Text style={styles.sectionTitle}>About this space</Text>
+          <View style={styles.section} className="border-t">
+            <Text style={styles.sectionTitle} className="font-semibold">About this space</Text>
             <Text style={styles.aboutText}>{aboutText}</Text>
           </View>
 
           {/* Amenities Section */}
-          <View style={styles.section}>
-            <Text style={styles.sectionTitle}>Amenities</Text>
+          <View style={styles.section} className="border-t">
+            <Text style={styles.sectionTitle} className="font-semibold">Amenities</Text>
             {amenities?.map((amenity, index) => (
-              <View key={index} style={styles.amenityRow}>
+              <View key={index} style={styles.amenityRow} className="flex-row items-start">
                 <Text style={styles.bullet}>•</Text>
-                <Text style={styles.amenityText}>{amenity}</Text>
+                <Text style={styles.amenityText} className="flex-1">{amenity}</Text>
               </View>
             ))}
           </View>
 
           {/* Location Section */}
-          <View style={styles.section}>
-            <Text style={styles.sectionTitle}>Location</Text>
+          <View style={styles.section} className="border-t">
+            <Text style={styles.sectionTitle} className="font-semibold">Location</Text>
             <Text style={styles.locationAddress}>{displayAddress}</Text>
 
-            <View style={styles.mapContainer}>
+            <View style={styles.mapContainer} className="w-[100%px] overflow-hidden relative">
               {HAS_GOOGLE_MAPS_API_KEY ? (
                 <MapView
-                  style={{ flex: 1 }}
+                  className="flex-1"
                   initialRegion={{
                     latitude: displayLatitude,
                     longitude: displayLongitude,
@@ -818,8 +818,8 @@ const Placedetails = () => {
                   />
                 </MapView>
               ) : (
-                <View style={styles.mapFallback}>
-                  <Text style={styles.mapFallbackText}>
+                <View style={styles.mapFallback} className="flex-1 items-center justify-center">
+                  <Text style={styles.mapFallbackText} className="text-center">
                     Map disabled. Add Google API key to enable.
                   </Text>
                 </View>
@@ -836,13 +836,13 @@ const Placedetails = () => {
                     },
                   })
                 }
-              >
+               className="absolute flex-row items-center">
                 <Image
                   source={require("@/assets/icons/Streetview-solid.png")}
                   style={styles.streetViewIcon}
                   resizeMode="contain"
-                />
-                <Text style={styles.streetViewText}>Street view</Text>
+                 className="tint-[#FFFFFF]"/>
+                <Text style={styles.streetViewText} className="font-medium text-[#FFFFFF]">Street view</Text>
               </TouchableOpacity>
 
               <TouchableOpacity
@@ -851,7 +851,7 @@ const Placedetails = () => {
                   setEnlargeMapVisible(true);
                   setShowLocationSheet(true);
                 }}
-              >
+               className="absolute">
                 <Image
                   source={require("@/assets/icons/expand.png")}
                   style={styles.expandViewIcon}
@@ -862,20 +862,20 @@ const Placedetails = () => {
           </View>
 
           {/* Cost Breakdown Section */}
-          <View style={styles.section}>
-            <Text style={styles.sectionTitle}>Cost Breakdown</Text>
+          <View style={styles.section} className="border-t">
+            <Text style={styles.sectionTitle} className="font-semibold">Cost Breakdown</Text>
 
             <View style={styles.costBreakdownContainer}>
               {costBreakdown.map((item, index) => (
-                <View key={index} style={styles.costRow}>
+                <View key={index} style={styles.costRow} className="flex-row justify-between items-center">
                   <Text style={styles.costLabel}>{item.title}</Text>
-                  <Text style={styles.costAmount}>{item.value}</Text>
+                  <Text style={styles.costAmount} className="font-semibold">{item.value}</Text>
                 </View>
               ))}
 
-              <View style={styles.totalRow}>
-                <Text style={styles.totalLabel}>Total Payable</Text>
-                <Text style={styles.totalAmount}>₦{totalPackage}</Text>
+              <View style={styles.totalRow} className="flex-row justify-between items-center border-t">
+                <Text style={styles.totalLabel} className="font-semibold">Total Payable</Text>
+                <Text style={styles.totalAmount} className="font-bold">₦{totalPackage}</Text>
               </View>
             </View>
             <Pressable
@@ -891,7 +891,7 @@ const Placedetails = () => {
           </View>
 
           {/* Complete Button */}
-          <View style={styles.completeButtonContainer}>
+          <View style={styles.completeButtonContainer} className="flex">
             <AppButton
               title="Book Now"
               onPress={() => setActiveInspectionSheet("inspection")}
@@ -915,22 +915,22 @@ const Placedetails = () => {
           onRequestClose={() => setShowGalleryModal(false)}
         >
           <SafeAreaViewContainer>
-            <View style={styles.galleryModalContainer}>
+            <View  className="flex-1">
               {/* Header */}
-              <View style={styles.galleryModalHeader}>
+              <View style={styles.galleryModalHeader} className="flex-row items-center justify-between border-b">
                 <Pressable onPress={() => setShowGalleryModal(false)}>
                   <Image
                     source={require("@/assets/icons/arrow-left-light.png")}
                     style={styles.backIcon}
                   />
                 </Pressable>
-                <View style={styles.galleryTitleContainer}>
-                  <Text style={styles.galleryModalTitle}>Gallery</Text>
+                <View  className="flex-1 items-center">
+                  <Text style={styles.galleryModalTitle} className="font-semibold">Gallery</Text>
                   <Text style={styles.galleryPhotoCount}>
                     {galleryData.length} Photos
                   </Text>
                 </View>
-                <View style={styles.galleryHeaderIcons}>
+                <View style={styles.galleryHeaderIcons} className="flex-row">
                   <TouchableOpacity>
                     <Image
                       source={require("@/assets/icons/share.png")}
@@ -954,20 +954,20 @@ const Placedetails = () => {
                 showsHorizontalScrollIndicator={false}
                 onScroll={handleScroll}
                 scrollEventThrottle={16}
-                style={styles.gallerySlider}
-              >
+
+               className="flex-1">
                 {galleryData.map((image, index) => (
                   <Image
                     key={index}
                     source={image}
                     style={styles.gallerySlideImage}
                     resizeMode="cover"
-                  />
+                   className="h-[100%px]"/>
                 ))}
               </ScrollView>
 
               {/* Dots Indicator */}
-              <View style={styles.dotsContainer}>
+              <View style={styles.dotsContainer} className="flex-row justify-center items-center">
                 {galleryData.map((_, index) => (
                   <View
                     key={index}
@@ -1000,15 +1000,15 @@ const Placedetails = () => {
                         styles.thumbnail,
                         currentImageIndex === index && styles.thumbnailActive,
                       ]}
-                    >
+                     className="overflow-hidden border-[2px] border-[transparent] relative">
                       <Image
                         source={image}
-                        style={styles.thumbnailImage}
+
                         resizeMode="cover"
-                      />
+                       className="w-[100%px] h-[100%px]"/>
                       {index === 3 && (
-                        <View style={styles.thumbnailOverlay}>
-                          <Text style={styles.thumbnailOverlayText}>+7</Text>
+                        <View  className="absolute top-[0px] left-[0px] right-[0px] bottom-[0px] bg-[rgba(0, 0, 0, 0.5)] items-center justify-center">
+                          <Text style={styles.thumbnailOverlayText} className="text-[#FFFFFF] font-bold">+7</Text>
                         </View>
                       )}
                     </TouchableOpacity>
@@ -1038,19 +1038,19 @@ const Placedetails = () => {
           <Pressable
             style={styles.optionsMenuOverlay}
             onPress={() => setShowOptionsMenu(false)}
-          >
+           className="flex-1 bg-[rgba(0,0,0,0.15)] items-end">
             <Pressable
               style={styles.optionsMenuContainer}
               onPress={(e) => e.stopPropagation()}
-            >
+             className="shadow-color-[#000] shadow-opacity-[0.15px] shadow-radius-[10px] elevation-[8px]">
               <TouchableOpacity
                 style={styles.optionsMenuItem}
                 onPress={() => {}}
-              >
+               className="flex-row items-center">
                 <BookmarkButton id={propertyId} showLabel />
               </TouchableOpacity>
 
-              <View style={styles.optionsMenuDivider} />
+              <View style={styles.optionsMenuDivider}  className="h-[1px]"/>
 
               <TouchableOpacity
                 style={styles.optionsMenuItem}
@@ -1058,15 +1058,15 @@ const Placedetails = () => {
                   setShowOptionsMenu(false);
                   // trigger share logic here
                 }}
-              >
+               className="flex-row items-center">
                 <Image
                   source={require("@/assets/icons/share.png")}
                   style={styles.optionsMenuIcon}
                 />
-                <Text style={styles.optionsMenuText}>Share</Text>
+                <Text style={styles.optionsMenuText} className="font-medium">Share</Text>
               </TouchableOpacity>
 
-              <View style={styles.optionsMenuDivider} />
+              <View style={styles.optionsMenuDivider}  className="h-[1px]"/>
 
               <TouchableOpacity
                 style={styles.optionsMenuItem}
@@ -1074,14 +1074,14 @@ const Placedetails = () => {
                   setShowOptionsMenu(false);
                   setShowReportModal(true);
                 }}
-              >
+               className="flex-row items-center">
                 <Image
                   source={require("@/assets/icons/flag-red.png")}
                   style={styles.optionsMenuIcon}
                 />
                 <Text
                   style={[styles.optionsMenuText, { color: colors.error[200] }]}
-                >
+                 className="font-medium">
                   Report listing
                 </Text>
               </TouchableOpacity>
@@ -1097,21 +1097,21 @@ const Placedetails = () => {
           onRequestClose={() => setShowReportModal(false)}
         >
           <Pressable
-            style={styles.reportModalOverlay}
+
             onPress={() => setShowReportModal(false)}
-          >
+           className="flex-1 bg-[rgba(0, 0, 0, 0.5)] justify-end">
             <Pressable
               style={styles.reportBottomSheet}
               onPress={(e) => e.stopPropagation()}
-            >
-              <View style={styles.modalHandle} />
+             className="max-h-[85%px]">
+              <View style={styles.modalHandle}  className="self-center"/>
 
               <ScrollView showsVerticalScrollIndicator={false}>
                 <View style={styles.reportModalBody}>
-                  <Text style={styles.reportModalTitle}>
+                  <Text style={styles.reportModalTitle} className="font-bold text-center">
                     Report this property
                   </Text>
-                  <Text style={styles.reportModalSubtitle}>
+                  <Text style={styles.reportModalSubtitle} className="text-center">
                     Let us know what the case is with this listing.
                   </Text>
 
@@ -1127,14 +1127,14 @@ const Placedetails = () => {
                             title={reason}
                           />
                           {isOthers && isSelected && (
-                            <View style={styles.othersInputContainer}>
+                            <View style={styles.othersInputContainer} className="flex-row items-center border-[1px]">
                               <TextInput
                                 style={styles.othersInput}
                                 placeholder="Type here..."
                                 placeholderTextColor={colors.slate[450]}
                                 value={othersText}
                                 onChangeText={setOthersText}
-                              />
+                               className="flex-1"/>
                               {othersText.length > 0 && (
                                 <TouchableOpacity
                                   onPress={() => setOthersText("")}
@@ -1188,10 +1188,10 @@ const Placedetails = () => {
         >
           {activeInspectionSheet === "inspection" && (
             <View style={styles.inspectionModalBody}>
-              <Text style={styles.inspectionModalTitle}>
+              <Text style={styles.inspectionModalTitle} className="font-bold text-center">
                 Schedule an inspection
               </Text>
-              <Text style={styles.inspectionModalSubtitle}>
+              <Text style={styles.inspectionModalSubtitle} className="text-center">
                 Pick a convenient time to inspect this space in person. A small
                 inspection fee may apply, payable before confirmation.
               </Text>
@@ -1199,13 +1199,13 @@ const Placedetails = () => {
               <TouchableOpacity
                 style={styles.inspectionInput}
                 onPress={() => setActiveInspectionSheet("date")}
-              >
+               className="flex-row items-center justify-between border-[1px]">
                 <Text
                   style={[
                     styles.inspectionInputText,
                     !selectedDate && styles.inspectionInputPlaceholder,
                   ]}
-                >
+                 className="flex-1">
                   {selectedDate
                     ? formatReadableDate(selectedDate)
                     : "Select inspection date"}
@@ -1219,27 +1219,27 @@ const Placedetails = () => {
               <TouchableOpacity
                 style={styles.inspectionInput}
                 onPress={() => setActiveInspectionSheet("time")}
-              >
+               className="flex-row items-center justify-between border-[1px]">
                 <Text
                   style={[
                     styles.inspectionInputText,
                     !selectedTime && styles.inspectionInputPlaceholder,
                   ]}
-                >
+                 className="flex-1">
                   {selectedTime ? selectedTime.label : "Select time"}
                 </Text>
                 <Image source={require("@/assets/icons/chevron-right.png")} />
               </TouchableOpacity>
 
-              <View style={styles.inspectionFeeRow}>
+              <View style={styles.inspectionFeeRow} className="flex-row justify-between items-center border-t border-b">
                 <Text style={styles.inspectionFeeLabel}>Inspection fee:</Text>
-                <Text style={styles.inspectionFeeAmount}>
+                <Text style={styles.inspectionFeeAmount} className="font-bold">
                   {formatMoneyParam(selectedTime?.price ?? 0)}
                 </Text>
               </View>
 
-              <View style={styles.inspectionNote}>
-                <Text style={styles.inspectionNoteText}>
+              <View style={styles.inspectionNote} className="flex-row">
+                <Text style={styles.inspectionNoteText} className="flex-1 text-center">
                   🔐 Fee is held by DiPlace and only released after a successful
                   inspection. Refunded if canceled or not completed.
                 </Text>
@@ -1340,15 +1340,11 @@ const Placedetails = () => {
                   todayTextColor: colors.info[200],
                   textDisabledColor: colors.slate[450],
                 }}
-                style={{ borderRadius: 20, paddingBottom: 10 }}
+                className="rounded-[20px] pb-[10px]"
               />
 
               <View
-                style={{
-                  flexDirection: "row",
-                  justifyContent: "flex-end",
-                  marginTop: 12,
-                }}
+                className="flex-row justify-end mt-[12px]"
               >
                 <TouchableOpacity
                   onPress={() => setActiveInspectionSheet("inspection")}
@@ -1371,8 +1367,8 @@ const Placedetails = () => {
 
           {activeInspectionSheet === "time" && (
             <>
-              <Text style={styles.timeSlotModalTitle}>Choose time slot</Text>
-              <Text style={styles.timeSlotModalSubtitle}>
+              <Text style={styles.timeSlotModalTitle} className="font-bold text-center">Choose time slot</Text>
+              <Text style={styles.timeSlotModalSubtitle} className="text-center">
                 Pick a convenient time for you from the agent&apos;s available
                 time slot.
               </Text>
@@ -1391,18 +1387,18 @@ const Placedetails = () => {
                           setSelectedTime(item);
                           setActiveInspectionSheet("inspection");
                         }}
-                      >
+                       className="flex-row items-center border-[1px]">
                         <View
                           style={[
                             styles.timeSlotRadio,
                             isSelected && styles.timeSlotRadioSelected,
                           ]}
-                        >
+                         className="border-[2px] items-center justify-center">
                           {isSelected && (
                             <View style={styles.timeSlotRadioInner} />
                           )}
                         </View>
-                        <Text style={styles.timeSlotItemText}>
+                        <Text style={styles.timeSlotItemText} className="flex-1">
                           {item.label}
                         </Text>
                       </TouchableOpacity>
@@ -1410,7 +1406,7 @@ const Placedetails = () => {
                   })}
                 </View>
               ) : (
-                <Text style={styles.timeSlotEmptyText}>
+                <Text style={styles.timeSlotEmptyText} className="text-center align-middle">
                   {selectedDate
                     ? "No available time slots for this date."
                     : "No inspection time slots are currently available."}
@@ -1429,10 +1425,10 @@ const Placedetails = () => {
             setEnlargeMapVisible(false);
           }}
         >
-          <View style={styles.fullMapContainer}>
+          <View  className="w-[100%px] h-[100%px] overflow-hidden relative">
             {HAS_GOOGLE_MAPS_API_KEY ? (
               <MapView
-                style={{ flex: 1 }}
+                className="flex-1"
                 initialRegion={{
                   latitude: displayLatitude,
                   longitude: displayLongitude,
@@ -1448,8 +1444,8 @@ const Placedetails = () => {
                 />
               </MapView>
             ) : (
-              <View style={styles.mapFallback}>
-                <Text style={styles.mapFallbackText}>
+              <View style={styles.mapFallback} className="flex-1 items-center justify-center">
+                <Text style={styles.mapFallbackText} className="text-center">
                   Map disabled. Add Google API key to enable.
                 </Text>
               </View>
@@ -1466,12 +1462,12 @@ const Placedetails = () => {
                   },
                 })
               }
-            >
+             className="absolute flex-row items-center">
               <Image
                 source={require("@/assets/icons/Streetview-solid.png")}
                 style={styles.streetViewIcon}
-              />
-              <Text style={styles.streetViewText}>Street view</Text>
+               className="tint-[#FFFFFF]"/>
+              <Text style={styles.streetViewText} className="font-medium text-[#FFFFFF]">Street view</Text>
             </TouchableOpacity>
 
             <TouchableOpacity
@@ -1480,7 +1476,7 @@ const Placedetails = () => {
                 setShowLocationSheet(false);
                 setEnlargeMapVisible(false);
               }}
-            >
+             className="absolute">
               <Image
                 source={require("@/assets/icons/collapse.png")}
                 style={styles.expandViewIcon}
@@ -1489,13 +1485,13 @@ const Placedetails = () => {
 
             {showLocationSheet && (
               <Pressable
-                style={styles.bottomSheetOverlay}
+
                 onPress={() => setShowLocationSheet(false)}
-              >
-                <Pressable style={styles.bottomSheetContainer}>
-                  <View style={styles.bottomSheetHandle} />
+               className="absolute bottom-[0px] left-[0px] right-[0px] justify-end">
+                <Pressable style={styles.bottomSheetContainer} className="bg-[#FFFFFF] min-h-[15%px] shadow-color-[#000] shadow-opacity-[0.1px] shadow-radius-[8px] elevation-[10px]">
+                  <View style={styles.bottomSheetHandle}  className="self-center"/>
                   <View style={styles.bottomSheetContent}>
-                    <Text style={styles.bottomSheetTitle}>Location</Text>
+                    <Text style={styles.bottomSheetTitle} className="font-semibold">Location</Text>
                     <Text style={styles.bottomSheetAddress}>
                       {displayAddress}
                     </Text>
@@ -1517,299 +1513,150 @@ const createStyles = (colors: ColorScheme) =>
     scrollContent: {
       paddingVertical: RFValue(20),
     },
-    mainContainer: {
-      flex: 1,
-      paddingBottom: RFValue(50),
-      paddingTop: RFValue(24),
-      backgroundColor: colors.background,
-    },
+    mainContainer: {paddingBottom: RFValue(50),
+paddingTop: RFValue(24),
+backgroundColor: colors.background},
     contentContainer: {
       paddingHorizontal: RFValue(16),
     },
-    imageContainer: {
-      width: "100%",
-      height: RFValue(250),
-      marginBottom: RFValue(12),
-      position: "relative",
-    },
-    mainImage: {
-      width: "100%",
-      height: "100%",
-      borderRadius: RFValue(12),
-    },
-    bookmarkButton: {
-      position: "absolute",
-      top: RFValue(12),
-      right: RFValue(12),
-      width: RFValue(36),
-      height: RFValue(36),
-      borderRadius: RFValue(18),
-      backgroundColor: "#FFFFFF",
-      alignItems: "center",
-      justifyContent: "center",
-    },
-    divider: {
-      width: 2,
-      backgroundColor: "rgba(255, 255, 255, 0.5)",
-      marginVertical: RFValue(8),
-    },
+    imageContainer: {height: RFValue(250),
+marginBottom: RFValue(12)},
+    mainImage: {borderRadius: RFValue(12)},
+    bookmarkButton: {top: RFValue(12),
+right: RFValue(12),
+width: RFValue(36),
+height: RFValue(36),
+borderRadius: RFValue(18)},
+    divider: {marginVertical: RFValue(8)},
     bookmarkIcon: {
       width: RFValue(18),
       height: RFValue(18),
       tintColor: colors.slate[650],
     },
-    actionButtons: {
-      flexDirection: "row",
-      gap: RFValue(8),
-      marginBottom: RFValue(20),
-      position: "absolute",
-      bottom: -RFValue(20),
-      backgroundColor: "rgba(0, 0, 0, 0.5)",
-      color: "#FFFFFF",
-      borderBottomEndRadius: RFValue(12),
-      borderBottomStartRadius: RFValue(12),
-    },
-    actionButton: {
-      flex: 1,
-      flexDirection: "row",
-      alignItems: "center",
-      justifyContent: "center",
-      paddingVertical: RFValue(12),
-
-      gap: RFValue(8),
-    },
+    actionButtons: {gap: RFValue(8),
+marginBottom: RFValue(20),
+bottom: -RFValue(20),
+borderBottomEndRadius: RFValue(12),
+borderBottomStartRadius: RFValue(12)},
+    actionButton: {paddingVertical: RFValue(12),
+gap: RFValue(8)},
     actionButtonIcon: {
       width: RFValue(18),
       height: RFValue(18),
       tintColor: colors.slate[650],
     },
-    actionButtonText: {
-      fontSize: RFValue(13),
-      fontWeight: "600",
-      color: "#FFFFFF",
-      letterSpacing: 0.5,
-    },
+    actionButtonText: {fontSize: RFValue(13)},
     propertyCard: {
       marginBottom: RFValue(24),
     },
-    propertyTitleRow: {
-      flexDirection: "row",
-      justifyContent: "space-between",
-      alignItems: "flex-start",
-      marginBottom: RFValue(8),
-    },
-    propertyTitle: {
-      fontSize: RFValue(16),
-      fontWeight: "700",
-      color: colors.slate[650],
-      flex: 1,
-      marginRight: RFValue(12),
-    },
-    propertyTitleContainer: {
-      flex: 1,
-      marginRight: RFValue(12),
-    },
-    badgeContainer: {
-      flexDirection: "column",
-      alignItems: "flex-end",
-    },
-    locationRow: {
-      flexDirection: "row",
-      alignItems: "center",
-      gap: RFValue(6),
-      marginBottom: RFValue(8),
-    },
+    propertyTitleRow: {marginBottom: RFValue(8)},
+    propertyTitle: {fontSize: RFValue(16),
+color: colors.slate[650],
+marginRight: RFValue(12)},
+    propertyTitleContainer: {marginRight: RFValue(12)},
+    badgeContainer: {},
+    locationRow: {gap: RFValue(6),
+marginBottom: RFValue(8)},
     locationIcon: {
       width: RFValue(16),
       height: RFValue(16),
       tintColor: colors.slate[500],
     },
-    addressText: {
-      fontSize: RFValue(13),
-      color: colors.slate[500],
-      flex: 1,
-    },
-    priceText: {
-      fontSize: RFValue(18),
-      fontWeight: "700",
-      color: colors.slate[650],
-    },
-    priceUnit: {
-      fontSize: RFValue(14),
-      fontWeight: "400",
-      color: colors.slate[650],
-      marginBottom: RFValue(12),
-    },
-    featuresRow: {
-      flexDirection: "row",
-      justifyContent: "space-around",
-      paddingTop: RFValue(20),
-      borderTopWidth: 1,
-      borderTopColor: colors.slate[350],
-    },
-    featureItem: {
-      alignItems: "center",
-      gap: RFValue(8),
-    },
+    addressText: {fontSize: RFValue(13),
+color: colors.slate[500]},
+    priceText: {fontSize: RFValue(18),
+color: colors.slate[650]},
+    priceUnit: {fontSize: RFValue(14),
+color: colors.slate[650],
+marginBottom: RFValue(12)},
+    featuresRow: {paddingTop: RFValue(20),
+borderTopColor: colors.slate[350]},
+    featureItem: {gap: RFValue(8)},
     featureIcon: {
       width: RFValue(24),
       height: RFValue(24),
       tintColor: colors.slate[600],
     },
-    featureText: {
-      fontSize: RFValue(13),
-      color: colors.slate[600],
-      fontWeight: "500",
-    },
-    section: {
-      paddingVertical: RFValue(16),
-      borderTopColor: colors.slate[350],
-      borderTopWidth: 1,
-    },
-    sectionTitle: {
-      fontSize: RFValue(16),
-      fontWeight: "600",
-      color: colors.slate[650],
-      marginBottom: RFValue(12),
-    },
+    featureText: {fontSize: RFValue(13),
+color: colors.slate[600]},
+    section: {paddingVertical: RFValue(16),
+borderTopColor: colors.slate[350]},
+    sectionTitle: {fontSize: RFValue(16),
+color: colors.slate[650],
+marginBottom: RFValue(12)},
     aboutText: {
       fontSize: RFValue(14),
       color: colors.slate[600],
       lineHeight: RFValue(22),
     },
-    amenityRow: {
-      flexDirection: "row",
-      alignItems: "flex-start",
-      marginBottom: RFValue(8),
-    },
+    amenityRow: {marginBottom: RFValue(8)},
     bullet: {
       fontSize: RFValue(14),
       color: colors.slate[650],
       marginRight: RFValue(8),
       marginTop: RFValue(2),
     },
-    amenityText: {
-      fontSize: RFValue(14),
-      color: colors.slate[650],
-      flex: 1,
-    },
+    amenityText: {fontSize: RFValue(14),
+color: colors.slate[650]},
     locationAddress: {
       fontSize: RFValue(14),
       color: colors.slate[650],
       marginBottom: RFValue(16),
     },
-    mapContainer: {
-      width: "100%",
-      height: RFValue(250),
-      borderRadius: RFValue(12),
-      overflow: "hidden",
-      position: "relative",
-    },
-    mapFallback: {
-      flex: 1,
-      alignItems: "center",
-      justifyContent: "center",
-      backgroundColor: colors.slate[150],
-      paddingHorizontal: RFValue(16),
-    },
-    mapFallbackText: {
-      fontSize: RFValue(14),
-      color: colors.slate[600],
-      textAlign: "center",
-    },
-    fullMapContainer: {
-      width: "100%",
-      height: "100%",
-      overflow: "hidden",
-      position: "relative",
-    },
-    streetViewButton: {
-      position: "absolute",
-      bottom: RFValue(12),
-      right: RFValue(12),
-      flexDirection: "row",
-      alignItems: "center",
-      backgroundColor: colors.slate[550],
-      paddingHorizontal: RFValue(12),
-      paddingVertical: RFValue(8),
-      borderRadius: RFValue(20),
-      gap: RFValue(6),
-    },
-    fullStreetViewButton: {
-      position: "absolute",
-      bottom: RFValue(150),
-      right: RFValue(12),
-      flexDirection: "row",
-      alignItems: "center",
-      backgroundColor: colors.slate[550],
-      paddingHorizontal: RFValue(12),
-      paddingVertical: RFValue(8),
-      borderRadius: RFValue(20),
-      gap: RFValue(6),
-    },
-    fullscreenButton: {
-      position: "absolute",
-      top: RFValue(12),
-      right: RFValue(12),
-      backgroundColor: colors.slate[100],
-      paddingHorizontal: RFValue(12),
-      paddingVertical: RFValue(12),
-      borderRadius: RFValue(30),
-    },
+    mapContainer: {height: RFValue(250),
+borderRadius: RFValue(12)},
+    mapFallback: {backgroundColor: colors.slate[150],
+paddingHorizontal: RFValue(16)},
+    mapFallbackText: {fontSize: RFValue(14),
+color: colors.slate[600]},
+    fullMapContainer: {},
+    streetViewButton: {bottom: RFValue(12),
+right: RFValue(12),
+backgroundColor: colors.slate[550],
+paddingHorizontal: RFValue(12),
+paddingVertical: RFValue(8),
+borderRadius: RFValue(20),
+gap: RFValue(6)},
+    fullStreetViewButton: {bottom: RFValue(150),
+right: RFValue(12),
+backgroundColor: colors.slate[550],
+paddingHorizontal: RFValue(12),
+paddingVertical: RFValue(8),
+borderRadius: RFValue(20),
+gap: RFValue(6)},
+    fullscreenButton: {top: RFValue(12),
+right: RFValue(12),
+backgroundColor: colors.slate[100],
+paddingHorizontal: RFValue(12),
+paddingVertical: RFValue(12),
+borderRadius: RFValue(30)},
     expandViewIcon: {
       width: RFValue(24),
       height: RFValue(24),
       tintColor: colors.slate[650],
     },
-    streetViewIcon: {
-      width: RFValue(14),
-      height: RFValue(14),
-      tintColor: "#FFFFFF",
-    },
-    streetViewText: {
-      fontSize: RFValue(12),
-      fontWeight: "500",
-      color: "#FFFFFF",
-    },
-    bottomSheetOverlay: {
-      position: "absolute",
-      bottom: 0,
-      left: 0,
-      right: 0,
-      justifyContent: "flex-end",
-    },
-    bottomSheetContainer: {
-      backgroundColor: "#FFFFFF",
-      borderTopLeftRadius: RFValue(20),
-      borderTopRightRadius: RFValue(20),
-      minHeight: "15%",
-      shadowColor: "#000",
-      shadowOffset: {
+    streetViewIcon: {width: RFValue(14),
+height: RFValue(14)},
+    streetViewText: {fontSize: RFValue(12)},
+    bottomSheetOverlay: {},
+    bottomSheetContainer: {borderTopLeftRadius: RFValue(20),
+borderTopRightRadius: RFValue(20),
+shadowOffset: {
         width: 0,
         height: -4,
-      },
-      shadowOpacity: 0.1,
-      shadowRadius: 8,
-      elevation: 10,
-    },
-    bottomSheetHandle: {
-      width: RFValue(40),
-      height: RFValue(4),
-      backgroundColor: colors.slate[300],
-      borderRadius: RFValue(2),
-      alignSelf: "center",
-      marginTop: RFValue(12),
-    },
+      }},
+    bottomSheetHandle: {width: RFValue(40),
+height: RFValue(4),
+backgroundColor: colors.slate[300],
+borderRadius: RFValue(2),
+marginTop: RFValue(12)},
     bottomSheetContent: {
       paddingHorizontal: RFValue(20),
       paddingVertical: RFValue(16),
     },
-    bottomSheetTitle: {
-      fontSize: RFValue(18),
-      fontWeight: "600",
-      color: colors.slate[650],
-      marginBottom: RFValue(12),
-    },
+    bottomSheetTitle: {fontSize: RFValue(18),
+color: colors.slate[650],
+marginBottom: RFValue(12)},
     bottomSheetAddress: {
       fontSize: RFValue(14),
       color: colors.slate[600],
@@ -1818,192 +1665,99 @@ const createStyles = (colors: ColorScheme) =>
     costBreakdownContainer: {
       borderRadius: RFValue(12),
     },
-    costRow: {
-      flexDirection: "row",
-      justifyContent: "space-between",
-      alignItems: "center",
-      marginBottom: RFValue(16),
-    },
+    costRow: {marginBottom: RFValue(16)},
     costLabel: {
       fontSize: RFValue(14),
       color: colors.slate[600],
     },
-    costAmount: {
-      fontSize: RFValue(14),
-      fontWeight: "600",
-      color: colors.slate[650],
-    },
-    totalRow: {
-      flexDirection: "row",
-      justifyContent: "space-between",
-      alignItems: "center",
-      paddingTop: RFValue(16),
-      borderTopWidth: 1,
-      borderTopColor: colors.slate[300],
-    },
+    costAmount: {fontSize: RFValue(14),
+color: colors.slate[650]},
+    totalRow: {paddingTop: RFValue(16),
+borderTopColor: colors.slate[300]},
     // Options dropdown menu
-    optionsMenuOverlay: {
-      flex: 1,
-      backgroundColor: "rgba(0,0,0,0.15)",
-      alignItems: "flex-end",
-      paddingTop: RFValue(56),
-      paddingRight: RFValue(16),
-    },
-    optionsMenuContainer: {
-      backgroundColor: colors.background,
-      borderRadius: RFValue(14),
-      width: RFValue(180),
-      paddingVertical: RFValue(4),
-      shadowColor: "#000",
-      shadowOffset: { width: 0, height: 4 },
-      shadowOpacity: 0.15,
-      shadowRadius: 10,
-      elevation: 8,
-    },
-    optionsMenuItem: {
-      flexDirection: "row",
-      alignItems: "center",
-      gap: RFValue(10),
-      paddingVertical: RFValue(12),
-      paddingHorizontal: RFValue(14),
-    },
+    optionsMenuOverlay: {paddingTop: RFValue(56),
+paddingRight: RFValue(16)},
+    optionsMenuContainer: {backgroundColor: colors.background,
+borderRadius: RFValue(14),
+width: RFValue(180),
+paddingVertical: RFValue(4),
+shadowOffset: { width: 0, height: 4 }},
+    optionsMenuItem: {gap: RFValue(10),
+paddingVertical: RFValue(12),
+paddingHorizontal: RFValue(14)},
     optionsMenuIcon: {
       width: RFValue(18),
       height: RFValue(18),
       tintColor: colors.slate[650],
     },
-    optionsMenuText: {
-      fontSize: RFValue(14),
-      fontWeight: "500",
-      color: colors.slate[650],
-    },
-    optionsMenuDivider: {
-      height: 1,
-      backgroundColor: colors.slate[300],
-      marginHorizontal: RFValue(14),
-    },
+    optionsMenuText: {fontSize: RFValue(14),
+color: colors.slate[650]},
+    optionsMenuDivider: {backgroundColor: colors.slate[300],
+marginHorizontal: RFValue(14)},
 
     // Report property modal - Bottom Sheet
-    reportModalOverlay: {
-      flex: 1,
-      backgroundColor: "rgba(0, 0, 0, 0.5)",
-      justifyContent: "flex-end",
-    },
-    reportBottomSheet: {
-      backgroundColor: colors.background,
-      borderTopLeftRadius: RFValue(24),
-      borderTopRightRadius: RFValue(24),
-      paddingHorizontal: RFValue(20),
-      paddingBottom: RFValue(32),
-      maxHeight: "85%",
-    },
+    reportModalOverlay: {},
+    reportBottomSheet: {backgroundColor: colors.background,
+borderTopLeftRadius: RFValue(24),
+borderTopRightRadius: RFValue(24),
+paddingHorizontal: RFValue(20),
+paddingBottom: RFValue(32)},
     reportModalBody: {
       gap: RFValue(10),
       paddingBottom: RFValue(8),
     },
-    reportModalTitle: {
-      fontSize: RFValue(18),
-      fontWeight: "700",
-      color: colors.slate[650],
-      textAlign: "center",
-      marginBottom: RFValue(4),
-    },
-    reportModalSubtitle: {
-      fontSize: RFValue(13),
-      color: colors.slate[500],
-      textAlign: "center",
-      marginBottom: RFValue(12),
-    },
+    reportModalTitle: {fontSize: RFValue(18),
+color: colors.slate[650],
+marginBottom: RFValue(4)},
+    reportModalSubtitle: {fontSize: RFValue(13),
+color: colors.slate[500],
+marginBottom: RFValue(12)},
     reportReasonsList: {
       gap: RFValue(12),
     },
-    reportReasonItem: {
-      flexDirection: "row",
-      alignItems: "center",
-      padding: RFValue(16),
-      backgroundColor: colors.slate[150],
-      borderRadius: RFValue(12),
-      borderWidth: 1,
-      borderColor: colors.slate[300],
-      gap: RFValue(12),
-    },
-    reportReasonText: {
-      flex: 1,
-      fontSize: RFValue(14),
-      color: colors.slate[650],
-    },
+    reportReasonItem: {padding: RFValue(16),
+backgroundColor: colors.slate[150],
+borderRadius: RFValue(12),
+borderColor: colors.slate[300],
+gap: RFValue(12)},
+    reportReasonText: {fontSize: RFValue(14),
+color: colors.slate[650]},
     reportSubmitContainer: {
       paddingTop: RFValue(20),
     },
-    totalLabel: {
-      fontSize: RFValue(16),
-      fontWeight: "600",
-      color: colors.slate[650],
-    },
-    totalAmount: {
-      fontSize: RFValue(18),
-      fontWeight: "700",
-      color: colors.slate[650],
-    },
-    completeButtonContainer: {
-      marginTop: RFValue(8),
-      display: "flex",
-      gap: RFValue(8),
-    },
+    totalLabel: {fontSize: RFValue(16),
+color: colors.slate[650]},
+    totalAmount: {fontSize: RFValue(18),
+color: colors.slate[650]},
+    completeButtonContainer: {marginTop: RFValue(8),
+gap: RFValue(8)},
     backIcon: {
       width: RFValue(20),
       height: RFValue(20),
       tintColor: colors.slate[650],
     },
     // Gallery Modal
-    galleryModalContainer: {
-      flex: 1,
-    },
-    galleryModalHeader: {
-      flexDirection: "row",
-      alignItems: "center",
-      justifyContent: "space-between",
-      paddingVertical: RFValue(16),
-      paddingHorizontal: RFValue(16),
-      borderBottomWidth: 1,
-      borderBottomColor: colors.slate[300],
-    },
-    galleryTitleContainer: {
-      flex: 1,
-      alignItems: "center",
-    },
-    galleryModalTitle: {
-      fontSize: RFValue(16),
-      fontWeight: "600",
-      color: colors.slate[650],
-    },
+    galleryModalContainer: {},
+    galleryModalHeader: {paddingVertical: RFValue(16),
+paddingHorizontal: RFValue(16),
+borderBottomColor: colors.slate[300]},
+    galleryTitleContainer: {},
+    galleryModalTitle: {fontSize: RFValue(16),
+color: colors.slate[650]},
     galleryPhotoCount: {
       fontSize: RFValue(12),
       color: colors.slate[500],
     },
-    galleryHeaderIcons: {
-      flexDirection: "row",
-      gap: RFValue(16),
-    },
+    galleryHeaderIcons: {gap: RFValue(16)},
     headerIcon: {
       width: RFValue(20),
       height: RFValue(20),
       tintColor: colors.slate[650],
     },
-    gallerySlider: {
-      flex: 1,
-    },
-    gallerySlideImage: {
-      width: width,
-      height: "100%",
-    },
-    dotsContainer: {
-      flexDirection: "row",
-      justifyContent: "center",
-      alignItems: "center",
-      paddingVertical: RFValue(16),
-      gap: RFValue(6),
-    },
+    gallerySlider: {},
+    gallerySlideImage: {width: width},
+    dotsContainer: {paddingVertical: RFValue(16),
+gap: RFValue(6)},
     dot: {
       width: RFValue(6),
       height: RFValue(6),
@@ -2021,101 +1775,50 @@ const createStyles = (colors: ColorScheme) =>
     thumbnailsScroll: {
       gap: RFValue(8),
     },
-    thumbnail: {
-      width: RFValue(70),
-      height: RFValue(70),
-      borderRadius: RFValue(8),
-      overflow: "hidden",
-      borderWidth: 2,
-      borderColor: "transparent",
-      position: "relative",
-    },
+    thumbnail: {width: RFValue(70),
+height: RFValue(70),
+borderRadius: RFValue(8)},
     thumbnailActive: {
       borderColor: colors.slate[650],
     },
-    thumbnailImage: {
-      width: "100%",
-      height: "100%",
-    },
-    thumbnailOverlay: {
-      position: "absolute",
-      top: 0,
-      left: 0,
-      right: 0,
-      bottom: 0,
-      backgroundColor: "rgba(0, 0, 0, 0.5)",
-      alignItems: "center",
-      justifyContent: "center",
-    },
-    thumbnailOverlayText: {
-      color: "#FFFFFF",
-      fontSize: RFValue(16),
-      fontWeight: "700",
-    },
+    thumbnailImage: {},
+    thumbnailOverlay: {},
+    thumbnailOverlayText: {fontSize: RFValue(16)},
     virtualTourContainer: {
       paddingHorizontal: RFValue(16),
       paddingBottom: RFValue(20),
     },
     // Inspection Modal - Bottom Sheet
-    inspectionModalOverlay: {
-      flex: 1,
-      backgroundColor: "rgba(0, 0, 0, 0.5)",
-      justifyContent: "flex-end",
-    },
-    inspectionBottomSheet: {
-      backgroundColor: colors.background,
-      borderTopLeftRadius: RFValue(24),
-      borderTopRightRadius: RFValue(24),
-      paddingHorizontal: RFValue(20),
-      paddingBottom: RFValue(32),
-      maxHeight: "85%",
-    },
-    modalHandle: {
-      width: RFValue(40),
-      height: RFValue(4),
-      backgroundColor: colors.slate[300],
-      borderRadius: RFValue(2),
-      alignSelf: "center",
-      marginVertical: RFValue(12),
-    },
+    inspectionModalOverlay: {},
+    inspectionBottomSheet: {backgroundColor: colors.background,
+borderTopLeftRadius: RFValue(24),
+borderTopRightRadius: RFValue(24),
+paddingHorizontal: RFValue(20),
+paddingBottom: RFValue(32)},
+    modalHandle: {width: RFValue(40),
+height: RFValue(4),
+backgroundColor: colors.slate[300],
+borderRadius: RFValue(2),
+marginVertical: RFValue(12)},
     inspectionModalBody: {
       gap: RFValue(10),
     },
-    inspectionModalTitle: {
-      fontSize: RFValue(20),
-      fontWeight: "700",
-      color: colors.slate[650],
-      textAlign: "center",
-      marginBottom: RFValue(4),
-    },
-    inspectionModalSubtitle: {
-      fontSize: RFValue(13),
-      color: colors.slate[500],
-      textAlign: "center",
-      lineHeight: RFValue(18),
-      marginBottom: RFValue(8),
-    },
-    inputLabel: {
-      fontSize: RFValue(14),
-      fontWeight: "500",
-      color: colors.slate[650],
-      marginBottom: RFValue(8),
-    },
-    inspectionInput: {
-      flexDirection: "row",
-      alignItems: "center",
-      justifyContent: "space-between",
-      backgroundColor: colors.slate[150],
-      borderRadius: RFValue(12),
-      padding: RFValue(16),
-      borderWidth: 1,
-      borderColor: colors.slate[300],
-    },
-    inspectionInputText: {
-      flex: 1,
-      fontSize: RFValue(15),
-      color: colors.slate[650],
-    },
+    inspectionModalTitle: {fontSize: RFValue(20),
+color: colors.slate[650],
+marginBottom: RFValue(4)},
+    inspectionModalSubtitle: {fontSize: RFValue(13),
+color: colors.slate[500],
+lineHeight: RFValue(18),
+marginBottom: RFValue(8)},
+    inputLabel: {fontSize: RFValue(14),
+color: colors.slate[650],
+marginBottom: RFValue(8)},
+    inspectionInput: {backgroundColor: colors.slate[150],
+borderRadius: RFValue(12),
+padding: RFValue(16),
+borderColor: colors.slate[300]},
+    inspectionInputText: {fontSize: RFValue(15),
+color: colors.slate[650]},
     inspectionInputPlaceholder: {
       color: colors.slate[450],
     },
@@ -2129,53 +1832,32 @@ const createStyles = (colors: ColorScheme) =>
       height: RFValue(16),
       tintColor: colors.slate[500],
     },
-    inspectionFeeRow: {
-      flexDirection: "row",
-      justifyContent: "space-between",
-      alignItems: "center",
-      paddingVertical: RFValue(16),
-      borderTopWidth: 1,
-      borderBottomWidth: 1,
-      borderColor: colors.slate[300],
-    },
+    inspectionFeeRow: {paddingVertical: RFValue(16),
+borderColor: colors.slate[300]},
     inspectionFeeLabel: {
       fontSize: RFValue(14),
       color: colors.slate[600],
     },
-    inspectionFeeAmount: {
-      fontSize: RFValue(18),
-      fontWeight: "700",
-      color: colors.slate[650],
-    },
-    inspectionNote: {
-      flexDirection: "row",
-      gap: RFValue(8),
-      padding: RFValue(12),
-      backgroundColor: colors.slate[150],
-      borderRadius: RFValue(12),
-    },
+    inspectionFeeAmount: {fontSize: RFValue(18),
+color: colors.slate[650]},
+    inspectionNote: {gap: RFValue(8),
+padding: RFValue(12),
+backgroundColor: colors.slate[150],
+borderRadius: RFValue(12)},
     shieldIcon: {
       width: RFValue(16),
       height: RFValue(16),
       tintColor: colors.success[200],
       marginTop: RFValue(2),
     },
-    inspectionNoteText: {
-      flex: 1,
-      fontSize: RFValue(12),
-      color: colors.slate[600],
-      lineHeight: RFValue(16),
-      textAlign: "center",
-    },
+    inspectionNoteText: {fontSize: RFValue(12),
+color: colors.slate[600],
+lineHeight: RFValue(16)},
     inspectionButtons: {
       gap: RFValue(12),
     },
     // Time Slot Modal
-    timeSlotModalOverlay: {
-      flex: 1,
-      backgroundColor: "rgba(0, 0, 0, 0.5)",
-      justifyContent: "flex-end",
-    },
+    timeSlotModalOverlay: {},
     timeSlotBottomSheet: {
       backgroundColor: colors.background,
       borderTopLeftRadius: RFValue(24),
@@ -2183,49 +1865,28 @@ const createStyles = (colors: ColorScheme) =>
       paddingHorizontal: RFValue(20),
       paddingBottom: RFValue(32),
     },
-    timeSlotModalTitle: {
-      fontSize: RFValue(18),
-      fontWeight: "700",
-      color: colors.slate[650],
-      textAlign: "center",
-      marginBottom: RFValue(4),
-    },
-    timeSlotModalSubtitle: {
-      fontSize: RFValue(13),
-      color: colors.slate[500],
-      textAlign: "center",
-      lineHeight: RFValue(18),
-      marginBottom: RFValue(20),
-    },
+    timeSlotModalTitle: {fontSize: RFValue(18),
+color: colors.slate[650],
+marginBottom: RFValue(4)},
+    timeSlotModalSubtitle: {fontSize: RFValue(13),
+color: colors.slate[500],
+lineHeight: RFValue(18),
+marginBottom: RFValue(20)},
     timeSlotList: {
       gap: RFValue(12),
     },
-    timeSlotEmptyText: {
-      color: colors.slate[500],
-      fontSize: RFValue(14),
-      minHeight: RFValue(72),
-      textAlign: "center",
-      textAlignVertical: "center",
-    },
-    timeSlotItem: {
-      flexDirection: "row",
-      alignItems: "center",
-      padding: RFValue(16),
-      backgroundColor: colors.slate[150],
-      borderRadius: RFValue(12),
-      borderWidth: 1,
-      borderColor: colors.slate[300],
-      gap: RFValue(12),
-    },
-    timeSlotRadio: {
-      width: RFValue(20),
-      height: RFValue(20),
-      borderRadius: RFValue(10),
-      borderWidth: 2,
-      borderColor: colors.slate[400],
-      alignItems: "center",
-      justifyContent: "center",
-    },
+    timeSlotEmptyText: {color: colors.slate[500],
+fontSize: RFValue(14),
+minHeight: RFValue(72)},
+    timeSlotItem: {padding: RFValue(16),
+backgroundColor: colors.slate[150],
+borderRadius: RFValue(12),
+borderColor: colors.slate[300],
+gap: RFValue(12)},
+    timeSlotRadio: {width: RFValue(20),
+height: RFValue(20),
+borderRadius: RFValue(10),
+borderColor: colors.slate[400]},
     timeSlotRadioSelected: {
       borderColor: colors.slate[650],
     },
@@ -2235,41 +1896,21 @@ const createStyles = (colors: ColorScheme) =>
       borderRadius: RFValue(5),
       backgroundColor: colors.slate[650],
     },
-    timeSlotItemText: {
-      flex: 1,
-      fontSize: RFValue(14),
-      color: colors.slate[650],
-    },
-    loadingContainer: {
-      flex: 1,
-      alignItems: "center",
-      justifyContent: "center",
-      paddingHorizontal: RFValue(20),
-      backgroundColor: colors.background,
-    },
-    loadingText: {
-      marginTop: RFValue(12),
-      fontSize: RFValue(14),
-      fontWeight: "600",
-      textAlign: "center",
-    },
-    othersInputContainer: {
-      flexDirection: "row",
-      alignItems: "center",
-      backgroundColor: colors.slate[150],
-      borderRadius: RFValue(12),
-      borderWidth: 1,
-      borderColor: colors.slate[300],
-      paddingHorizontal: RFValue(16),
-      paddingVertical: RFValue(4),
-      marginTop: -RFValue(4),
-    },
-    othersInput: {
-      flex: 1,
-      fontSize: RFValue(14),
-      color: colors.slate[650],
-      paddingVertical: RFValue(10),
-    },
+    timeSlotItemText: {fontSize: RFValue(14),
+color: colors.slate[650]},
+    loadingContainer: {paddingHorizontal: RFValue(20),
+backgroundColor: colors.background},
+    loadingText: {marginTop: RFValue(12),
+fontSize: RFValue(14)},
+    othersInputContainer: {backgroundColor: colors.slate[150],
+borderRadius: RFValue(12),
+borderColor: colors.slate[300],
+paddingHorizontal: RFValue(16),
+paddingVertical: RFValue(4),
+marginTop: -RFValue(4)},
+    othersInput: {fontSize: RFValue(14),
+color: colors.slate[650],
+paddingVertical: RFValue(10)},
     othersInputClearIcon: {
       width: RFValue(18),
       height: RFValue(18),

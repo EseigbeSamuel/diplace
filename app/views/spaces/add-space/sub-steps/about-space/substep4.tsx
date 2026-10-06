@@ -45,7 +45,7 @@ const CapacitySubstep: React.FC<CapacitySubstepProps> = ({
       style={styles.container}
       // behavior={Platform.OS === "ios" ? "padding" : "height"}
       // keyboardVerticalOffset={Platform.OS === "ios" ? 88 : 24}
-    >
+     className="flex-1">
       <KeyboardAwareScrollView
         enableOnAndroid={true}
         extraScrollHeight={90}
@@ -54,13 +54,13 @@ const CapacitySubstep: React.FC<CapacitySubstepProps> = ({
         contentContainerStyle={styles.scrollContent}
       >
         {/* Title */}
-        <Text style={styles.title}>Let's know the capacity of the space.</Text>
+        <Text style={styles.title} className="font-semibold">Let's know the capacity of the space.</Text>
 
         {/* Form Fields */}
         <View style={styles.formContainer}>
           {/* Rooms */}
-          <View style={styles.fieldRow}>
-            <View style={styles.labelContainer}>
+          <View style={styles.fieldRow} className="flex-row items-center justify-between">
+            <View  className="flex-1">
               <Text style={styles.label}>How many rooms are there?</Text>
             </View>
             <View style={styles.inputContainer}>
@@ -76,8 +76,8 @@ const CapacitySubstep: React.FC<CapacitySubstepProps> = ({
           </View>
 
           {/* Bathrooms */}
-          <View style={styles.fieldRow}>
-            <View style={styles.labelContainer}>
+          <View style={styles.fieldRow} className="flex-row items-center justify-between">
+            <View  className="flex-1">
               <Text style={styles.label}>How many bathrooms are there?</Text>
             </View>
             <View style={styles.inputContainer}>
@@ -93,8 +93,8 @@ const CapacitySubstep: React.FC<CapacitySubstepProps> = ({
           </View>
 
           {/* Kitchens */}
-          <View style={styles.fieldRow}>
-            <View style={styles.labelContainer}>
+          <View style={styles.fieldRow} className="flex-row items-center justify-between">
+            <View  className="flex-1">
               <Text style={styles.label}>How many kitchens are there?</Text>
             </View>
             <View style={styles.inputContainer}>
@@ -110,8 +110,8 @@ const CapacitySubstep: React.FC<CapacitySubstepProps> = ({
           </View>
 
           {/* Room Size */}
-          <View style={styles.fieldRow}>
-            <View style={styles.labelContainer}>
+          <View style={styles.fieldRow} className="flex-row items-center justify-between">
+            <View  className="flex-1">
               <Text style={styles.label}>What is the size of the room?</Text>
             </View>
             <View style={styles.inputContainer}>
@@ -129,7 +129,7 @@ const CapacitySubstep: React.FC<CapacitySubstepProps> = ({
                   });
                 }}
                 value={roomSize}
-              />
+               className="w-[100%px] border-[1px] text-center"/>
             </View>
           </View>
           {!!roomSizeError && (
@@ -159,33 +159,20 @@ const CapacitySubstep: React.FC<CapacitySubstepProps> = ({
 
 const createStyles = (colors: ColorScheme) =>
   StyleSheet.create({
-    container: {
-      flex: 1,
-      backgroundColor: colors.background,
-    },
+    container: {backgroundColor: colors.background},
     scrollContent: {
       paddingTop: RFValue(32),
       paddingBottom: RFValue(20),
     },
-    title: {
-      fontSize: RFValue(20),
-      fontWeight: "600",
-      color: colors.slate[650],
-      lineHeight: RFValue(28),
-      marginBottom: RFValue(32),
-    },
+    title: {fontSize: RFValue(20),
+color: colors.slate[650],
+lineHeight: RFValue(28),
+marginBottom: RFValue(32)},
     formContainer: {
       gap: RFValue(24),
     },
-    fieldRow: {
-      flexDirection: "row",
-      alignItems: "center",
-      justifyContent: "space-between",
-      gap: RFValue(16),
-    },
-    labelContainer: {
-      flex: 1,
-    },
+    fieldRow: {gap: RFValue(16)},
+    labelContainer: {},
     label: {
       fontSize: RFValue(15),
       color: colors.slate[600],
@@ -194,18 +181,13 @@ const createStyles = (colors: ColorScheme) =>
     inputContainer: {
       width: RFValue(120),
     },
-    textInput: {
-      width: "100%",
-      paddingVertical: RFValue(12),
-      paddingHorizontal: RFValue(16),
-      backgroundColor: colors.background,
-      borderRadius: RFValue(12),
-      borderWidth: 1,
-      borderColor: colors.slate[300],
-      fontSize: RFValue(15),
-      color: colors.slate[650],
-      textAlign: "center",
-    },
+    textInput: {paddingVertical: RFValue(12),
+paddingHorizontal: RFValue(16),
+backgroundColor: colors.background,
+borderRadius: RFValue(12),
+borderColor: colors.slate[300],
+fontSize: RFValue(15),
+color: colors.slate[650]},
     errorText: {
       fontSize: RFValue(12),
       color: colors.error[300],

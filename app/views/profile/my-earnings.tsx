@@ -74,27 +74,27 @@ const MyEarnings = ({ noHeader = false }) => {
       {noHeader ? null : <ViewHeader title="My Earnings" />}
       <ScrollView showsVerticalScrollIndicator={false}>
         {/* Earnings Card */}
-        <View style={earningsStyles.earningsCard}>
-          <View style={earningsStyles.earningsCardContent}>
+        <View style={earningsStyles.earningsCard} className="overflow-hidden">
+          <View style={earningsStyles.earningsCardContent} className="items-center">
             <Text style={earningsStyles.earningsLabel}>Your Earnings</Text>
-            <View style={earningsStyles.earningsAmountRow}>
-              <Text style={earningsStyles.earningsAmount}>₦500,000.00</Text>
+            <View style={earningsStyles.earningsAmountRow} className="flex-row items-center relative">
+              <Text style={earningsStyles.earningsAmount} className="font-bold">₦500,000.00</Text>
               <Image
                 source={require("@/assets/icons/password-hide.png")}
                 style={earningsStyles.eyeIcon}
               />
-              <View style={earningsStyles.liveEarningsAmount}>
-                <Text style={earningsStyles.earningsAmount}>
+              <View style={earningsStyles.liveEarningsAmount} className="absolute left-[0px] top-[0px] bottom-[0px] justify-center">
+                <Text style={earningsStyles.earningsAmount} className="font-bold">
                   {formatCurrency(totalEarnings)}
                 </Text>
               </View>
             </View>
-            <View style={earningsStyles.earningsStats}>
+            <View style={earningsStyles.earningsStats} className="flex-row items-center">
               <Image
                 source={require("@/assets/icons/trend-up-thin.png")}
                 style={earningsStyles.trendingIcon}
               />
-              <Text style={earningsStyles.statsText}>
+              <Text style={earningsStyles.statsText} className="font-semibold">
                 {transactionHistory.length}
               </Text>
               <Text style={earningsStyles.statsLabel}>transactions</Text>
@@ -108,10 +108,10 @@ const MyEarnings = ({ noHeader = false }) => {
 
         {/* Recent Earnings Section */}
         <View>
-          <View style={earningsStyles.sectionHeader}>
-            <Text style={earningsStyles.sectionTitle}>Recent Earnings</Text>
+          <View style={earningsStyles.sectionHeader} className="flex-row justify-between items-center">
+            <Text style={earningsStyles.sectionTitle} className="font-semibold">Recent Earnings</Text>
             <Pressable onPress={handleSeeAll}>
-              <View style={earningsStyles.seeAllButton}>
+              <View style={earningsStyles.seeAllButton} className="flex-row items-center">
                 <Text style={earningsStyles.seeAllText}>See all</Text>
                 <Image
                   source={require("@/assets/icons/arrow-right-dark.png")}
@@ -126,15 +126,15 @@ const MyEarnings = ({ noHeader = false }) => {
             {isTransactionHistoryLoading ? (
               <Text style={earningsStyles.transactionDate}>Loading earnings...</Text>
             ) : recentTransactions.length ? recentTransactions.map((transaction) => (
-              <View key={transaction.public_id} style={earningsStyles.transactionCard}>
-                <View style={earningsStyles.transactionLeft}>
-                  <View style={earningsStyles.iconContainer}>
+              <View key={transaction.public_id} style={earningsStyles.transactionCard} className="flex-row justify-between items-center border-b">
+                <View  className="flex-row items-center flex-1">
+                  <View style={earningsStyles.iconContainer} className="items-center justify-center">
                     <Image
                       source={getTransactionIcon(transaction.purpose)}
                       style={earningsStyles.transactionIcon}
                     />
                   </View>
-                  <View style={earningsStyles.transactionInfo}>
+                  <View  className="flex-1">
                     <Text style={earningsStyles.transactionDescription}>
                       {getDescription(transaction.purpose)}
                     </Text>
@@ -143,7 +143,7 @@ const MyEarnings = ({ noHeader = false }) => {
                     </Text>
                   </View>
                 </View>
-                <Text style={earningsStyles.transactionAmount}>
+                <Text style={earningsStyles.transactionAmount} className="font-semibold">
                   {formatCurrency(transaction.amount)}
                 </Text>
               </View>
@@ -161,62 +161,34 @@ export default MyEarnings;
 
 const styles = (colors: ColorScheme) =>
   StyleSheet.create({
-    earningsCard: {
-      marginBottom: RFValue(24),
-      backgroundColor: colors.slate[650],
-      borderRadius: RFValue(16),
-      overflow: "hidden",
-    },
-    earningsCardContent: {
-      padding: RFValue(24),
-      alignItems: "center",
-    },
+    earningsCard: {marginBottom: RFValue(24),
+backgroundColor: colors.slate[650],
+borderRadius: RFValue(16)},
+    earningsCardContent: {padding: RFValue(24)},
     earningsLabel: {
       fontSize: RFValue(14),
       color: colors.slate[200],
       marginBottom: RFValue(8),
     },
-    earningsAmountRow: {
-      flexDirection: "row",
-      alignItems: "center",
-      marginBottom: RFValue(16),
-      position: "relative",
-    },
-    earningsAmount: {
-      fontSize: RFValue(27),
-      fontWeight: "700",
-      color: colors.slate[100],
-      marginRight: RFValue(12),
-    },
-    liveEarningsAmount: {
-      position: "absolute",
-      left: 0,
-      top: 0,
-      bottom: 0,
-      backgroundColor: colors.slate[650],
-      justifyContent: "center",
-      paddingRight: RFValue(8),
-    },
+    earningsAmountRow: {marginBottom: RFValue(16)},
+    earningsAmount: {fontSize: RFValue(27),
+color: colors.slate[100],
+marginRight: RFValue(12)},
+    liveEarningsAmount: {backgroundColor: colors.slate[650],
+paddingRight: RFValue(8)},
     eyeIcon: {
       width: RFValue(24),
       height: RFValue(24),
       tintColor: colors.slate[200],
     },
-    earningsStats: {
-      flexDirection: "row",
-      alignItems: "center",
-      gap: RFValue(6),
-    },
+    earningsStats: {gap: RFValue(6)},
     trendingIcon: {
       width: RFValue(16),
       height: RFValue(16),
       tintColor: colors.success[300],
     },
-    statsText: {
-      fontSize: RFValue(14),
-      color: colors.success[300],
-      fontWeight: "600",
-    },
+    statsText: {fontSize: RFValue(14),
+color: colors.success[300]},
     statsLabel: {
       fontSize: RFValue(14),
       color: colors.slate[200],
@@ -227,22 +199,10 @@ const styles = (colors: ColorScheme) =>
       height: RFValue(16),
       tintColor: colors.slate[200],
     },
-    sectionHeader: {
-      flexDirection: "row",
-      justifyContent: "space-between",
-      alignItems: "center",
-      marginBottom: RFValue(16),
-    },
-    sectionTitle: {
-      fontSize: RFValue(18),
-      fontWeight: "600",
-      color: colors.slate[650],
-    },
-    seeAllButton: {
-      flexDirection: "row",
-      alignItems: "center",
-      gap: RFValue(4),
-    },
+    sectionHeader: {marginBottom: RFValue(16)},
+    sectionTitle: {fontSize: RFValue(18),
+color: colors.slate[650]},
+    seeAllButton: {gap: RFValue(4)},
     seeAllText: {
       fontSize: RFValue(14),
       color: colors.slate[650],
@@ -255,36 +215,20 @@ const styles = (colors: ColorScheme) =>
     transactionList: {
       gap: RFValue(16),
     },
-    transactionCard: {
-      flexDirection: "row",
-      justifyContent: "space-between",
-      alignItems: "center",
-      paddingVertical: RFValue(12),
-      borderBottomWidth: 1,
-      borderBottomColor: colors.slate[300],
-    },
-    transactionLeft: {
-      flexDirection: "row",
-      alignItems: "center",
-      flex: 1,
-    },
-    iconContainer: {
-      width: RFValue(40),
-      height: RFValue(40),
-      borderRadius: RFValue(20),
-      backgroundColor: colors.slate[200],
-      alignItems: "center",
-      justifyContent: "center",
-      marginRight: RFValue(12),
-    },
+    transactionCard: {paddingVertical: RFValue(12),
+borderBottomColor: colors.slate[300]},
+    transactionLeft: {},
+    iconContainer: {width: RFValue(40),
+height: RFValue(40),
+borderRadius: RFValue(20),
+backgroundColor: colors.slate[200],
+marginRight: RFValue(12)},
     transactionIcon: {
       width: RFValue(20),
       height: RFValue(20),
       tintColor: colors.slate[650],
     },
-    transactionInfo: {
-      flex: 1,
-    },
+    transactionInfo: {},
     transactionDescription: {
       fontSize: RFValue(15),
       color: colors.slate[650],
@@ -294,9 +238,6 @@ const styles = (colors: ColorScheme) =>
       fontSize: RFValue(13),
       color: colors.slate[500],
     },
-    transactionAmount: {
-      fontSize: RFValue(15),
-      fontWeight: "600",
-      color: colors.slate[650],
-    },
+    transactionAmount: {fontSize: RFValue(15),
+color: colors.slate[650]},
   });

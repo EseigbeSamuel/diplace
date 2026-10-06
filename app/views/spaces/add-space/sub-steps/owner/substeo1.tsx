@@ -43,7 +43,7 @@ const PropertyOwnerSubstep: React.FC<PropertyTypeSubstepProps> = ({
   };
 
   return (
-    <View style={styles.container}>
+    <View style={styles.container} className="flex-1">
       <KeyboardAwareScrollView
         enableOnAndroid={true}
         extraScrollHeight={20}
@@ -53,7 +53,7 @@ const PropertyOwnerSubstep: React.FC<PropertyTypeSubstepProps> = ({
       >
         {/* Property Type Section */}
         <View style={styles.section}>
-          <Text style={styles.title}>Who owns this space?</Text>
+          <Text style={styles.title} className="font-semibold">Who owns this space?</Text>
 
           <View style={styles.optionsContainer}>
             {propertyTypes.map((type) => (
@@ -86,23 +86,17 @@ const PropertyOwnerSubstep: React.FC<PropertyTypeSubstepProps> = ({
 
 const createStyles = (colors: ColorScheme) =>
   StyleSheet.create({
-    container: {
-      flex: 1,
-      backgroundColor: colors.background,
-    },
+    container: {backgroundColor: colors.background},
     scrollContent: {
       paddingTop: RFValue(32),
     },
     section: {
       marginBottom: RFValue(40),
     },
-    title: {
-      fontSize: RFValue(20),
-      fontWeight: "600",
-      color: colors.slate[650],
-      lineHeight: RFValue(28),
-      marginBottom: RFValue(20),
-    },
+    title: {fontSize: RFValue(20),
+color: colors.slate[650],
+lineHeight: RFValue(28),
+marginBottom: RFValue(20)},
     optionsContainer: {
       gap: RFValue(12),
     },

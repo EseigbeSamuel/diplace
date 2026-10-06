@@ -305,7 +305,7 @@ const InspectionPayment = () => {
 
             <Text style={[custom.small, { marginTop: 10 }]}>
               You have
-              <Text style={{ color: "red", fontWeight: "600" }}>
+              <Text className="text-[red] font-semibold">
                 {String(minutes).padStart(2, "0")}:
                 {String(seconds).padStart(2, "0")}
               </Text>

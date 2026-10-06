@@ -51,31 +51,31 @@ const TodayActivityCard = ({
   };
 
   return (
-    <Pressable onPress={handlePress} style={s.card} className="p-4 mb-4">
+    <Pressable onPress={handlePress} style={s.card} className="p-4 mb-4 border-[1px]">
       {/* Top Header Row */}
       <View className="flex flex-row items-center justify-between mb-2">
-        <Text style={s.activityType}>{item.activity_type}</Text>
+        <Text style={s.activityType} className="font-bold uppercase">{item.activity_type}</Text>
         <Text style={s.timeLabel}>{item.time_label}</Text>
       </View>
 
       {/* Middle Content Row */}
       <View className="flex flex-row justify-between items-start mb-3">
         <View className="flex-1 mr-2">
-          <Text style={s.propertyTitle}>{item.property.title}</Text>
-          <Text style={s.propertyLocation} numberOfLines={1}>
+          <Text style={s.propertyTitle} className="font-bold">{item.property.title}</Text>
+          <Text style={s.propertyLocation} numberOfLines={1} className="font-medium mt-[2px]">
             📍 {item.property.location}
           </Text>
         </View>
         <Image
           source={require("@/assets/icons/arrow-right-up-outline-dark.png")}
           style={s.arrowIcon}
-        />
+         className="w-[14px] h-[14px]"/>
       </View>
 
       {/* Bottom Row */}
       <View
         style={s.footerDivider}
-        className="pt-3 flex flex-row items-center justify-between"
+        className="pt-3 flex flex-row items-center justify-between border-dashed border-t"
       >
         <View className="flex flex-row items-center gap-2">
           <Image
@@ -86,13 +86,13 @@ const TodayActivityCard = ({
             }}
             style={s.avatar}
           />
-          <Text style={s.actorName}>
+          <Text style={s.actorName} className="font-semibold">
             {item.actor.first_name} {item.actor.last_name}{" "}
             {item.actor.status === "verified" && (
               <Image
                 source={require("@/assets/icons/badge-check-green.png")}
                 style={s.verifiedBadge}
-              />
+               className="w-[12px] h-[12px]"/>
             )}
           </Text>
         </View>
@@ -102,13 +102,13 @@ const TodayActivityCard = ({
             <Image
               source={require("@/assets/icons/Chat - Iconly Pro.png")}
               style={s.actionIcon}
-            />
+             className="w-[16px] h-[16px]"/>
           </Pressable>
           <Pressable>
             <Image
               source={require("@/assets/icons/calling.png")}
               style={s.actionIcon}
-            />
+             className="w-[16px] h-[16px]"/>
           </Pressable>
         </View>
       </View>
@@ -169,7 +169,7 @@ const TodayActivityScreen = () => {
               />
             ))
           ) : (
-            <Text style={s.emptyText}>No activities for today.</Text>
+            <Text style={s.emptyText} className="text-center mt-[20px]">No activities for today.</Text>
           )}
         </View>
       </ScrollView>
@@ -186,15 +186,11 @@ const styles = (colors: ColorScheme, isDarkMode: boolean) =>
     card: {
       backgroundColor: isDarkMode ? colors.slate[100] : "#FFFFFF",
       borderColor: colors.slate[250],
-      borderWidth: 1,
+
       borderRadius: RFValue(12),
     },
-    activityType: {
-      color: colors.slate[500],
-      fontSize: RFValue(13),
-      fontWeight: "bold",
-      textTransform: "uppercase",
-    },
+    activityType: {color: colors.slate[500],
+fontSize: RFValue(13)},
     timeLabel: {
       color: colors.slate[500],
       fontSize: RFValue(13),
@@ -202,24 +198,20 @@ const styles = (colors: ColorScheme, isDarkMode: boolean) =>
     propertyTitle: {
       color: colors.slate[650],
       fontSize: RFValue(16),
-      fontWeight: "bold",
+
     },
     propertyLocation: {
       color: colors.slate[550],
       fontSize: RFValue(13.5),
-      fontWeight: "500",
-      marginTop: 2,
+
+
     },
     arrowIcon: {
-      width: 14,
-      height: 14,
+
+
       tintColor: colors.slate[550],
     },
-    footerDivider: {
-      borderTopWidth: 1,
-      borderColor: colors.slate[200],
-      borderStyle: "dashed",
-    },
+    footerDivider: {borderColor: colors.slate[200]},
     avatar: {
       width: RFValue(20),
       height: RFValue(20),
@@ -228,20 +220,20 @@ const styles = (colors: ColorScheme, isDarkMode: boolean) =>
     actorName: {
       color: colors.slate[650],
       fontSize: RFValue(14),
-      fontWeight: "600",
+
     },
     verifiedBadge: {
-      width: 12,
-      height: 12,
+
+
     },
     actionIcon: {
-      width: 16,
-      height: 16,
+
+
       tintColor: colors.slate[550],
     },
     emptyText: {
       color: colors.slate[500],
-      textAlign: "center",
-      marginTop: 20,
+
+
     },
   });

@@ -70,43 +70,43 @@ const Support = () => {
           <Pressable
             style={supportStyles.menuItem}
             onPress={handleChatWhatsApp}
-          >
-            <View style={supportStyles.menuItemLeft}>
-              <View style={supportStyles.iconContainer}>
+           className="flex-row items-center justify-between">
+            <View style={supportStyles.menuItemLeft} className="flex-row items-center flex-1">
+              <View style={supportStyles.iconContainer} className="items-center justify-center">
                 <Image
                   source={require("@/assets/icons/whatsapp-icon.png")}
                   style={supportStyles.whatsappIcon}
                 />
               </View>
-              <Text style={supportStyles.menuText}>
+              <Text style={supportStyles.menuText} className="flex-1">
                 Chat with DrPlace on WhatsApp
               </Text>
             </View>
           </Pressable>
 
           {/* Send us an email */}
-          <Pressable style={supportStyles.menuItem} onPress={handleSendEmail}>
-            <View style={supportStyles.menuItemLeft}>
-              <View style={supportStyles.iconContainer}>
+          <Pressable style={supportStyles.menuItem} onPress={handleSendEmail} className="flex-row items-center justify-between">
+            <View style={supportStyles.menuItemLeft} className="flex-row items-center flex-1">
+              <View style={supportStyles.iconContainer} className="items-center justify-center">
                 <Image
                   source={require("@/assets/icons/mail-outline-light.png")}
                   style={supportStyles.menuIcon}
                 />
               </View>
-              <Text style={supportStyles.menuText}>Send us an email</Text>
+              <Text style={supportStyles.menuText} className="flex-1">Send us an email</Text>
             </View>
           </Pressable>
 
           {/* FAQs */}
-          <Pressable style={supportStyles.menuItem} onPress={handleFAQs}>
-            <View style={supportStyles.menuItemLeft}>
-              <View style={supportStyles.iconContainer}>
+          <Pressable style={supportStyles.menuItem} onPress={handleFAQs} className="flex-row items-center justify-between">
+            <View style={supportStyles.menuItemLeft} className="flex-row items-center flex-1">
+              <View style={supportStyles.iconContainer} className="items-center justify-center">
                 <Image
                   source={require("@/assets/icons/help-chat-2.png")}
                   style={supportStyles.menuIcon}
                 />
               </View>
-              <Text style={supportStyles.menuText}>FAQs</Text>
+              <Text style={supportStyles.menuText} className="flex-1">FAQs</Text>
             </View>
             <Image
               source={require("@/assets/icons/chevron-right.png")}
@@ -127,23 +127,23 @@ const styles = (colors: ColorScheme) =>
       paddingHorizontal: RFValue(3),
     },
     menuItem: {
-      flexDirection: "row",
-      alignItems: "center",
-      justifyContent: "space-between",
+
+
+
       paddingVertical: RFValue(8),
     },
     menuItemLeft: {
-      flexDirection: "row",
-      alignItems: "center",
-      flex: 1,
+
+
+
     },
     iconContainer: {
       width: RFValue(40),
       height: RFValue(40),
       borderRadius: RFValue(20),
       backgroundColor: colors.slate[150],
-      alignItems: "center",
-      justifyContent: "center",
+
+
       marginRight: RFValue(12),
     },
     menuIcon: {
@@ -158,7 +158,7 @@ const styles = (colors: ColorScheme) =>
     menuText: {
       fontSize: RFValue(15),
       color: colors.slate[650],
-      flex: 1,
+
     },
     chevronIcon: {
       tintColor: colors.slate[600],

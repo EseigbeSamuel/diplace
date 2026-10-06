@@ -77,37 +77,37 @@ const ConfirmDetailsSubstep: React.FC<ConfirmDetailsSubstepProps> = ({
   };
 
   return (
-    <View style={styles.container}>
+    <View style={styles.container} className="flex-1">
       <ScrollView
         showsVerticalScrollIndicator={false}
         contentContainerStyle={styles.scrollContent}
       >
-        <Text style={styles.title}>Confirm your details</Text>
+        <Text style={styles.title} className="font-semibold">Confirm your details</Text>
 
         {/* Personal Info */}
         <View style={styles.section}>
-          <View style={styles.infoContainer}>
-            <View style={styles.sectionHeaderInside}>
-              <Text style={styles.sectionTitle}>Personal Information</Text>
+          <View style={styles.infoContainer} className="border-[1px]">
+            <View style={styles.sectionHeaderInside} className="flex-row items-center justify-between border-b">
+              <Text style={styles.sectionTitle} className="font-semibold">Personal Information</Text>
             </View>
-            <View style={styles.infoRow}>
-              <View style={styles.infoField}>
+            <View style={styles.infoRow} className="flex-row">
+              <View  className="flex-1">
                 <Text style={styles.infoLabel}>Surname</Text>
-                <Text style={styles.infoValue}>{personalInfo.surname}</Text>
+                <Text style={styles.infoValue} className="font-semibold">{personalInfo.surname}</Text>
               </View>
-              <View style={styles.infoField}>
+              <View  className="flex-1">
                 <Text style={styles.infoLabel}>First Name</Text>
-                <Text style={styles.infoValue}>{personalInfo.firstName}</Text>
+                <Text style={styles.infoValue} className="font-semibold">{personalInfo.firstName}</Text>
               </View>
             </View>
-            <View style={styles.infoRow}>
-              <View style={styles.infoField}>
+            <View style={styles.infoRow} className="flex-row">
+              <View  className="flex-1">
                 <Text style={styles.infoLabel}>Middle Name</Text>
-                <Text style={styles.infoValue}>{personalInfo.middleName}</Text>
+                <Text style={styles.infoValue} className="font-semibold">{personalInfo.middleName}</Text>
               </View>
-              <View style={styles.infoField}>
+              <View  className="flex-1">
                 <Text style={styles.infoLabel}>Phone No.</Text>
-                <Text style={styles.infoValue}>{personalInfo.phoneNumber}</Text>
+                <Text style={styles.infoValue} className="font-semibold">{personalInfo.phoneNumber}</Text>
               </View>
             </View>
           </View>
@@ -116,41 +116,41 @@ const ConfirmDetailsSubstep: React.FC<ConfirmDetailsSubstepProps> = ({
         {/* Bank Details */}
         {!isBanksLoading && (
           <View style={styles.section}>
-            <View style={styles.infoContainer}>
-              <View style={styles.sectionHeaderInside}>
-                <Text style={styles.sectionTitle}>Bank Details</Text>
+            <View style={styles.infoContainer} className="border-[1px]">
+              <View style={styles.sectionHeaderInside} className="flex-row items-center justify-between border-b">
+                <Text style={styles.sectionTitle} className="font-semibold">Bank Details</Text>
                 <Pressable
                   style={styles.editButton}
                   onPress={handleEditBankDetails}
-                >
+                 className="flex-row items-center">
                   {/* <Image
                   source={require("@/assets/icons/edit-pencil-fill.png")}
                   style={styles.editIcon}
                 /> */}
                   <Edit size={16} color={colors.slate[650]} />
-                  <Text style={styles.editText}>Edit</Text>
+                  <Text style={styles.editText} className="font-medium">Edit</Text>
                 </Pressable>
               </View>
 
-              <View style={styles.infoRow}>
-                <View style={styles.infoField}>
+              <View style={styles.infoRow} className="flex-row">
+                <View  className="flex-1">
                   <Text style={styles.infoLabel}>Account Number</Text>
-                  <Text style={styles.infoValue}>
+                  <Text style={styles.infoValue} className="font-semibold">
                     {spaceForm.value.accountDetails?.accountNumber ||
                       "UNAVAILABLE"}
                   </Text>
                 </View>
-                <View style={styles.infoField}>
+                <View  className="flex-1">
                   <Text style={styles.infoLabel}>Account Name</Text>
-                  <Text style={styles.infoValue}>
+                  <Text style={styles.infoValue} className="font-semibold">
                     {spaceForm.value.accountDetails?.accountName ||
                       "UNAVAILABLE"}
                   </Text>
                 </View>
               </View>
-              <View style={styles.fullWidthRow}>
+              <View  className="w-[100%px]">
                 <Text style={styles.infoLabel}>Bank</Text>
-                <Text style={styles.infoValue}>
+                <Text style={styles.infoValue} className="font-semibold">
                   {spaceForm.value.accountDetails?.bank || "N/A"}
                 </Text>
               </View>
@@ -177,67 +177,46 @@ const ConfirmDetailsSubstep: React.FC<ConfirmDetailsSubstepProps> = ({
 
 const createStyles = (colors: ColorScheme) =>
   StyleSheet.create({
-    container: { flex: 1, backgroundColor: colors.background },
+    container: {backgroundColor: colors.background},
     scrollContent: { paddingTop: RFValue(32) },
-    title: {
-      fontSize: RFValue(20),
-      fontWeight: "600",
-      color: colors.slate[650],
-      marginBottom: RFValue(32),
-    },
+    title: {fontSize: RFValue(20),
+color: colors.slate[650],
+marginBottom: RFValue(32)},
     section: { marginBottom: RFValue(24) },
-    sectionHeaderInside: {
-      flexDirection: "row",
-      alignItems: "center",
-      justifyContent: "space-between",
-      backgroundColor: colors.slate[150],
-      paddingHorizontal: RFValue(16),
-      paddingVertical: RFValue(16),
-      marginHorizontal: RFValue(-16),
-      marginTop: RFValue(-16),
-      borderBottomWidth: 1,
-      borderBottomColor: colors.slate[300],
-      borderTopLeftRadius: RFValue(12),
-      borderTopRightRadius: RFValue(12),
-    },
-    sectionTitle: {
-      fontSize: RFValue(16),
-      fontWeight: "600",
-      color: colors.slate[650],
-    },
-    editButton: { flexDirection: "row", alignItems: "center", gap: RFValue(6) },
+    sectionHeaderInside: {backgroundColor: colors.slate[150],
+paddingHorizontal: RFValue(16),
+paddingVertical: RFValue(16),
+marginHorizontal: RFValue(-16),
+marginTop: RFValue(-16),
+borderBottomColor: colors.slate[300],
+borderTopLeftRadius: RFValue(12),
+borderTopRightRadius: RFValue(12)},
+    sectionTitle: {fontSize: RFValue(16),
+color: colors.slate[650]},
+    editButton: {gap: RFValue(6)},
     editIcon: {
       width: RFValue(16),
       height: RFValue(16),
       tintColor: colors.slate[650],
     },
-    editText: {
-      fontSize: RFValue(14),
-      fontWeight: "500",
-      color: colors.slate[650],
-    },
-    infoContainer: {
-      backgroundColor: colors.background,
-      borderRadius: RFValue(12),
-      borderWidth: 1,
-      borderColor: colors.slate[300],
-      padding: RFValue(16),
-      gap: RFValue(16),
-    },
-    infoRow: { flexDirection: "row", gap: RFValue(16) },
-    infoField: { flex: 1 },
-    fullWidthRow: { width: "100%" },
+    editText: {fontSize: RFValue(14),
+color: colors.slate[650]},
+    infoContainer: {backgroundColor: colors.background,
+borderRadius: RFValue(12),
+borderColor: colors.slate[300],
+padding: RFValue(16),
+gap: RFValue(16)},
+    infoRow: {gap: RFValue(16)},
+    infoField: {},
+    fullWidthRow: {},
     infoLabel: {
       fontSize: RFValue(13),
       color: colors.slate[600],
       marginBottom: RFValue(6),
     },
-    infoValue: {
-      fontSize: RFValue(15),
-      fontWeight: "600",
-      color: colors.slate[650],
-      lineHeight: RFValue(22),
-    },
+    infoValue: {fontSize: RFValue(15),
+color: colors.slate[650],
+lineHeight: RFValue(22)},
     buttonContainer: {
       paddingVertical: RFValue(16),
       backgroundColor: colors.background,

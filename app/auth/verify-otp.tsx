@@ -257,7 +257,7 @@ export default function VerifyOtp() {
           keyboardType="number-pad"
           maxLength={OTP_LENGTH}
           autoFocus
-          style={{ position: "absolute", opacity: 0 }}
+          className="absolute opacity-[0]"
           textContentType="oneTimeCode" // iOS autofill
           autoComplete={Platform.OS === "android" ? "sms-otp" : "one-time-code"} // Android autofill
         />
@@ -267,7 +267,7 @@ export default function VerifyOtp() {
           activeOpacity={1}
           onPress={() => inputRef.current?.focus()}
         >
-          <View style={styles.container}>
+          <View style={styles.container} className="flex-row justify-between my-[20px]">
             {Array.from({ length: OTP_LENGTH }).map((_, i) => {
               const digit = otp[i] || "";
               const isFocused = otp.length === i;
@@ -279,8 +279,8 @@ export default function VerifyOtp() {
                     styles.box,
                     isFocused && { borderColor: colors.slate[650] },
                   ]}
-                >
-                  <Text style={styles.text}>{digit}</Text>
+                 className="border-[1.5px] justify-center items-center">
+                  <Text style={styles.text} className="font-semibold">{digit}</Text>
                 </View>
               );
             })}
@@ -316,22 +316,22 @@ export default function VerifyOtp() {
 const verifyOtpStyles = (colors: ColorScheme) =>
   StyleSheet.create({
     container: {
-      flexDirection: "row",
-      justifyContent: "space-between",
-      marginVertical: 20,
+
+
+
     },
     box: {
       width: RFValue(40),
       height: RFValue(46),
       borderRadius: RFValue(12),
-      borderWidth: 1.5,
+
       borderColor: colors.slate[300],
-      justifyContent: "center",
-      alignItems: "center",
+
+
     },
     text: {
       fontSize: RFValue(20),
-      fontWeight: "600",
+
       color: colors.slate[650],
     },
   });

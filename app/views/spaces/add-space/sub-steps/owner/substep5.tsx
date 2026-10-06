@@ -100,12 +100,12 @@ const RentalAgreementSubstep: React.FC<RentalAgreementSubstepProps> = ({
   };
 
   return (
-    <View style={styles.container}>
+    <View style={styles.container} className="flex-1">
       <ScrollView
         showsVerticalScrollIndicator={false}
         contentContainerStyle={styles.scrollContent}
       >
-        <Text style={styles.title}>Upload rental agreement</Text>
+        <Text style={styles.title} className="font-bold">Upload rental agreement</Text>
         <Text style={styles.description}>
           Upload any rental agreement for the use of this space. Please review
           it carefully before proceeding. You can skip this step if you don't
@@ -116,22 +116,22 @@ const RentalAgreementSubstep: React.FC<RentalAgreementSubstepProps> = ({
           <TouchableOpacity
             style={styles.uploadDocumentButton}
             onPress={() => setShowPicker(true)}
-          >
+           className="flex-row items-center justify-end">
             <Image
               source={require("@/assets/icons/Upload - Iconly Pro.png")}
               style={styles.uploadIconSmall}
               resizeMode="contain"
             />
-            <Text style={styles.uploadDocumentText}>Upload document</Text>
+            <Text style={styles.uploadDocumentText} className="font-medium">Upload document</Text>
           </TouchableOpacity>
         )}
 
         <View style={styles.uploadSection}>
-          <View style={styles.uploadHeader}>
-            <View style={{ gap: 6 }}>
-              <Text style={styles.uploadLabel}>Rental Agreement</Text>
+          <View style={styles.uploadHeader} className="flex-row justify-between items-center">
+            <View className="gap-[6px]">
+              <Text style={styles.uploadLabel} className="font-semibold">Rental Agreement</Text>
               {!spaceForm.value.rentalAgreement && !isUploading && (
-                <View style={styles.placeholderContainer}>
+                <View style={styles.placeholderContainer} className="flex-row items-center">
                   <Image
                     source={require("@/assets/icons/paper.png")}
                     style={styles.fileIconSmall}
@@ -143,13 +143,13 @@ const RentalAgreementSubstep: React.FC<RentalAgreementSubstepProps> = ({
                 </View>
               )}
               {spaceForm.value.rentalAgreement && (
-                <View style={styles.fileInfo}>
+                <View style={styles.fileInfo} className="flex-row items-center">
                   <Image
                     source={require("@/assets/icons/paper.png")}
                     style={styles.fileIconSmall}
                     resizeMode="contain"
                   />
-                  <View style={styles.fileDetails}>
+                  <View  className="flex-1">
                     <Text style={styles.fileSize}>
                       Uploaded:{" "}
                       {formatFileSize(spaceForm.value.rentalAgreement.size)}
@@ -158,7 +158,7 @@ const RentalAgreementSubstep: React.FC<RentalAgreementSubstepProps> = ({
                 </View>
               )}
               {isUploading && (
-                <View style={styles.uploadingContainer}>
+                <View style={styles.uploadingContainer} className="flex-row items-center">
                   <ActivityIndicator color={"green"} />
                   <Text style={styles.uploadingText}>Uploading...</Text>
                 </View>
@@ -180,8 +180,8 @@ const RentalAgreementSubstep: React.FC<RentalAgreementSubstepProps> = ({
               <TouchableOpacity
                 style={styles.actionButton}
                 onPress={handlePreview}
-              >
-                <Text style={styles.previewText}>Preview</Text>
+               className="flex-row items-center justify-between">
+                <Text style={styles.previewText} className="font-medium">Preview</Text>
                 <Image
                   source={require("@/assets/icons/arrow-right-up-outline-dark.png")}
                   style={styles.chevronIcon}
@@ -197,13 +197,13 @@ const RentalAgreementSubstep: React.FC<RentalAgreementSubstepProps> = ({
                 <TouchableOpacity
                   style={styles.removeButton}
                   onPress={handleRemove}
-                >
+                 className="flex-row items-center justify-end">
                   <Image
                     source={require("@/assets/icons/delete.png")}
                     style={styles.trashIcon}
                     resizeMode="contain"
                   />
-                  <Text style={styles.removeText}>Remove</Text>
+                  <Text style={styles.removeText} className="font-medium">Remove</Text>
                 </TouchableOpacity>
               </View>
             </View>
@@ -212,9 +212,9 @@ const RentalAgreementSubstep: React.FC<RentalAgreementSubstepProps> = ({
       </ScrollView>
 
       {/* Bottom Buttons */}
-      <View style={styles.bottomButtons}>
+      <View style={styles.bottomButtons} className="absolute bottom-[0px] left-[0px] right-[0px] flex-row">
         <TouchableOpacity style={styles.skipButton} onPress={onSkip}>
-          <Text style={styles.skipText}>Skip</Text>
+          <Text style={styles.skipText} className="font-medium">Skip</Text>
         </TouchableOpacity>
 
         <TouchableOpacity
@@ -224,13 +224,13 @@ const RentalAgreementSubstep: React.FC<RentalAgreementSubstepProps> = ({
           ]}
           onPress={onNext}
           disabled={!spaceForm.value.rentalAgreement}
-        >
+         className="flex-1 items-center justify-center">
           <Text
             style={[
               styles.nextText,
               !spaceForm.value.rentalAgreement && styles.nextTextDisabled,
             ]}
-          >
+           className="font-semibold">
             Next
           </Text>
         </TouchableOpacity>
@@ -249,20 +249,14 @@ const RentalAgreementSubstep: React.FC<RentalAgreementSubstepProps> = ({
 
 const createStyles = (colors: ColorScheme) =>
   StyleSheet.create({
-    container: {
-      flex: 1,
-      backgroundColor: colors.background,
-    },
+    container: {backgroundColor: colors.background},
     scrollContent: {
       paddingVertical: RFValue(20),
       paddingBottom: RFValue(100),
     },
-    title: {
-      fontSize: RFValue(24),
-      fontWeight: "700",
-      color: colors.slate[650],
-      marginBottom: RFValue(12),
-    },
+    title: {fontSize: RFValue(24),
+color: colors.slate[650],
+marginBottom: RFValue(12)},
     description: {
       fontSize: RFValue(14),
       color: colors.slate[600],
@@ -272,20 +266,12 @@ const createStyles = (colors: ColorScheme) =>
     uploadSection: {
       gap: RFValue(12),
     },
-    uploadHeader: {
-      flexDirection: "row",
-      justifyContent: "space-between",
-      alignItems: "center",
-      backgroundColor: colors.slate[200],
-      paddingHorizontal: RFValue(12),
-      paddingVertical: RFValue(12),
-      borderRadius: RFValue(8),
-    },
-    uploadLabel: {
-      fontSize: RFValue(15),
-      fontWeight: "600",
-      color: colors.slate[650],
-    },
+    uploadHeader: {backgroundColor: colors.slate[200],
+paddingHorizontal: RFValue(12),
+paddingVertical: RFValue(12),
+borderRadius: RFValue(8)},
+    uploadLabel: {fontSize: RFValue(15),
+color: colors.slate[650]},
     uploadIconButton: {
       padding: RFValue(8),
     },
@@ -319,21 +305,13 @@ const createStyles = (colors: ColorScheme) =>
       height: RFValue(14),
       tintColor: colors.error[200],
     },
-    placeholderContainer: {
-      flexDirection: "row",
-      alignItems: "center",
-      gap: RFValue(8),
-    },
+    placeholderContainer: {gap: RFValue(8)},
     placeholderText: {
       fontSize: RFValue(14),
       color: colors.slate[500],
     },
-    uploadingContainer: {
-      flexDirection: "row",
-      alignItems: "center",
-      gap: RFValue(8),
-      paddingVertical: RFValue(16),
-    },
+    uploadingContainer: {gap: RFValue(8),
+paddingVertical: RFValue(16)},
     uploadingText: {
       fontSize: RFValue(14),
       color: colors.slate[500],
@@ -341,20 +319,11 @@ const createStyles = (colors: ColorScheme) =>
     fileContainer: {
       gap: RFValue(12),
     },
-    fileInfo: {
-      flexDirection: "row",
-      alignItems: "center",
-      gap: RFValue(12),
-    },
-    fileDetails: {
-      flex: 1,
-    },
-    fileName: {
-      fontSize: RFValue(14),
-      fontWeight: "500",
-      color: colors.slate[650],
-      marginBottom: RFValue(4),
-    },
+    fileInfo: {gap: RFValue(12)},
+    fileDetails: {},
+    fileName: {fontSize: RFValue(14),
+color: colors.slate[650],
+marginBottom: RFValue(4)},
     fileSize: {
       fontSize: RFValue(12),
       color: colors.slate[500],
@@ -362,84 +331,38 @@ const createStyles = (colors: ColorScheme) =>
     fileActions: {
       gap: RFValue(12),
     },
-    actionButton: {
-      flexDirection: "row",
-      alignItems: "center",
-      justifyContent: "space-between",
-      paddingVertical: RFValue(12),
-    },
-    previewText: {
-      fontSize: RFValue(14),
-      fontWeight: "500",
-      color: colors.slate[650],
-    },
-    removeButton: {
-      flexDirection: "row",
-      alignItems: "center",
-      justifyContent: "flex-end",
-      gap: RFValue(8),
-      paddingVertical: RFValue(8),
-    },
-    removeText: {
-      fontSize: RFValue(14),
-      fontWeight: "500",
-      color: colors.error[200],
-    },
-    uploadDocumentButton: {
-      flexDirection: "row",
-      alignItems: "center",
-      justifyContent: "flex-end",
-      gap: RFValue(8),
-      marginBottom: RFValue(24),
-    },
-    uploadDocumentText: {
-      fontSize: RFValue(14),
-      fontWeight: "500",
-      color: colors.slate[650],
-    },
-    bottomButtons: {
-      position: "absolute",
-      bottom: 0,
-      left: 0,
-      right: 0,
-      flexDirection: "row",
-      gap: RFValue(16),
-      paddingHorizontal: RFValue(20),
-      paddingVertical: RFValue(16),
-    },
+    actionButton: {paddingVertical: RFValue(12)},
+    previewText: {fontSize: RFValue(14),
+color: colors.slate[650]},
+    removeButton: {gap: RFValue(8),
+paddingVertical: RFValue(8)},
+    removeText: {fontSize: RFValue(14),
+color: colors.error[200]},
+    uploadDocumentButton: {gap: RFValue(8),
+marginBottom: RFValue(24)},
+    uploadDocumentText: {fontSize: RFValue(14),
+color: colors.slate[650]},
+    bottomButtons: {gap: RFValue(16),
+paddingHorizontal: RFValue(20),
+paddingVertical: RFValue(16)},
     skipButton: {
       paddingVertical: RFValue(14),
       paddingHorizontal: RFValue(24),
     },
-    skipText: {
-      fontSize: RFValue(16),
-      fontWeight: "500",
-      color: colors.slate[600],
-    },
-    nextButton: {
-      flex: 1,
-      backgroundColor: colors.slate[650],
-      borderRadius: RFValue(24),
-      paddingVertical: RFValue(14),
-      alignItems: "center",
-      justifyContent: "center",
-    },
+    skipText: {fontSize: RFValue(16),
+color: colors.slate[600]},
+    nextButton: {backgroundColor: colors.slate[650],
+borderRadius: RFValue(24),
+paddingVertical: RFValue(14)},
     nextButtonDisabled: {
       backgroundColor: colors.slate[300],
     },
-    nextText: {
-      fontSize: RFValue(16),
-      fontWeight: "600",
-      color: colors.background,
-    },
+    nextText: {fontSize: RFValue(16),
+color: colors.background},
     nextTextDisabled: {
       color: colors.slate[500],
     },
-    modalOverlay: {
-      flex: 1,
-      backgroundColor: "rgba(0, 0, 0, 0.5)",
-      justifyContent: "flex-end",
-    },
+    modalOverlay: {},
     modalContent: {
       backgroundColor: colors.background,
       borderTopLeftRadius: RFValue(24),
@@ -447,47 +370,25 @@ const createStyles = (colors: ColorScheme) =>
       paddingTop: RFValue(12),
       paddingBottom: RFValue(32),
     },
-    modalHandle: {
-      width: RFValue(40),
-      height: RFValue(4),
-      backgroundColor: colors.slate[300],
-      borderRadius: RFValue(2),
-      alignSelf: "center",
-      marginBottom: RFValue(20),
-    },
-    modalTitle: {
-      fontSize: RFValue(18),
-      fontWeight: "600",
-      color: colors.slate[650],
-      textAlign: "center",
-      marginBottom: RFValue(24),
-    },
-    optionsContainer: {
-      flexDirection: "row",
-      paddingHorizontal: RFValue(20),
-      gap: RFValue(22),
-    },
-    optionButton: {
-      alignItems: "center",
-      gap: RFValue(12),
-    },
-    optionIconBlue: {
-      alignItems: "center",
-      justifyContent: "center",
-    },
-    optionIconOrange: {
-      alignItems: "center",
-      justifyContent: "center",
-    },
+    modalHandle: {width: RFValue(40),
+height: RFValue(4),
+backgroundColor: colors.slate[300],
+borderRadius: RFValue(2),
+marginBottom: RFValue(20)},
+    modalTitle: {fontSize: RFValue(18),
+color: colors.slate[650],
+marginBottom: RFValue(24)},
+    optionsContainer: {paddingHorizontal: RFValue(20),
+gap: RFValue(22)},
+    optionButton: {gap: RFValue(12)},
+    optionIconBlue: {},
+    optionIconOrange: {},
     optionImage: {
       width: RFValue(48),
       height: RFValue(48),
     },
-    optionText: {
-      fontSize: RFValue(14),
-      fontWeight: "500",
-      color: colors.slate[650],
-    },
+    optionText: {fontSize: RFValue(14),
+color: colors.slate[650]},
   });
 
 export default RentalAgreementSubstep;

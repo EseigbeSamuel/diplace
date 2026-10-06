@@ -39,13 +39,13 @@ const GetStarted: React.FC = () => {
   };
 
   return (
-    <View style={styles.container}>
+    <View  className="flex-1">
       {/* Background Image */}
       <ImageBackground
         source={require("@/assets/images/owner-right.jpg")}
         style={styles.backgroundImage}
         resizeMode="cover"
-      >
+       className="flex-1">
         {/* Dark Overlay Gradient */}
         <LinearGradient
           colors={[
@@ -53,16 +53,16 @@ const GetStarted: React.FC = () => {
             "rgba(0, 0, 0, 0.7)",
             "rgba(0, 0, 0, 0.9)",
           ]}
-          style={styles.gradientOverlay}
-        >
+
+         className="flex-1 justify-end">
           <View style={styles.content}>
             {/* Welcome Text */}
             <View style={styles.textContainer}>
-              <Text style={styles.welcomeText}>
+              <Text style={styles.welcomeText} className="font-bold text-[#FFFFFF]">
                 Welcome! 👋{"\n"}
                 Let&apos;s help you tailor your experience.
               </Text>
-              <Text style={styles.descriptionText}>
+              <Text style={styles.descriptionText} className="text-[rgba(255, 255, 255, 0.85)]">
                 What will you use DiPlace for? Let&apos;s help you customize
                 your experience to meet your goals.
               </Text>
@@ -85,10 +85,10 @@ const GetStarted: React.FC = () => {
                         ? require("@/assets/icons/checkbox-circle-fill.png")
                         : require("@/assets/icons/checkbox-blank-circle-outline.png")
                     }
-                    style={styles.checkbox}
-                    className="w-6 h-6"
+
+                    className="w-6 h-6 tint-[#FFFFFF]"
                   />
-                  <Text style={styles.subTitle}>
+                  <Text style={styles.subTitle} className="text-[#FFFFFF]">
                     I am a Renter looking for a space
                   </Text>
                 </View>
@@ -108,10 +108,10 @@ const GetStarted: React.FC = () => {
                         ? require("@/assets/icons/checkbox-circle-fill.png")
                         : require("@/assets/icons/checkbox-blank-circle-outline.png")
                     }
-                    style={styles.checkbox}
-                    className="w-6 h-6"
+
+                    className="w-6 h-6 tint-[#FFFFFF]"
                   />
-                  <Text style={styles.subTitle}>
+                  <Text style={styles.subTitle} className="text-[#FFFFFF]">
                     I am a space Agent / Manager / Owner
                   </Text>
                 </View>
@@ -138,18 +138,10 @@ const GetStarted: React.FC = () => {
 
 const createStyles = (colors: ColorScheme) =>
   StyleSheet.create({
-    container: {
-      flex: 1,
-    },
-    backgroundImage: {
-      flex: 1,
-      width: width,
-      height: height,
-    },
-    gradientOverlay: {
-      flex: 1,
-      justifyContent: "flex-end",
-    },
+    container: {},
+    backgroundImage: {width: width,
+height: height},
+    gradientOverlay: {},
     content: {
       paddingHorizontal: RFValue(20),
       paddingBottom: RFValue(40),
@@ -157,90 +149,39 @@ const createStyles = (colors: ColorScheme) =>
     textContainer: {
       marginBottom: RFValue(40),
     },
-    welcomeText: {
-      fontSize: RFValue(28),
-      fontWeight: "700",
-      color: "#FFFFFF",
-      lineHeight: RFValue(36),
-      marginBottom: RFValue(16),
-    },
-    descriptionText: {
-      fontSize: RFValue(14),
-      color: "rgba(255, 255, 255, 0.85)",
-      lineHeight: RFValue(22),
-    },
+    welcomeText: {fontSize: RFValue(28),
+lineHeight: RFValue(36),
+marginBottom: RFValue(16)},
+    descriptionText: {fontSize: RFValue(14),
+lineHeight: RFValue(22)},
     optionsContainer: {
       gap: RFValue(16),
       marginBottom: RFValue(32),
     },
-    optionButton: {
-      flexDirection: "row",
-      alignItems: "center",
-      paddingVertical: RFValue(16),
-      paddingHorizontal: RFValue(16),
-      backgroundColor: "rgba(255, 255, 255, 0.1)",
-      borderRadius: RFValue(12),
-      borderWidth: 1.5,
-      borderColor: "rgba(255, 255, 255, 0.2)",
-    },
-    optionButtonSelected: {
-      backgroundColor: "rgba(255, 255, 255, 0.15)",
-      borderColor: "#FFFFFF",
-    },
+    optionButton: {paddingVertical: RFValue(16),
+paddingHorizontal: RFValue(16),
+borderRadius: RFValue(12)},
+    optionButtonSelected: {},
     radioContainer: {
       marginRight: RFValue(12),
     },
-    radioOuter: {
-      width: RFValue(20),
-      height: RFValue(20),
-      borderRadius: RFValue(10),
-      borderWidth: 2,
-      borderColor: "rgba(255, 255, 255, 0.6)",
-      alignItems: "center",
-      justifyContent: "center",
-    },
-    radioOuterSelected: {
-      borderColor: "#FFFFFF",
-    },
-    radioInner: {
-      width: RFValue(10),
-      height: RFValue(10),
-      borderRadius: RFValue(5),
-      backgroundColor: "#FFFFFF",
-    },
-    optionText: {
-      fontSize: RFValue(15),
-      fontWeight: "500",
-      color: "rgba(255, 255, 255, 0.85)",
-      flex: 1,
-    },
-    optionTextSelected: {
-      color: "#FFFFFF",
-      fontWeight: "600",
-    },
+    radioOuter: {width: RFValue(20),
+height: RFValue(20),
+borderRadius: RFValue(10)},
+    radioOuterSelected: {},
+    radioInner: {width: RFValue(10),
+height: RFValue(10),
+borderRadius: RFValue(5)},
+    optionText: {fontSize: RFValue(15)},
+    optionTextSelected: {},
     buttonContainer: {
       marginTop: RFValue(8),
     },
-    checkbox: {
-      tintColor: "#FFFFFF",
-    },
-    borderDarkGray: {
-      borderWidth: 1,
-      borderStyle: "solid",
-      borderColor: "#FFFFFF",
-      borderRadius: RFValue(12),
-    },
-    borderLightGray: {
-      borderWidth: 1,
-      borderStyle: "solid",
-      borderColor: "rgba(255, 255, 255, 0.2)",
-      borderRadius: RFValue(12),
-    },
-    subTitle: {
-      fontSize: RFValue(14),
-      lineHeight: RFValue(20),
-      color: "#FFFFFF",
-    },
+    checkbox: {},
+    borderDarkGray: {borderRadius: RFValue(12)},
+    borderLightGray: {borderRadius: RFValue(12)},
+    subTitle: {fontSize: RFValue(14),
+lineHeight: RFValue(20)},
   });
 
 export default GetStarted;

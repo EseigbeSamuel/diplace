@@ -38,8 +38,8 @@ const Security = () => {
           <Pressable
             style={securityStyles.menuItem}
             onPress={handleChangePassword}
-          >
-            <View style={securityStyles.menuItemLeft}>
+           className="flex-row items-center justify-between">
+            <View style={securityStyles.menuItemLeft} className="flex-row items-center">
               <Image
                 source={require("@/assets/icons/Lock.png")}
                 style={securityStyles.menuIcon}
@@ -56,8 +56,8 @@ const Security = () => {
           <Pressable
             style={securityStyles.menuItem}
             onPress={handleForgotPassword}
-          >
-            <View style={securityStyles.menuItemLeft}>
+           className="flex-row items-center justify-between">
+            <View style={securityStyles.menuItemLeft} className="flex-row items-center">
               <Image
                 source={require("@/assets/icons/Danger Circle - Iconly Pro.png")}
                 style={securityStyles.menuIcon}
@@ -76,15 +76,15 @@ export default Security;
 const styles = (colors: ColorScheme) =>
   StyleSheet.create({
     menuItem: {
-      flexDirection: "row",
-      alignItems: "center",
-      justifyContent: "space-between",
+
+
+
       paddingVertical: RFValue(16),
       paddingHorizontal: RFValue(8),
     },
     menuItemLeft: {
-      flexDirection: "row",
-      alignItems: "center",
+
+
     },
     menuIcon: {
       width: RFValue(20),

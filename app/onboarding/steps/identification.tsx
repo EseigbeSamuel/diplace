@@ -139,13 +139,13 @@ const IdentityVerificationStep = ({ onNext }: IdentityVerificationProps) => {
     !isCompleting;
 
   return (
-    <View style={Styles.root}>
+    <View  className="flex-1">
       <KeyboardAwareScrollView
         showsVerticalScrollIndicator={false}
         contentContainerStyle={Styles.scrollContent}
         extraScrollHeight={30}
       >
-        <View style={Styles.container}>
+        <View style={Styles.container} className="grow justify-between">
           <View style={Styles.contentContainer}>
             <Image
               source={require("@/assets/icons/identification 2.png")}
@@ -154,7 +154,7 @@ const IdentityVerificationStep = ({ onNext }: IdentityVerificationProps) => {
             />
 
             <View style={Styles.textContainer}>
-              <Text style={Styles.headText}>Verify your identity</Text>
+              <Text style={Styles.headText} className="font-semibold">Verify your identity</Text>
               <Text style={Styles.descriptionText}>
                 Select NIN or BVN. We will fetch your details for confirmation
                 before completing verification.
@@ -181,28 +181,28 @@ const IdentityVerificationStep = ({ onNext }: IdentityVerificationProps) => {
             )}
 
             {isFetching && (
-              <View style={Styles.fetchingContainer}>
+              <View style={Styles.fetchingContainer} className="flex-row items-center justify-end">
                 <ActivityIndicator size="small" color={colors.slate[650]} />
                 <Text style={Styles.fetchingText}>Fetching data...</Text>
               </View>
             )}
 
             {confirmationData && !isFetching && (
-              <View style={Styles.personalInfoContainer}>
-                <Text style={Styles.sectionTitle}>Confirm your information</Text>
+              <View style={Styles.personalInfoContainer} className="border-[1px]">
+                <Text style={Styles.sectionTitle} className="font-semibold">Confirm your information</Text>
                 {confirmationEntries.length > 0 ? (
                   <View style={Styles.infoGrid}>
                     {confirmationEntries.map(([key, value]) => (
                       <View key={key} style={Styles.infoField}>
                         <Text style={Styles.infoLabel}>{prettifyKey(key)}</Text>
-                        <Text style={Styles.infoValue}>
+                        <Text style={Styles.infoValue} className="font-semibold">
                           {formatValue(value)}
                         </Text>
                       </View>
                     ))}
                   </View>
                 ) : (
-                  <Text style={Styles.infoValue}>
+                  <Text style={Styles.infoValue} className="font-semibold">
                     Your details were fetched successfully. Please confirm to
                     continue.
                   </Text>
@@ -230,17 +230,17 @@ const IdentityVerificationStep = ({ onNext }: IdentityVerificationProps) => {
         onRequestClose={() => setShowIDTypeModal(false)}
       >
         <TouchableOpacity
-          style={Styles.modalOverlay}
+
           activeOpacity={1}
           onPress={() => setShowIDTypeModal(false)}
-        >
+         className="flex-1 bg-[rgba(0, 0, 0, 0.5)] justify-end">
           <TouchableOpacity
             activeOpacity={1}
             style={Styles.modalContent}
             onPress={(event) => event.stopPropagation()}
           >
-            <View style={Styles.modalHandle} />
-            <Text style={Styles.modalTitle}>
+            <View style={Styles.modalHandle}  className="self-center"/>
+            <Text style={Styles.modalTitle} className="font-semibold">
               Choose means of identification
             </Text>
             <Text style={Styles.modalDescription}>
@@ -275,17 +275,9 @@ export default IdentityVerificationStep;
 
 const styles = (colors: ColorScheme) =>
   StyleSheet.create({
-    root: {
-      flex: 1,
-    },
-    scrollContent: {
-      flexGrow: 1,
-    },
-    container: {
-      flexGrow: 1,
-      justifyContent: "space-between",
-      paddingBottom: RFValue(20),
-    },
+    root: {},
+    scrollContent: {},
+    container: {paddingBottom: RFValue(20)},
     contentContainer: {
       paddingTop: RFValue(40),
       gap: RFValue(8),
@@ -298,42 +290,28 @@ const styles = (colors: ColorScheme) =>
     textContainer: {
       gap: RFValue(12),
     },
-    headText: {
-      fontSize: RFValue(24),
-      fontWeight: "600",
-      lineHeight: RFValue(32),
-      color: colors.slate[650],
-    },
+    headText: {fontSize: RFValue(24),
+lineHeight: RFValue(32),
+color: colors.slate[650]},
     descriptionText: {
       fontSize: RFValue(14),
       lineHeight: RFValue(22),
       color: colors.slate[600],
     },
-    fetchingContainer: {
-      flexDirection: "row",
-      alignItems: "center",
-      gap: RFValue(12),
-      paddingVertical: RFValue(8),
-      justifyContent: "flex-end",
-    },
+    fetchingContainer: {gap: RFValue(12),
+paddingVertical: RFValue(8)},
     fetchingText: {
       fontSize: RFValue(14),
       color: colors.slate[600],
     },
-    personalInfoContainer: {
-      gap: RFValue(16),
-      paddingVertical: RFValue(16),
-      paddingHorizontal: RFValue(16),
-      backgroundColor: colors.slate[150],
-      borderRadius: RFValue(12),
-      borderWidth: 1,
-      borderColor: colors.slate[300],
-    },
-    sectionTitle: {
-      fontSize: RFValue(16),
-      fontWeight: "600",
-      color: colors.slate[650],
-    },
+    personalInfoContainer: {gap: RFValue(16),
+paddingVertical: RFValue(16),
+paddingHorizontal: RFValue(16),
+backgroundColor: colors.slate[150],
+borderRadius: RFValue(12),
+borderColor: colors.slate[300]},
+    sectionTitle: {fontSize: RFValue(16),
+color: colors.slate[650]},
     infoGrid: {
       gap: RFValue(14),
     },
@@ -344,20 +322,13 @@ const styles = (colors: ColorScheme) =>
       fontSize: RFValue(13),
       color: colors.slate[600],
     },
-    infoValue: {
-      fontSize: RFValue(15),
-      fontWeight: "600",
-      color: colors.slate[650],
-      lineHeight: RFValue(22),
-    },
+    infoValue: {fontSize: RFValue(15),
+color: colors.slate[650],
+lineHeight: RFValue(22)},
     buttonContainer: {
       marginTop: RFValue(24),
     },
-    modalOverlay: {
-      flex: 1,
-      backgroundColor: "rgba(0, 0, 0, 0.5)",
-      justifyContent: "flex-end",
-    },
+    modalOverlay: {},
     modalContent: {
       backgroundColor: colors.background,
       borderTopLeftRadius: RFValue(24),
@@ -366,20 +337,14 @@ const styles = (colors: ColorScheme) =>
       paddingBottom: RFValue(32),
       paddingHorizontal: RFValue(20),
     },
-    modalHandle: {
-      width: RFValue(40),
-      height: RFValue(4),
-      backgroundColor: colors.slate[300],
-      borderRadius: RFValue(2),
-      alignSelf: "center",
-      marginBottom: RFValue(20),
-    },
-    modalTitle: {
-      fontSize: RFValue(18),
-      fontWeight: "600",
-      color: colors.slate[650],
-      marginBottom: RFValue(8),
-    },
+    modalHandle: {width: RFValue(40),
+height: RFValue(4),
+backgroundColor: colors.slate[300],
+borderRadius: RFValue(2),
+marginBottom: RFValue(20)},
+    modalTitle: {fontSize: RFValue(18),
+color: colors.slate[650],
+marginBottom: RFValue(8)},
     modalDescription: {
       fontSize: RFValue(14),
       color: colors.slate[600],

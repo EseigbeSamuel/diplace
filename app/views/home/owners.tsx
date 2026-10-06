@@ -30,14 +30,17 @@ function SkeletonBlock({
   height = 16,
   borderRadius = 8,
   style,
+  className,
 }: {
   width?: number | `${number}%` | "100%";
   height?: number;
   borderRadius?: number;
   style?: any;
+  className?: string;
 }) {
   return (
     <View
+      className={className}
       style={[
         {
           width,
@@ -155,15 +158,7 @@ export default function OwnersHome() {
                     />
                     <LinearGradient
                       colors={["transparent", "rgba(0,0,0,0.85)"]}
-                      style={{
-                        position: "absolute",
-                        bottom: 0,
-                        left: 0,
-                        right: 0,
-                        height: "60%",
-                        borderBottomLeftRadius: 24,
-                        borderBottomRightRadius: 24,
-                      }}
+                      className="absolute bottom-0 left-0 right-0 h-[60%] rounded-bl-[24px] rounded-br-[24px]"
                     />
                     <View className="absolute bottom-4 left-4 right-4">
                       {isOverviewLoading ? (
@@ -172,18 +167,13 @@ export default function OwnersHome() {
                             width="62%"
                             height={18}
                             borderRadius={8}
-                            style={{
-                              backgroundColor: "rgba(255,255,255,0.35)",
-                            }}
+                            className="bg-[rgba(255,255,255,0.35)]"
                           />
                           <SkeletonBlock
                             width="48%"
                             height={14}
                             borderRadius={8}
-                            style={{
-                              marginTop: 8,
-                              backgroundColor: "rgba(255,255,255,0.3)",
-                            }}
+                            className="mt-[8px] bg-[rgba(255,255,255,0.3)]"
                           />
                         </View>
                       ) : (

@@ -224,8 +224,5 @@ const loginStyles = (colors: ColorScheme) =>
     textInputIcon: {
       tintColor: colors.slate[650],
     },
-    outlineStyle: {
-      borderRadius: 8,
-      borderColor: colors.slate[650],
-    },
+    outlineStyle: {borderColor: colors.slate[650]},
   });

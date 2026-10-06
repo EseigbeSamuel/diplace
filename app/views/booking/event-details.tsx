@@ -90,25 +90,25 @@ const EventDetails = () => {
   return (
     <SafeAreaViewContainer>
       {/* Header */}
-      <View style={styles.header}>
+      <View style={styles.header} className="flex-row items-center justify-between">
         <Pressable onPress={() => router.back()}>
           <Image
             source={require("@/assets/icons/arrow-left-light.png")}
             style={styles.backIcon}
           />
         </Pressable>
-        <Text style={styles.headerTitle}>Event details</Text>
-        <Text style={styles.stepIndicator}>2/4</Text>
+        <Text style={styles.headerTitle} className="font-semibold flex-1 text-center">Event details</Text>
+        <Text style={styles.stepIndicator} className="font-medium">2/4</Text>
       </View>
 
       <ScrollView
         showsVerticalScrollIndicator={false}
         contentContainerStyle={styles.scrollContent}
       >
-        <View style={styles.container}>
+        <View  className="flex-1">
           {/* Title Section */}
           <View style={styles.titleSection}>
-            <Text style={styles.title}>Event Details</Text>
+            <Text style={styles.title} className="font-bold">Event Details</Text>
             <Text style={styles.subtitle}>
               Let's know about the event schedule.
             </Text>
@@ -116,14 +116,14 @@ const EventDetails = () => {
 
           {/* Event Schedule Section */}
           <View style={styles.section}>
-            <Text style={styles.sectionLabel}>Event Schedule</Text>
+            <Text style={styles.sectionLabel} className="font-semibold">Event Schedule</Text>
 
             {/* Event Type */}
             <Pressable
               style={styles.inputContainer}
               onPress={() => setShowEventTypeModal(true)}
-            >
-              <View style={styles.inputWrapper}>
+             className="flex-row items-center border-[1px]">
+              <View  className="flex-1">
                 <Text style={styles.inputLabel}>Event type</Text>
                 <Text
                   style={[
@@ -144,12 +144,12 @@ const EventDetails = () => {
             <Pressable
               style={styles.inputContainer}
               onPress={() => setShowStartDatePicker(true)}
-            >
+             className="flex-row items-center border-[1px]">
               <Image
                 source={require("@/assets/icons/calendar.png")}
                 style={styles.inputIcon}
               />
-              <View style={styles.inputWrapper}>
+              <View  className="flex-1">
                 <Text style={styles.inputLabel}>Date of event</Text>
                 <Text
                   style={[
@@ -165,8 +165,8 @@ const EventDetails = () => {
             </Pressable>
 
             {/* Number of Days */}
-            <View style={styles.inputContainer}>
-              <View style={styles.inputWrapper}>
+            <View style={styles.inputContainer} className="flex-row items-center border-[1px]">
+              <View  className="flex-1">
                 <Text style={styles.inputLabel}>No. of days</Text>
                 <TextInput
                   style={styles.input}
@@ -175,7 +175,7 @@ const EventDetails = () => {
                   placeholder="1"
                   placeholderTextColor={colors.slate[450]}
                   keyboardType="number-pad"
-                />
+                 className="p-[0px]"/>
               </View>
               <Image
                 source={require("@/assets/icons/chevronupdown.png")}
@@ -187,12 +187,12 @@ const EventDetails = () => {
             <Pressable
               style={styles.inputContainer}
               onPress={() => setShowDurationModal(true)}
-            >
+             className="flex-row items-center border-[1px]">
               <Image
                 source={require("@/assets/icons/Time.png")}
                 style={styles.inputIcon}
               />
-              <View style={styles.inputWrapper}>
+              <View  className="flex-1">
                 <Text style={styles.inputLabel}>Estimated duration</Text>
                 <Text
                   style={[
@@ -212,7 +212,7 @@ const EventDetails = () => {
 
           {/* Add Notes Section */}
           <View style={styles.section}>
-            <Text style={styles.sectionLabel}>Add Notes</Text>
+            <Text style={styles.sectionLabel} className="font-semibold">Add Notes</Text>
             <TextInput
               style={styles.notesInput}
               value={notes}
@@ -222,7 +222,7 @@ const EventDetails = () => {
               multiline
               numberOfLines={6}
               textAlignVertical="top"
-            />
+             className="border-[1px]"/>
           </View>
         </View>
       </ScrollView>
@@ -242,12 +242,12 @@ const EventDetails = () => {
         onRequestClose={() => setShowEventTypeModal(false)}
       >
         <Pressable
-          style={styles.modalOverlay}
+
           onPress={() => setShowEventTypeModal(false)}
-        >
-          <View style={styles.modalContent}>
-            <View style={styles.modalHandle} />
-            <Text style={styles.modalTitle}>Choose event type</Text>
+         className="flex-1 bg-[rgba(0, 0, 0, 0.5)] justify-end">
+          <View style={styles.modalContent} className="max-h-[80%px]">
+            <View style={styles.modalHandle}  className="self-center"/>
+            <Text style={styles.modalTitle} className="font-bold">Choose event type</Text>
             <Text style={styles.modalSubtitle}>
               Select the type of event that suits what you will be using the
               space for.
@@ -286,12 +286,12 @@ const EventDetails = () => {
         onRequestClose={() => setShowDurationModal(false)}
       >
         <Pressable
-          style={styles.modalOverlay}
+
           onPress={() => setShowDurationModal(false)}
-        >
-          <View style={styles.modalContent}>
-            <View style={styles.modalHandle} />
-            <Text style={styles.modalTitle}>Estimate duration</Text>
+         className="flex-1 bg-[rgba(0, 0, 0, 0.5)] justify-end">
+          <View style={styles.modalContent} className="max-h-[80%px]">
+            <View style={styles.modalHandle}  className="self-center"/>
+            <Text style={styles.modalTitle} className="font-bold">Estimate duration</Text>
             <Text style={styles.modalSubtitle}>
               Give an estimate of how long the event will last.
             </Text>
@@ -326,10 +326,10 @@ const EventDetails = () => {
         onRequestClose={() => setShowStartDatePicker(false)}
       >
         <Pressable
-          style={styles.calenderModalOverlay}
+
           onPress={() => setShowStartDatePicker(false)}
-        >
-          <Pressable style={styles.calendarModal}>
+         className="flex-1 bg-[rgba(0, 0, 0, 0.5)] justify-center items-center">
+          <Pressable style={styles.calendarModal} className="w-[90%px]">
             <Calendar
               onDayPress={(day) => {
                 setStartDate(day.dateString);
@@ -368,10 +368,10 @@ const EventDetails = () => {
         onRequestClose={() => setShowEndDatePicker(false)}
       >
         <Pressable
-          style={styles.calenderModalOverlay}
+
           onPress={() => setShowEndDatePicker(false)}
-        >
-          <Pressable style={styles.calendarModal}>
+         className="flex-1 bg-[rgba(0, 0, 0, 0.5)] justify-center items-center">
+          <Pressable style={styles.calendarModal} className="w-[90%px]">
             <Calendar
               minDate={startDate || undefined}
               onDayPress={(day) => {
@@ -406,45 +406,25 @@ export default EventDetails;
 
 const getStyles = (colors: ColorScheme) =>
   StyleSheet.create({
-    header: {
-      flexDirection: "row",
-      alignItems: "center",
-      justifyContent: "space-between",
-      paddingVertical: RFValue(16),
-    },
+    header: {paddingVertical: RFValue(16)},
     backIcon: {
       width: RFValue(20),
       height: RFValue(20),
       tintColor: colors.slate[650],
     },
-    headerTitle: {
-      fontSize: RFValue(16),
-      fontWeight: "600",
-      color: colors.slate[650],
-      flex: 1,
-      textAlign: "center",
-    },
-    stepIndicator: {
-      fontSize: RFValue(14),
-      color: colors.slate[500],
-      fontWeight: "500",
-    },
-    scrollContent: {
-      flexGrow: 1,
-    },
-    container: {
-      flex: 1,
-    },
+    headerTitle: {fontSize: RFValue(16),
+color: colors.slate[650]},
+    stepIndicator: {fontSize: RFValue(14),
+color: colors.slate[500]},
+    scrollContent: {},
+    container: {},
     titleSection: {
       marginTop: RFValue(24),
       marginBottom: RFValue(32),
     },
-    title: {
-      fontSize: RFValue(22),
-      fontWeight: "700",
-      color: colors.slate[650],
-      marginBottom: RFValue(8),
-    },
+    title: {fontSize: RFValue(22),
+color: colors.slate[650],
+marginBottom: RFValue(8)},
     subtitle: {
       fontSize: RFValue(14),
       color: colors.slate[500],
@@ -454,42 +434,29 @@ const getStyles = (colors: ColorScheme) =>
       marginBottom: RFValue(32),
     },
 
-    sectionLabel: {
-      fontSize: RFValue(15),
-      fontWeight: "600",
-      color: colors.slate[650],
-      marginBottom: RFValue(16),
-    },
-    inputContainer: {
-      flexDirection: "row",
-      alignItems: "center",
-      backgroundColor: colors.slate[150],
-      borderRadius: RFValue(12),
-      paddingVertical: RFValue(8),
-      paddingHorizontal: RFValue(16),
-      marginBottom: RFValue(16),
-      borderWidth: 1,
-      borderColor: colors.slate[300],
-    },
+    sectionLabel: {fontSize: RFValue(15),
+color: colors.slate[650],
+marginBottom: RFValue(16)},
+    inputContainer: {backgroundColor: colors.slate[150],
+borderRadius: RFValue(12),
+paddingVertical: RFValue(8),
+paddingHorizontal: RFValue(16),
+marginBottom: RFValue(16),
+borderColor: colors.slate[300]},
     inputIcon: {
       width: RFValue(20),
       height: RFValue(20),
       tintColor: colors.slate[500],
       marginRight: RFValue(12),
     },
-    inputWrapper: {
-      flex: 1,
-    },
+    inputWrapper: {},
     inputLabel: {
       fontSize: RFValue(12),
       color: colors.slate[500],
       marginBottom: RFValue(6),
     },
-    input: {
-      fontSize: RFValue(15),
-      color: colors.slate[650],
-      padding: 0,
-    },
+    input: {fontSize: RFValue(15),
+color: colors.slate[650]},
     inputValue: {
       fontSize: RFValue(15),
       color: colors.slate[650],
@@ -507,74 +474,43 @@ const getStyles = (colors: ColorScheme) =>
       height: RFValue(16),
       tintColor: colors.slate[500],
     },
-    notesInput: {
-      backgroundColor: colors.slate[150],
-      borderRadius: RFValue(12),
-      padding: RFValue(16),
-      borderWidth: 1,
-      borderColor: colors.slate[300],
-      fontSize: RFValue(15),
-      color: colors.slate[650],
-      minHeight: RFValue(120),
-    },
-    footer: {
-      paddingHorizontal: RFValue(20),
-      paddingVertical: RFValue(16),
-      borderTopWidth: 1,
-      borderTopColor: colors.slate[300],
-    },
-    continueButton: {
-      backgroundColor: colors.slate[650],
-      borderRadius: RFValue(12),
-      paddingVertical: RFValue(16),
-      alignItems: "center",
-      justifyContent: "center",
-    },
+    notesInput: {backgroundColor: colors.slate[150],
+borderRadius: RFValue(12),
+padding: RFValue(16),
+borderColor: colors.slate[300],
+fontSize: RFValue(15),
+color: colors.slate[650],
+minHeight: RFValue(120)},
+    footer: {paddingHorizontal: RFValue(20),
+paddingVertical: RFValue(16),
+borderTopColor: colors.slate[300]},
+    continueButton: {backgroundColor: colors.slate[650],
+borderRadius: RFValue(12),
+paddingVertical: RFValue(16)},
     continueButtonTextDisabled: {
       color: colors.slate[500],
     },
-    calendarModal: {
-      backgroundColor: colors.background,
-      borderRadius: RFValue(20),
-      padding: RFValue(16),
-      width: "90%",
-    },
+    calendarModal: {backgroundColor: colors.background,
+borderRadius: RFValue(20),
+padding: RFValue(16)},
 
-    modalOverlay: {
-      flex: 1,
-      backgroundColor: "rgba(0, 0, 0, 0.5)",
-      justifyContent: "flex-end",
-    },
-    calenderModalOverlay: {
-      flex: 1,
-      backgroundColor: "rgba(0, 0, 0, 0.5)",
-      justifyContent: "center",
-      alignItems: "center",
-    },
+    modalOverlay: {},
+    calenderModalOverlay: {},
 
-    modalContent: {
-      backgroundColor: colors.background,
-      borderTopLeftRadius: RFValue(24),
-      borderTopRightRadius: RFValue(24),
-      paddingHorizontal: RFValue(20),
-      paddingBottom: RFValue(40),
-      maxHeight: "80%",
-    },
-    modalHandle: {
-      width: RFValue(40),
-      height: RFValue(4),
-      backgroundColor: colors.slate[300],
-      borderRadius: RFValue(2),
-      alignSelf: "center",
-      marginVertical: RFValue(12),
-    },
-    modalTitle: {
-      fontSize: RFValue(20),
-      fontWeight: "700",
-      color: colors.slate[650],
-      marginBottom: RFValue(8),
-      marginTop: RFValue(8),
-    },
+    modalContent: {backgroundColor: colors.background,
+borderTopLeftRadius: RFValue(24),
+borderTopRightRadius: RFValue(24),
+paddingHorizontal: RFValue(20),
+paddingBottom: RFValue(40)},
+    modalHandle: {width: RFValue(40),
+height: RFValue(4),
+backgroundColor: colors.slate[300],
+borderRadius: RFValue(2),
+marginVertical: RFValue(12)},
+    modalTitle: {fontSize: RFValue(20),
+color: colors.slate[650],
+marginBottom: RFValue(8),
+marginTop: RFValue(8)},
     modalSubtitle: {
       fontSize: RFValue(14),
       color: colors.slate[500],
@@ -587,32 +523,20 @@ const getStyles = (colors: ColorScheme) =>
     modalItem: {
       paddingVertical: RFValue(4),
     },
-    radioButton: {
-      width: RFValue(20),
-      height: RFValue(20),
-      borderRadius: RFValue(10),
-      borderWidth: 2,
-      borderColor: colors.slate[400],
-      marginRight: RFValue(12),
-      alignItems: "center",
-      justifyContent: "center",
-    },
+    radioButton: {width: RFValue(20),
+height: RFValue(20),
+borderRadius: RFValue(10),
+borderColor: colors.slate[400],
+marginRight: RFValue(12)},
     radioButtonInner: {
       width: RFValue(10),
       height: RFValue(10),
       borderRadius: RFValue(5),
       backgroundColor: colors.slate[650],
     },
-    modalItemText: {
-      fontSize: RFValue(15),
-      color: colors.slate[650],
-      flex: 1,
-    },
-    modalSaveButton: {
-      backgroundColor: colors.slate[650],
-      borderRadius: RFValue(12),
-      paddingVertical: RFValue(16),
-      alignItems: "center",
-      justifyContent: "center",
-    },
+    modalItemText: {fontSize: RFValue(15),
+color: colors.slate[650]},
+    modalSaveButton: {backgroundColor: colors.slate[650],
+borderRadius: RFValue(12),
+paddingVertical: RFValue(16)},
   });

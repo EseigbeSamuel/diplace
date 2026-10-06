@@ -55,18 +55,18 @@ const AmenitiesSubstep: React.FC<AmenitiesSubstepProps> = ({
   };
 
   return (
-    <View style={styles.container}>
+    <View style={styles.container} className="flex-1">
       <ScrollView
         showsVerticalScrollIndicator={false}
         contentContainerStyle={styles.scrollContent}
       >
         {/* Title */}
-        <Text style={styles.title}>
+        <Text style={styles.title} className="font-semibold">
           What amenities are available in this space?
         </Text>
 
         {/* Amenities Grid */}
-        <View style={styles.amenitiesGrid}>
+        <View style={styles.amenitiesGrid} className="flex-row flex-wrap">
           {amenities.map((amenity) => (
             <Pressable
               key={amenity}
@@ -76,14 +76,14 @@ const AmenitiesSubstep: React.FC<AmenitiesSubstepProps> = ({
                   styles.amenityChipSelected,
               ]}
               onPress={() => toggleAmenity(amenity)}
-            >
+             className="border-[1px]">
               <Text
                 style={[
                   styles.amenityText,
                   spaceForm.value.amenities?.includes(amenity) &&
                     styles.amenityTextSelected,
                 ]}
-              >
+               className="font-normal">
                 {amenity}
               </Text>
             </Pressable>
@@ -109,47 +109,28 @@ const AmenitiesSubstep: React.FC<AmenitiesSubstepProps> = ({
 
 const createStyles = (colors: ColorScheme) =>
   StyleSheet.create({
-    container: {
-      flex: 1,
-      backgroundColor: colors.background,
-    },
+    container: {backgroundColor: colors.background},
     scrollContent: {
       paddingTop: RFValue(32),
       paddingBottom: RFValue(20),
     },
-    title: {
-      fontSize: RFValue(20),
-      fontWeight: "600",
-      color: colors.slate[650],
-      lineHeight: RFValue(28),
-      marginBottom: RFValue(24),
-    },
-    amenitiesGrid: {
-      flexDirection: "row",
-      flexWrap: "wrap",
-      gap: RFValue(12),
-    },
-    amenityChip: {
-      paddingVertical: RFValue(12),
-      paddingHorizontal: RFValue(16),
-      backgroundColor: colors.slate[150],
-      borderRadius: RFValue(24),
-      borderWidth: 1,
-      borderColor: colors.slate[300],
-    },
+    title: {fontSize: RFValue(20),
+color: colors.slate[650],
+lineHeight: RFValue(28),
+marginBottom: RFValue(24)},
+    amenitiesGrid: {gap: RFValue(12)},
+    amenityChip: {paddingVertical: RFValue(12),
+paddingHorizontal: RFValue(16),
+backgroundColor: colors.slate[150],
+borderRadius: RFValue(24),
+borderColor: colors.slate[300]},
     amenityChipSelected: {
       backgroundColor: colors.slate[650],
       borderColor: colors.slate[650],
     },
-    amenityText: {
-      fontSize: RFValue(14),
-      color: colors.slate[650],
-      fontWeight: "400",
-    },
-    amenityTextSelected: {
-      color: colors.background,
-      fontWeight: "500",
-    },
+    amenityText: {fontSize: RFValue(14),
+color: colors.slate[650]},
+    amenityTextSelected: {color: colors.background},
     buttonContainer: {
       paddingVertical: RFValue(16),
       backgroundColor: colors.background,

@@ -165,12 +165,12 @@ const RecentEarnings = () => {
       <ViewHeader title="Recent Earnings" />
       <ScrollView showsVerticalScrollIndicator={false}>
         {/* Filter Section */}
-        <View style={recentEarningsStyles.filterContainer}>
+        <View  className="items-end">
           <Pressable
             style={recentEarningsStyles.filterButton}
             onPress={handleFilterPress}
-          >
-            <Text style={recentEarningsStyles.filterText}>
+           className="flex-row items-center">
+            <Text style={recentEarningsStyles.filterText} className="font-medium">
               {selectedFilter}
             </Text>
             <Image
@@ -187,22 +187,22 @@ const RecentEarnings = () => {
           ) : Object.entries(groupedTransactions).length ? Object.entries(groupedTransactions).map(
             ([month, monthTransactions]) => (
               <View key={month} style={recentEarningsStyles.monthGroup}>
-                <Text style={recentEarningsStyles.monthTitle}>{month}</Text>
+                <Text style={recentEarningsStyles.monthTitle} className="font-semibold">{month}</Text>
                 <View style={recentEarningsStyles.transactionList}>
                   {monthTransactions.map((transaction) => (
                     <TouchableOpacity
                       key={transaction.public_id}
                       style={recentEarningsStyles.transactionCard}
                       onPress={handleEarningsClicked}
-                    >
-                      <View style={recentEarningsStyles.transactionLeft}>
-                        <View style={recentEarningsStyles.iconContainer}>
+                     className="flex-row justify-between items-center border-b">
+                      <View  className="flex-row items-center flex-1">
+                        <View style={recentEarningsStyles.iconContainer} className="items-center justify-center">
                           <Image
                             source={getTransactionIcon(transaction.purpose)}
                             style={recentEarningsStyles.transactionIcon}
                           />
                         </View>
-                        <View style={recentEarningsStyles.transactionInfo}>
+                        <View  className="flex-1">
                           <Text
                             style={recentEarningsStyles.transactionDescription}
                           >
@@ -213,7 +213,7 @@ const RecentEarnings = () => {
                           </Text>
                         </View>
                       </View>
-                      <Text style={recentEarningsStyles.transactionAmount}>
+                      <Text style={recentEarningsStyles.transactionAmount} className="font-semibold">
                         NGN {transaction.amount.toLocaleString("en-NG")}
                       </Text>
                     </TouchableOpacity>
@@ -234,23 +234,14 @@ export default RecentEarnings;
 
 const styles = (colors: ColorScheme) =>
   StyleSheet.create({
-    filterContainer: {
-      alignItems: "flex-end",
-    },
-    filterButton: {
-      flexDirection: "row",
-      alignItems: "center",
-      paddingHorizontal: RFValue(12),
-      paddingVertical: RFValue(8),
-      backgroundColor: colors.slate[200],
-      borderRadius: RFValue(8),
-      gap: RFValue(8),
-    },
-    filterText: {
-      fontSize: RFValue(14),
-      color: colors.slate[650],
-      fontWeight: "500",
-    },
+    filterContainer: {},
+    filterButton: {paddingHorizontal: RFValue(12),
+paddingVertical: RFValue(8),
+backgroundColor: colors.slate[200],
+borderRadius: RFValue(8),
+gap: RFValue(8)},
+    filterText: {fontSize: RFValue(14),
+color: colors.slate[650]},
     chevronIcon: {
       width: RFValue(16),
       height: RFValue(16),
@@ -262,45 +253,26 @@ const styles = (colors: ColorScheme) =>
     monthGroup: {
       marginBottom: RFValue(24),
     },
-    monthTitle: {
-      fontSize: RFValue(16),
-      fontWeight: "600",
-      color: colors.slate[650],
-      marginBottom: RFValue(16),
-    },
+    monthTitle: {fontSize: RFValue(16),
+color: colors.slate[650],
+marginBottom: RFValue(16)},
     transactionList: {
       gap: RFValue(16),
     },
-    transactionCard: {
-      flexDirection: "row",
-      justifyContent: "space-between",
-      alignItems: "center",
-      paddingVertical: RFValue(12),
-      borderBottomWidth: 1,
-      borderBottomColor: colors.slate[300],
-    },
-    transactionLeft: {
-      flexDirection: "row",
-      alignItems: "center",
-      flex: 1,
-    },
-    iconContainer: {
-      width: RFValue(40),
-      height: RFValue(40),
-      borderRadius: RFValue(20),
-      backgroundColor: colors.slate[200],
-      alignItems: "center",
-      justifyContent: "center",
-      marginRight: RFValue(12),
-    },
+    transactionCard: {paddingVertical: RFValue(12),
+borderBottomColor: colors.slate[300]},
+    transactionLeft: {},
+    iconContainer: {width: RFValue(40),
+height: RFValue(40),
+borderRadius: RFValue(20),
+backgroundColor: colors.slate[200],
+marginRight: RFValue(12)},
     transactionIcon: {
       width: RFValue(20),
       height: RFValue(20),
       tintColor: colors.slate[650],
     },
-    transactionInfo: {
-      flex: 1,
-    },
+    transactionInfo: {},
     transactionDescription: {
       fontSize: RFValue(15),
       color: colors.slate[650],
@@ -310,9 +282,6 @@ const styles = (colors: ColorScheme) =>
       fontSize: RFValue(13),
       color: colors.slate[500],
     },
-    transactionAmount: {
-      fontSize: RFValue(15),
-      fontWeight: "600",
-      color: colors.slate[650],
-    },
+    transactionAmount: {fontSize: RFValue(15),
+color: colors.slate[650]},
   });

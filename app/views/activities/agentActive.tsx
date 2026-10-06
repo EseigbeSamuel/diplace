@@ -90,7 +90,7 @@ const AgentActiveActivity = () => {
     if (list.length === 0) return null;
     return (
       <View className="mb-6">
-        <Text style={s.sectionTitle}>{title}</Text>
+        <Text style={s.sectionTitle} className="font-bold">{title}</Text>
         <View className="gap-1.5">
           {list.map((item) => (
             <AgentBookingCard
@@ -174,7 +174,7 @@ const AgentActiveActivity = () => {
       {!isLoading && activeFilter === "all" && (
         <View
           style={s.todayCard}
-          className="flex flex-col gap-3 p-4 rounded-2xl mb-6"
+          className="flex flex-col gap-3 p-4 rounded-2xl mb-6 border-[1px]"
         >
           <View className="flex flex-row gap-4 items-start">
             <Image
@@ -183,8 +183,8 @@ const AgentActiveActivity = () => {
               style={s.calendarTint}
             />
             <View className="flex-1 gap-1">
-              <Text style={s.todayTitle}>Today's Activity</Text>
-              <Text style={s.todayBody}>
+              <Text style={s.todayTitle} className="font-bold">Today's Activity</Text>
+              <Text style={s.todayBody} className="font-medium">
                 You have {todayCount} activit{todayCount === 1 ? "y" : "ies"}{" "}
                 lined up for you today. Check them out now.
               </Text>
@@ -201,13 +201,13 @@ const AgentActiveActivity = () => {
                 <Image
                   source={require("@/assets/images/sammy.jpg")}
                   style={s.avatarFirst}
-                />
+                 className="border-[1.5px]"/>
                 <Image
                   source={require("@/assets/images/user.png")}
                   style={s.avatarSecond}
-                />
-                <View style={s.avatarExtra}>
-                  <Text style={s.avatarExtraText}>+2</Text>
+                 className="border-[1.5px]"/>
+                <View style={s.avatarExtra} className="justify-center items-center border-[1.5px]">
+                  <Text style={s.avatarExtraText} className="font-bold">+2</Text>
                 </View>
               </View>
             </View>
@@ -216,7 +216,7 @@ const AgentActiveActivity = () => {
               onPress={() => router.push("/views/activities/todayActivity")}
               className="flex flex-row items-center gap-1"
             >
-              <Text style={s.viewScheduleText}>View schedule</Text>
+              <Text style={s.viewScheduleText} className="font-semibold">View schedule</Text>
               <Image
                 source={require("@/assets/icons/arrow-right-up-outline-dark.png")}
                 className="w-3.5 h-3.5"
@@ -235,7 +235,7 @@ const AgentActiveActivity = () => {
           {renderSection("Booked", bookedList)}
           {renderSection("Inspected", inspectedList)}
           {hasNoData && (
-            <Text style={s.emptyText}>No active activities found.</Text>
+            <Text style={s.emptyText} className="text-center mt-[20px]">No active activities found.</Text>
           )}
         </View>
       )}
@@ -255,7 +255,7 @@ const AgentActiveActivity = () => {
 
       {!isLoading && activeFilter === "cancelled" && (
         <View className="py-10 items-center justify-center">
-          <Text style={s.emptyText}>No cancelled bookings found.</Text>
+          <Text style={s.emptyText} className="text-center mt-[20px]">No cancelled bookings found.</Text>
         </View>
       )}
     </ScrollView>
@@ -267,86 +267,43 @@ export default AgentActiveActivity;
 const styles = (colors: ColorScheme, isDarkMode: boolean) =>
   StyleSheet.create({
     // Date badge
-    dateBadge: {
-      width: RFValue(44),
-      height: RFValue(46),
-      borderRadius: RFValue(10),
-      borderWidth: 1,
-      borderColor: colors.slate[300],
-      justifyContent: "center",
-      alignItems: "center",
-      backgroundColor: isDarkMode ? colors.slate[100] : "#FFFFFF",
-    },
-    month: {
-      fontSize: RFValue(11),
-      color: colors.slate[500],
-      textTransform: "uppercase",
-      fontWeight: "600",
-    },
-    day: {
-      fontSize: RFValue(16.5),
-      fontWeight: "bold",
-      color: colors.slate[650],
-      marginTop: -2,
-    },
-    dueText: {
-      fontSize: RFValue(12),
-      color: colors.slate[500],
-      marginBottom: 1,
-      fontWeight: "500",
-    },
-    cardTitle: {
-      fontSize: RFValue(16),
-      fontWeight: "600",
-      color: colors.slate[650],
-    },
-    cardLocation: {
-      fontSize: RFValue(13.5),
-      color: colors.slate[500],
-      marginTop: 1,
-    },
+    dateBadge: {width: RFValue(44),
+height: RFValue(46),
+borderRadius: RFValue(10),
+borderColor: colors.slate[300],
+backgroundColor: isDarkMode ? colors.slate[100] : "#FFFFFF"},
+    month: {fontSize: RFValue(11),
+color: colors.slate[500]},
+    day: {fontSize: RFValue(16.5),
+color: colors.slate[650],
+marginTop: -2},
+    dueText: {fontSize: RFValue(12),
+color: colors.slate[500]},
+    cardTitle: {fontSize: RFValue(16),
+color: colors.slate[650]},
+    cardLocation: {fontSize: RFValue(13.5),
+color: colors.slate[500]},
     // NEW badge
-    newBadge: {
-      backgroundColor: isDarkMode ? "rgba(239, 68, 68, 0.15)" : "#FEE2E2",
-      paddingHorizontal: 8,
-      paddingVertical: 3,
-      borderRadius: 20,
-    },
-    newBadgeText: {
-      color: "#EF4444",
-      fontSize: RFValue(10.5),
-      fontWeight: "bold",
-    },
+    newBadge: {backgroundColor: isDarkMode ? "rgba(239, 68, 68, 0.15)" : "#FEE2E2"},
+    newBadgeText: {fontSize: RFValue(10.5)},
     arrowTint: {
       tintColor: colors.slate[550],
     },
     // Section
-    sectionTitle: {
-      color: colors.slate[650],
-      fontSize: RFValue(18),
-      fontWeight: "700",
-      marginBottom: RFValue(8),
-    },
+    sectionTitle: {color: colors.slate[650],
+fontSize: RFValue(18),
+marginBottom: RFValue(8)},
     // Today card
-    todayCard: {
-      borderColor: colors.slate[250],
-      backgroundColor: isDarkMode ? colors.slate[100] : colors.slate[150],
-      borderWidth: 1,
-    },
+    todayCard: {borderColor: colors.slate[250],
+backgroundColor: isDarkMode ? colors.slate[100] : colors.slate[150]},
     calendarTint: {
       tintColor: colors.slate[650],
     },
-    todayTitle: {
-      color: colors.slate[650],
-      fontSize: RFValue(16),
-      fontWeight: "bold",
-    },
-    todayBody: {
-      color: colors.slate[600],
-      fontSize: RFValue(14),
-      lineHeight: RFValue(19),
-      fontWeight: "500",
-    },
+    todayTitle: {color: colors.slate[650],
+fontSize: RFValue(16)},
+    todayBody: {color: colors.slate[600],
+fontSize: RFValue(14),
+lineHeight: RFValue(19)},
     todayFooter: {
       borderColor: colors.slate[250],
     },
@@ -354,46 +311,25 @@ const styles = (colors: ColorScheme, isDarkMode: boolean) =>
       fontSize: RFValue(13),
       color: colors.slate[550],
     },
-    avatarFirst: {
-      width: RFValue(20),
-      height: RFValue(20),
-      borderRadius: RFValue(10),
-      borderWidth: 1.5,
-      borderColor: isDarkMode ? colors.slate[100] : colors.slate[150],
-    },
-    avatarSecond: {
-      width: RFValue(20),
-      height: RFValue(20),
-      borderRadius: RFValue(10),
-      borderWidth: 1.5,
-      borderColor: isDarkMode ? colors.slate[100] : colors.slate[150],
-      marginLeft: -RFValue(6),
-    },
-    avatarExtra: {
-      width: RFValue(20),
-      height: RFValue(20),
-      borderRadius: RFValue(10),
-      backgroundColor: colors.slate[250],
-      justifyContent: "center",
-      alignItems: "center",
-      borderWidth: 1.5,
-      borderColor: isDarkMode ? colors.slate[100] : colors.slate[150],
-      marginLeft: -RFValue(6),
-    },
-    avatarExtraText: {
-      fontSize: RFValue(9.5),
-      color: colors.slate[550],
-      fontWeight: "bold",
-    },
-    viewScheduleText: {
-      color: colors.slate[650],
-      fontSize: RFValue(14),
-      fontWeight: "600",
-    },
-    emptyText: {
-      color: colors.slate[550],
-      fontSize: RFValue(13),
-      textAlign: "center",
-      marginTop: 20,
-    },
+    avatarFirst: {width: RFValue(20),
+height: RFValue(20),
+borderRadius: RFValue(10),
+borderColor: isDarkMode ? colors.slate[100] : colors.slate[150]},
+    avatarSecond: {width: RFValue(20),
+height: RFValue(20),
+borderRadius: RFValue(10),
+borderColor: isDarkMode ? colors.slate[100] : colors.slate[150],
+marginLeft: -RFValue(6)},
+    avatarExtra: {width: RFValue(20),
+height: RFValue(20),
+borderRadius: RFValue(10),
+backgroundColor: colors.slate[250],
+borderColor: isDarkMode ? colors.slate[100] : colors.slate[150],
+marginLeft: -RFValue(6)},
+    avatarExtraText: {fontSize: RFValue(9.5),
+color: colors.slate[550]},
+    viewScheduleText: {color: colors.slate[650],
+fontSize: RFValue(14)},
+    emptyText: {color: colors.slate[550],
+fontSize: RFValue(13)},
   });

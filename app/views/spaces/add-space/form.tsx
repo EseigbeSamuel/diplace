@@ -283,9 +283,9 @@ const AddSpaceForm: React.FC = () => {
 
   if (editingPropertyId && isPropertyDetailsLoading) {
     return (
-      <View style={formStyles.loadingContainer}>
+      <View style={formStyles.loadingContainer} className="flex-1 justify-center items-center">
         <ActivityIndicator size="large" color={colors.slate[650]} />
-        <Text style={[formStyles.loadingText, { color: colors.slate[650] }]}>
+        <Text style={[formStyles.loadingText, { color: colors.slate[650] }]} className="font-[InstrumentSansSemiBold] text-center">
           Loading Draft...
         </Text>
       </View>
@@ -294,8 +294,8 @@ const AddSpaceForm: React.FC = () => {
 
   if (editingPropertyId && propertyDetailsError) {
     return (
-      <View style={formStyles.loadingContainer}>
-        <Text style={[formStyles.loadingText, { color: colors.slate[650] }]}>
+      <View style={formStyles.loadingContainer} className="flex-1 justify-center items-center">
+        <Text style={[formStyles.loadingText, { color: colors.slate[650] }]} className="font-[InstrumentSansSemiBold] text-center">
           Failed to load draft data.
         </Text>
         <View style={{ width: RFValue(140), marginTop: RFValue(8) }}>
@@ -321,122 +321,62 @@ export default AddSpaceForm;
 
 export const createStyles = (colors: ColorScheme) =>
   StyleSheet.create({
-    container: {
-      flex: 1,
-      backgroundColor: colors.background,
-    },
+    container: {backgroundColor: colors.background},
 
-    imageStackContainer: {
-      height: RFValue(280),
-      marginTop: RFValue(24),
-      marginBottom: RFValue(32),
-      alignItems: "center",
-      justifyContent: "center",
-      position: "relative",
-    },
-    backgroundImage: {
-      position: "absolute",
-      width: width * 0.5,
-      height: RFValue(260),
-      borderRadius: RFValue(24),
-      overflow: "hidden",
-    },
-    leftImage: {
-      left: RFValue(10),
-      transform: [{ rotate: "-8deg" }],
-      zIndex: 1,
-      borderWidth: 8,
-      borderColor: colors.slate[400],
-    },
-    rightImage: {
-      right: RFValue(10),
-      transform: [{ rotate: "8deg" }],
-      zIndex: 1,
-      borderWidth: 8,
-      borderColor: colors.slate[400],
-    },
-    backgroundImageContent: {
-      width: "100%",
-      height: RFValue(250),
-    },
-    mainImageCard: {
-      width: width * 0.65,
-      height: RFValue(260),
-      borderRadius: RFValue(24),
-      overflow: "hidden",
-      backgroundColor: colors.slate[200],
-      shadowColor: "#000",
-      shadowOffset: {
+    imageStackContainer: {height: RFValue(280),
+marginTop: RFValue(24),
+marginBottom: RFValue(32)},
+    backgroundImage: {width: width * 0.5,
+height: RFValue(260),
+borderRadius: RFValue(24)},
+    leftImage: {left: RFValue(10),
+transform: [{ rotate: "-8deg" }],
+borderColor: colors.slate[400]},
+    rightImage: {right: RFValue(10),
+transform: [{ rotate: "8deg" }],
+borderColor: colors.slate[400]},
+    backgroundImageContent: {height: RFValue(250)},
+    mainImageCard: {width: width * 0.65,
+height: RFValue(260),
+borderRadius: RFValue(24),
+backgroundColor: colors.slate[200],
+shadowOffset: {
         width: 0,
         height: 8,
       },
-      shadowOpacity: 0.25,
-      shadowRadius: 16,
-      elevation: 12,
-      zIndex: 2,
-      borderWidth: 8,
-      borderColor: colors.slate[400],
-    },
-    mainImage: {
-      width: "100%",
-      height: "100%",
-    },
+borderColor: colors.slate[400]},
+    mainImage: {},
     stepInfo: {
       paddingHorizontal: RFValue(4),
     },
-    stepLabel: {
-      fontSize: RFValue(14),
-      fontWeight: "600",
-      color: colors.slate[600],
-      marginBottom: RFValue(8),
-    },
-    stepTitle: {
-      fontSize: RFValue(24),
-      fontWeight: "700",
-      color: colors.slate[650],
-      marginBottom: RFValue(12),
-      lineHeight: RFValue(32),
-    },
+    stepLabel: {fontSize: RFValue(14),
+color: colors.slate[600],
+marginBottom: RFValue(8)},
+    stepTitle: {fontSize: RFValue(24),
+color: colors.slate[650],
+marginBottom: RFValue(12),
+lineHeight: RFValue(32)},
     stepDescription: {
       fontSize: RFValue(14),
       color: colors.slate[600],
       lineHeight: RFValue(22),
     },
-    bottomButtons: {
-      flexDirection: "row",
-      alignItems: "center",
-      justifyContent: "space-between",
-      paddingHorizontal: RFValue(20),
-      paddingVertical: RFValue(20),
-      backgroundColor: colors.background,
-      gap: RFValue(26),
-    },
+    bottomButtons: {paddingHorizontal: RFValue(20),
+paddingVertical: RFValue(20),
+backgroundColor: colors.background,
+gap: RFValue(26)},
     skipButton: {
       paddingHorizontal: RFValue(24),
       paddingVertical: RFValue(14),
     },
-    skipText: {
-      fontSize: RFValue(16),
-      color: colors.slate[600],
-      fontWeight: "500",
-    },
-    nextButtonWrapper: {
-      flex: 1,
-    },
+    skipText: {fontSize: RFValue(16),
+color: colors.slate[600]},
+    nextButtonWrapper: {},
   });
 
 const formStyles = StyleSheet.create({
-  loadingContainer: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    paddingHorizontal: RFValue(20),
-    gap: RFValue(12),
-  },
-  loadingText: {
-    fontSize: RFValue(20),
-    lineHeight: RFValue(26),
-    fontFamily: "InstrumentSansSemiBold",
-    textAlign: "center",
-  },
+  loadingContainer: {paddingHorizontal: RFValue(20),
+gap: RFValue(12)},
+  loadingText: {fontSize: RFValue(20),
+lineHeight: RFValue(26)},
 });

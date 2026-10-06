@@ -58,19 +58,19 @@ const ConfirmCostSubstep: React.FC<ConfirmCostSubstepProps> = ({
   };
 
   return (
-    <View style={styles.container}>
+    <View style={styles.container} className="flex-1">
       <ScrollView
         showsVerticalScrollIndicator={false}
         contentContainerStyle={styles.scrollContent}
       >
         {/* Title */}
-        <Text style={styles.title}>Confirm total cost</Text>
+        <Text style={styles.title} className="font-semibold">Confirm total cost</Text>
 
         {/* Total Package Card */}
-        <View style={styles.totalPackageCard}>
-          <View style={styles.totalPackageContent}>
+        <View style={styles.totalPackageCard} className="flex-row items-center justify-between">
+          <View  className="flex-1">
             <Text style={styles.totalPackageLabel}>Total Package</Text>
-            <Text style={styles.totalPackageAmount}>
+            <Text style={styles.totalPackageAmount} className="font-bold">
               {formatCurrency(totalPackage)}
             </Text>
           </View>
@@ -81,15 +81,15 @@ const ConfirmCostSubstep: React.FC<ConfirmCostSubstepProps> = ({
         </View>
 
         {/* Cost Breakdown Section */}
-        <View style={styles.breakdownSection}>
-          <View style={styles.breakdownHeader}>
-            <Text style={styles.breakdownTitle}>Cost Breakdown</Text>
-            <Pressable style={styles.editButton} onPress={handleEdit}>
+        <View style={styles.breakdownSection} className="border-[1px]">
+          <View style={styles.breakdownHeader} className="flex-row items-center justify-between">
+            <Text style={styles.breakdownTitle} className="font-semibold">Cost Breakdown</Text>
+            <Pressable style={styles.editButton} onPress={handleEdit} className="flex-row items-center">
               <Image
                 source={require("@/assets/icons/edit-pencil.png")}
                 style={styles.editIcon}
               />
-              <Text style={styles.editText}>Edit</Text>
+              <Text style={styles.editText} className="font-medium">Edit</Text>
             </Pressable>
           </View>
 
@@ -97,9 +97,9 @@ const ConfirmCostSubstep: React.FC<ConfirmCostSubstepProps> = ({
             {/* Space Rent */}
 
             {costBreakdown?.map((charge) => (
-              <View style={styles.breakdownItem} key={charge.id}>
+              <View style={styles.breakdownItem} key={charge.id} className="flex-row items-center justify-between">
                 <Text style={styles.breakdownItemLabel}>{charge.title}</Text>
-                <Text style={styles.breakdownItemValue}>
+                <Text style={styles.breakdownItemValue} className="font-semibold">
                   {formatCurrency(
                     Number(charge.value.replace(/[^0-9]/g, "")) || 0
                   )}
@@ -108,12 +108,12 @@ const ConfirmCostSubstep: React.FC<ConfirmCostSubstepProps> = ({
             ))}
 
             {/* Total Divider */}
-            <View style={styles.totalDivider} />
+            <View style={styles.totalDivider}  className="h-[1px]"/>
 
             {/* Total Payable */}
-            <View style={styles.totalPayableRow}>
-              <Text style={styles.totalPayableLabel}>Total Payable</Text>
-              <Text style={styles.totalPayableValue}>
+            <View style={styles.totalPayableRow} className="flex-row items-center justify-between">
+              <Text style={styles.totalPayableLabel} className="font-semibold">Total Payable</Text>
+              <Text style={styles.totalPayableValue} className="font-bold">
                 {formatCurrency(totalPackage)}
               </Text>
             </View>
@@ -136,122 +136,66 @@ const ConfirmCostSubstep: React.FC<ConfirmCostSubstepProps> = ({
 
 const createStyles = (colors: ColorScheme) =>
   StyleSheet.create({
-    container: {
-      flex: 1,
-      backgroundColor: colors.background,
-    },
+    container: {backgroundColor: colors.background},
     scrollContent: {
       paddingTop: RFValue(32),
     },
-    title: {
-      fontSize: RFValue(20),
-      fontWeight: "600",
-      color: colors.slate[650],
-      marginBottom: RFValue(24),
-    },
-    totalPackageCard: {
-      flexDirection: "row",
-      alignItems: "center",
-      justifyContent: "space-between",
-      backgroundColor: colors.slate[650],
-      borderRadius: RFValue(16),
-      padding: RFValue(24),
-      marginBottom: RFValue(32),
-    },
-    totalPackageContent: {
-      flex: 1,
-    },
+    title: {fontSize: RFValue(20),
+color: colors.slate[650],
+marginBottom: RFValue(24)},
+    totalPackageCard: {backgroundColor: colors.slate[650],
+borderRadius: RFValue(16),
+padding: RFValue(24),
+marginBottom: RFValue(32)},
+    totalPackageContent: {},
     totalPackageLabel: {
       fontSize: RFValue(14),
       color: colors.slate[200],
       marginBottom: RFValue(8),
     },
-    totalPackageAmount: {
-      fontSize: RFValue(24),
-      fontWeight: "700",
-      color: colors.slate[100],
-    },
+    totalPackageAmount: {fontSize: RFValue(24),
+color: colors.slate[100]},
     moneyBagIcon: {
       width: RFValue(48),
       height: RFValue(48),
     },
-    breakdownSection: {
-      marginBottom: RFValue(24),
-      borderWidth: 1,
-      borderColor: colors.slate[300],
-      borderRadius: RFValue(12),
-    },
-    breakdownHeader: {
-      flexDirection: "row",
-      alignItems: "center",
-      justifyContent: "space-between",
-      marginBottom: RFValue(20),
-      backgroundColor: colors.slate[300],
-      paddingHorizontal: RFValue(8),
-      paddingVertical: RFValue(16),
-      borderTopRightRadius: RFValue(12),
-      borderTopLeftRadius: RFValue(12),
-    },
-    breakdownTitle: {
-      fontSize: RFValue(16),
-      fontWeight: "600",
-      color: colors.slate[650],
-    },
-    editButton: {
-      flexDirection: "row",
-      alignItems: "center",
-      gap: RFValue(6),
-    },
+    breakdownSection: {marginBottom: RFValue(24),
+borderColor: colors.slate[300],
+borderRadius: RFValue(12)},
+    breakdownHeader: {marginBottom: RFValue(20),
+backgroundColor: colors.slate[300],
+paddingHorizontal: RFValue(8),
+paddingVertical: RFValue(16),
+borderTopRightRadius: RFValue(12),
+borderTopLeftRadius: RFValue(12)},
+    breakdownTitle: {fontSize: RFValue(16),
+color: colors.slate[650]},
+    editButton: {gap: RFValue(6)},
     editIcon: {
       width: RFValue(16),
       height: RFValue(16),
       tintColor: colors.slate[650],
     },
-    editText: {
-      fontSize: RFValue(14),
-      fontWeight: "500",
-      color: colors.slate[650],
-    },
+    editText: {fontSize: RFValue(14),
+color: colors.slate[650]},
     breakdownList: {
       gap: RFValue(16),
     },
-    breakdownItem: {
-      flexDirection: "row",
-      alignItems: "center",
-      justifyContent: "space-between",
-      paddingHorizontal: RFValue(8),
-    },
+    breakdownItem: {paddingHorizontal: RFValue(8)},
     breakdownItemLabel: {
       fontSize: RFValue(15),
       color: colors.slate[600],
     },
-    breakdownItemValue: {
-      fontSize: RFValue(15),
-      fontWeight: "600",
-      color: colors.slate[650],
-    },
-    totalDivider: {
-      height: 1,
-      backgroundColor: colors.slate[300],
-      marginVertical: RFValue(8),
-    },
-    totalPayableRow: {
-      flexDirection: "row",
-      alignItems: "center",
-      justifyContent: "space-between",
-      paddingHorizontal: RFValue(8),
-      paddingBottom: RFValue(12),
-    },
-    totalPayableLabel: {
-      fontSize: RFValue(16),
-      fontWeight: "600",
-      color: colors.slate[650],
-    },
-    totalPayableValue: {
-      fontSize: RFValue(18),
-      fontWeight: "700",
-      color: colors.slate[650],
-    },
+    breakdownItemValue: {fontSize: RFValue(15),
+color: colors.slate[650]},
+    totalDivider: {backgroundColor: colors.slate[300],
+marginVertical: RFValue(8)},
+    totalPayableRow: {paddingHorizontal: RFValue(8),
+paddingBottom: RFValue(12)},
+    totalPayableLabel: {fontSize: RFValue(16),
+color: colors.slate[650]},
+    totalPayableValue: {fontSize: RFValue(18),
+color: colors.slate[650]},
     buttonContainer: {
       paddingVertical: RFValue(16),
       backgroundColor: colors.background,

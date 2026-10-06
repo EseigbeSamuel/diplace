@@ -121,14 +121,14 @@ const PaymentScreen = () => {
   return (
     <SafeAreaViewContainer>
       {/* Header */}
-      <View style={styles.header}>
+      <View style={styles.header} className="flex-row items-center justify-between">
         <Pressable onPress={() => router.back()}>
           <Image
             source={require("@/assets/icons/arrow-left-light.png")}
             style={styles.backIcon}
           />
         </Pressable>
-        <Text style={styles.headerTitle}>
+        <Text style={styles.headerTitle} className="font-semibold flex-1 text-center">
           {isInspection
             ? "Pay for inspection"
             : !isPartialPayment
@@ -142,12 +142,12 @@ const PaymentScreen = () => {
         showsVerticalScrollIndicator={false}
         contentContainerStyle={styles.scrollContent}
       >
-        <View style={styles.container}>
+        <View  className="flex-1">
           {/* Amount Card */}
-          <View style={styles.amountCard}>
+          <View style={styles.amountCard} className="border-[1px]">
             <Text style={styles.amountLabel}>Amount Payable</Text>
-            <View style={styles.amountRow}>
-              <Text style={styles.amount}>{amount}</Text>
+            <View  className="flex-row items-center justify-between">
+              <Text style={styles.amount} className="font-bold">{amount}</Text>
               <Image
                 source={require("@/assets/icons/money-bag.png")}
                 style={styles.moneyBagIcon}
@@ -156,8 +156,8 @@ const PaymentScreen = () => {
           </View>
 
           {/* Payment Methods */}
-          <View style={styles.paymentMethodsSection}>
-            <Text style={styles.sectionTitle}>Pay via</Text>
+          <View style={styles.paymentMethodsSection} className="border-t">
+            <Text style={styles.sectionTitle} className="font-semibold">Pay via</Text>
 
             {/* Credit/Debit Card */}
             <Pressable
@@ -167,13 +167,13 @@ const PaymentScreen = () => {
                   styles.paymentMethodCardSelected,
               ]}
               onPress={() => setSelectedPaymentMethod("card")}
-            >
-              <View style={styles.paymentMethodLeft}>
+             className="flex-row items-center justify-between">
+              <View style={styles.paymentMethodLeft} className="flex-row items-center">
                 <Image
                   source={require("@/assets/icons/credit-card.png")}
                   style={styles.paymentMethodIcon}
                 />
-                <Text style={styles.paymentMethodText}>Credit/Debit card</Text>
+                <Text style={styles.paymentMethodText} className="font-medium">Credit/Debit card</Text>
               </View>
               <View
                 style={[
@@ -181,7 +181,7 @@ const PaymentScreen = () => {
                   selectedPaymentMethod === "card" &&
                     styles.radioButtonSelected,
                 ]}
-              >
+               className="border-[2px] items-center justify-center">
                 {selectedPaymentMethod === "card" && (
                   <View style={styles.radioButtonInner} />
                 )}
@@ -196,13 +196,13 @@ const PaymentScreen = () => {
                   styles.paymentMethodCardSelected,
               ]}
               onPress={() => setSelectedPaymentMethod("bank")}
-            >
-              <View style={styles.paymentMethodLeft}>
+             className="flex-row items-center justify-between">
+              <View style={styles.paymentMethodLeft} className="flex-row items-center">
                 <Image
                   source={require("@/assets/icons/bank-emoji.png")}
                   style={styles.paymentMethodIcon}
                 />
-                <Text style={styles.paymentMethodText}>Bank transfer</Text>
+                <Text style={styles.paymentMethodText} className="font-medium">Bank transfer</Text>
               </View>
               <View
                 style={[
@@ -210,7 +210,7 @@ const PaymentScreen = () => {
                   selectedPaymentMethod === "bank" &&
                     styles.radioButtonSelected,
                 ]}
-              >
+               className="border-[2px] items-center justify-center">
                 {selectedPaymentMethod === "bank" && (
                   <View style={styles.radioButtonInner} />
                 )}
@@ -225,13 +225,13 @@ const PaymentScreen = () => {
                   styles.paymentMethodCardSelected,
               ]}
               onPress={() => setSelectedPaymentMethod("ussd")}
-            >
-              <View style={styles.paymentMethodLeft}>
+             className="flex-row items-center justify-between">
+              <View style={styles.paymentMethodLeft} className="flex-row items-center">
                 <Image
                   source={require("@/assets/icons/phone emoji.png")}
                   style={styles.paymentMethodIcon}
                 />
-                <Text style={styles.paymentMethodText}>USSD</Text>
+                <Text style={styles.paymentMethodText} className="font-medium">USSD</Text>
               </View>
               <View
                 style={[
@@ -239,7 +239,7 @@ const PaymentScreen = () => {
                   selectedPaymentMethod === "ussd" &&
                     styles.radioButtonSelected,
                 ]}
-              >
+               className="border-[2px] items-center justify-center">
                 {selectedPaymentMethod === "ussd" && (
                   <View style={styles.radioButtonInner} />
                 )}
@@ -250,14 +250,14 @@ const PaymentScreen = () => {
       </ScrollView>
 
       {/* Footer */}
-      <View style={styles.footer}>
+      <View style={styles.footer} className="absolute bottom-[0px] left-[0px] right-[0px]">
         <AppButton
           onPress={handleMakePayment}
           title={isInitiateBookingPaymentPending ? "Initializing Payment..." : "Make Payment"}
           disabled={!selectedPaymentMethod || isInitiateBookingPaymentPending}
         />
-        <View style={styles.securePaymentNote}>
-          <Text style={styles.securePaymentText}>
+        <View style={styles.securePaymentNote} className="flex-row items-start justify-center">
+          <Text style={styles.securePaymentText} className="flex-1 text-center">
             🔐 Your payment is 100% secure. Funds are held safely until
             inspection is confirmed.
           </Text>
@@ -272,19 +272,19 @@ const PaymentScreen = () => {
         onRequestClose={() => setShowCardModal(false)}
       >
         <Pressable
-          style={styles.modalOverlay}
+
           onPress={() => setShowCardModal(false)}
-        >
+         className="flex-1 bg-[rgba(0, 0, 0, 0.5)] justify-end">
           <Pressable
             style={styles.modalBottomSheet}
             onPress={(e) => e.stopPropagation()}
-          >
+           className="max-h-[90%px]">
             {/* Handle Bar */}
-            <View style={styles.modalHandle} />
+            <View style={styles.modalHandle}  className="self-center"/>
 
             {/* Header */}
-            <Text style={styles.modalHeaderTitle}>Pay with card</Text>
-            <Text style={styles.modalHeaderSubtitle}>
+            <Text style={styles.modalHeaderTitle} className="font-semibold text-center">Pay with card</Text>
+            <Text style={styles.modalHeaderSubtitle} className="text-center">
               Fill card details to complete transaction
             </Text>
 
@@ -302,7 +302,7 @@ const PaymentScreen = () => {
               />
 
               {/* Expiry and CVV */}
-              <View style={styles.inputRow}>
+              <View style={styles.inputRow} className="flex-row">
                 <View style={[styles.inputContainer, { flex: 1 }]}>
                   <TextField
                     label="Expiry Date"
@@ -329,8 +329,8 @@ const PaymentScreen = () => {
               </View>
 
               {/* Save Card Toggle */}
-              <View style={styles.saveCardContainer}>
-                <Text style={styles.saveCardText}>Save card details</Text>
+              <View  className="flex-row items-center justify-between">
+                <Text style={styles.saveCardText} className="font-medium">Save card details</Text>
 
                 <Switch
                   trackColor={{
@@ -361,8 +361,8 @@ const PaymentScreen = () => {
               />
 
               {/* Secure Note */}
-              <View style={styles.securePaymentNote}>
-                <Text style={styles.securePaymentText}>
+              <View style={styles.securePaymentNote} className="flex-row items-start justify-center">
+                <Text style={styles.securePaymentText} className="flex-1 text-center">
                   🔐 Your payment is 100% secure. Funds are held safely until
                   inspection is confirmed.
                 </Text>
@@ -380,19 +380,19 @@ const PaymentScreen = () => {
         onRequestClose={() => setShowBankModal(false)}
       >
         <Pressable
-          style={styles.modalOverlay}
+
           onPress={() => setShowBankModal(false)}
-        >
+         className="flex-1 bg-[rgba(0, 0, 0, 0.5)] justify-end">
           <Pressable
             style={styles.modalBottomSheet}
             onPress={(e) => e.stopPropagation()}
-          >
+           className="max-h-[90%px]">
             {/* Handle Bar */}
-            <View style={styles.modalHandle} />
+            <View style={styles.modalHandle}  className="self-center"/>
 
             {/* Header */}
-            <Text style={styles.modalHeaderTitle}>Pay via bank transfer</Text>
-            <Text style={styles.modalHeaderSubtitle}>
+            <Text style={styles.modalHeaderTitle} className="font-semibold text-center">Pay via bank transfer</Text>
+            <Text style={styles.modalHeaderSubtitle} className="text-center">
               Transfer to the bank details below to complete transaction.
             </Text>
 
@@ -401,7 +401,7 @@ const PaymentScreen = () => {
               {/* Account Name */}
               <View style={styles.bankDetailItem}>
                 <Text style={styles.bankDetailLabel}>Account Name</Text>
-                <Text style={styles.bankDetailValue}>
+                <Text style={styles.bankDetailValue} className="font-semibold">
                   Paystack/DiPlace Technologies
                 </Text>
               </View>
@@ -409,14 +409,14 @@ const PaymentScreen = () => {
               {/* Account Number */}
               <View style={styles.bankDetailItem}>
                 <Text style={styles.bankDetailLabel}>Account Number</Text>
-                <View style={styles.bankDetailValueRow}>
-                  <Text style={styles.bankDetailValue}>8102934980</Text>
-                  <Pressable style={styles.copyButton}>
+                <View style={styles.bankDetailValueRow} className="flex-row items-center">
+                  <Text style={styles.bankDetailValue} className="font-semibold">8102934980</Text>
+                  <Pressable style={styles.copyButton} className="flex-row items-center">
                     <Image
                       source={require("@/assets/icons/copy-linear.png")}
                       style={styles.copyIcon}
                     />
-                    <Text style={styles.copyText}>copy</Text>
+                    <Text style={styles.copyText} className="font-medium">copy</Text>
                   </Pressable>
                 </View>
               </View>
@@ -424,14 +424,14 @@ const PaymentScreen = () => {
               {/* Bank Name */}
               <View style={styles.bankDetailItem}>
                 <Text style={styles.bankDetailLabel}>Bank Name</Text>
-                <Text style={styles.bankDetailValue}>Wema Bank Plc</Text>
+                <Text style={styles.bankDetailValue} className="font-semibold">Wema Bank Plc</Text>
               </View>
 
               {/* Timer Notice */}
-              <View style={styles.timerNotice}>
-                <Text style={styles.timerText}>
+              <View style={styles.timerNotice} className="text-center">
+                <Text style={styles.timerText} className="text-center">
                   You have{" "}
-                  <Text style={styles.timerHighlight}>9:59 minutes</Text> to
+                  <Text style={styles.timerHighlight} className="font-bold">9:59 minutes</Text> to
                   complete your transfer. This page will be confirmed in this
                   period.
                 </Text>
@@ -445,8 +445,8 @@ const PaymentScreen = () => {
               />
 
               {/* Secure Note */}
-              <View style={styles.securePaymentNote}>
-                <Text style={styles.securePaymentText}>
+              <View style={styles.securePaymentNote} className="flex-row items-start justify-center">
+                <Text style={styles.securePaymentText} className="flex-1 text-center">
                   🔐 Your payment is 100% secure. Funds are held safely until
                   inspection is confirmed.
                 </Text>
@@ -463,110 +463,61 @@ export default PaymentScreen;
 
 const getStyles = (colors: ColorScheme) =>
   StyleSheet.create({
-    header: {
-      flexDirection: "row",
-      alignItems: "center",
-      justifyContent: "space-between",
-      paddingVertical: RFValue(16),
-    },
+    header: {paddingVertical: RFValue(16)},
     backIcon: {
       width: RFValue(20),
       height: RFValue(20),
       tintColor: colors.slate[650],
     },
-    headerTitle: {
-      fontSize: RFValue(16),
-      fontWeight: "600",
-      color: colors.slate[650],
-      flex: 1,
-      textAlign: "center",
-    },
-    scrollContent: {
-      flexGrow: 1,
-      paddingBottom: RFValue(160),
-    },
-    container: {
-      flex: 1,
-    },
-    amountCard: {
-      backgroundColor: colors.slate[150],
-      borderRadius: RFValue(16),
-      paddingVertical: RFValue(20),
-      paddingHorizontal: RFValue(16),
-      marginTop: RFValue(20),
-      marginBottom: RFValue(24),
-      borderWidth: 1,
-      borderColor: colors.slate[300],
-    },
+    headerTitle: {fontSize: RFValue(16),
+color: colors.slate[650]},
+    scrollContent: {paddingBottom: RFValue(160)},
+    container: {},
+    amountCard: {backgroundColor: colors.slate[150],
+borderRadius: RFValue(16),
+paddingVertical: RFValue(20),
+paddingHorizontal: RFValue(16),
+marginTop: RFValue(20),
+marginBottom: RFValue(24),
+borderColor: colors.slate[300]},
     amountLabel: {
       fontSize: RFValue(13),
       color: colors.slate[500],
       marginBottom: RFValue(8),
     },
-    amountRow: {
-      flexDirection: "row",
-      alignItems: "center",
-      justifyContent: "space-between",
-    },
-    amount: {
-      fontSize: RFValue(24),
-      fontWeight: "700",
-      color: colors.slate[650],
-    },
+    amountRow: {},
+    amount: {fontSize: RFValue(24),
+color: colors.slate[650]},
     moneyBagIcon: {
       width: RFValue(28),
       height: RFValue(28),
     },
-    paymentMethodsSection: {
-      marginBottom: RFValue(24),
-      marginTop: RFValue(8),
-      paddingTop: RFValue(16),
-
-      borderTopWidth: 1,
-      borderTopColor: colors.slate[300],
-    },
-    sectionTitle: {
-      fontSize: RFValue(16),
-      fontWeight: "600",
-      color: colors.slate[650],
-      marginBottom: RFValue(16),
-    },
-    paymentMethodCard: {
-      flexDirection: "row",
-      alignItems: "center",
-      justifyContent: "space-between",
-      backgroundColor: colors.background,
-      borderRadius: RFValue(12),
-      paddingVertical: RFValue(16),
-      paddingHorizontal: RFValue(8),
-      marginBottom: RFValue(12),
-    },
+    paymentMethodsSection: {marginBottom: RFValue(24),
+marginTop: RFValue(8),
+paddingTop: RFValue(16),
+borderTopColor: colors.slate[300]},
+    sectionTitle: {fontSize: RFValue(16),
+color: colors.slate[650],
+marginBottom: RFValue(16)},
+    paymentMethodCard: {backgroundColor: colors.background,
+borderRadius: RFValue(12),
+paddingVertical: RFValue(16),
+paddingHorizontal: RFValue(8),
+marginBottom: RFValue(12)},
     paymentMethodCardSelected: {
       borderColor: colors.slate[500],
     },
-    paymentMethodLeft: {
-      flexDirection: "row",
-      alignItems: "center",
-      gap: RFValue(12),
-    },
+    paymentMethodLeft: {gap: RFValue(12)},
     paymentMethodIcon: {
       width: RFValue(24),
       height: RFValue(24),
     },
-    paymentMethodText: {
-      fontSize: RFValue(15),
-      fontWeight: "500",
-      color: colors.slate[650],
-    },
-    radioButton: {
-      width: RFValue(20),
-      height: RFValue(20),
-      borderRadius: RFValue(10),
-      borderWidth: 2,
-      borderColor: colors.slate[400],
-      alignItems: "center",
-      justifyContent: "center",
-    },
+    paymentMethodText: {fontSize: RFValue(15),
+color: colors.slate[650]},
+    radioButton: {width: RFValue(20),
+height: RFValue(20),
+borderRadius: RFValue(10),
+borderColor: colors.slate[400]},
     radioButtonSelected: {
       borderColor: colors.slate[650],
     },
@@ -576,93 +527,52 @@ const getStyles = (colors: ColorScheme) =>
       borderRadius: RFValue(5),
       backgroundColor: colors.slate[650],
     },
-    footer: {
-      position: "absolute",
-      bottom: 0,
-      left: 0,
-      right: 0,
-      paddingHorizontal: RFValue(20),
-      paddingTop: RFValue(16),
-      paddingBottom: RFValue(24),
-      backgroundColor: colors.background,
-    },
-    securePaymentNote: {
-      flexDirection: "row",
-      alignItems: "flex-start",
-      gap: RFValue(8),
-      marginTop: RFValue(12),
-      justifyContent: "center",
-    },
+    footer: {paddingHorizontal: RFValue(20),
+paddingTop: RFValue(16),
+paddingBottom: RFValue(24),
+backgroundColor: colors.background},
+    securePaymentNote: {gap: RFValue(8),
+marginTop: RFValue(12)},
     shieldIcon: {
       width: RFValue(16),
       height: RFValue(16),
       marginTop: RFValue(2),
     },
-    securePaymentText: {
-      flex: 1,
-      fontSize: RFValue(12),
-      color: colors.slate[500],
-      lineHeight: RFValue(16),
-      textAlign: "center",
-    },
+    securePaymentText: {fontSize: RFValue(12),
+color: colors.slate[500],
+lineHeight: RFValue(16)},
     // Modal Styles
-    modalOverlay: {
-      flex: 1,
-      backgroundColor: "rgba(0, 0, 0, 0.5)",
-      justifyContent: "flex-end",
-    },
-    modalBottomSheet: {
-      backgroundColor: colors.background,
-      borderTopLeftRadius: RFValue(24),
-      borderTopRightRadius: RFValue(24),
-      paddingHorizontal: RFValue(20),
-      paddingTop: RFValue(12),
-      paddingBottom: RFValue(32),
-      maxHeight: "90%",
-    },
-    modalHandle: {
-      width: RFValue(40),
-      height: RFValue(4),
-      backgroundColor: colors.slate[300],
-      borderRadius: RFValue(2),
-      alignSelf: "center",
-      marginBottom: RFValue(20),
-    },
-    modalHeaderTitle: {
-      fontSize: RFValue(18),
-      fontWeight: "600",
-      color: colors.slate[650],
-      textAlign: "center",
-      marginBottom: RFValue(4),
-    },
-    modalHeaderSubtitle: {
-      fontSize: RFValue(13),
-      color: colors.slate[500],
-      textAlign: "center",
-      marginBottom: RFValue(24),
-    },
+    modalOverlay: {},
+    modalBottomSheet: {backgroundColor: colors.background,
+borderTopLeftRadius: RFValue(24),
+borderTopRightRadius: RFValue(24),
+paddingHorizontal: RFValue(20),
+paddingTop: RFValue(12),
+paddingBottom: RFValue(32)},
+    modalHandle: {width: RFValue(40),
+height: RFValue(4),
+backgroundColor: colors.slate[300],
+borderRadius: RFValue(2),
+marginBottom: RFValue(20)},
+    modalHeaderTitle: {fontSize: RFValue(18),
+color: colors.slate[650],
+marginBottom: RFValue(4)},
+    modalHeaderSubtitle: {fontSize: RFValue(13),
+color: colors.slate[500],
+marginBottom: RFValue(24)},
     modalBody: {
       gap: RFValue(16),
     },
     inputContainer: {
       gap: RFValue(8),
     },
-    inputLabel: {
-      fontSize: RFValue(14),
-      fontWeight: "500",
-      color: colors.slate[650],
-    },
-    inputWrapper: {
-      flexDirection: "row",
-      alignItems: "center",
-      justifyContent: "space-between",
-      backgroundColor: colors.slate[150],
-      borderRadius: RFValue(12),
-      paddingHorizontal: RFValue(16),
-      paddingVertical: RFValue(14),
-      borderWidth: 1,
-      borderColor: colors.slate[300],
-    },
+    inputLabel: {fontSize: RFValue(14),
+color: colors.slate[650]},
+    inputWrapper: {backgroundColor: colors.slate[150],
+borderRadius: RFValue(12),
+paddingHorizontal: RFValue(16),
+paddingVertical: RFValue(14),
+borderColor: colors.slate[300]},
     inputPlaceholder: {
       fontSize: RFValue(14),
       color: colors.slate[500],
@@ -672,29 +582,15 @@ const getStyles = (colors: ColorScheme) =>
       height: RFValue(18),
       tintColor: colors.slate[500],
     },
-    inputRow: {
-      flexDirection: "row",
-      gap: RFValue(12),
-    },
-    saveCardContainer: {
-      flexDirection: "row",
-      alignItems: "center",
-      justifyContent: "space-between",
-    },
-    saveCardText: {
-      fontSize: RFValue(14),
-      fontWeight: "500",
-      color: colors.slate[650],
-    },
-    toggle: {
-      width: RFValue(44),
-      height: RFValue(24),
-      borderRadius: RFValue(12),
-      backgroundColor: colors.success[200],
-      padding: RFValue(2),
-      justifyContent: "center",
-      alignItems: "flex-end",
-    },
+    inputRow: {gap: RFValue(12)},
+    saveCardContainer: {},
+    saveCardText: {fontSize: RFValue(14),
+color: colors.slate[650]},
+    toggle: {width: RFValue(44),
+height: RFValue(24),
+borderRadius: RFValue(12),
+backgroundColor: colors.success[200],
+padding: RFValue(2)},
     bankDetailItem: {
       gap: RFValue(8),
     },
@@ -702,46 +598,23 @@ const getStyles = (colors: ColorScheme) =>
       fontSize: RFValue(13),
       color: colors.slate[500],
     },
-    bankDetailValue: {
-      fontSize: RFValue(15),
-      fontWeight: "600",
-      color: colors.slate[650],
-    },
-    bankDetailValueRow: {
-      flexDirection: "row",
-      alignItems: "center",
-      gap: RFValue(2),
-    },
-    copyButton: {
-      flexDirection: "row",
-      alignItems: "center",
-      gap: RFValue(4),
-      paddingHorizontal: RFValue(8),
-      paddingVertical: RFValue(4),
-    },
+    bankDetailValue: {fontSize: RFValue(15),
+color: colors.slate[650]},
+    bankDetailValueRow: {gap: RFValue(2)},
+    copyButton: {gap: RFValue(4),
+paddingHorizontal: RFValue(8),
+paddingVertical: RFValue(4)},
     copyIcon: {
       width: RFValue(14),
       height: RFValue(14),
       tintColor: colors.slate[550],
     },
-    copyText: {
-      fontSize: RFValue(13),
-      color: colors.slate[550],
-      fontWeight: "500",
-    },
-    timerNotice: {
-      borderRadius: RFValue(12),
-      paddingVertical: RFValue(12),
-      textAlign: "center",
-    },
-    timerText: {
-      fontSize: RFValue(13),
-      color: colors.slate[650],
-      lineHeight: RFValue(18),
-      textAlign: "center",
-    },
-    timerHighlight: {
-      fontWeight: "700",
-      color: colors.error[200],
-    },
+    copyText: {fontSize: RFValue(13),
+color: colors.slate[550]},
+    timerNotice: {borderRadius: RFValue(12),
+paddingVertical: RFValue(12)},
+    timerText: {fontSize: RFValue(13),
+color: colors.slate[650],
+lineHeight: RFValue(18)},
+    timerHighlight: {color: colors.error[200]},
   });

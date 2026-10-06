@@ -107,27 +107,27 @@ const BookingSummary = () => {
   return (
     <SafeAreaViewContainer>
       {/* Header */}
-      <View style={styles.header}>
+      <View style={styles.header} className="flex-row items-center justify-between">
         <Pressable onPress={() => router.back()}>
           <Image
             source={require("@/assets/icons/arrow-left-light.png")}
             style={styles.backIcon}
           />
         </Pressable>
-        <Text style={styles.headerTitle}>Booking summary</Text>
-        <Text style={styles.stepIndicator}>4/4</Text>
+        <Text style={styles.headerTitle} className="font-semibold flex-1 text-center">Booking summary</Text>
+        <Text style={styles.stepIndicator} className="font-medium">4/4</Text>
       </View>
 
       <ScrollView
         showsVerticalScrollIndicator={false}
         contentContainerStyle={styles.scrollContent}
       >
-        <View style={styles.container}>
+        <View  className="flex-1">
           {/* Total Amount Card */}
           <View style={styles.totalAmountCard}>
             <Text style={styles.totalAmountLabel}>Total Amount Payable</Text>
-            <View style={styles.totalAmountRow}>
-              <Text style={styles.totalAmount}>{bookingData.totalAmount}</Text>
+            <View  className="flex-row items-center justify-between">
+              <Text style={styles.totalAmount} className="font-bold">{bookingData.totalAmount}</Text>
               <Image
                 source={require("@/assets/icons/money-bag.png")}
                 style={styles.moneyBagIcon}
@@ -137,8 +137,8 @@ const BookingSummary = () => {
 
           {/* Property Info Section */}
           <View style={styles.section}>
-            <Text style={styles.sectionTitle}>Property Info</Text>
-            <View style={styles.propertyCard}>
+            <Text style={styles.sectionTitle} className="font-semibold">Property Info</Text>
+            <View style={styles.propertyCard} className="flex-row border-[1px]">
               <Image
                 source={
                   bookingData.propertyImage.uri.length > 8
@@ -149,14 +149,14 @@ const BookingSummary = () => {
                 }
                 style={styles.propertyImage}
               />
-              <View style={styles.propertyInfo}>
-                <Text style={styles.propertyName}>
+              <View  className="flex-1 justify-center">
+                <Text style={styles.propertyName} className="font-semibold">
                   {bookingData.propertyName}
                 </Text>
                 <Text style={styles.propertyLocation}>
                   {bookingData.propertyLocation}
                 </Text>
-                <Text style={styles.propertyPrice}>
+                <Text style={styles.propertyPrice} className="font-semibold">
                   {bookingData.propertyPrice}
                 </Text>
               </View>
@@ -165,36 +165,36 @@ const BookingSummary = () => {
 
           {/* Cost Breakdown Section */}
           <View style={styles.section}>
-            <Text style={styles.sectionTitle}>Cost Breakdown</Text>
+            <Text style={styles.sectionTitle} className="font-semibold">Cost Breakdown</Text>
             <View style={styles.breakdownCard}>
-              <View style={styles.breakdownRow}>
+              <View style={styles.breakdownRow} className="flex-row justify-between items-center">
                 <Text style={styles.breakdownLabel}>
                   Rent ({bookingData.rentDays} days)
                 </Text>
-                <Text style={styles.breakdownValue}>
+                <Text style={styles.breakdownValue} className="font-semibold">
                   {bookingData.rentAmount}
                 </Text>
               </View>
-              <View style={styles.breakdownRow}>
+              <View style={styles.breakdownRow} className="flex-row justify-between items-center">
                 <Text style={styles.breakdownLabel}>
                   Caution fee (refundable)
                 </Text>
-                <Text style={styles.breakdownValue}>
+                <Text style={styles.breakdownValue} className="font-semibold">
                   {bookingData.cautionFee}
                 </Text>
               </View>
-              <View style={styles.breakdownRow}>
+              <View style={styles.breakdownRow} className="flex-row justify-between items-center">
                 <Text style={styles.breakdownLabel}>
                   DiPlace Platform fee (0.5%)
                 </Text>
-                <Text style={styles.breakdownValue}>
+                <Text style={styles.breakdownValue} className="font-semibold">
                   {bookingData.platformFee}
                 </Text>
               </View>
-              <View style={styles.breakdownDivider} />
-              <View style={styles.breakdownRow}>
-                <Text style={styles.breakdownTotalLabel}>Total Amount</Text>
-                <Text style={styles.breakdownTotalValue}>
+              <View style={styles.breakdownDivider}  className="h-[1px]"/>
+              <View style={styles.breakdownRow} className="flex-row justify-between items-center">
+                <Text style={styles.breakdownTotalLabel} className="font-semibold">Total Amount</Text>
+                <Text style={styles.breakdownTotalValue} className="font-bold">
                   {bookingData.totalAmount}
                 </Text>
               </View>
@@ -203,8 +203,8 @@ const BookingSummary = () => {
 
           {/* Renter's Information Section */}
           <View style={styles.section}>
-            <View style={styles.sectionHeader}>
-              <Text style={styles.sectionTitle}>Renter's Information</Text>
+            <View style={styles.sectionHeader} className="flex-row items-center justify-between">
+              <Text style={styles.sectionTitle} className="font-semibold">Renter's Information</Text>
               <Pressable
                 onPress={() => router.push("/views/booking/renters-info")}
               >
@@ -214,8 +214,8 @@ const BookingSummary = () => {
                 />
               </Pressable>
             </View>
-            <View style={styles.infoCard}>
-              <Text style={styles.infoName}>{bookingData.renterName}</Text>
+            <View style={styles.infoCard} className="border-[1px]">
+              <Text style={styles.infoName} className="font-semibold">{bookingData.renterName}</Text>
               <Text style={styles.infoOccupation}>
                 {bookingData.renterOccupation}
               </Text>
@@ -227,8 +227,8 @@ const BookingSummary = () => {
 
           {/* Event Details Section */}
           <View style={styles.section}>
-            <View style={styles.sectionHeader}>
-              <Text style={styles.sectionTitle}>Event Details</Text>
+            <View style={styles.sectionHeader} className="flex-row items-center justify-between">
+              <Text style={styles.sectionTitle} className="font-semibold">Event Details</Text>
               <Pressable
                 onPress={() => router.push("/views/booking/event-details")}
               >
@@ -238,9 +238,9 @@ const BookingSummary = () => {
                 />
               </Pressable>
             </View>
-            <View style={styles.infoCard}>
-              <Text style={styles.eventType}>{bookingData.eventType}</Text>
-              <View style={styles.eventDetailRow}>
+            <View style={styles.infoCard} className="border-[1px]">
+              <Text style={styles.eventType} className="font-semibold">{bookingData.eventType}</Text>
+              <View style={styles.eventDetailRow} className="flex-row items-center">
                 <Image
                   source={require("@/assets/icons/calendar.png")}
                   style={styles.eventIcon}
@@ -249,7 +249,7 @@ const BookingSummary = () => {
                   Event Date: {bookingData.eventDates}
                 </Text>
               </View>
-              <View style={styles.eventDetailRow}>
+              <View style={styles.eventDetailRow} className="flex-row items-center">
                 <Image
                   source={require("@/assets/icons/clock.png")}
                   style={styles.eventIcon}
@@ -264,7 +264,7 @@ const BookingSummary = () => {
       </ScrollView>
 
       {/* Footer Buttons */}
-      <View style={styles.footer}>
+      <View style={styles.footer} className="absolute bottom-[0px] left-[0px] right-[0px] flex flex-col">
         <AppButton
           onPress={handleConfirmPayment}
           title={
@@ -294,37 +294,37 @@ const BookingSummary = () => {
         onRequestClose={() => setShowReserveModal(false)}
       >
         <Pressable
-          style={styles.modalOverlay}
+
           onPress={() => setShowReserveModal(false)}
-        >
+         className="flex-1 bg-[rgba(0, 0, 0, 0.5)] justify-end">
           <Pressable
             style={styles.modalBottomSheet}
             onPress={(e) => e.stopPropagation()}
           >
             {/* Handle Bar */}
-            <View style={styles.modalHandle} />
+            <View style={styles.modalHandle}  className="self-center"/>
 
             {/* Header */}
-            <Text style={styles.modalHeaderTitle}>Reserve space</Text>
-            <Text style={styles.modalHeaderSubtitle}>
+            <Text style={styles.modalHeaderTitle} className="font-semibold text-center">Reserve space</Text>
+            <Text style={styles.modalHeaderSubtitle} className="text-center">
               Make partial payment to reserve this space
             </Text>
 
             {/* Content */}
             <View style={styles.modalBody}>
-              <Text style={styles.modalBodyTitle}>Secure this space</Text>
+              <Text style={styles.modalBodyTitle} className="font-semibold">Secure this space</Text>
               <Text style={styles.modalBodyText}>
                 Secure your event space with just{" "}
-                <Text style={styles.modalBodyBold}>20% reservation fee.</Text>{" "}
+                <Text style={styles.modalBodyBold} className="font-semibold">20% reservation fee.</Text>{" "}
                 Pay the balance at least 7 days before your event.{" "}
-                <Text style={styles.modalLink}>Cancellation policy</Text> still
+                <Text style={styles.modalLink} className="underline">Cancellation policy</Text> still
                 applies.
               </Text>
 
               {/* Reservation Fee */}
-              <View style={styles.reservationFeeContainer}>
+              <View style={styles.reservationFeeContainer} className="border-[1px] flex-row justify-between items-center">
                 <Text style={styles.reservationFeeLabel}>Reservation fee:</Text>
-                <Text style={styles.reservationFeeAmount}>
+                <Text style={styles.reservationFeeAmount} className="font-bold">
                   {bookingData.reservationFee}
                 </Text>
               </View>
@@ -333,13 +333,13 @@ const BookingSummary = () => {
               <Pressable
                 style={styles.termsContainer}
                 onPress={() => setAgreedToTerms(!agreedToTerms)}
-              >
-                <View style={styles.checkbox}>
+               className="flex-row items-start">
+                <View style={styles.checkbox} className="border-[1.5px] items-center justify-center">
                   {agreedToTerms && <View style={styles.checkboxChecked} />}
                 </View>
-                <Text style={styles.termsText}>
+                <Text style={styles.termsText} className="flex-1">
                   I have read and agree to the{" "}
-                  <Text style={styles.modalLink}>
+                  <Text style={styles.modalLink} className="underline">
                     terms of service and cancellation policy
                   </Text>
                   .
@@ -370,18 +370,18 @@ const BookingSummary = () => {
         animationType="slide"
         onRequestClose={() => setShowFullPaymentModal(false)}
       >
-        <View style={styles.centerModalOverlay}>
-          <View style={styles.centerModalContent}>
-            <Text style={styles.centerModalTitle}>
+        <View style={styles.centerModalOverlay} className="flex-1 bg-[rgba(0, 0, 0, 0.5)] justify-center items-center">
+          <View style={styles.centerModalContent} className="w-[100%px]">
+            <Text style={styles.centerModalTitle} className="font-bold text-center">
               Can't pay full now? Reserve instead!
             </Text>
-            <Text style={styles.centerModalMessage}>
+            <Text style={styles.centerModalMessage} className="text-center">
               You can secure this space by paying a small 20% reservation fee
               and pay the rest later; at least 7 days before your event.
               Cancellation policy still applies.
             </Text>
 
-            <View style={styles.centerModalFooter}>
+            <View style={styles.centerModalFooter} className="flex flex-col">
               <AppButton
                 onPress={() => {
                   setShowFullPaymentModal(false);
@@ -414,41 +414,23 @@ export default BookingSummary;
 
 const getStyles = (colors: ColorScheme) =>
   StyleSheet.create({
-    header: {
-      flexDirection: "row",
-      alignItems: "center",
-      justifyContent: "space-between",
-      paddingVertical: RFValue(16),
-    },
-    stepIndicator: {
-      fontSize: RFValue(14),
-      color: colors.slate[500],
-      fontWeight: "500",
-    },
+    header: {paddingVertical: RFValue(16)},
+    stepIndicator: {fontSize: RFValue(14),
+color: colors.slate[500]},
     backIcon: {
       width: RFValue(20),
       height: RFValue(20),
       tintColor: colors.slate[650],
     },
-    headerTitle: {
-      fontSize: RFValue(16),
-      fontWeight: "600",
-      color: colors.slate[650],
-      flex: 1,
-      textAlign: "center",
-    },
+    headerTitle: {fontSize: RFValue(16),
+color: colors.slate[650]},
     moreIcon: {
       width: RFValue(20),
       height: RFValue(20),
       tintColor: colors.slate[650],
     },
-    scrollContent: {
-      flexGrow: 1,
-      paddingBottom: RFValue(120),
-    },
-    container: {
-      flex: 1,
-    },
+    scrollContent: {paddingBottom: RFValue(120)},
+    container: {},
     totalAmountCard: {
       backgroundColor: colors.slate[650],
       borderRadius: RFValue(16),
@@ -461,16 +443,9 @@ const getStyles = (colors: ColorScheme) =>
       color: colors.slate[450],
       marginBottom: RFValue(8),
     },
-    totalAmountRow: {
-      flexDirection: "row",
-      alignItems: "center",
-      justifyContent: "space-between",
-    },
-    totalAmount: {
-      fontSize: RFValue(28),
-      fontWeight: "700",
-      color: colors.slate[200],
-    },
+    totalAmountRow: {},
+    totalAmount: {fontSize: RFValue(28),
+color: colors.slate[200]},
     moneyBagIcon: {
       width: RFValue(32),
       height: RFValue(32),
@@ -478,103 +453,59 @@ const getStyles = (colors: ColorScheme) =>
     section: {
       marginBottom: RFValue(24),
     },
-    sectionHeader: {
-      flexDirection: "row",
-      alignItems: "center",
-      justifyContent: "space-between",
-      marginBottom: RFValue(12),
-    },
-    sectionTitle: {
-      fontSize: RFValue(16),
-      fontWeight: "600",
-      color: colors.slate[650],
-      marginBottom: RFValue(12),
-    },
+    sectionHeader: {marginBottom: RFValue(12)},
+    sectionTitle: {fontSize: RFValue(16),
+color: colors.slate[650],
+marginBottom: RFValue(12)},
     editIcon: {
       width: RFValue(18),
       height: RFValue(18),
       tintColor: colors.slate[500],
     },
-    propertyCard: {
-      flexDirection: "row",
-      backgroundColor: colors.slate[150],
-      borderRadius: RFValue(12),
-      padding: RFValue(12),
-      borderWidth: 1,
-      borderColor: colors.slate[300],
-    },
+    propertyCard: {backgroundColor: colors.slate[150],
+borderRadius: RFValue(12),
+padding: RFValue(12),
+borderColor: colors.slate[300]},
     propertyImage: {
       width: RFValue(80),
       height: RFValue(80),
       borderRadius: RFValue(8),
       marginRight: RFValue(12),
     },
-    propertyInfo: {
-      flex: 1,
-      justifyContent: "center",
-    },
-    propertyName: {
-      fontSize: RFValue(15),
-      fontWeight: "600",
-      color: colors.slate[650],
-      marginBottom: RFValue(4),
-    },
+    propertyInfo: {},
+    propertyName: {fontSize: RFValue(15),
+color: colors.slate[650],
+marginBottom: RFValue(4)},
     propertyLocation: {
       fontSize: RFValue(13),
       color: colors.slate[500],
       marginBottom: RFValue(6),
     },
-    propertyPrice: {
-      fontSize: RFValue(14),
-      fontWeight: "600",
-      color: colors.slate[650],
-    },
+    propertyPrice: {fontSize: RFValue(14),
+color: colors.slate[650]},
     breakdownCard: {
       paddingVertical: RFValue(9),
     },
-    breakdownRow: {
-      flexDirection: "row",
-      justifyContent: "space-between",
-      alignItems: "center",
-      marginBottom: RFValue(12),
-    },
+    breakdownRow: {marginBottom: RFValue(12)},
     breakdownLabel: {
       fontSize: RFValue(14),
       color: colors.slate[600],
     },
-    breakdownValue: {
-      fontSize: RFValue(14),
-      fontWeight: "600",
-      color: colors.slate[650],
-    },
-    breakdownDivider: {
-      height: 1,
-      backgroundColor: colors.slate[300],
-      marginVertical: RFValue(8),
-    },
-    breakdownTotalLabel: {
-      fontSize: RFValue(15),
-      fontWeight: "600",
-      color: colors.slate[650],
-    },
-    breakdownTotalValue: {
-      fontSize: RFValue(16),
-      fontWeight: "700",
-      color: colors.slate[650],
-    },
-    infoCard: {
-      backgroundColor: colors.slate[150],
-      borderRadius: RFValue(12),
-      padding: RFValue(16),
-      borderWidth: 1,
-      borderColor: colors.slate[300],
-    },
-    infoName: {
-      fontSize: RFValue(15),
-      fontWeight: "600",
-      color: colors.slate[650],
-      marginBottom: RFValue(4),
-    },
+    breakdownValue: {fontSize: RFValue(14),
+color: colors.slate[650]},
+    breakdownDivider: {backgroundColor: colors.slate[300],
+marginVertical: RFValue(8)},
+    breakdownTotalLabel: {fontSize: RFValue(15),
+color: colors.slate[650]},
+    breakdownTotalValue: {fontSize: RFValue(16),
+color: colors.slate[650]},
+    infoCard: {backgroundColor: colors.slate[150],
+borderRadius: RFValue(12),
+padding: RFValue(16),
+borderColor: colors.slate[300]},
+    infoName: {fontSize: RFValue(15),
+color: colors.slate[650],
+marginBottom: RFValue(4)},
     infoOccupation: {
       fontSize: RFValue(14),
       color: colors.slate[500],
@@ -585,17 +516,10 @@ const getStyles = (colors: ColorScheme) =>
       color: colors.slate[600],
       marginBottom: RFValue(6),
     },
-    eventType: {
-      fontSize: RFValue(15),
-      fontWeight: "600",
-      color: colors.slate[650],
-      marginBottom: RFValue(12),
-    },
-    eventDetailRow: {
-      flexDirection: "row",
-      alignItems: "center",
-      marginBottom: RFValue(8),
-    },
+    eventType: {fontSize: RFValue(15),
+color: colors.slate[650],
+marginBottom: RFValue(12)},
+    eventDetailRow: {marginBottom: RFValue(8)},
     eventIcon: {
       width: RFValue(16),
       height: RFValue(16),
@@ -606,24 +530,12 @@ const getStyles = (colors: ColorScheme) =>
       fontSize: RFValue(14),
       color: colors.slate[600],
     },
-    footer: {
-      position: "absolute",
-      bottom: 0,
-      left: 0,
-      right: 0,
-      paddingHorizontal: RFValue(20),
-      paddingVertical: RFValue(16),
-      backgroundColor: colors.background,
-      display: "flex",
-      flexDirection: "column",
-      gap: RFValue(8),
-    },
+    footer: {paddingHorizontal: RFValue(20),
+paddingVertical: RFValue(16),
+backgroundColor: colors.background,
+gap: RFValue(8)},
     // Modal Styles
-    modalOverlay: {
-      flex: 1,
-      backgroundColor: "rgba(0, 0, 0, 0.5)",
-      justifyContent: "flex-end",
-    },
+    modalOverlay: {},
     modalBottomSheet: {
       backgroundColor: colors.background,
       borderTopLeftRadius: RFValue(24),
@@ -632,125 +544,65 @@ const getStyles = (colors: ColorScheme) =>
       paddingTop: RFValue(12),
       paddingBottom: RFValue(32),
     },
-    modalHandle: {
-      width: RFValue(40),
-      height: RFValue(4),
-      backgroundColor: colors.slate[300],
-      borderRadius: RFValue(2),
-      alignSelf: "center",
-      marginBottom: RFValue(20),
-    },
-    modalHeaderTitle: {
-      fontSize: RFValue(18),
-      fontWeight: "600",
-      color: colors.slate[650],
-      textAlign: "center",
-      marginBottom: RFValue(4),
-    },
-    modalHeaderSubtitle: {
-      fontSize: RFValue(13),
-      color: colors.slate[500],
-      textAlign: "center",
-      marginBottom: RFValue(24),
-    },
+    modalHandle: {width: RFValue(40),
+height: RFValue(4),
+backgroundColor: colors.slate[300],
+borderRadius: RFValue(2),
+marginBottom: RFValue(20)},
+    modalHeaderTitle: {fontSize: RFValue(18),
+color: colors.slate[650],
+marginBottom: RFValue(4)},
+    modalHeaderSubtitle: {fontSize: RFValue(13),
+color: colors.slate[500],
+marginBottom: RFValue(24)},
     modalBody: {
       gap: RFValue(16),
     },
-    modalBodyTitle: {
-      fontSize: RFValue(16),
-      fontWeight: "600",
-      color: colors.slate[650],
-    },
+    modalBodyTitle: {fontSize: RFValue(16),
+color: colors.slate[650]},
     modalBodyText: {
       fontSize: RFValue(14),
       color: colors.slate[600],
       lineHeight: RFValue(20),
     },
-    modalBodyBold: {
-      fontWeight: "600",
-      color: colors.slate[650],
-    },
-    modalLink: {
-      color: colors.info[200],
-      textDecorationLine: "underline",
-    },
-    centerModalOverlay: {
-      flex: 1,
-      backgroundColor: "rgba(0, 0, 0, 0.5)",
-      justifyContent: "center",
-      alignItems: "center",
-      paddingHorizontal: RFValue(20),
-    },
-    centerModalContent: {
-      backgroundColor: colors.background,
-      borderRadius: RFValue(20),
-      padding: RFValue(24),
-      width: "100%",
-      maxWidth: RFValue(400),
-    },
-    centerModalTitle: {
-      fontSize: RFValue(18),
-      fontWeight: "700",
-      color: colors.slate[650],
-      marginBottom: RFValue(12),
-      textAlign: "center",
-    },
-    centerModalMessage: {
-      fontSize: RFValue(14),
-      color: colors.slate[600],
-      lineHeight: RFValue(20),
-      textAlign: "center",
-      marginBottom: RFValue(24),
-    },
-    centerModalFooter: {
-      display: "flex",
-      flexDirection: "column",
-      gap: RFValue(8),
-    },
-    reservationFeeContainer: {
-      backgroundColor: colors.slate[150],
-      borderRadius: RFValue(12),
-      padding: RFValue(16),
-      borderWidth: 1,
-      borderColor: colors.slate[300],
-      flexDirection: "row",
-      justifyContent: "space-between",
-      alignItems: "center",
-    },
+    modalBodyBold: {color: colors.slate[650]},
+    modalLink: {color: colors.info[200]},
+    centerModalOverlay: {paddingHorizontal: RFValue(20)},
+    centerModalContent: {backgroundColor: colors.background,
+borderRadius: RFValue(20),
+padding: RFValue(24),
+maxWidth: RFValue(400)},
+    centerModalTitle: {fontSize: RFValue(18),
+color: colors.slate[650],
+marginBottom: RFValue(12)},
+    centerModalMessage: {fontSize: RFValue(14),
+color: colors.slate[600],
+lineHeight: RFValue(20),
+marginBottom: RFValue(24)},
+    centerModalFooter: {gap: RFValue(8)},
+    reservationFeeContainer: {backgroundColor: colors.slate[150],
+borderRadius: RFValue(12),
+padding: RFValue(16),
+borderColor: colors.slate[300]},
     reservationFeeLabel: {
       fontSize: RFValue(14),
       color: colors.slate[600],
     },
-    reservationFeeAmount: {
-      fontSize: RFValue(18),
-      fontWeight: "700",
-      color: colors.slate[650],
-    },
-    termsContainer: {
-      flexDirection: "row",
-      alignItems: "flex-start",
-      gap: RFValue(10),
-    },
-    checkbox: {
-      width: RFValue(18),
-      height: RFValue(18),
-      borderWidth: 1.5,
-      borderColor: colors.slate[400],
-      borderRadius: RFValue(4),
-      marginTop: RFValue(2),
-      alignItems: "center",
-      justifyContent: "center",
-    },
+    reservationFeeAmount: {fontSize: RFValue(18),
+color: colors.slate[650]},
+    termsContainer: {gap: RFValue(10)},
+    checkbox: {width: RFValue(18),
+height: RFValue(18),
+borderColor: colors.slate[400],
+borderRadius: RFValue(4),
+marginTop: RFValue(2)},
     checkboxChecked: {
       width: RFValue(10),
       height: RFValue(10),
       backgroundColor: colors.info[200],
       borderRadius: RFValue(2),
     },
-    termsText: {
-      flex: 1,
-      fontSize: RFValue(13),
-      color: colors.slate[600],
-      lineHeight: RFValue(18),
-    },
+    termsText: {fontSize: RFValue(13),
+color: colors.slate[600],
+lineHeight: RFValue(18)},
   });

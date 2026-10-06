@@ -34,10 +34,10 @@ const VerifyAccountInfoStep = ({
     completed?: boolean;
     last?: boolean;
   }) => (
-    <View style={[Styles.listItem, last && Styles.lastListItem]}>
-      <View style={Styles.listItemLeft}>
+    <View style={[Styles.listItem, last && Styles.lastListItem]} className="flex-row items-center justify-between border-b">
+      <View style={Styles.listItemLeft} className="items-center flex-row flex-1">
         <Image source={icon} style={Styles.listIcon} resizeMode="contain" />
-        <Text style={Styles.listText}>{label}</Text>
+        <Text style={Styles.listText} className="flex-1 font-medium">{label}</Text>
       </View>
       {completed ? (
         <Image
@@ -50,14 +50,14 @@ const VerifyAccountInfoStep = ({
   );
 
   return (
-    <View style={Styles.container}>
+    <View style={Styles.container} className="flex-1 justify-between">
       {/* Icon and Content */}
-      <View style={{ flex: 1 }}>
+      <View className="flex-1">
         <ScrollView
           style={Styles.contentContainer}
           showsVerticalScrollIndicator={false}
           contentContainerStyle={{ paddingBottom: 50 }}
-        >
+         className="flex-1">
           {/* 3D Icon */}
           <View style={Styles.iconContainer}>
             <Image
@@ -69,7 +69,7 @@ const VerifyAccountInfoStep = ({
 
           {/* Title and Description */}
           <View style={Styles.textContainer}>
-            <Text style={Styles.headText}>Verify your account</Text>
+            <Text style={Styles.headText} className="font-semibold">Verify your account</Text>
             <Text style={Styles.descriptionText}>
               To help connect you with verified agents, we have to collect some
               info to verify your account.
@@ -77,7 +77,7 @@ const VerifyAccountInfoStep = ({
           </View>
 
           {/* Verification Items List */}
-          <View style={Styles.listContainer}>
+          <View style={Styles.listContainer} className="w-[100%px] border-[1px]">
             {renderVerificationItem({
               icon: require("@/assets/icons/Camera - Iconly Pro.png"),
               label: "Selfie",
@@ -133,12 +133,12 @@ export default VerifyAccountInfoStep;
 const styles = (colors: ColorScheme) =>
   StyleSheet.create({
     container: {
-      flex: 1,
-      justifyContent: "space-between",
+
+
       paddingBottom: RFValue(20),
     },
     contentContainer: {
-      flex: 1,
+
       gap: RFValue(12),
       paddingTop: RFValue(40),
     },
@@ -154,7 +154,7 @@ const styles = (colors: ColorScheme) =>
     },
     headText: {
       fontSize: RFValue(24),
-      fontWeight: "600",
+
       lineHeight: RFValue(32),
       color: colors.slate[650],
     },
@@ -164,44 +164,36 @@ const styles = (colors: ColorScheme) =>
       color: colors.slate[600],
     },
     listContainer: {
-      width: "100%",
+
       paddingHorizontal: RFValue(8),
       backgroundColor: colors.background,
       borderRadius: RFValue(16),
-      borderWidth: 1,
+
       borderColor: colors.slate[300],
       paddingVertical: RFValue(8),
       marginTop: RFValue(8),
     },
-    listItem: {
-      flexDirection: "row",
-      alignItems: "center",
-      justifyContent: "space-between",
-      paddingVertical: RFValue(16),
-      paddingHorizontal: RFValue(8),
-      borderBottomWidth: 1,
-      borderBottomColor: colors.slate[300],
-    },
+    listItem: {paddingVertical: RFValue(16),
+paddingHorizontal: RFValue(8),
+borderBottomColor: colors.slate[300]},
     listItemLeft: {
-      alignItems: "center",
-      flexDirection: "row",
-      flex: 1,
+
+
+
       gap: RFValue(12),
     },
-    lastListItem: {
-      borderBottomWidth: 0,
-    },
+    lastListItem: {},
     listIcon: {
       width: RFValue(24),
       height: RFValue(24),
       tintColor: colors.slate[600],
     },
     listText: {
-      flex: 1,
+
       fontSize: RFValue(15),
       lineHeight: RFValue(22),
       color: colors.slate[650],
-      fontWeight: "500",
+
     },
     completedIcon: {
       height: RFValue(22),

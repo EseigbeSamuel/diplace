@@ -163,13 +163,13 @@ const MediaUploadSubstep: React.FC<MediaUploadSubstepProps> = ({
   };
 
   return (
-    <View style={styles.container}>
+    <View style={styles.container} className="flex-1">
       <ScrollView
         showsVerticalScrollIndicator={false}
         contentContainerStyle={styles.scrollContent}
       >
         {/* Title */}
-        <Text style={styles.title}>Upload photos and videos of the space.</Text>
+        <Text style={styles.title} className="font-semibold">Upload photos and videos of the space.</Text>
 
         {/* Gallery Section */}
         {media.length < 1 && (
@@ -177,11 +177,11 @@ const MediaUploadSubstep: React.FC<MediaUploadSubstepProps> = ({
               style={styles.gallerySection}
               onPress={handleOpenMediaPicker}
               disabled={isPickingMedia}
-            >
-              <View style={styles.galleryHeader}>
-                <Text style={styles.galleryText}>Gallery</Text>
+             className="flex-row items-center justify-between">
+              <View  className="gap-[4px]">
+                <Text style={styles.galleryText} className="font-semibold">Gallery</Text>
 
-                <View style={styles.galleryIconContainer}>
+                <View style={styles.galleryIconContainer} className="flex-row items-center">
                   <Image
                     source={require("@/assets/icons/Image - Iconly Pro.png")}
                     style={styles.galleryIcon}
@@ -204,37 +204,37 @@ const MediaUploadSubstep: React.FC<MediaUploadSubstepProps> = ({
 
         {/* Uploaded Media Count and Upload Button */}
         {media.length > 0 && (
-            <View style={styles.uploadedHeader}>
-              <Text style={styles.uploadedCount}>
+            <View style={styles.uploadedHeader} className="flex-row items-center justify-between">
+              <Text style={styles.uploadedCount} className="font-semibold">
                 {media.length} files uploaded
               </Text>
               <Pressable
                 style={styles.uploadMoreButton}
                 onPress={handleOpenMediaPicker}
                 disabled={isPickingMedia}
-              >
+               className="flex-row items-center border-[1px]">
                 <Image
                   source={require("@/assets/icons/Upload - Iconly Pro.png")}
                   style={styles.uploadIcon}
                 />
-                <Text style={styles.uploadMoreText}>Upload new</Text>
+                <Text style={styles.uploadMoreText} className="font-medium">Upload new</Text>
               </Pressable>
             </View>
           )}
 
         {/* Media Grid */}
         {media.length > 0 && (
-            <View style={styles.mediaGrid}>
+            <View style={styles.mediaGrid} className="flex-row flex-wrap">
               {media.map((item) => (
-                  <View key={item.id} style={styles.mediaItem}>
+                  <View key={item.id} style={styles.mediaItem} className="w-[31%px] overflow-hidden relative aspect-ratio-[0.75px]">
                     {item.type === "image" ? (
                       <Image
                         source={{ uri: item.uri }}
-                        style={styles.mediaImage}
+
                         resizeMode="cover"
-                      />
+                       className="w-[100%px] h-[100%px]"/>
                     ) : (
-                      <View style={styles.videoPreview}>
+                      <View style={styles.videoPreview} className="flex-1 items-center justify-center">
                         <Image
                           source={require("@/assets/icons/Video - Iconly Pro.png")}
                           style={styles.videoPreviewIcon}
@@ -244,18 +244,18 @@ const MediaUploadSubstep: React.FC<MediaUploadSubstepProps> = ({
                     <Pressable
                       style={styles.removeButton}
                       onPress={() => removeMedia(item.id)}
-                    >
+                     className="absolute items-center justify-center">
                       <Image
                         source={require("@/assets/icons/close-contained.png")}
                         style={styles.removeIcon}
                       />
                     </Pressable>
                     {item.type === "video" && (
-                      <View style={styles.videoBadge}>
+                      <View style={styles.videoBadge} className="absolute bg-[rgba(0, 0, 0, 0.6)]">
                         <Image
                           source={require("@/assets/icons/Video - Iconly Pro.png")}
                           style={styles.playIcon}
-                        />
+                         className="tint-[#FFFFFF]"/>
                       </View>
                     )}
                   </View>
@@ -290,150 +290,80 @@ const MediaUploadSubstep: React.FC<MediaUploadSubstepProps> = ({
 
 const createStyles = (colors: ColorScheme) =>
   StyleSheet.create({
-    container: {
-      flex: 1,
-      backgroundColor: colors.background,
-    },
+    container: {backgroundColor: colors.background},
     scrollContent: {
       paddingTop: RFValue(32),
       paddingBottom: RFValue(20),
     },
-    title: {
-      fontSize: RFValue(20),
-      fontWeight: "600",
-      color: colors.slate[650],
-      lineHeight: RFValue(28),
-      marginBottom: RFValue(24),
-    },
-    gallerySection: {
-      paddingVertical: RFValue(20),
-      paddingHorizontal: RFValue(16),
-      backgroundColor: colors.slate[200],
-      borderRadius: RFValue(12),
-      marginBottom: RFValue(24),
-      flexDirection: "row",
-      alignItems: "center",
-      justifyContent: "space-between",
-    },
-    galleryHeader: {
-      gap: 4,
-    },
-    galleryIconContainer: {
-      flexDirection: "row",
-      alignItems: "center",
-      marginBottom: RFValue(8),
-    },
+    title: {fontSize: RFValue(20),
+color: colors.slate[650],
+lineHeight: RFValue(28),
+marginBottom: RFValue(24)},
+    gallerySection: {paddingVertical: RFValue(20),
+paddingHorizontal: RFValue(16),
+backgroundColor: colors.slate[200],
+borderRadius: RFValue(12),
+marginBottom: RFValue(24)},
+    galleryHeader: {},
+    galleryIconContainer: {marginBottom: RFValue(8)},
     galleryIcon: {
       width: RFValue(16),
       height: RFValue(16),
       tintColor: colors.slate[650],
       marginRight: RFValue(8),
     },
-    galleryText: {
-      fontSize: RFValue(15),
-      fontWeight: "600",
-      color: colors.slate[650],
-    },
+    galleryText: {fontSize: RFValue(15),
+color: colors.slate[650]},
     clickText: {
       fontSize: RFValue(13),
       color: colors.slate[500],
     },
-    uploadedHeader: {
-      flexDirection: "row",
-      alignItems: "center",
-      justifyContent: "space-between",
-      marginBottom: RFValue(16),
-    },
-    uploadedCount: {
-      fontSize: RFValue(15),
-      fontWeight: "600",
-      color: colors.slate[650],
-    },
-    uploadMoreButton: {
-      flexDirection: "row",
-      alignItems: "center",
-      paddingVertical: RFValue(8),
-      paddingHorizontal: RFValue(12),
-      backgroundColor: colors.slate[150],
-      borderRadius: RFValue(8),
-      borderWidth: 1,
-      borderColor: colors.slate[300],
-    },
+    uploadedHeader: {marginBottom: RFValue(16)},
+    uploadedCount: {fontSize: RFValue(15),
+color: colors.slate[650]},
+    uploadMoreButton: {paddingVertical: RFValue(8),
+paddingHorizontal: RFValue(12),
+backgroundColor: colors.slate[150],
+borderRadius: RFValue(8),
+borderColor: colors.slate[300]},
     uploadIcon: {
       width: RFValue(16),
       height: RFValue(16),
       tintColor: colors.slate[650],
       marginRight: RFValue(6),
     },
-    uploadMoreText: {
-      fontSize: RFValue(13),
-      fontWeight: "500",
-      color: colors.slate[650],
-    },
-    mediaGrid: {
-      flexDirection: "row",
-      flexWrap: "wrap",
-      gap: RFValue(4),
-    },
-    mediaItem: {
-      width: "31%",
-      aspectRatio: 0.75,
-      borderRadius: RFValue(12),
-      overflow: "hidden",
-      position: "relative",
-      backgroundColor: colors.slate[200],
-    },
-    mediaImage: {
-      width: "100%",
-      height: "100%",
-    },
-    videoPreview: {
-      flex: 1,
-      alignItems: "center",
-      justifyContent: "center",
-      backgroundColor: colors.slate[300],
-    },
+    uploadMoreText: {fontSize: RFValue(13),
+color: colors.slate[650]},
+    mediaGrid: {gap: RFValue(4)},
+    mediaItem: {borderRadius: RFValue(12),
+backgroundColor: colors.slate[200]},
+    mediaImage: {},
+    videoPreview: {backgroundColor: colors.slate[300]},
     videoPreviewIcon: {
       width: RFValue(32),
       height: RFValue(32),
       tintColor: colors.slate[650],
     },
-    removeButton: {
-      position: "absolute",
-      top: RFValue(2),
-      right: RFValue(0),
-      width: RFValue(24),
-      height: RFValue(24),
-      alignItems: "center",
-      justifyContent: "center",
-    },
+    removeButton: {top: RFValue(2),
+right: RFValue(0),
+width: RFValue(24),
+height: RFValue(24)},
     removeIcon: {
       width: RFValue(20),
       height: RFValue(20),
       tintColor: colors.slate[650],
     },
-    videoBadge: {
-      position: "absolute",
-      bottom: RFValue(8),
-      left: RFValue(8),
-      backgroundColor: "rgba(0, 0, 0, 0.6)",
-      borderRadius: RFValue(4),
-      padding: RFValue(4),
-    },
-    playIcon: {
-      width: RFValue(16),
-      height: RFValue(16),
-      tintColor: "#FFFFFF",
-    },
+    videoBadge: {bottom: RFValue(8),
+left: RFValue(8),
+borderRadius: RFValue(4),
+padding: RFValue(4)},
+    playIcon: {width: RFValue(16),
+height: RFValue(16)},
     buttonContainer: {
       paddingVertical: RFValue(16),
       backgroundColor: colors.background,
     },
-    modalOverlay: {
-      flex: 1,
-      backgroundColor: "rgba(0, 0, 0, 0.5)",
-      justifyContent: "flex-end",
-    },
+    modalOverlay: {},
     modalContent: {
       backgroundColor: colors.background,
       borderTopLeftRadius: RFValue(24),
@@ -442,48 +372,27 @@ const createStyles = (colors: ColorScheme) =>
       paddingTop: RFValue(12),
       paddingBottom: RFValue(32),
     },
-    modalHandle: {
-      width: RFValue(40),
-      height: RFValue(4),
-      backgroundColor: colors.slate[300],
-      borderRadius: RFValue(2),
-      alignSelf: "center",
-      marginBottom: RFValue(20),
-    },
-    modalTitle: {
-      fontSize: RFValue(18),
-      fontWeight: "600",
-      color: colors.slate[650],
-      textAlign: "center",
-      marginBottom: RFValue(24),
-    },
-    mediaOptions: {
-      flexDirection: "row",
-      justifyContent: "space-around",
-      alignItems: "center",
-    },
-    mediaOption: {
-      alignItems: "center",
-      gap: RFValue(12),
-    },
-    mediaOptionIconContainer: {
-      width: RFValue(60),
-      height: RFValue(60),
-      borderRadius: RFValue(30),
-      backgroundColor: colors.slate[150],
-      alignItems: "center",
-      justifyContent: "center",
-    },
+    modalHandle: {width: RFValue(40),
+height: RFValue(4),
+backgroundColor: colors.slate[300],
+borderRadius: RFValue(2),
+marginBottom: RFValue(20)},
+    modalTitle: {fontSize: RFValue(18),
+color: colors.slate[650],
+marginBottom: RFValue(24)},
+    mediaOptions: {},
+    mediaOption: {gap: RFValue(12)},
+    mediaOptionIconContainer: {width: RFValue(60),
+height: RFValue(60),
+borderRadius: RFValue(30),
+backgroundColor: colors.slate[150]},
     mediaOptionIcon: {
       borderRadius: RFValue(8),
       width: RFValue(48),
       height: RFValue(48),
     },
-    mediaOptionText: {
-      fontSize: RFValue(13),
-      color: colors.slate[650],
-      fontWeight: "500",
-    },
+    mediaOptionText: {fontSize: RFValue(13),
+color: colors.slate[650]},
   });
 
 export default MediaUploadSubstep;

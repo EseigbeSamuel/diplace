@@ -63,9 +63,9 @@ const PaymentReceipt = ({ receiptData, onClose }: PaymentReceiptProps) => {
     <SafeAreaViewContainer>
       {/* Custom Header */}
       <View style={receiptStyles.header}>
-        <View style={receiptStyles.headerContent}>
-          <Text style={receiptStyles.headerTitle}>Payment receipt</Text>
-          <Pressable onPress={onClose} style={receiptStyles.closeButton}>
+        <View style={receiptStyles.headerContent} className="flex-row items-center justify-center relative">
+          <Text style={receiptStyles.headerTitle} className="font-semibold">Payment receipt</Text>
+          <Pressable onPress={onClose} style={receiptStyles.closeButton} className="absolute">
             <Image
               source={require("@/assets/icons/X-close.png")}
               style={receiptStyles.closeIcon}
@@ -75,29 +75,29 @@ const PaymentReceipt = ({ receiptData, onClose }: PaymentReceiptProps) => {
       </View>
 
       <ScrollView showsVerticalScrollIndicator={false}>
-        <View style={receiptStyles.container}>
+        <View style={receiptStyles.container} className="flex-1">
           {/* Receipt Card with Notches */}
-          <View style={receiptStyles.receiptCard}>
+          <View style={receiptStyles.receiptCard} className="relative overflow-[visible] shadow-color-[#000] shadow-opacity-[0.1px] shadow-radius-[8px] elevation-[5px]">
             {/* Left Notches */}
-            <View style={receiptStyles.notchLeft} />
+            <View style={receiptStyles.notchLeft}  className="absolute top-[50%px] border-[1px] z-[1]"/>
 
             {/* Right Notches */}
-            <View style={receiptStyles.notchRight} />
+            <View style={receiptStyles.notchRight}  className="absolute top-[50%px] border-[1px] z-[1]"/>
 
             {/* Card Content */}
             <View style={receiptStyles.cardContent}>
               {/* Success Icon */}
-              <View style={receiptStyles.successSection}>
-                <View style={receiptStyles.successIconContainer}>
+              <View style={receiptStyles.successSection} className="items-center">
+                <View style={receiptStyles.successIconContainer} className="items-center justify-center border-[1px]">
                   <Image
                     source={require("@/assets/icons/tick-circle.png")}
                     style={receiptStyles.successIcon}
                   />
                 </View>
-                <Text style={receiptStyles.successTitle}>
+                <Text style={receiptStyles.successTitle} className="font-bold">
                   Payment Received 🎉
                 </Text>
-                <Text style={receiptStyles.successSubtitle}>
+                <Text style={receiptStyles.successSubtitle} className="text-center">
                   You have successfully received a payment
                 </Text>
               </View>
@@ -105,97 +105,97 @@ const PaymentReceipt = ({ receiptData, onClose }: PaymentReceiptProps) => {
               {/* Receipt Details */}
               <View style={receiptStyles.detailsSection}>
                 {/* Reference Number */}
-                <View style={receiptStyles.detailRow}>
+                <View  className="flex-row justify-between items-start">
                   <Text style={receiptStyles.detailLabel}>
                     Reference number
                   </Text>
-                  <Text style={receiptStyles.detailValue}>
+                  <Text style={receiptStyles.detailValue} className="font-medium text-right">
                     {receipt.referenceNumber}
                   </Text>
                 </View>
 
                 {/* Date & Time */}
-                <View style={receiptStyles.detailRow}>
+                <View  className="flex-row justify-between items-start">
                   <Text style={receiptStyles.detailLabel}>Date & time</Text>
-                  <Text style={receiptStyles.detailValue}>
+                  <Text style={receiptStyles.detailValue} className="font-medium text-right">
                     {receipt.dateTime}
                   </Text>
                 </View>
 
                 {/* Description */}
-                <View style={receiptStyles.detailRow}>
+                <View  className="flex-row justify-between items-start">
                   <Text style={receiptStyles.detailLabel}>Description</Text>
-                  <Text style={receiptStyles.detailValue}>
+                  <Text style={receiptStyles.detailValue} className="font-medium text-right">
                     {receipt.description}
                   </Text>
                 </View>
 
                 {/* Divider */}
-                <View style={receiptStyles.divider} />
+                <View style={receiptStyles.divider}  className="h-[1px]"/>
 
                 {/* Property */}
-                <View style={receiptStyles.propertySection}>
+                <View  className="flex-row justify-between items-start">
                   <Text style={receiptStyles.detailLabel}>Property</Text>
-                  <View style={receiptStyles.propertyContent}>
-                    <Text style={receiptStyles.propertyName}>
+                  <View  className="items-end">
+                    <Text style={receiptStyles.propertyName} className="font-medium text-right">
                       {receipt.property}
                     </Text>
-                    <Text style={receiptStyles.propertyAddress}>
+                    <Text style={receiptStyles.propertyAddress} className="text-right">
                       {receipt.propertyAddress}
                     </Text>
                   </View>
                 </View>
 
                 {/* Divider */}
-                <View style={receiptStyles.divider} />
+                <View style={receiptStyles.divider}  className="h-[1px]"/>
 
                 {/* Paid to */}
-                <View style={receiptStyles.paidToSection}>
+                <View  className="flex-row justify-between items-start">
                   <Text style={receiptStyles.detailLabel}>Paid to</Text>
-                  <View style={receiptStyles.paidToContent}>
-                    <Text style={receiptStyles.paidToName}>
+                  <View  className="flex-1 items-end">
+                    <Text style={receiptStyles.paidToName} className="font-medium text-right">
                       {receipt.paidTo}
                     </Text>
-                    <Text style={receiptStyles.bankName}>
+                    <Text style={receiptStyles.bankName} className="text-right">
                       {receipt.accountNumber}
                     </Text>
                   </View>
                 </View>
 
                 {/* Divider */}
-                <View style={receiptStyles.divider} />
+                <View style={receiptStyles.divider}  className="h-[1px]"/>
 
                 {/* Total Amount */}
-                <View style={receiptStyles.totalRow}>
-                  <Text style={receiptStyles.totalLabel}>Total Amount</Text>
-                  <Text style={receiptStyles.totalAmount}>
+                <View style={receiptStyles.totalRow} className="flex-row justify-between items-center">
+                  <Text style={receiptStyles.totalLabel} className="font-semibold">Total Amount</Text>
+                  <Text style={receiptStyles.totalAmount} className="font-bold">
                     {receipt.totalAmount}
                   </Text>
                 </View>
               </View>
 
               {/* Action Buttons */}
-              <View style={receiptStyles.actionButtons}>
+              <View style={receiptStyles.actionButtons} className="flex-row justify-center">
                 <Pressable
                   style={receiptStyles.actionButton}
                   onPress={handleDownload}
-                >
+                 className="flex-row items-center justify-center flex-1">
                   <Image
                     source={require("@/assets/icons/Download - Iconly Pro-1.png")}
                     style={receiptStyles.actionIcon}
                   />
-                  <Text style={receiptStyles.actionText}>Download</Text>
+                  <Text style={receiptStyles.actionText} className="font-medium">Download</Text>
                 </Pressable>
 
                 <Pressable
                   style={receiptStyles.actionButton}
                   onPress={handleShare}
-                >
+                 className="flex-row items-center justify-center flex-1">
                   <Image
                     source={require("@/assets/icons/share-solid.png")}
                     style={receiptStyles.actionIcon}
                   />
-                  <Text style={receiptStyles.actionText}>Share</Text>
+                  <Text style={receiptStyles.actionText} className="font-medium">Share</Text>
                 </Pressable>
               </View>
             </View>
@@ -213,217 +213,103 @@ const styles = (colors: ColorScheme) =>
     header: {
       backgroundColor: colors.background,
     },
-    headerContent: {
-      flexDirection: "row",
-      alignItems: "center",
-      justifyContent: "center",
-      paddingVertical: RFValue(16),
-      position: "relative",
-    },
-    headerTitle: {
-      fontSize: RFValue(16),
-      fontWeight: "600",
-      color: colors.slate[650],
-    },
-    closeButton: {
-      position: "absolute",
-      right: RFValue(8),
-      padding: RFValue(4),
-    },
+    headerContent: {paddingVertical: RFValue(16)},
+    headerTitle: {fontSize: RFValue(16),
+color: colors.slate[650]},
+    closeButton: {right: RFValue(8),
+padding: RFValue(4)},
     closeIcon: {
       width: RFValue(20),
       height: RFValue(20),
       tintColor: colors.slate[650],
     },
-    container: {
-      flex: 1,
-      paddingTop: RFValue(24),
-      paddingHorizontal: RFValue(3),
-      paddingBottom: RFValue(40),
-    },
-    receiptCard: {
-      backgroundColor: colors.background,
-      borderRadius: RFValue(16),
-      position: "relative",
-      overflow: "visible",
-      // Shadow for card
-      shadowColor: "#000",
-      shadowOffset: {
+    container: {paddingTop: RFValue(24),
+paddingHorizontal: RFValue(3),
+paddingBottom: RFValue(40)},
+    receiptCard: {backgroundColor: colors.background,
+borderRadius: RFValue(16),
+shadowOffset: {
         width: 0,
         height: 2,
-      },
-      shadowOpacity: 0.1,
-      shadowRadius: 8,
-      elevation: 5,
-    },
-    notchLeft: {
-      position: "absolute",
-      left: -RFValue(10),
-      top: "50%",
-      width: RFValue(20),
-      height: RFValue(20),
-      borderRadius: RFValue(30),
-      backgroundColor: colors.slate[150],
-      marginTop: -RFValue(10),
-      borderWidth: 1,
-      borderColor: colors.slate[300],
-      zIndex: 1,
-    },
-    notchRight: {
-      position: "absolute",
-      right: -RFValue(10),
-      top: "50%",
-      width: RFValue(20),
-      height: RFValue(20),
-      borderRadius: RFValue(10),
-      backgroundColor: colors.slate[150],
-
-      borderWidth: 1,
-      borderColor: colors.slate[300],
-      marginTop: -RFValue(10),
-      zIndex: 1,
-    },
+      }},
+    notchLeft: {left: -RFValue(10),
+width: RFValue(20),
+height: RFValue(20),
+borderRadius: RFValue(30),
+backgroundColor: colors.slate[150],
+marginTop: -RFValue(10),
+borderColor: colors.slate[300]},
+    notchRight: {right: -RFValue(10),
+width: RFValue(20),
+height: RFValue(20),
+borderRadius: RFValue(10),
+backgroundColor: colors.slate[150],
+borderColor: colors.slate[300],
+marginTop: -RFValue(10)},
     cardContent: {
       paddingVertical: RFValue(24),
       paddingHorizontal: RFValue(16),
     },
-    successSection: {
-      alignItems: "center",
-      marginBottom: RFValue(32),
-    },
-    successIconContainer: {
-      width: RFValue(60),
-      height: RFValue(60),
-      borderRadius: RFValue(30),
-      backgroundColor: colors.success[100],
-      alignItems: "center",
-      justifyContent: "center",
-      marginBottom: RFValue(16),
-
-      borderWidth: 1,
-      borderColor: colors.success[200],
-    },
+    successSection: {marginBottom: RFValue(32)},
+    successIconContainer: {width: RFValue(60),
+height: RFValue(60),
+borderRadius: RFValue(30),
+backgroundColor: colors.success[100],
+marginBottom: RFValue(16),
+borderColor: colors.success[200]},
     successIcon: {
       width: RFValue(32),
       height: RFValue(32),
       tintColor: colors.success[300],
     },
-    successTitle: {
-      fontSize: RFValue(20),
-      fontWeight: "700",
-      color: colors.slate[650],
-      marginBottom: RFValue(8),
-    },
-    successSubtitle: {
-      fontSize: RFValue(14),
-      color: colors.slate[500],
-      textAlign: "center",
-    },
+    successTitle: {fontSize: RFValue(20),
+color: colors.slate[650],
+marginBottom: RFValue(8)},
+    successSubtitle: {fontSize: RFValue(14),
+color: colors.slate[500]},
     detailsSection: {
       gap: RFValue(16),
     },
-    detailRow: {
-      flexDirection: "row",
-      justifyContent: "space-between",
-      alignItems: "flex-start",
-    },
+    detailRow: {},
     detailLabel: {
       fontSize: RFValue(14),
       color: colors.slate[500],
     },
-    detailValue: {
-      fontSize: RFValue(14),
-      color: colors.slate[650],
-      fontWeight: "500",
-      textAlign: "right",
-    },
-    propertySection: {
-      flexDirection: "row",
-      justifyContent: "space-between",
-      alignItems: "flex-start",
-    },
-    propertyContent: {
-      alignItems: "flex-end",
-    },
-    propertyName: {
-      fontSize: RFValue(14),
-      color: colors.slate[650],
-      fontWeight: "500",
-      textAlign: "right",
-    },
-    propertyAddress: {
-      fontSize: RFValue(13),
-      color: colors.slate[500],
-      textAlign: "right",
-      marginTop: RFValue(2),
-    },
-    paidToSection: {
-      flexDirection: "row",
-      justifyContent: "space-between",
-      alignItems: "flex-start",
-    },
-    paidToContent: {
-      flex: 1,
-      alignItems: "flex-end",
-    },
-    paidToName: {
-      fontSize: RFValue(14),
-      color: colors.slate[650],
-      fontWeight: "500",
-      textAlign: "right",
-    },
-    bankName: {
-      fontSize: RFValue(13),
-      color: colors.slate[500],
-      textAlign: "right",
-      marginTop: RFValue(2),
-    },
-    divider: {
-      height: 1,
-      backgroundColor: colors.slate[300],
-      marginVertical: RFValue(8),
-    },
-    totalRow: {
-      flexDirection: "row",
-      justifyContent: "space-between",
-      alignItems: "center",
-      paddingTop: RFValue(8),
-    },
-    totalLabel: {
-      fontSize: RFValue(16),
-      fontWeight: "600",
-      color: colors.slate[650],
-    },
-    totalAmount: {
-      fontSize: RFValue(20),
-      fontWeight: "700",
-      color: colors.slate[650],
-    },
-    actionButtons: {
-      flexDirection: "row",
-      justifyContent: "center",
-      gap: RFValue(16),
-      marginTop: RFValue(32),
-    },
-    actionButton: {
-      flexDirection: "row",
-      alignItems: "center",
-      justifyContent: "center",
-      gap: RFValue(8),
-      paddingHorizontal: RFValue(24),
-      paddingVertical: RFValue(12),
-      borderRadius: RFValue(8),
-      backgroundColor: colors.slate[150],
-      flex: 1,
-    },
+    detailValue: {fontSize: RFValue(14),
+color: colors.slate[650]},
+    propertySection: {},
+    propertyContent: {},
+    propertyName: {fontSize: RFValue(14),
+color: colors.slate[650]},
+    propertyAddress: {fontSize: RFValue(13),
+color: colors.slate[500],
+marginTop: RFValue(2)},
+    paidToSection: {},
+    paidToContent: {},
+    paidToName: {fontSize: RFValue(14),
+color: colors.slate[650]},
+    bankName: {fontSize: RFValue(13),
+color: colors.slate[500],
+marginTop: RFValue(2)},
+    divider: {backgroundColor: colors.slate[300],
+marginVertical: RFValue(8)},
+    totalRow: {paddingTop: RFValue(8)},
+    totalLabel: {fontSize: RFValue(16),
+color: colors.slate[650]},
+    totalAmount: {fontSize: RFValue(20),
+color: colors.slate[650]},
+    actionButtons: {gap: RFValue(16),
+marginTop: RFValue(32)},
+    actionButton: {gap: RFValue(8),
+paddingHorizontal: RFValue(24),
+paddingVertical: RFValue(12),
+borderRadius: RFValue(8),
+backgroundColor: colors.slate[150]},
     actionIcon: {
       width: RFValue(18),
       height: RFValue(18),
       tintColor: colors.slate[650],
     },
-    actionText: {
-      fontSize: RFValue(14),
-      fontWeight: "500",
-      color: colors.slate[650],
-    },
+    actionText: {fontSize: RFValue(14),
+color: colors.slate[650]},
   });

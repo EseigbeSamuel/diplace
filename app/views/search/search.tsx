@@ -89,11 +89,11 @@ const SearchScreen = () => {
 
   return (
     <SafeAreaViewContainer disableBottom>
-      <View style={styles.topBar}>
+      <View style={styles.topBar} className="flex-row items-center">
         <Pressable style={styles.backButton} onPress={() => router.back()}>
           <ArrowLeft size={RFValue(18)} color={colors.slate[650]} />
         </Pressable>
-        <View style={styles.searchBox}>
+        <View style={styles.searchBox} className="flex-1 border-[1px] flex-row items-center">
           <Search size={RFValue(16)} color={colors.slate[500]} />
           <TextInput
             value={searchText}
@@ -102,7 +102,7 @@ const SearchScreen = () => {
             placeholderTextColor={colors.slate[400]}
             style={styles.searchInput}
             returnKeyType="search"
-          />
+           className="flex-1 py-[0px]"/>
           {searchText ? (
             <Pressable onPress={() => setSearchText("")}>
               <X size={RFValue(16)} color={colors.slate[500]} />
@@ -111,14 +111,14 @@ const SearchScreen = () => {
           <Pressable
             style={styles.filterButton}
             onPress={() => setFilterVisible(true)}
-          >
+           className="items-center justify-center">
             <SlidersHorizontal size={RFValue(17)} color={colors.background} />
           </Pressable>
         </View>
       </View>
 
-      <View style={styles.resultsHeader}>
-        <Text style={styles.resultsTitle}>
+      <View style={styles.resultsHeader} className="border-b">
+        <Text style={styles.resultsTitle} className="font-semibold">
           {searchText.trim() ? `${results.length} results found` : "Top Result"}
         </Text>
       </View>
@@ -135,7 +135,7 @@ const SearchScreen = () => {
             <ResultRow item={item} styles={styles} colors={colors} />
           )}
           ListEmptyComponent={
-            <Text style={styles.empty}>No spaces found.</Text>
+            <Text style={styles.empty} className="text-center">No spaces found.</Text>
           }
         />
       )}
@@ -192,7 +192,7 @@ function ResultRow({
     .filter(Boolean)
     .join(", ");
   return (
-    <View style={styles.resultRow}>
+    <View style={styles.resultRow} className="flex-row items-center border-b">
       <Image
         source={
           image
@@ -201,16 +201,16 @@ function ResultRow({
         }
         style={styles.resultImage}
       />
-      <View style={styles.resultInfo}>
-        <Text numberOfLines={1} style={styles.resultTitle}>
+      <View style={styles.resultInfo} className="flex-1">
+        <Text numberOfLines={1} style={styles.resultTitle} className="font-semibold">
           {item.title}
         </Text>
         <Text numberOfLines={1} style={styles.resultAddress}>
           {address || "Location unavailable"}
         </Text>
-        <Text style={styles.resultPrice}>
+        <Text style={styles.resultPrice} className="font-bold">
           ₦{new Intl.NumberFormat("en-NG").format(item.price || 0)}
-          <Text style={styles.frequency}>
+          <Text style={styles.frequency} className="font-normal">
             {" "}
             /{item.cost_frequency?.replace("per_", "")}
           </Text>
@@ -224,28 +224,28 @@ function ResultRow({
 const createStyles = (colors: any) =>
   StyleSheet.create({
     topBar: {
-      flexDirection: "row",
-      alignItems: "center",
+
+
       gap: RFValue(8),
       marginBottom: RFValue(18),
     },
     backButton: { padding: RFValue(4) },
     searchBox: {
-      flex: 1,
+
       height: RFValue(42),
-      borderWidth: 1,
+
       borderColor: colors.slate[650],
       borderRadius: RFValue(22),
-      flexDirection: "row",
-      alignItems: "center",
+
+
       paddingLeft: RFValue(12),
       gap: RFValue(8),
     },
     searchInput: {
-      flex: 1,
+
       color: colors.slate[650],
       fontSize: RFValue(13),
-      paddingVertical: 0,
+
     },
     filterButton: {
       width: RFValue(32),
@@ -253,49 +253,41 @@ const createStyles = (colors: any) =>
       marginRight: RFValue(4),
       borderRadius: RFValue(16),
       backgroundColor: colors.slate[650],
-      alignItems: "center",
-      justifyContent: "center",
+
+
     },
-    resultsHeader: {
-      borderBottomWidth: 1,
-      borderBottomColor: colors.slate[200],
-      paddingBottom: RFValue(10),
-    },
+    resultsHeader: {borderBottomColor: colors.slate[200],
+paddingBottom: RFValue(10)},
     resultsTitle: {
       fontSize: RFValue(14),
-      fontWeight: "600",
+
       color: colors.slate[650],
     },
     listContent: { paddingVertical: RFValue(8), paddingBottom: RFValue(30) },
-    resultRow: {
-      flexDirection: "row",
-      alignItems: "center",
-      gap: RFValue(10),
-      paddingVertical: RFValue(9),
-      borderBottomWidth: 1,
-      borderBottomColor: colors.slate[150],
-    },
+    resultRow: {gap: RFValue(10),
+paddingVertical: RFValue(9),
+borderBottomColor: colors.slate[150]},
     resultImage: {
       width: RFValue(72),
       height: RFValue(58),
       borderRadius: RFValue(8),
       backgroundColor: colors.slate[150],
     },
-    resultInfo: { flex: 1, gap: RFValue(3) },
+    resultInfo: {  gap: RFValue(3) },
     resultTitle: {
       color: colors.slate[650],
       fontSize: RFValue(13),
-      fontWeight: "600",
+
     },
     resultAddress: { color: colors.slate[500], fontSize: RFValue(10) },
     resultPrice: {
       color: colors.slate[650],
       fontSize: RFValue(11),
-      fontWeight: "700",
+
     },
-    frequency: { color: colors.slate[500], fontWeight: "400" },
+    frequency: { color: colors.slate[500]},
     empty: {
-      textAlign: "center",
+
       color: colors.slate[500],
       paddingTop: RFValue(32),
     },

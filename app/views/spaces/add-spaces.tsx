@@ -53,10 +53,10 @@ const AddSpace = () => {
     <SafeAreaViewContainer>
       <SectionHeader title="Add a space" />
       <ScrollView showsVerticalScrollIndicator={false}>
-        <View style={addSpaceStyles.container}>
+        <View style={addSpaceStyles.container} className="flex-1">
           {/* Main Title */}
-          <View style={{}}>
-            <Text style={addSpaceStyles.mainTitle}>
+          <View className="">
+            <Text style={addSpaceStyles.mainTitle} className="font-semibold font-[InstrumentSansBold]">
               Get your space on DiPlace with these easy steps.
             </Text>
           </View>
@@ -64,19 +64,19 @@ const AddSpace = () => {
           <View style={addSpaceStyles.stepsList}>
             {steps.map((step, index) => (
               <View key={step.id} style={addSpaceStyles.stepItem}>
-                <View style={addSpaceStyles.stepContent}>
-                  <View style={addSpaceStyles.stepTextContainer}>
-                    <Text style={addSpaceStyles.stepTitle}>{step.title}</Text>
+                <View style={addSpaceStyles.stepContent} className="flex-row items-start justify-between">
+                  <View style={addSpaceStyles.stepTextContainer} className="flex-1">
+                    <Text style={addSpaceStyles.stepTitle} className="font-semibold">{step.title}</Text>
                     <Text style={addSpaceStyles.stepDescription}>
                       {step.description}
                     </Text>
                   </View>
-                  <View style={[addSpaceStyles.iconWrapper]}>
+                  <View style={[addSpaceStyles.iconWrapper]} className="items-center justify-center">
                     <Image source={step.icon} style={addSpaceStyles.stepIcon} />
                   </View>
                 </View>
                 {index < steps.length - 1 && (
-                  <View style={addSpaceStyles.divider} />
+                  <View style={addSpaceStyles.divider}  className="h-[1px]"/>
                 )}
               </View>
             ))}
@@ -102,64 +102,39 @@ export default AddSpace;
 
 const styles = (colors: ColorScheme) =>
   StyleSheet.create({
-    container: {
-      flex: 1,
-      paddingHorizontal: RFValue(3),
-      paddingTop: RFValue(20),
-    },
-    mainTitle: {
-      fontSize: RFValue(24),
-      fontWeight: "600",
-      color: colors.slate[650],
-      lineHeight: RFValue(30),
-      marginBottom: RFValue(32),
-      paddingHorizontal: RFValue(2),
-      fontFamily: "InstrumentSansBold",
-    },
+    container: {paddingHorizontal: RFValue(3),
+paddingTop: RFValue(20)},
+    mainTitle: {fontSize: RFValue(24),
+color: colors.slate[650],
+lineHeight: RFValue(30),
+marginBottom: RFValue(32),
+paddingHorizontal: RFValue(2)},
     stepsList: {
       marginBottom: RFValue(20),
     },
     stepItem: {
       marginBottom: RFValue(4),
     },
-    stepContent: {
-      flexDirection: "row",
-      alignItems: "flex-start",
-      justifyContent: "space-between",
-      paddingVertical: RFValue(20),
-      paddingHorizontal: RFValue(2),
-    },
-    stepTextContainer: {
-      flex: 1,
-      marginRight: RFValue(16),
-    },
-    stepTitle: {
-      fontSize: RFValue(16),
-      fontWeight: "600",
-      color: colors.slate[650],
-      marginBottom: RFValue(6),
-    },
+    stepContent: {paddingVertical: RFValue(20),
+paddingHorizontal: RFValue(2)},
+    stepTextContainer: {marginRight: RFValue(16)},
+    stepTitle: {fontSize: RFValue(16),
+color: colors.slate[650],
+marginBottom: RFValue(6)},
     stepDescription: {
       fontSize: RFValue(13),
       color: colors.slate[600],
       lineHeight: RFValue(19),
     },
-    iconWrapper: {
-      width: RFValue(50),
-      height: RFValue(50),
-      borderRadius: RFValue(12),
-      alignItems: "center",
-      justifyContent: "center",
-    },
+    iconWrapper: {width: RFValue(50),
+height: RFValue(50),
+borderRadius: RFValue(12)},
     stepIcon: {
       width: RFValue(40),
       height: RFValue(40),
     },
-    divider: {
-      height: 1,
-      backgroundColor: colors.slate[300],
-      marginHorizontal: RFValue(2),
-    },
+    divider: {backgroundColor: colors.slate[300],
+marginHorizontal: RFValue(2)},
     buttonContainer: {
       paddingVertical: RFValue(20),
       backgroundColor: colors.background,

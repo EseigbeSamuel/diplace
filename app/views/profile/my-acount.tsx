@@ -39,8 +39,8 @@ const MyAccount = () => {
       <ScrollView showsVerticalScrollIndicator={false}>
         <View>
           {/* Edit Profile */}
-          <Pressable style={accountStyles.menuItem} onPress={handleEditProfile}>
-            <View style={accountStyles.menuItemLeft}>
+          <Pressable style={accountStyles.menuItem} onPress={handleEditProfile} className="flex-row items-center justify-between">
+            <View style={accountStyles.menuItemLeft} className="flex-row items-center">
               <Image
                 source={require("@/assets/icons/edit-pencil.png")}
                 style={accountStyles.menuIcon}
@@ -57,20 +57,20 @@ const MyAccount = () => {
           <Pressable
             style={accountStyles.menuItem}
             onPress={handleVerifyAccount}
-          >
-            <View style={accountStyles.menuItemLeft}>
+           className="flex-row items-center justify-between">
+            <View style={accountStyles.menuItemLeft} className="flex-row items-center">
               <Image
                 source={require("@/assets/icons/badge-check-1.png")}
                 style={accountStyles.menuIcon}
               />
               <Text style={accountStyles.menuText}>Verify Account</Text>
             </View>
-            <Pressable style={accountStyles.verifiedBadge}>
+            <Pressable style={accountStyles.verifiedBadge} className="flex-row items-center">
               <Image
                 source={require("@/assets/icons/badge-check-green.png")}
                 style={accountStyles.verifiedIcon}
               />
-              <Text style={accountStyles.verifiedText}>Verified</Text>
+              <Text style={accountStyles.verifiedText} className="font-medium">Verified</Text>
             </Pressable>
           </Pressable>
 
@@ -78,8 +78,8 @@ const MyAccount = () => {
           <Pressable
             style={accountStyles.menuItem}
             onPress={handleDeleteAccount}
-          >
-            <View style={accountStyles.menuItemLeft}>
+           className="flex-row items-center justify-between">
+            <View style={accountStyles.menuItemLeft} className="flex-row items-center">
               <Image
                 source={require("@/assets/icons/Delete - Iconly Pro-1.png")}
                 style={[accountStyles.menuIcon, accountStyles.deleteIcon]}
@@ -98,14 +98,14 @@ export default MyAccount;
 const styles = (colors: ColorScheme) =>
   StyleSheet.create({
     menuItem: {
-      flexDirection: "row",
-      alignItems: "center",
-      justifyContent: "space-between",
+
+
+
       paddingVertical: RFValue(16),
     },
     menuItemLeft: {
-      flexDirection: "row",
-      alignItems: "center",
+
+
     },
     menuIcon: {
       width: RFValue(20),
@@ -121,8 +121,8 @@ const styles = (colors: ColorScheme) =>
       tintColor: colors.slate[600],
     },
     verifiedBadge: {
-      flexDirection: "row",
-      alignItems: "center",
+
+
       backgroundColor: colors.success[100],
       paddingHorizontal: RFValue(10),
       paddingVertical: RFValue(6),
@@ -137,7 +137,7 @@ const styles = (colors: ColorScheme) =>
     verifiedText: {
       fontSize: RFValue(13),
       color: colors.success[300],
-      fontWeight: "500",
+
     },
     deleteIcon: {
       tintColor: colors.error[200],

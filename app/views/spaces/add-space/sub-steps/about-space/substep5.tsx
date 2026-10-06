@@ -35,7 +35,7 @@ const SpaceDescriptionSubstep: React.FC<SpaceDescriptionSubstepProps> = ({
   };
 
   return (
-    <View style={styles.container}>
+    <View style={styles.container} className="flex-1">
       <KeyboardAwareScrollView
         enableOnAndroid={true}
         extraScrollHeight={20}
@@ -45,7 +45,7 @@ const SpaceDescriptionSubstep: React.FC<SpaceDescriptionSubstepProps> = ({
       >
         {/* Space Name Section */}
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>What can we call this space?</Text>
+          <Text style={styles.sectionTitle} className="font-semibold">What can we call this space?</Text>
           <View style={styles.inputWrapper}>
             <TextInput
               style={styles.textInput}
@@ -60,7 +60,7 @@ const SpaceDescriptionSubstep: React.FC<SpaceDescriptionSubstepProps> = ({
                 })
               }
               value={spaceForm.value.description?.title || ""}
-            />
+             className="w-[100%px] border-[1px] border-style-[solid]"/>
           </View>
           <Text style={styles.helperText}>
             Keep it short max "2 bedrooms in a suite apartments"
@@ -69,7 +69,7 @@ const SpaceDescriptionSubstep: React.FC<SpaceDescriptionSubstepProps> = ({
 
         {/* Description Section */}
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Let's describe this space</Text>
+          <Text style={styles.sectionTitle} className="font-semibold">Let's describe this space</Text>
           <View style={styles.textareaWrapper}>
             <TextInput
               style={styles.textarea}
@@ -88,9 +88,9 @@ const SpaceDescriptionSubstep: React.FC<SpaceDescriptionSubstepProps> = ({
               numberOfLines={8}
               maxLength={MAX_DESCRIPTION_LENGTH}
               textAlignVertical="top"
-            />
+             className="w-[100%px] border-[1px] border-style-[solid]"/>
           </View>
-          <View style={styles.charCountContainer}>
+          <View  className="flex-row justify-between items-center">
             <Pressable
               style={styles.charCountLabel}
               onPress={() =>
@@ -133,10 +133,7 @@ const SpaceDescriptionSubstep: React.FC<SpaceDescriptionSubstepProps> = ({
 
 const createStyles = (colors: ColorScheme) =>
   StyleSheet.create({
-    container: {
-      flex: 1,
-      backgroundColor: colors.background,
-    },
+    container: {backgroundColor: colors.background},
     scrollContent: {
       paddingTop: RFValue(32),
       paddingBottom: RFValue(20),
@@ -144,28 +141,20 @@ const createStyles = (colors: ColorScheme) =>
     section: {
       marginBottom: RFValue(32),
     },
-    sectionTitle: {
-      fontSize: RFValue(20),
-      fontWeight: "600",
-      color: colors.slate[650],
-      lineHeight: RFValue(28),
-      marginBottom: RFValue(16),
-    },
+    sectionTitle: {fontSize: RFValue(20),
+color: colors.slate[650],
+lineHeight: RFValue(28),
+marginBottom: RFValue(16)},
     inputWrapper: {
       marginBottom: RFValue(8),
     },
-    textInput: {
-      width: "100%",
-      paddingVertical: RFValue(14),
-      paddingHorizontal: RFValue(16),
-      backgroundColor: colors.background,
-      borderRadius: RFValue(12),
-      borderWidth: 1,
-      borderColor: colors.slate[300],
-      fontSize: RFValue(15),
-      color: colors.slate[650],
-      borderStyle: "solid",
-    },
+    textInput: {paddingVertical: RFValue(14),
+paddingHorizontal: RFValue(16),
+backgroundColor: colors.background,
+borderRadius: RFValue(12),
+borderColor: colors.slate[300],
+fontSize: RFValue(15),
+color: colors.slate[650]},
     helperText: {
       fontSize: RFValue(13),
       color: colors.slate[500],
@@ -174,24 +163,15 @@ const createStyles = (colors: ColorScheme) =>
     textareaWrapper: {
       marginBottom: RFValue(8),
     },
-    textarea: {
-      width: "100%",
-      minHeight: RFValue(150),
-      paddingVertical: RFValue(14),
-      paddingHorizontal: RFValue(16),
-      backgroundColor: colors.background,
-      borderRadius: RFValue(12),
-      borderWidth: 1,
-      borderColor: colors.slate[300],
-      fontSize: RFValue(15),
-      color: colors.slate[650],
-      borderStyle: "solid",
-    },
-    charCountContainer: {
-      flexDirection: "row",
-      justifyContent: "space-between",
-      alignItems: "center",
-    },
+    textarea: {minHeight: RFValue(150),
+paddingVertical: RFValue(14),
+paddingHorizontal: RFValue(16),
+backgroundColor: colors.background,
+borderRadius: RFValue(12),
+borderColor: colors.slate[300],
+fontSize: RFValue(15),
+color: colors.slate[650]},
+    charCountContainer: {},
     charCountLabel: {
       fontSize: RFValue(13),
       color: colors.slate[650],

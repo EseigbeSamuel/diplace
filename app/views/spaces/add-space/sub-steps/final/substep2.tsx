@@ -98,12 +98,12 @@ const InspectionTimeSubstep: React.FC<InspectionTimeSubstepProps> = ({
   };
 
   return (
-    <View style={styles.container}>
+    <View style={styles.container} className="flex-1">
       <ScrollView
         showsVerticalScrollIndicator={false}
         contentContainerStyle={styles.scrollContent}
       >
-        <Text style={styles.title}>
+        <Text style={styles.title} className="font-semibold">
           When can renters come for physical inspection?
         </Text>
         <Text style={styles.description}>
@@ -123,18 +123,18 @@ const InspectionTimeSubstep: React.FC<InspectionTimeSubstepProps> = ({
           <TouchableOpacity
             style={styles.addCustomButton}
             onPress={handleAddCustomTime}
-          >
+           className="flex-row items-center justify-end">
             <Image
               source={require("@/assets/icons/plus.png")}
               style={styles.addIcon}
               resizeMode="contain"
             />
-            <Text style={styles.addCustomText}>Add custom time</Text>
+            <Text style={styles.addCustomText} className="font-medium">Add custom time</Text>
           </TouchableOpacity>
         </View>
       </ScrollView>
 
-      <View style={styles.buttonContainer}>
+      <View style={styles.buttonContainer} className="absolute bottom-[0px] left-[0px] right-[0px] border-t">
         <AppButton
           title="Next"
           onPress={handleNext}
@@ -160,15 +160,12 @@ const InspectionTimeSubstep: React.FC<InspectionTimeSubstepProps> = ({
 
 const createStyles = (colors: ColorScheme) =>
   StyleSheet.create({
-    container: { flex: 1, backgroundColor: colors.background },
+    container: {backgroundColor: colors.background},
     scrollContent: { paddingTop: RFValue(32), paddingBottom: RFValue(100) },
-    title: {
-      fontSize: RFValue(20),
-      fontWeight: "600",
-      color: colors.slate[650],
-      lineHeight: RFValue(28),
-      marginBottom: RFValue(16),
-    },
+    title: {fontSize: RFValue(20),
+color: colors.slate[650],
+lineHeight: RFValue(28),
+marginBottom: RFValue(16)},
     description: {
       fontSize: RFValue(14),
       color: colors.slate[600],
@@ -176,33 +173,18 @@ const createStyles = (colors: ColorScheme) =>
       marginBottom: RFValue(32),
     },
     slotsContainer: { gap: RFValue(16) },
-    addCustomButton: {
-      flexDirection: "row",
-      alignItems: "center",
-      justifyContent: "flex-end",
-      paddingVertical: RFValue(14),
-      gap: RFValue(8),
-    },
+    addCustomButton: {paddingVertical: RFValue(14),
+gap: RFValue(8)},
     addIcon: {
       width: RFValue(16),
       height: RFValue(16),
       tintColor: colors.slate[650],
     },
-    addCustomText: {
-      fontSize: RFValue(15),
-      fontWeight: "500",
-      color: colors.slate[650],
-    },
-    buttonContainer: {
-      position: "absolute",
-      bottom: 0,
-      left: 0,
-      right: 0,
-      paddingVertical: RFValue(16),
-      backgroundColor: colors.background,
-      borderTopWidth: 1,
-      borderTopColor: colors.slate[200],
-    },
+    addCustomText: {fontSize: RFValue(15),
+color: colors.slate[650]},
+    buttonContainer: {paddingVertical: RFValue(16),
+backgroundColor: colors.background,
+borderTopColor: colors.slate[200]},
   });
 
 export default InspectionTimeSubstep;

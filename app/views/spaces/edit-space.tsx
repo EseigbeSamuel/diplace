@@ -121,7 +121,7 @@ const Substep4: React.FC<{ onNext: () => void; onPrev: () => void }> = ({
             <View>
               <TextInput
                 placeholder="250 Cap"
-                className="rounded-md p-5"
+                className="rounded-md p-5 border-[1px] border-style-[solid]"
                 placeholderTextColor={colors.slate[600]}
                 style={[Styles.borderDarkGray, Styles.textBlack]}
               />
@@ -134,7 +134,7 @@ const Substep4: React.FC<{ onNext: () => void; onPrev: () => void }> = ({
             <View>
               <TextInput
                 placeholder="30ft X 75ft"
-                className="rounded-md p-5"
+                className="rounded-md p-5 border-[1px] border-style-[solid]"
                 placeholderTextColor={colors.slate[600]}
                 style={[Styles.borderDarkGray, Styles.textBlack]}
               />
@@ -197,22 +197,10 @@ const styles = (colors: ColorScheme) =>
       //   backgroundColor: colors.slate[650],
       color: colors.slate[650],
     },
-    checkboxButton: {
-      color: colors.slate[100],
-      borderWidth: 1,
-      borderStyle: "solid",
-      borderColor: colors.slate[600],
-    },
-    borderDarkGray: {
-      borderWidth: 1,
-      borderStyle: "solid",
-      borderColor: colors.slate[600],
-    },
-    borderLightGray: {
-      borderWidth: 1,
-      borderStyle: "solid",
-      borderColor: colors.slate[300],
-    },
+    checkboxButton: {color: colors.slate[100],
+borderColor: colors.slate[600]},
+    borderDarkGray: {borderColor: colors.slate[600]},
+    borderLightGray: {borderColor: colors.slate[300]},
     title: {
       fontSize: RFValue(24),
       lineHeight: RFValue(32),

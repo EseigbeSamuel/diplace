@@ -146,8 +146,8 @@ const EmailVerificationStep = ({ onNext }: EmailVerificationProps) => {
   };
 
   return (
-    <View style={Styles.container}>
-      <View style={Styles.contentContainer}>
+    <View  className="flex-1">
+      <View style={Styles.contentContainer} className="flex-1">
         <View style={Styles.iconContainer}>
           <Image
             source={require("@/assets/icons/mail-outline-light.png")}
@@ -157,13 +157,13 @@ const EmailVerificationStep = ({ onNext }: EmailVerificationProps) => {
         </View>
 
         <View style={Styles.textContainer}>
-          <Text style={Styles.headText}>Verify your email address</Text>
+          <Text style={Styles.headText} className="font-semibold">Verify your email address</Text>
           <Text style={Styles.descriptionText}>
             Please input the OTP sent to your registered email address{" "}
-            <Text style={Styles.emailText}>{maskedEmail}</Text>
+            <Text style={Styles.emailText} className="font-semibold">{maskedEmail}</Text>
           </Text>
           {isSending ? (
-            <View style={Styles.sendingContainer}>
+            <View style={Styles.sendingContainer} className="items-center flex-row">
               <ActivityIndicator size="small" color={colors.slate[600]} />
               <Text style={Styles.sendingText}>Sending verification code...</Text>
             </View>
@@ -186,7 +186,7 @@ const EmailVerificationStep = ({ onNext }: EmailVerificationProps) => {
           />
         </View>
 
-        <View style={Styles.resendContainer}>
+        <View style={Styles.resendContainer} className="flex-row items-center justify-center">
           <Text style={Styles.resendText}>Didn&apos;t receive OTP? </Text>
           <TouchableOpacity onPress={handleResendCode} disabled={resendDisabled}>
             <Text
@@ -194,7 +194,7 @@ const EmailVerificationStep = ({ onNext }: EmailVerificationProps) => {
                 Styles.resendLink,
                 resendDisabled && Styles.resendLinkDisabled,
               ]}
-            >
+             className="font-semibold">
               {initiateVerificationPending || resendVerificationOtpPending
                 ? "Sending..."
                 : "Resend code"}
@@ -213,13 +213,8 @@ export default EmailVerificationStep;
 
 const styles = (colors: ColorScheme) =>
   StyleSheet.create({
-    container: {
-      flex: 1,
-    },
-    contentContainer: {
-      flex: 1,
-      paddingTop: RFValue(40),
-    },
+    container: {},
+    contentContainer: {paddingTop: RFValue(40)},
     iconContainer: {
       marginBottom: RFValue(16),
     },
@@ -232,46 +227,28 @@ const styles = (colors: ColorScheme) =>
       marginBottom: RFValue(40),
       gap: RFValue(8),
     },
-    headText: {
-      fontSize: RFValue(24),
-      fontWeight: "600",
-      lineHeight: RFValue(32),
-      color: colors.slate[650],
-    },
+    headText: {fontSize: RFValue(24),
+lineHeight: RFValue(32),
+color: colors.slate[650]},
     descriptionText: {
       fontSize: RFValue(14),
       lineHeight: RFValue(22),
       color: colors.slate[600],
     },
-    emailText: {
-      fontWeight: "600",
-      color: colors.slate[650],
-    },
-    sendingContainer: {
-      alignItems: "center",
-      flexDirection: "row",
-      gap: RFValue(8),
-      marginTop: RFValue(8),
-    },
+    emailText: {color: colors.slate[650]},
+    sendingContainer: {gap: RFValue(8),
+marginTop: RFValue(8)},
     sendingText: {
       color: colors.slate[600],
       fontSize: RFValue(13),
     },
-    resendContainer: {
-      flexDirection: "row",
-      alignItems: "center",
-      marginBottom: RFValue(32),
-      justifyContent: "center",
-    },
+    resendContainer: {marginBottom: RFValue(32)},
     resendText: {
       fontSize: RFValue(14),
       color: colors.slate[600],
     },
-    resendLink: {
-      fontSize: RFValue(14),
-      color: colors.info[200],
-      fontWeight: "600",
-    },
+    resendLink: {fontSize: RFValue(14),
+color: colors.info[200]},
     resendLinkDisabled: {
       color: colors.slate[450],
     },

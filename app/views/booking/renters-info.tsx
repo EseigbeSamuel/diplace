@@ -52,27 +52,27 @@ const RentersInformation = () => {
       <KeyboardAvoidingView
         behavior={Platform.OS === "ios" ? "padding" : "height"}
         style={styles.flex}
-      >
+       className="flex-1">
         {/* Header */}
-        <View style={styles.header}>
+        <View style={styles.header} className="flex-row items-center justify-between">
           <Pressable onPress={() => router.back()}>
             <Image
               source={require("@/assets/icons/arrow-left-light.png")}
               style={styles.backIcon}
             />
           </Pressable>
-          <Text style={styles.headerTitle}>Tenant's information</Text>
-          <Text style={styles.stepIndicator}>1/4</Text>
+          <Text style={styles.headerTitle} className="font-semibold flex-1 text-center">Tenant's information</Text>
+          <Text style={styles.stepIndicator} className="font-medium">1/4</Text>
         </View>
 
         <ScrollView
           showsVerticalScrollIndicator={false}
           contentContainerStyle={styles.scrollContent}
         >
-          <View style={styles.container}>
+          <View  className="flex-1">
             {/* Title Section */}
             <View style={styles.titleSection}>
-              <Text style={styles.title}>Tenant's Information</Text>
+              <Text style={styles.title} className="font-bold">Tenant's Information</Text>
               <Text style={styles.subtitle}>
                 Let us know who is booking this space.
               </Text>
@@ -80,7 +80,7 @@ const RentersInformation = () => {
 
             {/* Personal Information Section */}
             <View style={styles.section}>
-              <Text style={styles.sectionLabel}>Personal Information</Text>
+              <Text style={styles.sectionLabel} className="font-semibold">Personal Information</Text>
 
               {/* Full Name / Organization Input */}
 
@@ -102,7 +102,7 @@ const RentersInformation = () => {
 
             {/* Contact Details Section */}
             <View style={styles.section}>
-              <Text style={styles.sectionLabel}>Contact Details</Text>
+              <Text style={styles.sectionLabel} className="font-semibold">Contact Details</Text>
 
               <TextField
                 label="Email"
@@ -142,49 +142,26 @@ export default RentersInformation;
 
 const getStyles = (colors: ColorScheme) =>
   StyleSheet.create({
-    flex: {
-      flex: 1,
-      paddingBottom: RFValue(16),
-    },
-    header: {
-      flexDirection: "row",
-      alignItems: "center",
-      justifyContent: "space-between",
-      paddingVertical: RFValue(16),
-    },
+    flex: {paddingBottom: RFValue(16)},
+    header: {paddingVertical: RFValue(16)},
     backIcon: {
       width: RFValue(20),
       height: RFValue(20),
       tintColor: colors.slate[650],
     },
-    headerTitle: {
-      fontSize: RFValue(16),
-      fontWeight: "600",
-      color: colors.slate[650],
-      flex: 1,
-      textAlign: "center",
-    },
-    stepIndicator: {
-      fontSize: RFValue(14),
-      color: colors.slate[500],
-      fontWeight: "500",
-    },
-    scrollContent: {
-      flexGrow: 1,
-    },
-    container: {
-      flex: 1,
-    },
+    headerTitle: {fontSize: RFValue(16),
+color: colors.slate[650]},
+    stepIndicator: {fontSize: RFValue(14),
+color: colors.slate[500]},
+    scrollContent: {},
+    container: {},
     titleSection: {
       marginTop: RFValue(16),
       marginBottom: RFValue(32),
     },
-    title: {
-      fontSize: RFValue(22),
-      fontWeight: "700",
-      color: colors.slate[650],
-      marginBottom: RFValue(8),
-    },
+    title: {fontSize: RFValue(22),
+color: colors.slate[650],
+marginBottom: RFValue(8)},
     subtitle: {
       fontSize: RFValue(14),
       color: colors.slate[500],
@@ -193,92 +170,55 @@ const getStyles = (colors: ColorScheme) =>
     section: {
       marginBottom: RFValue(32),
     },
-    sectionLabel: {
-      fontSize: RFValue(15),
-      fontWeight: "600",
-      color: colors.slate[650],
-      marginBottom: RFValue(16),
-    },
-    inputContainer: {
-      flexDirection: "row",
-      alignItems: "flex-start",
-      backgroundColor: colors.slate[150],
-      borderRadius: RFValue(12),
-      paddingHorizontal: RFValue(16),
-      paddingVertical: RFValue(16),
-      marginBottom: RFValue(16),
-      borderWidth: 1,
-      borderColor: colors.slate[300],
-    },
+    sectionLabel: {fontSize: RFValue(15),
+color: colors.slate[650],
+marginBottom: RFValue(16)},
+    inputContainer: {backgroundColor: colors.slate[150],
+borderRadius: RFValue(12),
+paddingHorizontal: RFValue(16),
+paddingVertical: RFValue(16),
+marginBottom: RFValue(16),
+borderColor: colors.slate[300]},
     inputIcon: {
       width: RFValue(20),
       height: RFValue(20),
       tintColor: colors.slate[550],
       marginRight: RFValue(12),
     },
-    inputWrapper: {
-      flex: 1,
-    },
+    inputWrapper: {},
     inputLabel: {
       fontSize: RFValue(12),
       color: colors.slate[500],
       marginBottom: RFValue(6),
     },
-    input: {
-      fontSize: RFValue(15),
-      color: colors.slate[650],
-      padding: 0,
-    },
-    phoneInputWrapper: {
-      flex: 1,
-      flexDirection: "row",
-      alignItems: "center",
-    },
-    countryCodeContainer: {
-      flexDirection: "row",
-      alignItems: "center",
-    },
+    input: {fontSize: RFValue(15),
+color: colors.slate[650]},
+    phoneInputWrapper: {},
+    countryCodeContainer: {},
     flagIcon: {
       width: RFValue(20),
       height: RFValue(20),
       marginRight: RFValue(6),
     },
-    countryCode: {
-      fontSize: RFValue(15),
-      color: colors.slate[650],
-      fontWeight: "500",
-      marginRight: RFValue(4),
-    },
+    countryCode: {fontSize: RFValue(15),
+color: colors.slate[650],
+marginRight: RFValue(4)},
     chevronIcon: {
       width: RFValue(12),
       height: RFValue(12),
       tintColor: colors.slate[500],
     },
-    phoneDivider: {
-      width: 1,
-      height: RFValue(20),
-      backgroundColor: colors.slate[300],
-      marginHorizontal: RFValue(12),
-    },
-    phoneInput: {
-      flex: 1,
-      fontSize: RFValue(15),
-      color: colors.slate[650],
-      padding: 0,
-    },
-    footer: {
-      paddingHorizontal: RFValue(20),
-      paddingVertical: RFValue(16),
-      borderTopWidth: 1,
-      borderTopColor: colors.slate[300],
-    },
-    continueButton: {
-      backgroundColor: colors.slate[650],
-      borderRadius: RFValue(12),
-      paddingVertical: RFValue(16),
-      alignItems: "center",
-      justifyContent: "center",
-    },
+    phoneDivider: {height: RFValue(20),
+backgroundColor: colors.slate[300],
+marginHorizontal: RFValue(12)},
+    phoneInput: {fontSize: RFValue(15),
+color: colors.slate[650]},
+    footer: {paddingHorizontal: RFValue(20),
+paddingVertical: RFValue(16),
+borderTopColor: colors.slate[300]},
+    continueButton: {backgroundColor: colors.slate[650],
+borderRadius: RFValue(12),
+paddingVertical: RFValue(16)},
     continueButtonDisabled: {
       backgroundColor: colors.slate[300],
     },

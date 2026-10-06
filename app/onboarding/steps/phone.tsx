@@ -176,7 +176,7 @@ const PhoneVerificationStep = ({ onNext }: PhoneVerificationProps) => {
       enableAutomaticScroll
       contentContainerStyle={{ flex: 1, paddingBottom: RFValue(20) }}
     >
-      <View style={styles.contentContainer}>
+      <View style={styles.contentContainer} className="flex-1">
         <View style={styles.iconContainer}>
           <Image
             source={require("@/assets/icons/Call - Iconly Pro.png")}
@@ -186,7 +186,7 @@ const PhoneVerificationStep = ({ onNext }: PhoneVerificationProps) => {
         </View>
 
         <View style={styles.textContainer}>
-          <Text style={styles.headText}>Verify your phone number</Text>
+          <Text style={styles.headText} className="font-semibold">Verify your phone number</Text>
           <Text style={styles.descriptionText}>
             We will send an OTP to your phone number to verify your account.
           </Text>
@@ -221,15 +221,15 @@ const PhoneVerificationStep = ({ onNext }: PhoneVerificationProps) => {
         }}
         snapPoints={snapPoints}
       >
-        <View style={styles.container}>
+        <View style={styles.container} className="flex-1">
           <View>
             <View style={styles.modalTextContainer}>
-              <Text style={styles.headModalText}>Verify OTP</Text>
+              <Text style={styles.headModalText} className="font-semibold text-center">Verify OTP</Text>
               <Text style={[styles.descriptionText, { textAlign: "center" }]}>
                 Please input the code sent to {fullPhoneNumber}.
               </Text>
               {isSending ? (
-                <View style={styles.sendingContainer}>
+                <View style={styles.sendingContainer} className="items-center flex-row justify-center">
                   <ActivityIndicator size="small" color={colors.slate[600]} />
                   <Text style={styles.sendingText}>Sending code...</Text>
                 </View>
@@ -253,7 +253,7 @@ const PhoneVerificationStep = ({ onNext }: PhoneVerificationProps) => {
               />
             </View>
 
-            <View style={styles.resendContainer}>
+            <View style={styles.resendContainer} className="flex-row items-center justify-center">
               <Text style={styles.resendText}>Didn&apos;t receive OTP? </Text>
               <TouchableOpacity
                 onPress={handleResendCode}
@@ -264,7 +264,7 @@ const PhoneVerificationStep = ({ onNext }: PhoneVerificationProps) => {
                     styles.resendLink,
                     resendDisabled && styles.resendLinkDisabled,
                   ]}
-                >
+                 className="text-[#3B82F6] font-semibold">
                   {isSending ? "Sending..." : "Resend code"}
                 </Text>
               </TouchableOpacity>
@@ -286,14 +286,8 @@ export default PhoneVerificationStep;
 
 const styleSheet = (colors: ColorScheme) =>
   StyleSheet.create({
-    container: {
-      flex: 1,
-      paddingBottom: RFValue(20),
-    },
-    contentContainer: {
-      flex: 1,
-      paddingTop: RFValue(40),
-    },
+    container: {paddingBottom: RFValue(20)},
+    contentContainer: {paddingTop: RFValue(40)},
     iconContainer: {
       marginBottom: RFValue(20),
     },
@@ -310,50 +304,29 @@ const styleSheet = (colors: ColorScheme) =>
       marginBottom: RFValue(20),
       gap: RFValue(8),
     },
-    headText: {
-      fontSize: RFValue(24),
-      fontWeight: "600",
-      lineHeight: RFValue(32),
-      color: colors.slate[650],
-    },
-    headModalText: {
-      fontSize: RFValue(24),
-      fontWeight: "600",
-      lineHeight: RFValue(32),
-      color: colors.slate[650],
-      textAlign: "center",
-    },
+    headText: {fontSize: RFValue(24),
+lineHeight: RFValue(32),
+color: colors.slate[650]},
+    headModalText: {fontSize: RFValue(24),
+lineHeight: RFValue(32),
+color: colors.slate[650]},
     descriptionText: {
       fontSize: RFValue(14),
       lineHeight: RFValue(22),
       color: colors.slate[600],
     },
-    sendingContainer: {
-      alignItems: "center",
-      flexDirection: "row",
-      gap: RFValue(8),
-      justifyContent: "center",
-      marginTop: RFValue(8),
-    },
+    sendingContainer: {gap: RFValue(8),
+marginTop: RFValue(8)},
     sendingText: {
       color: colors.slate[600],
       fontSize: RFValue(13),
     },
-    resendContainer: {
-      flexDirection: "row",
-      alignItems: "center",
-      marginTop: RFValue(16),
-      justifyContent: "center",
-    },
+    resendContainer: {marginTop: RFValue(16)},
     resendText: {
       fontSize: RFValue(14),
       color: colors.slate[600],
     },
-    resendLink: {
-      fontSize: RFValue(14),
-      color: "#3B82F6",
-      fontWeight: "600",
-    },
+    resendLink: {fontSize: RFValue(14)},
     resendLinkDisabled: {
       color: colors.slate[450],
     },

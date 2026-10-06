@@ -399,16 +399,7 @@ const Discover = () => {
                       intensity={20}
                       tint={isDarkMode ? "dark" : "light"}
                       blurMethod="dimezisBlurViewSdk31Plus"
-                      style={{
-                        position: "absolute",
-                        left: 0,
-                        right: 0,
-                        bottom: 0,
-                        flexDirection: "row",
-                        alignItems: "center",
-                        gap: 8,
-                        padding: 16,
-                      }}
+                      className="absolute left-[0px] right-[0px] bottom-[0px] flex-row items-center gap-[8px] p-[16px]"
                     >
                       {isDarkMode ? (
                         <Image
@@ -714,11 +705,7 @@ const Discover = () => {
         onRequestClose={() => setShowFilterModal(false)}
       >
         <Pressable
-          style={{
-            flex: 1,
-            justifyContent: "flex-end",
-            backgroundColor: "rgba(0, 0, 0, 0.4)",
-          }}
+          className="flex-1 justify-end bg-[rgba(0, 0, 0, 0.4)]"
           onPress={() => setShowFilterModal(false)}
         >
           <Pressable
@@ -769,24 +756,24 @@ const Discover = () => {
         animationType="slide"
         onRequestClose={handleCityClose}
       >
-        <View style={homeStyles.cityModalOverlay}>
-          <View style={homeStyles.cityModalSheet}>
-            <View style={homeStyles.cityModalHeader}>
+        <View  className="flex-1 bg-[rgba(0, 0, 0, 0.4)] justify-end">
+          <View style={homeStyles.cityModalSheet} className="px-[20px] pt-[16px] pb-[36px] min-h-[280px] border-top-left-radius-[24px] border-top-right-radius-[24px]">
+            <View style={homeStyles.cityModalHeader} className="flex-row items-center justify-between pb-[16px] border-b">
               <Pressable
                 onPress={handleCityBack}
-                style={homeStyles.cityModalBack}
-              >
+
+               className="p-[6px]">
                 {/* <Image
                   source={require("@/assets/icons/arrow-left-dark.png")}
                   style={{ width: 20, height: 20 }}
                 /> */}
                 <ArrowLeft color={colors.slate[650]} />
               </Pressable>
-              <Text style={homeStyles.cityModalTitle}>City</Text>
+              <Text style={homeStyles.cityModalTitle} className="font-bold">City</Text>
               <Pressable
                 onPress={handleCityClose}
-                style={homeStyles.cityModalClose}
-              >
+
+               className="p-[6px]">
                 {/* <Image
                   source={require("@/assets/icons/close-contained.png")}
                   style={{ width: 14, height: 14 }}
@@ -795,7 +782,7 @@ const Discover = () => {
               </Pressable>
             </View>
 
-            <View style={homeStyles.cityModalList}>
+            <View  className="pt-[16px] gap-[10px]">
               {cities.map((city) => {
                 const isSelected = selectedCity === city;
                 return (
@@ -806,13 +793,13 @@ const Discover = () => {
                       homeStyles.cityOption,
                       isSelected && homeStyles.cityOptionSelected,
                     ]}
-                  >
+                   className="flex-row items-center justify-between py-[14px] px-[16px] rounded-[12px] border-[1px]">
                     <Text
                       style={[
                         homeStyles.cityOptionText,
                         isSelected && homeStyles.cityOptionTextSelected,
                       ]}
-                    >
+                     className="font-medium">
                       {city}
                     </Text>
                     {isSelected && (
@@ -863,65 +850,18 @@ const styles = (colors: ColorScheme) =>
       lineHeight: RFValue(16),
       color: colors.slate[600],
     },
-    cityModalOverlay: {
-      flex: 1,
-      backgroundColor: "rgba(0, 0, 0, 0.4)",
-      justifyContent: "flex-end",
-    },
-    cityModalSheet: {
-      backgroundColor: colors.background,
-      borderTopLeftRadius: 24,
-      borderTopRightRadius: 24,
-      paddingHorizontal: 20,
-      paddingTop: 16,
-      paddingBottom: 36,
-      minHeight: 280,
-    },
-    cityModalHeader: {
-      flexDirection: "row",
-      alignItems: "center",
-      justifyContent: "space-between",
-      paddingBottom: 16,
-      borderBottomWidth: 1,
-      borderBottomColor: colors.slate[200] || "#E2E8F0",
-    },
-    cityModalBack: {
-      padding: 6,
-    },
-    cityModalTitle: {
-      fontSize: RFValue(16),
-      fontWeight: "700",
-      color: colors.slate[650],
-    },
-    cityModalClose: {
-      padding: 6,
-    },
-    cityModalList: {
-      paddingTop: 16,
-      gap: 10,
-    },
-    cityOption: {
-      flexDirection: "row",
-      alignItems: "center",
-      justifyContent: "space-between",
-      paddingVertical: 14,
-      paddingHorizontal: 16,
-      borderRadius: 12,
-      borderWidth: 1,
-      borderColor: colors.slate[200] || "#E2E8F0",
-      backgroundColor: colors.background,
-    },
-    cityOptionSelected: {
-      borderColor: "#3B82F6",
-      backgroundColor: "rgba(59, 130, 246, 0.06)",
-    },
-    cityOptionText: {
-      fontSize: RFValue(14),
-      fontWeight: "500",
-      color: colors.slate[650],
-    },
-    cityOptionTextSelected: {
-      color: "#3B82F6",
-      fontWeight: "700",
-    },
+    cityModalOverlay: {},
+    cityModalSheet: {backgroundColor: colors.background},
+    cityModalHeader: {borderBottomColor: colors.slate[200] || "#E2E8F0"},
+    cityModalBack: {},
+    cityModalTitle: {fontSize: RFValue(16),
+color: colors.slate[650]},
+    cityModalClose: {},
+    cityModalList: {},
+    cityOption: {borderColor: colors.slate[200] || "#E2E8F0",
+backgroundColor: colors.background},
+    cityOptionSelected: {},
+    cityOptionText: {fontSize: RFValue(14),
+color: colors.slate[650]},
+    cityOptionTextSelected: {},
   });

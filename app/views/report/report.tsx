@@ -61,11 +61,11 @@ const ReportBottomSheet: React.FC<ReportBottomSheetProps> = ({
   };
 
   return (
-    <View style={custom.container}>
+    <View style={custom.container} className="flex-1">
       {/* Header */}
-      <View style={custom.header}>
-        <Text style={custom.title}>{title}</Text>
-        <Text style={custom.description}>{description}</Text>
+      <View style={custom.header} className="items-center">
+        <Text style={custom.title} className="font-[InstrumentSansSemiBold] text-center">{title}</Text>
+        <Text style={custom.description} className="text-center">{description}</Text>
       </View>
 
       {/* Options List */}
@@ -73,24 +73,24 @@ const ReportBottomSheet: React.FC<ReportBottomSheetProps> = ({
         style={custom.optionsList}
         showsVerticalScrollIndicator={false}
         contentContainerStyle={custom.optionsContent}
-      >
+       className="flex-1">
         {options.map((option) => (
           <Pressable
             key={option.id}
             style={custom.optionItem}
             onPress={() => setSelectedOption(option.id)}
-          >
+           className="flex-row items-center">
             <View
               style={[
                 custom.radioButton,
                 selectedOption === option.id && custom.radioButtonSelected,
               ]}
-            >
+             className="border-[2px] items-center justify-center">
               {selectedOption === option.id && (
                 <View style={custom.radioButtonInner} />
               )}
             </View>
-            <Text style={custom.optionText}>{option.title}</Text>
+            <Text style={custom.optionText} className="flex-1">{option.title}</Text>
           </Pressable>
         ))}
       </ScrollView>
@@ -112,54 +112,29 @@ export default ReportBottomSheet;
 
 const styles = (colors: ColorScheme) =>
   StyleSheet.create({
-    container: {
-      paddingHorizontal: RFValue(20),
-      paddingTop: RFValue(10),
-      paddingBottom: RFValue(20),
-      flex: 1,
-    },
-    header: {
-      alignItems: "center",
-      marginBottom: RFValue(24),
-      gap: RFValue(8),
-    },
-    title: {
-      fontSize: RFValue(20),
-      lineHeight: RFValue(28),
-      fontFamily: "InstrumentSansSemiBold",
-      color: colors.slate[650],
-      textAlign: "center",
-    },
-    description: {
-      fontSize: RFValue(14),
-      lineHeight: RFValue(20),
-      color: colors.slate[600],
-      textAlign: "center",
-    },
-    optionsList: {
-      flex: 1,
-      marginBottom: RFValue(16),
-    },
+    container: {paddingHorizontal: RFValue(20),
+paddingTop: RFValue(10),
+paddingBottom: RFValue(20)},
+    header: {marginBottom: RFValue(24),
+gap: RFValue(8)},
+    title: {fontSize: RFValue(20),
+lineHeight: RFValue(28),
+color: colors.slate[650]},
+    description: {fontSize: RFValue(14),
+lineHeight: RFValue(20),
+color: colors.slate[600]},
+    optionsList: {marginBottom: RFValue(16)},
     optionsContent: {
       gap: RFValue(12),
       paddingBottom: RFValue(16),
     },
-    optionItem: {
-      flexDirection: "row",
-      alignItems: "center",
-      gap: RFValue(12),
-      paddingVertical: RFValue(12),
-      paddingHorizontal: RFValue(4),
-    },
-    radioButton: {
-      width: RFValue(20),
-      height: RFValue(20),
-      borderRadius: RFValue(10),
-      borderWidth: 2,
-      borderColor: colors.slate[300],
-      alignItems: "center",
-      justifyContent: "center",
-    },
+    optionItem: {gap: RFValue(12),
+paddingVertical: RFValue(12),
+paddingHorizontal: RFValue(4)},
+    radioButton: {width: RFValue(20),
+height: RFValue(20),
+borderRadius: RFValue(10),
+borderColor: colors.slate[300]},
     radioButtonSelected: {
       borderColor: colors.slate[650],
     },
@@ -169,12 +144,9 @@ const styles = (colors: ColorScheme) =>
       borderRadius: RFValue(5),
       backgroundColor: colors.slate[650],
     },
-    optionText: {
-      fontSize: RFValue(15),
-      lineHeight: RFValue(22),
-      color: colors.slate[650],
-      flex: 1,
-    },
+    optionText: {fontSize: RFValue(15),
+lineHeight: RFValue(22),
+color: colors.slate[650]},
     buttonContainer: {
       paddingTop: RFValue(8),
     },

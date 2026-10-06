@@ -73,7 +73,7 @@ const Profile = () => {
             label: "Refer a Friend",
             onPress: () => {},
             rightElement: (
-              <Pressable style={profileStyles.shareButton}>
+              <Pressable style={profileStyles.shareButton} className="flex-row items-center">
                 <Image
                   source={require("@/assets/icons/share-solid.png")}
                   style={profileStyles.smallIcon}
@@ -157,7 +157,7 @@ const Profile = () => {
             label: "Refer a Friend",
             onPress: () => {},
             rightElement: (
-              <Pressable style={profileStyles.shareButton}>
+              <Pressable style={profileStyles.shareButton} className="flex-row items-center">
                 <Image
                   source={require("@/assets/icons/share-solid.png")}
                   style={profileStyles.smallIcon}
@@ -231,8 +231,8 @@ const Profile = () => {
       <SectionHeader title="Profile" />
       <ScrollView showsVerticalScrollIndicator={false}>
         {/* Profile Header */}
-        <View style={profileStyles.profileHeader}>
-          <View style={profileStyles.avatarContainer}>
+        <View style={profileStyles.profileHeader} className="items-center">
+          <View style={profileStyles.avatarContainer} className="relative">
             <Image
               source={
                 currentUser?.profile_picture &&
@@ -245,7 +245,7 @@ const Profile = () => {
             <Pressable
               style={profileStyles.editBadge}
               onPress={() => router.push("/views/profile/edit-profile")}
-            >
+             className="absolute bottom-[0px] right-[0px] items-center justify-center border-[3px]">
               <Image
                 source={require("@/assets/icons/Camera - Iconly Pro.png")}
                 style={profileStyles.editIcon}
@@ -253,16 +253,16 @@ const Profile = () => {
             </Pressable>
           </View>
 
-          <View style={profileStyles.profileInfo}>
-            <View style={profileStyles.nameContainer}>
-              <Text style={profileStyles.name}>{profileName}</Text>
+          <View  className="items-center">
+            <View style={profileStyles.nameContainer} className="flex-row items-center">
+              <Text style={profileStyles.name} className="font-semibold">{profileName}</Text>
               <Image
                 source={require("@/assets/icons/badge-check-green.png")}
                 style={profileStyles.verifiedIcon}
               />
             </View>
 
-            <View style={profileStyles.contactRow}>
+            <View style={profileStyles.contactRow} className="flex-row items-center">
               <Image
                 source={require("@/assets/icons/mail-outline-light.png")}
                 style={profileStyles.contactIcon}
@@ -270,7 +270,7 @@ const Profile = () => {
               <Text style={profileStyles.contactText}>{profileEmail}</Text>
             </View>
 
-            <View style={profileStyles.contactRow}>
+            <View style={profileStyles.contactRow} className="flex-row items-center">
               <Image
                 source={require("@/assets/icons/calling.png")}
                 style={profileStyles.contactIcon}
@@ -284,9 +284,9 @@ const Profile = () => {
         <Pressable
           style={profileStyles.upgradeBanner}
           onPress={() => router.push("/onboarding/welcome")}
-        >
-          <View style={profileStyles.upgradeContent}>
-            <Text style={profileStyles.upgradeTitle}>
+         className="flex-row items-start justify-between">
+          <View style={profileStyles.upgradeContent} className="flex-1">
+            <Text style={profileStyles.upgradeTitle} className="font-semibold">
               {userType === "agent"
                 ? "Upgrade to Featured Agent"
                 : "Earn as a Space Manager / Agent"}
@@ -313,9 +313,9 @@ const Profile = () => {
                 item.isLogout && profileStyles.logoutItem,
               ]}
               onPress={item.onPress}
-            >
-              <View style={profileStyles.menuItemLeft}>
-                <View style={[profileStyles.iconContainer]}>
+             className="flex-row items-center justify-between">
+              <View  className="flex-row items-center">
+                <View style={[profileStyles.iconContainer]} className="items-center justify-center">
                   <Image
                     source={item.icon}
                     style={[
@@ -364,60 +364,33 @@ export default Profile;
 
 const styles = (colors: ColorScheme) =>
   StyleSheet.create({
-    profileHeader: {
-      alignItems: "center",
-      paddingVertical: RFValue(16),
-    },
-    avatarContainer: {
-      position: "relative",
-      marginBottom: RFValue(12),
-    },
+    profileHeader: {paddingVertical: RFValue(16)},
+    avatarContainer: {marginBottom: RFValue(12)},
     avatar: {
       width: RFValue(80),
       height: RFValue(80),
       borderRadius: RFValue(40),
     },
-    editBadge: {
-      position: "absolute",
-      bottom: 0,
-      right: 0,
-      backgroundColor: colors.slate[200],
-      width: RFValue(28),
-      height: RFValue(28),
-      borderRadius: RFValue(14),
-      alignItems: "center",
-      justifyContent: "center",
-      borderWidth: 3,
-      borderColor: colors.background,
-    },
+    editBadge: {backgroundColor: colors.slate[200],
+width: RFValue(28),
+height: RFValue(28),
+borderRadius: RFValue(14),
+borderColor: colors.background},
     editIcon: {
       width: RFValue(14),
       height: RFValue(14),
       tintColor: colors.slate[600],
     },
-    profileInfo: {
-      alignItems: "center",
-    },
-    nameContainer: {
-      flexDirection: "row",
-      alignItems: "center",
-      marginBottom: RFValue(8),
-    },
-    name: {
-      fontSize: RFValue(20),
-      fontWeight: "600",
-      color: colors.slate[650],
-      marginRight: RFValue(6),
-    },
+    profileInfo: {},
+    nameContainer: {marginBottom: RFValue(8)},
+    name: {fontSize: RFValue(20),
+color: colors.slate[650],
+marginRight: RFValue(6)},
     verifiedIcon: {
       width: RFValue(18),
       height: RFValue(18),
     },
-    contactRow: {
-      flexDirection: "row",
-      alignItems: "center",
-      marginVertical: RFValue(4),
-    },
+    contactRow: {marginVertical: RFValue(4)},
     contactIcon: {
       width: RFValue(16),
       height: RFValue(16),
@@ -428,26 +401,14 @@ const styles = (colors: ColorScheme) =>
       fontSize: RFValue(14),
       color: colors.slate[600],
     },
-    upgradeBanner: {
-      backgroundColor: colors.slate[200],
-
-      marginBottom: RFValue(16),
-      padding: RFValue(16),
-      borderRadius: RFValue(12),
-      flexDirection: "row",
-      alignItems: "flex-start",
-      justifyContent: "space-between",
-    },
-    upgradeContent: {
-      flex: 1,
-      marginRight: RFValue(12),
-    },
-    upgradeTitle: {
-      fontSize: RFValue(15),
-      fontWeight: "600",
-      color: colors.slate[650],
-      marginBottom: RFValue(4),
-    },
+    upgradeBanner: {backgroundColor: colors.slate[200],
+marginBottom: RFValue(16),
+padding: RFValue(16),
+borderRadius: RFValue(12)},
+    upgradeContent: {marginRight: RFValue(12)},
+    upgradeTitle: {fontSize: RFValue(15),
+color: colors.slate[650],
+marginBottom: RFValue(4)},
     upgradeDescription: {
       fontSize: RFValue(12),
       color: colors.slate[600],
@@ -459,23 +420,11 @@ const styles = (colors: ColorScheme) =>
       tintColor: colors.slate[650],
     },
 
-    menuItem: {
-      flexDirection: "row",
-      alignItems: "center",
-      justifyContent: "space-between",
-      paddingVertical: RFValue(16),
-    },
-    menuItemLeft: {
-      flexDirection: "row",
-      alignItems: "center",
-    },
-    iconContainer: {
-      width: RFValue(40),
-      height: RFValue(40),
-      alignItems: "center",
-      justifyContent: "center",
-      marginRight: RFValue(12),
-    },
+    menuItem: {paddingVertical: RFValue(16)},
+    menuItemLeft: {},
+    iconContainer: {width: RFValue(40),
+height: RFValue(40),
+marginRight: RFValue(12)},
     menuIcon: {
       width: RFValue(26),
       height: RFValue(26),
@@ -488,12 +437,8 @@ const styles = (colors: ColorScheme) =>
       tintColor: colors.slate[600],
       marginRight: RFValue(4),
     },
-    shareButton: {
-      flexDirection: "row",
-      alignItems: "center",
-      paddingHorizontal: RFValue(12),
-      paddingVertical: RFValue(6),
-    },
+    shareButton: {paddingHorizontal: RFValue(12),
+paddingVertical: RFValue(6)},
     smallIcon: {
       width: RFValue(14),
       height: RFValue(14),
@@ -504,9 +449,7 @@ const styles = (colors: ColorScheme) =>
       fontSize: RFValue(13),
       color: colors.slate[650],
     },
-    logoutItem: {
-      borderBottomWidth: 0,
-    },
+    logoutItem: {},
     logoutIconContainer: {
       tintColor: colors.error[200],
     },

@@ -93,25 +93,25 @@ const PublishNowSubstep: React.FC<PublishNowSubstepProps> = ({
   };
 
   return (
-    <View style={styles.container}>
+    <View style={styles.container} className="flex-1">
       <ScrollView
         showsVerticalScrollIndicator={false}
         contentContainerStyle={styles.scrollContent}
       >
         {/* Title */}
-        <Text style={styles.title}>Publish now</Text>
+        <Text style={styles.title} className="font-semibold">Publish now</Text>
 
         {/* Steps List */}
         <View style={styles.stepsList}>
           {steps.map((step) => (
-            <View key={step.id} style={styles.stepItem}>
-              <View style={styles.stepContent}>
-                <View style={styles.stepTextContainer}>
-                  <Text style={styles.stepTitle}>{step.title}</Text>
+            <View key={step.id}  className="border-bottom-[0px]">
+              <View style={styles.stepContent} className="flex-row items-start justify-between">
+                <View  className="flex-1">
+                  <Text style={styles.stepTitle} className="font-semibold">{step.title}</Text>
                   <Text style={styles.stepDescription}>{step.description}</Text>
                 </View>
                 {step.completed && (
-                  <View style={styles.checkmarkContainer}>
+                  <View  className="items-center justify-center">
                     <Image
                       source={require("@/assets/icons/checkbox-circle-fill.png")}
                       style={styles.checkmarkIcon}
@@ -127,10 +127,10 @@ const PublishNowSubstep: React.FC<PublishNowSubstepProps> = ({
         <Pressable
           style={styles.termsContainer}
           onPress={() => setAgreedToTerms(!agreedToTerms)}
-        >
+         className="flex-row items-start">
           <View
             style={[styles.checkbox, agreedToTerms && styles.checkboxSelected]}
-          >
+           className="border-[2px] items-center justify-center">
             {agreedToTerms && (
               <Image
                 source={require("@/assets/icons/checkbox-checked.png")}
@@ -138,9 +138,9 @@ const PublishNowSubstep: React.FC<PublishNowSubstepProps> = ({
               />
             )}
           </View>
-          <Text style={styles.termsText}>
+          <Text style={styles.termsText} className="flex-1">
             I have read and agree to the{" "}
-            <Text style={styles.termsLink}>Terms of service</Text>
+            <Text style={styles.termsLink} className="underline">Terms of service</Text>
           </Text>
         </Pressable>
       </ScrollView>
@@ -165,73 +165,43 @@ const PublishNowSubstep: React.FC<PublishNowSubstepProps> = ({
 
 const createStyles = (colors: ColorScheme) =>
   StyleSheet.create({
-    container: {
-      flex: 1,
-      backgroundColor: colors.background,
-    },
+    container: {backgroundColor: colors.background},
     scrollContent: {
       paddingTop: RFValue(32),
       paddingBottom: RFValue(20),
     },
-    title: {
-      fontSize: RFValue(20),
-      fontWeight: "600",
-      color: colors.slate[650],
-      marginBottom: RFValue(32),
-    },
+    title: {fontSize: RFValue(20),
+color: colors.slate[650],
+marginBottom: RFValue(32)},
     stepsList: {
       marginBottom: RFValue(32),
       gap: RFValue(24),
     },
-    stepItem: {
-      borderBottomWidth: 0,
-    },
-    stepContent: {
-      flexDirection: "row",
-      alignItems: "flex-start",
-      justifyContent: "space-between",
-      gap: RFValue(16),
-    },
-    stepTextContainer: {
-      flex: 1,
-    },
-    stepTitle: {
-      fontSize: RFValue(16),
-      fontWeight: "600",
-      color: colors.slate[650],
-      marginBottom: RFValue(6),
-    },
+    stepItem: {},
+    stepContent: {gap: RFValue(16)},
+    stepTextContainer: {},
+    stepTitle: {fontSize: RFValue(16),
+color: colors.slate[650],
+marginBottom: RFValue(6)},
     stepDescription: {
       fontSize: RFValue(13),
       color: colors.slate[600],
       lineHeight: RFValue(19),
     },
-    checkmarkContainer: {
-      alignItems: "center",
-      justifyContent: "center",
-    },
+    checkmarkContainer: {},
     checkmarkIcon: {
       width: RFValue(24),
       height: RFValue(24),
       tintColor: colors.success[300],
     },
-    termsContainer: {
-      flexDirection: "row",
-      alignItems: "flex-start",
-      gap: RFValue(12),
-      marginBottom: RFValue(24),
-    },
-    checkbox: {
-      width: RFValue(18),
-      height: RFValue(18),
-      borderRadius: RFValue(4),
-      borderWidth: 2,
-      borderColor: colors.slate[400],
-      backgroundColor: colors.background,
-      alignItems: "center",
-      justifyContent: "center",
-      marginTop: RFValue(2),
-    },
+    termsContainer: {gap: RFValue(12),
+marginBottom: RFValue(24)},
+    checkbox: {width: RFValue(18),
+height: RFValue(18),
+borderRadius: RFValue(4),
+borderColor: colors.slate[400],
+backgroundColor: colors.background,
+marginTop: RFValue(2)},
     checkboxSelected: {
       backgroundColor: colors.slate[650],
       borderColor: colors.slate[650],
@@ -241,16 +211,10 @@ const createStyles = (colors: ColorScheme) =>
       height: RFValue(18),
       tintColor: colors.slate[350],
     },
-    termsText: {
-      flex: 1,
-      fontSize: RFValue(14),
-      color: colors.slate[600],
-      lineHeight: RFValue(20),
-    },
-    termsLink: {
-      color: colors.info[200],
-      textDecorationLine: "underline",
-    },
+    termsText: {fontSize: RFValue(14),
+color: colors.slate[600],
+lineHeight: RFValue(20)},
+    termsLink: {color: colors.info[200]},
     buttonContainer: {
       paddingVertical: RFValue(16),
       backgroundColor: colors.background,

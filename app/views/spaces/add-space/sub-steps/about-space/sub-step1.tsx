@@ -38,7 +38,7 @@ const PropertyTypeSubstep: React.FC<PropertyTypeSubstepProps> = ({
   };
 
   return (
-    <View style={styles.container}>
+    <View style={styles.container} className="flex-1">
       <KeyboardAwareScrollView
         enableOnAndroid={true}
         extraScrollHeight={20}
@@ -48,7 +48,7 @@ const PropertyTypeSubstep: React.FC<PropertyTypeSubstepProps> = ({
       >
         {/* Property Type Section */}
         <View style={styles.section}>
-          <Text style={styles.title}>What type of property is this space?</Text>
+          <Text style={styles.title} className="font-semibold">What type of property is this space?</Text>
 
           <View style={styles.optionsContainer}>
             {propertyTypes.map((type) => (
@@ -66,8 +66,8 @@ const PropertyTypeSubstep: React.FC<PropertyTypeSubstepProps> = ({
 
         {/* Units Available Section */}
         <View style={styles.section}>
-          <Text style={styles.title}>How many units are available?</Text>
-          <View style={styles.numericFieldWrapper}>
+          <Text style={styles.title} className="font-semibold">How many units are available?</Text>
+          <View style={styles.numericFieldWrapper} className="self-center">
             <NumericField
               value={spaceForm.value.units || 0}
               onChange={(value) => setValue({ units: value })}
@@ -93,30 +93,21 @@ const PropertyTypeSubstep: React.FC<PropertyTypeSubstepProps> = ({
 
 const createStyles = (colors: ColorScheme) =>
   StyleSheet.create({
-    container: {
-      flex: 1,
-      backgroundColor: colors.background,
-    },
+    container: {backgroundColor: colors.background},
     scrollContent: {
       paddingTop: RFValue(32),
     },
     section: {
       marginBottom: RFValue(40),
     },
-    title: {
-      fontSize: RFValue(20),
-      fontWeight: "600",
-      color: colors.slate[650],
-      lineHeight: RFValue(28),
-      marginBottom: RFValue(20),
-    },
+    title: {fontSize: RFValue(20),
+color: colors.slate[650],
+lineHeight: RFValue(28),
+marginBottom: RFValue(20)},
     optionsContainer: {
       gap: RFValue(12),
     },
-    numericFieldWrapper: {
-      marginTop: RFValue(8),
-      alignSelf: "center",
-    },
+    numericFieldWrapper: {marginTop: RFValue(8)},
     buttonContainer: {
       paddingVertical: RFValue(16),
       backgroundColor: colors.background,

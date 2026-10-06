@@ -54,11 +54,11 @@ const AgentHistoryCard = ({ item }: { item: HistoryActivityItem }) => {
   return (
     <View style={s.card} className="flex flex-row gap-3 py-3 border-b">
       {/* Icon */}
-      <View style={s.iconWrapper}>
+      <View style={s.iconWrapper} className="justify-center items-center">
         <Image
           source={require("@/assets/icons/Time.png")}
           style={s.iconImage}
-        />
+         className="w-[16px] h-[16px]"/>
       </View>
 
       {/* Details */}
@@ -66,28 +66,21 @@ const AgentHistoryCard = ({ item }: { item: HistoryActivityItem }) => {
         <View className="flex flex-row items-center justify-between gap-2 mb-1.5">
           <Text style={s.dateText}>{dateText}</Text>
           <View
-            style={[
-              s.statusBadge,
-              {
-                backgroundColor: isDarkMode
-                  ? "rgba(255, 255, 255, 0.08)"
-                  : statusBg,
-              },
-            ]}
-          >
+
+           className="px-[8px] py-[2.5px] rounded-[12px]">
             <Text
               style={[
                 s.statusText,
                 { color: isDarkMode ? colors.slate[600] : statusColor },
               ]}
-            >
+             className="font-bold">
               {item.badge.charAt(0).toUpperCase() + item.badge.slice(1)}
             </Text>
           </View>
         </View>
 
-        <Text style={s.cardTitle}>{item.title}</Text>
-        <Text style={s.cardDescription}>{item.description}</Text>
+        <Text style={s.cardTitle} className="font-semibold">{item.title}</Text>
+        <Text style={s.cardDescription} className="mt-[3px]">{item.description}</Text>
       </View>
     </View>
   );
@@ -131,7 +124,7 @@ const AgentActivityHistory = () => {
         refreshControl={refreshControl}
       >
         <View className="py-8">
-          <Text style={s.emptyText}>No activity history found.</Text>
+          <Text style={s.emptyText} className="text-center">No activity history found.</Text>
         </View>
       </ScrollView>
     );
@@ -145,7 +138,7 @@ const AgentActivityHistory = () => {
       {historyData.map(
         (group: HistoryActivitiesResponseItem, index: number) => (
           <View key={group.label || index} className="py-4">
-            <Text style={s.groupTitle}>{group.label}</Text>
+            <Text style={s.groupTitle} className="font-bold">{group.label}</Text>
             <View className="gap-1">
               {(group.items ?? []).map((item: HistoryActivityItem) => (
                 <AgentHistoryCard
@@ -165,55 +158,28 @@ export default AgentActivityHistory;
 
 const styles = (colors: ColorScheme, isDarkMode: boolean) =>
   StyleSheet.create({
-    groupTitle: {
-      color: colors.slate[650],
-      fontSize: RFValue(18),
-      fontWeight: "bold",
-      marginBottom: RFValue(8),
-    },
+    groupTitle: {color: colors.slate[650],
+fontSize: RFValue(18),
+marginBottom: RFValue(8)},
     card: {
       borderColor: colors.slate[200],
     },
-    iconWrapper: {
-      width: RFValue(36),
-      height: RFValue(36),
-      borderRadius: RFValue(18),
-      backgroundColor: colors.slate[150],
-      justifyContent: "center",
-      alignItems: "center",
-    },
-    iconImage: {
-      width: 16,
-      height: 16,
-      tintColor: colors.slate[650],
-    },
+    iconWrapper: {width: RFValue(36),
+height: RFValue(36),
+borderRadius: RFValue(18),
+backgroundColor: colors.slate[150]},
+    iconImage: {tintColor: colors.slate[650]},
     dateText: {
       fontSize: RFValue(12.5),
       color: colors.slate[500],
     },
-    statusBadge: {
-      paddingHorizontal: 8,
-      paddingVertical: 2.5,
-      borderRadius: 12,
-    },
-    statusText: {
-      fontSize: RFValue(11.5),
-      fontWeight: "bold",
-    },
-    cardTitle: {
-      fontSize: RFValue(15.5),
-      fontWeight: "600",
-      color: colors.slate[650],
-      lineHeight: RFValue(20.5),
-    },
-    cardDescription: {
-      fontSize: RFValue(13.5),
-      color: colors.slate[600],
-      lineHeight: RFValue(18.5),
-      marginTop: 3,
-    },
-    emptyText: {
-      color: colors.slate[500],
-      textAlign: "center",
-    },
+    statusBadge: {},
+    statusText: {fontSize: RFValue(11.5)},
+    cardTitle: {fontSize: RFValue(15.5),
+color: colors.slate[650],
+lineHeight: RFValue(20.5)},
+    cardDescription: {fontSize: RFValue(13.5),
+color: colors.slate[600],
+lineHeight: RFValue(18.5)},
+    emptyText: {color: colors.slate[500]},
   });

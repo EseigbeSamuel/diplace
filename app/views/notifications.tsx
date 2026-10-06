@@ -588,7 +588,7 @@ const Notifications = () => {
                     },
                     custom.shadow,
                   ]}
-                  className="flex flex-row items-start gap-3.5 p-4 rounded-2xl"
+                  className="flex flex-row items-start gap-3.5 p-4 rounded-2xl shadow-color-[#000] shadow-radius-[6px] elevation-[2px]"
                 >
                   {/* Left Icon / Avatar: 'D' letter badge or Bell icon */}
                   <View
@@ -635,7 +635,7 @@ const Notifications = () => {
                     <View className="flex flex-row items-start justify-between">
                       <Text
                         style={custom.itemTitle}
-                        className="flex-1 mr-2"
+                        className="flex-1 mr-2 font-semibold"
                         numberOfLines={1}
                       >
                         {item.title}
@@ -672,7 +672,7 @@ const Notifications = () => {
                       hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
                       className="flex flex-row items-center gap-1.5 self-start mt-2.5"
                     >
-                      <Text style={custom.itemAction}>{meta.text}</Text>
+                      <Text style={custom.itemAction} className="font-semibold">{meta.text}</Text>
 
                       <Image
                         source={
@@ -710,31 +710,20 @@ const styles = (colors: ColorScheme, isDarkMode: boolean) =>
     container: {
       backgroundColor: colors.background,
     },
-    itemTitle: {
-      fontSize: RFValue(13),
-      fontWeight: "600",
-      color: colors.slate[650],
-      lineHeight: RFValue(18),
-    },
+    itemTitle: {fontSize: RFValue(13),
+color: colors.slate[650],
+lineHeight: RFValue(18)},
     itemMessage: {
       fontSize: RFValue(11.5),
       color: colors.slate[600],
       lineHeight: RFValue(16.5),
     },
-    itemAction: {
-      fontSize: RFValue(12),
-      fontWeight: "600",
-      color: colors.slate[650],
-    },
+    itemAction: {fontSize: RFValue(12),
+color: colors.slate[650]},
     itemTime: {
       fontSize: RFValue(10.5),
       color: colors.slate[500],
     },
-    shadow: {
-      shadowColor: "#000",
-      shadowOffset: { width: 0, height: 2 },
-      shadowOpacity: isDarkMode ? 0.15 : 0.04,
-      shadowRadius: 6,
-      elevation: 2,
-    },
+    shadow: {shadowOffset: { width: 0, height: 2 },
+shadowOpacity: isDarkMode ? 0.15 : 0.04},
   });

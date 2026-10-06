@@ -34,7 +34,7 @@ const LandlordAccountInfoSubstep: React.FC<LandlordAccountInfoSubstepProps> = ({
   };
 
   return (
-    <View style={styles.container}>
+    <View style={styles.container} className="flex-1">
       <KeyboardAwareScrollView
         enableOnAndroid={true}
         extraScrollHeight={20}
@@ -43,7 +43,7 @@ const LandlordAccountInfoSubstep: React.FC<LandlordAccountInfoSubstepProps> = ({
         contentContainerStyle={styles.scrollContent}
       >
         {/* Title */}
-        <Text style={styles.title}>
+        <Text style={styles.title} className="font-semibold">
           Give us the {spaceForm.type === "event" ? "owner's" : "landlord's"}{" "}
           payment details
         </Text>
@@ -51,32 +51,32 @@ const LandlordAccountInfoSubstep: React.FC<LandlordAccountInfoSubstepProps> = ({
         {!spaceForm.value.ownerAccountDetails?.accountName ? (
           <>
             <View style={styles.previewCard}>
-              <View style={styles.cardHeader}>
-                <View style={styles.bankIconContainer}>
+              <View style={styles.cardHeader} className="flex-row justify-between items-start">
+                <View style={styles.bankIconContainer} className="items-center justify-center">
                   <Image
                     source={require("@/assets/icons/bank-emoji.png")}
                     style={styles.bankIcon}
                   />
                 </View>
-                <View style={styles.accountNumberSection}>
+                <View  className="items-end">
                   <Text style={styles.accountNumberLabel}>Account Number</Text>
-                  <Text style={styles.accountNumber}>
+                  <Text style={styles.accountNumber} className="font-bold tracking-[1px]">
                     {spaceForm.value.ownerAccountDetails?.accountNumber ||
                       "N/A"}
                   </Text>
                 </View>
               </View>
-              <View style={styles.cardFooter}>
-                <View style={styles.accountNameSection}>
+              <View  className="flex-row justify-between">
+                <View  className="flex-1">
                   <Text style={styles.accountNameLabel}>Account Name</Text>
-                  <Text style={styles.accountName}>
+                  <Text style={styles.accountName} className="font-semibold">
                     {spaceForm.value.ownerAccountDetails?.accountName ||
                       "UNAVAILABLE"}
                   </Text>
                 </View>
-                <View style={styles.bankSection}>
+                <View  className="items-end">
                   <Text style={styles.bankLabel}>Bank</Text>
-                  <Text style={styles.bankName}>
+                  <Text style={styles.bankName} className="font-semibold text-right">
                     {spaceForm.value.ownerAccountDetails?.bank || "UNAVAILABLE"}
                   </Text>
                 </View>
@@ -86,49 +86,49 @@ const LandlordAccountInfoSubstep: React.FC<LandlordAccountInfoSubstepProps> = ({
               <Pressable
                 onPress={() => setShowBankModal(true)}
                 style={styles.addContent}
-              >
+               className="flex-row items-center justify-center">
                 <Image
                   source={require("@/assets/icons/plus.png")}
                   style={styles.addIcon}
                 />
-                <Text style={styles.addText}>Add bank details</Text>
+                <Text style={styles.addText} className="font-medium">Add bank details</Text>
               </Pressable>
             </View>
           </>
         ) : (
           <View style={styles.section}>
-            <View style={styles.infoContainer}>
-              <View style={styles.sectionHeaderInside}>
-                <Text style={styles.sectionTitle}>Bank Details</Text>
+            <View style={styles.infoContainer} className="border-[1px]">
+              <View style={styles.sectionHeaderInside} className="flex-row items-center justify-between border-b">
+                <Text style={styles.sectionTitle} className="font-semibold">Bank Details</Text>
                 <Pressable
                   style={styles.editButton}
                   onPress={() => setShowBankModal(true)}
-                >
+                 className="flex-row items-center">
                   <Image
                     source={require("@/assets/icons/edit-pencil-fill.png")}
                     style={styles.editIcon}
                   />
-                  <Text style={styles.editText}>Edit</Text>
+                  <Text style={styles.editText} className="font-medium">Edit</Text>
                 </Pressable>
               </View>
 
-              <View style={styles.infoRow}>
-                <View style={styles.infoField}>
+              <View style={styles.infoRow} className="flex-row">
+                <View  className="flex-1">
                   <Text style={styles.infoLabel}>Account Number</Text>
-                  <Text style={styles.infoValue}>
+                  <Text style={styles.infoValue} className="font-semibold">
                     {spaceForm.value.ownerAccountDetails?.accountNumber}
                   </Text>
                 </View>
-                <View style={styles.infoField}>
+                <View  className="flex-1">
                   <Text style={styles.infoLabel}>Account Name</Text>
-                  <Text style={styles.infoValue}>
+                  <Text style={styles.infoValue} className="font-semibold">
                     {spaceForm.value.ownerAccountDetails?.accountName}
                   </Text>
                 </View>
               </View>
-              <View style={styles.fullWidthRow}>
+              <View  className="w-[100%px]">
                 <Text style={styles.infoLabel}>Bank</Text>
-                <Text style={styles.infoValue}>
+                <Text style={styles.infoValue} className="font-semibold">
                   {spaceForm.value.ownerAccountDetails?.bank}
                 </Text>
               </View>
@@ -161,21 +161,15 @@ const LandlordAccountInfoSubstep: React.FC<LandlordAccountInfoSubstepProps> = ({
 
 const createStyles = (colors: ColorScheme) =>
   StyleSheet.create({
-    container: {
-      flex: 1,
-      backgroundColor: colors.background,
-    },
+    container: {backgroundColor: colors.background},
     scrollContent: {
       paddingTop: RFValue(32),
       paddingBottom: RFValue(20),
     },
-    title: {
-      fontSize: RFValue(20),
-      fontWeight: "600",
-      color: colors.slate[650],
-      lineHeight: RFValue(28),
-      marginBottom: RFValue(32),
-    },
+    title: {fontSize: RFValue(20),
+color: colors.slate[650],
+lineHeight: RFValue(28),
+marginBottom: RFValue(32)},
     previewCard: {
       backgroundColor: colors.slate[650],
       borderRadius: RFValue(16),
@@ -183,142 +177,87 @@ const createStyles = (colors: ColorScheme) =>
       marginBottom: RFValue(32),
       minHeight: RFValue(180),
     },
-    cardHeader: {
-      flexDirection: "row",
-      justifyContent: "space-between",
-      alignItems: "flex-start",
-      marginBottom: RFValue(40),
-    },
-    bankIconContainer: {
-      width: RFValue(48),
-      height: RFValue(48),
-      borderRadius: RFValue(12),
-      alignItems: "center",
-      justifyContent: "center",
-    },
+    cardHeader: {marginBottom: RFValue(40)},
+    bankIconContainer: {width: RFValue(48),
+height: RFValue(48),
+borderRadius: RFValue(12)},
     bankIcon: {
       width: RFValue(48),
       height: RFValue(48),
     },
-    accountNumberSection: {
-      alignItems: "flex-end",
-    },
+    accountNumberSection: {},
     accountNumberLabel: {
       fontSize: RFValue(11),
       color: colors.slate[200],
       marginBottom: RFValue(4),
     },
-    accountNumber: {
-      fontSize: RFValue(20),
-      fontWeight: "700",
-      color: colors.slate[100],
-      letterSpacing: 1,
-    },
-    cardFooter: {
-      flexDirection: "row",
-      justifyContent: "space-between",
-    },
-    accountNameSection: {
-      flex: 1,
-    },
+    accountNumber: {fontSize: RFValue(20),
+color: colors.slate[100]},
+    cardFooter: {},
+    accountNameSection: {},
     accountNameLabel: {
       fontSize: RFValue(11),
       color: colors.slate[200],
       marginBottom: RFValue(4),
     },
-    accountName: {
-      fontSize: RFValue(14),
-      fontWeight: "600",
-      color: colors.slate[100],
-    },
-    bankSection: {
-      alignItems: "flex-end",
-    },
+    accountName: {fontSize: RFValue(14),
+color: colors.slate[100]},
+    bankSection: {},
     bankLabel: {
       fontSize: RFValue(11),
       color: colors.slate[200],
       marginBottom: RFValue(4),
     },
-    bankName: {
-      fontSize: RFValue(12),
-      fontWeight: "600",
-      color: colors.slate[100],
-      textAlign: "right",
-    },
+    bankName: {fontSize: RFValue(12),
+color: colors.slate[100]},
 
     buttonContainer: {
       paddingVertical: RFValue(16),
       backgroundColor: colors.background,
     },
-    addContent: {
-      flexDirection: "row",
-      alignItems: "center",
-      gap: RFValue(8),
-      justifyContent: "center",
-    },
+    addContent: {gap: RFValue(8)},
     addIcon: {
       width: RFValue(20),
       height: RFValue(20),
       tintColor: colors.slate[650],
     },
-    addText: {
-      fontSize: RFValue(16),
-      fontWeight: "500",
-      color: colors.slate[650],
-    },
+    addText: {fontSize: RFValue(16),
+color: colors.slate[650]},
     section: { marginBottom: RFValue(24) },
-    sectionHeaderInside: {
-      flexDirection: "row",
-      alignItems: "center",
-      justifyContent: "space-between",
-      backgroundColor: colors.slate[150],
-      paddingHorizontal: RFValue(16),
-      paddingVertical: RFValue(16),
-      marginHorizontal: RFValue(-16),
-      marginTop: RFValue(-16),
-      borderBottomWidth: 1,
-      borderBottomColor: colors.slate[300],
-      borderTopLeftRadius: RFValue(12),
-      borderTopRightRadius: RFValue(12),
-    },
-    sectionTitle: {
-      fontSize: RFValue(16),
-      fontWeight: "600",
-      color: colors.slate[650],
-    },
-    editButton: { flexDirection: "row", alignItems: "center", gap: RFValue(6) },
+    sectionHeaderInside: {backgroundColor: colors.slate[150],
+paddingHorizontal: RFValue(16),
+paddingVertical: RFValue(16),
+marginHorizontal: RFValue(-16),
+marginTop: RFValue(-16),
+borderBottomColor: colors.slate[300],
+borderTopLeftRadius: RFValue(12),
+borderTopRightRadius: RFValue(12)},
+    sectionTitle: {fontSize: RFValue(16),
+color: colors.slate[650]},
+    editButton: {gap: RFValue(6)},
     editIcon: {
       width: RFValue(16),
       height: RFValue(16),
       tintColor: colors.slate[650],
     },
-    editText: {
-      fontSize: RFValue(14),
-      fontWeight: "500",
-      color: colors.slate[650],
-    },
-    infoContainer: {
-      backgroundColor: colors.background,
-      borderRadius: RFValue(12),
-      borderWidth: 1,
-      borderColor: colors.slate[300],
-      padding: RFValue(16),
-      gap: RFValue(16),
-    },
-    infoRow: { flexDirection: "row", gap: RFValue(16) },
-    infoField: { flex: 1 },
-    fullWidthRow: { width: "100%" },
+    editText: {fontSize: RFValue(14),
+color: colors.slate[650]},
+    infoContainer: {backgroundColor: colors.background,
+borderRadius: RFValue(12),
+borderColor: colors.slate[300],
+padding: RFValue(16),
+gap: RFValue(16)},
+    infoRow: {gap: RFValue(16)},
+    infoField: {},
+    fullWidthRow: {},
     infoLabel: {
       fontSize: RFValue(13),
       color: colors.slate[600],
       marginBottom: RFValue(6),
     },
-    infoValue: {
-      fontSize: RFValue(15),
-      fontWeight: "600",
-      color: colors.slate[650],
-      lineHeight: RFValue(22),
-    },
+    infoValue: {fontSize: RFValue(15),
+color: colors.slate[650],
+lineHeight: RFValue(22)},
   });
 
 export default LandlordAccountInfoSubstep;

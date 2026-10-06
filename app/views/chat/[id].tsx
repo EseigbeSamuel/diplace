@@ -111,20 +111,20 @@ const SystemMessage = ({
   text: string;
   colors: ColorScheme;
 }) => (
-  <View style={styles.systemMessageContainer}>
+  <View  className="flex-row items-center px-[16px] my-[16px]">
     <View
-      style={[styles.systemMessageLine, { backgroundColor: colors.slate[250] }]}
-    />
+
+     className="flex-1 h-[1px]"/>
     <View
-      style={[styles.systemMessagePill, { backgroundColor: colors.slate[150] }]}
-    >
-      <Text style={[styles.systemMessageText, { color: colors.slate[500] }]}>
+
+     className="rounded-[12px] px-[12px] py-[5px] mx-[10px]">
+      <Text  className="text-[12px] font-medium">
         {text}
       </Text>
     </View>
     <View
-      style={[styles.systemMessageLine, { backgroundColor: colors.slate[250] }]}
-    />
+
+     className="flex-1 h-[1px]"/>
   </View>
 );
 
@@ -140,26 +140,13 @@ const PropertyMessage = ({
   showHoldForRenter: boolean;
   onViewDetails?: () => void;
 }) => (
-  <View style={styles.propertyMessageContainer}>
+  <View  className="items-start w-[100%px] my-[8px]">
     <View
-      style={[
-        styles.propertyContainer,
-        { backgroundColor: colors.background },
-        {
-          shadowColor: colors.slate[400],
-          shadowOffset: { width: 0, height: 2 },
-          shadowOpacity: 0.1,
-          shadowRadius: 8,
-          elevation: 3,
-        },
-      ]}
-    >
+
+     className="w-[100%px] rounded-[16px] pr-[4px] overflow-hidden max-w-[100%px] border-[1px] border-[rgba(0,0,0,0.05)]">
       <View
-        style={[
-          styles.propertyContent,
-          { borderLeftColor: colors.info[200], borderLeftWidth: 5 },
-        ]}
-      >
+
+       className="pl-[6px] flex flex-row rounded-[6px] py-[5px]">
         <View>
           <Image
             source={
@@ -167,58 +154,47 @@ const PropertyMessage = ({
                 ? { uri: item.propertyData.image }
                 : require("@/assets/images/diplace.jpg")
             }
-            style={styles.propertyImage}
-          />
+
+           className="w-[65px] h-[70px] rounded-[10px] mr-[5px] object-cover"/>
         </View>
-        <View style={styles.propertyDetails}>
+        <View  className="flex-1 min-w-[0px] pr-[8px]">
           <Text
             numberOfLines={2}
-            style={[styles.propertyTitle, { color: colors.slate[650] }]}
-          >
+
+           className="text-[14px] font-semibold mb-[6px] leading-[20px]">
             {item.propertyData?.title}
           </Text>
-          <Text style={[styles.propertyLocation, { color: colors.slate[500] }]}>
+          <Text  className="text-[11px] mb-[4px] leading-[16px]">
             {item.propertyData?.location}
           </Text>
-          <Text style={[styles.propertyPrice, { color: colors.slate[650] }]}>
+          <Text  className="text-[16px] font-bold mb-[8px]">
             {item.propertyData?.price}{" "}
             <Text
-              style={[styles.propertyPriceUnit, { color: colors.slate[500] }]}
-            >
+
+             className="text-[14px] font-normal">
               / {item.propertyData?.frequency}
             </Text>
           </Text>
         </View>
       </View>
-      <View style={styles.propertyActions}>
+      <View  className="flex-row px-[16px] pb-[16px] gap-[8px]">
         <TouchableOpacity
           onPress={onViewDetails}
-          style={[
-            styles.propertyButton,
-            styles.viewDetailsButton,
-            {
-              borderColor: colors.slate[300],
-              backgroundColor: colors.slate[300],
-            },
-          ]}
-        >
+
+         className="flex-1 py-[10px] px-[12px] rounded-[20px] items-center border-[1px]">
           <Text
-            style={[styles.propertyButtonText, { color: colors.slate[650] }]}
-          >
+
+           className="text-[13px] font-medium">
             View details
           </Text>
         </TouchableOpacity>
         {showHoldForRenter && (
           <TouchableOpacity
-            style={[
-              styles.propertyButton,
-              styles.rentButton,
-              { borderWidth: 1, backgroundColor: colors.slate[650] },
-            ]}
-          >
+
+           className="flex-1 py-[10px] px-[12px] rounded-[20px] items-center">
             <Text
-              style={[styles.propertyButtonText, { color: colors.slate[100] }]}
-            >
+
+             className="text-[13px] font-medium">
               Hold for renter
             </Text>
           </TouchableOpacity>
@@ -243,15 +219,9 @@ const ReplyPreview = ({
 
   return (
     <View
-      style={[
-        styles.replyContainer,
-        {
-          borderLeftColor: colors.info[200],
-          backgroundColor: colors.slate[150],
-        },
-      ]}
-    >
-      <Text style={[styles.replyText, { color: colors.slate[500] }]}>
+
+     className="pl-[12px] py-[6px] mb-[4px] border-left-[3px] border-top-left-radius-[8px] border-top-right-radius-[8px]">
+      <Text  className="text-[13px] italic">
         {replyMessage.text.length > 50
           ? `${replyMessage.text.substring(0, 50)}...`
           : replyMessage.text}
@@ -263,11 +233,8 @@ const ReplyPreview = ({
 // Regular text message
 const TextMessage = ({ item, colors, messages, onReply }: MessageItemProps) => (
   <View
-    style={[
-      styles.messageContainer,
-      item.isUser ? styles.userMessageContainer : styles.otherMessageContainer,
-    ]}
-  >
+
+   className="my-[3px]">
     <TouchableOpacity
       style={styles.messageBubbleContainer}
       activeOpacity={0.85}
@@ -276,16 +243,8 @@ const TextMessage = ({ item, colors, messages, onReply }: MessageItemProps) => (
       delayLongPress={350}
     >
       <View
-        style={[
-          styles.messageBubble,
-          item.isUser
-            ? [styles.userMessageBubble, { backgroundColor: colors.slate[250] }]
-            : [
-                styles.otherMessageBubble,
-                { backgroundColor: colors.slate[650] },
-              ],
-        ]}
-      >
+
+       className="px-[16px] py-[12px] rounded-[18px]">
         {item.replyTo && (
           <ReplyPreview
             replyToId={item.replyTo}
@@ -294,22 +253,16 @@ const TextMessage = ({ item, colors, messages, onReply }: MessageItemProps) => (
           />
         )}
         <Text
-          style={[
-            styles.messageText,
-            { color: item.isUser ? colors.slate[650] : colors.background },
-          ]}
-        >
+
+         className="text-[15px] leading-[20px]">
           {item.text}
         </Text>
         <View
-          style={[styles.messageMeta, item.isUser && styles.userMessageMeta]}
-        >
+
+         className="flex-row items-center gap-[4px] mt-[4px]">
           <Text
-            style={[
-              styles.messageTime,
-              { color: item.isUser ? colors.slate[500] : colors.slate[300] },
-            ]}
-          >
+
+           className="text-[11px]">
             {item.timestamp}
           </Text>
           {item.isUser &&
@@ -740,7 +693,7 @@ const ChatPage = () => {
 
   const renderStars = (currentRating: number) => {
     return (
-      <View style={styles.starsContainer}>
+      <View  className="flex-row justify-center gap-[8px] mb-[24px]">
         {[1, 2, 3, 4, 5].map((star) => (
           <TouchableOpacity key={star} onPress={() => setRating(star)}>
             <Star
@@ -763,55 +716,40 @@ const ChatPage = () => {
       />
 
       <View
-        style={[
-          styles.header,
-          {
-            backgroundColor: colors.background,
-            borderBottomColor: colors.slate[200],
-          },
-        ]}
-      >
+
+       className="flex-row items-center py-[12px] border-b">
         <TouchableOpacity
-          style={styles.backButton}
+
           onPress={() => router.back()}
-        >
+         className="pr-[12px]">
           <ArrowLeft size={24} color={colors.slate[650]} />
         </TouchableOpacity>
 
-        <View style={styles.contactInfo}>
+        <View  className="flex-1 flex-row items-center">
           <Image
             source={{ uri: contactInfo.avatar }}
-            style={styles.contactAvatar}
-          />
-          <View style={styles.contactDetails}>
-            <View style={styles.contactNameContainer}>
-              <Text style={[styles.contactName, { color: colors.slate[650] }]}>
+
+           className="w-[40px] h-[40px] rounded-[20px] mr-[12px]"/>
+          <View  className="flex-1">
+            <View  className="flex-row items-center">
+              <Text  className="text-[16px] font-semibold mr-[6px]">
                 {contactInfo.name}
               </Text>
               {contactInfo.isVerified && (
-                <View style={styles.verifiedBadge}>
+                <View  className="rounded-[8px] w-[16px] h-[16px] justify-center items-center">
                   <Image
                     source={require("@/assets/icons/badge-check-green.png")}
                   />
                 </View>
               )}
             </View>
-            <View style={styles.presenceRow}>
+            <View  className="flex-row items-center gap-[6px]">
               <View
-                style={[
-                  styles.presenceDot,
-                  {
-                    backgroundColor:
-                      (otherParticipant?.is_online ??
-                      otherParticipant?.status === "active")
-                        ? colors.success[200]
-                        : colors.slate[400],
-                  },
-                ]}
-              />
+
+               className="w-[8px] h-[8px] rounded-[4px]"/>
               <Text
-                style={[styles.contactStatus, { color: colors.slate[500] }]}
-              >
+
+               className="text-[12px] mt-[2px]">
                 {(otherParticipant?.is_online ??
                 otherParticipant?.status === "active")
                   ? "Active now"
@@ -821,9 +759,9 @@ const ChatPage = () => {
           </View>
         </View>
 
-        <View style={styles.headerActions}>
+        <View  className="flex-row gap-[8px] items-center">
           <TouchableOpacity
-            style={styles.headerButton}
+
             onPress={() =>
               router.push({
                 pathname: "/views/call",
@@ -835,13 +773,13 @@ const ChatPage = () => {
                 },
               })
             }
-          >
+           className="p-[8px]">
             <Calling size={24} color={colors.slate[650]} />
           </TouchableOpacity>
           <TouchableOpacity
-            style={styles.headerButton}
+
             onPress={() => setShowMenu(true)}
-          >
+           className="p-[8px]">
             <More size={24} color={colors.slate[650]} />
           </TouchableOpacity>
         </View>
@@ -853,33 +791,27 @@ const ChatPage = () => {
         data={messagesWithDateMarkers}
         renderItem={renderMessage}
         keyExtractor={(item) => item.id}
-        style={styles.messagesList}
+
         contentContainerStyle={styles.messagesContent}
         showsVerticalScrollIndicator={false}
         onContentSizeChange={scrollToLatest}
         onLayout={scrollToLatest}
-      />
+       className="flex-1"/>
 
       {/* Reply Preview */}
       {replyTo && (
         <View
-          style={[
-            styles.replyPreviewContainer,
-            {
-              backgroundColor: colors.slate[100],
-              borderTopColor: colors.slate[200],
-            },
-          ]}
-        >
-          <View style={styles.replyPreviewContent}>
+
+         className="px-[16px] py-[8px] flex-row items-center border-t">
+          <View  className="flex-1">
             <Text
-              style={[styles.replyPreviewLabel, { color: colors.slate[500] }]}
-            >
+
+             className="text-[12px] font-medium mb-[2px]">
               Replying to:
             </Text>
             <Text
-              style={[styles.replyPreviewText, { color: colors.slate[650] }]}
-            >
+
+             className="text-[13px]">
               {messages
                 .find((msg) => msg.id === replyTo)
                 ?.text?.substring(0, 60)}
@@ -888,11 +820,11 @@ const ChatPage = () => {
           </View>
           <TouchableOpacity
             onPress={() => setReplyTo(null)}
-            style={styles.cancelReplyButton}
-          >
+
+           className="p-[8px]">
             <Text
-              style={[styles.cancelReplyText, { color: colors.slate[500] }]}
-            >
+
+             className="text-[16px] font-bold">
               ✕
             </Text>
           </TouchableOpacity>
@@ -902,29 +834,23 @@ const ChatPage = () => {
       {/* Input Area */}
       <KeyboardAvoidingView
         behavior={Platform.OS === "ios" ? "padding" : "height"}
-        style={[
-          styles.inputContainer,
-          {
-            backgroundColor: colors.background,
-            borderTopColor: colors.slate[200],
-          },
-        ]}
-      >
-        <View style={[styles.inputRow, { backgroundColor: colors.slate[150] }]}>
+
+       className="py-[12px] border-t">
+        <View  className="flex-row items-end rounded-[24px] px-[16px] py-[8px]">
           <TextInput
-            style={[styles.textInput, { color: colors.slate[650] }]}
+
             placeholder="Message"
             placeholderTextColor={colors.slate[500]}
             value={inputText}
             onChangeText={setInputText}
             multiline
             maxLength={500}
-          />
+           className="flex-1 text-[16px] max-h-[120px] py-[8px]"/>
           <TouchableOpacity
-            style={[styles.sendButton]}
+
             onPress={sendMessage}
             disabled={inputText.trim().length === 0 || isSendMessagePending}
-          >
+           className="w-[32px] h-[32px] rounded-[16px] justify-center items-center ml-[8px]">
             <Send size={22} color={colors.slate[500]} />
           </TouchableOpacity>
         </View>
@@ -938,40 +864,40 @@ const ChatPage = () => {
         onRequestClose={() => setShowMenu(false)}
       >
         <Pressable
-          style={styles.menuOverlay}
+
           onPress={() => setShowMenu(false)}
-        >
+         className="flex-1 bg-[rgba(0, 0, 0, 0.5)] justify-start items-end">
           <View
             style={[
               styles.menuContainer,
               { backgroundColor: colors.background },
             ]}
-          >
+           className="mt-[60px] mr-[16px] rounded-[12px] min-w-[200px] shadow-color-[#000] shadow-opacity-[0.25px] shadow-radius-[8px] elevation-[5px]">
             {!recipientIsRenter && (
               <TouchableOpacity
-                style={styles.menuItem}
+
                 onPress={() => {
                   setShowMenu(false);
                   setShowReviewModal(true);
                 }}
-              >
+               className="flex-row items-center py-[14px] px-[16px] gap-[12px]">
                 <Star size={20} color={colors.slate[650]} />
-                <Text style={[styles.menuText, { color: colors.slate[650] }]}>
+                <Text  className="text-[15px] font-medium">
                   Give a review
                 </Text>
               </TouchableOpacity>
             )}
 
             <TouchableOpacity
-              style={styles.menuItem}
+
               onPress={() => {
                 setShowMenu(false);
                 // reportRef.current?.present();
                 setShowReportModal(true);
               }}
-            >
+             className="flex-row items-center py-[14px] px-[16px] gap-[12px]">
               <Flag size={20} color={colors.slate[650]} />
-              <Text style={[styles.menuText, { color: colors.slate[650] }]}>
+              <Text  className="text-[15px] font-medium">
                 Report {recipientLabel}
               </Text>
             </TouchableOpacity>
@@ -987,22 +913,19 @@ const ChatPage = () => {
         onRequestClose={() => setShowReviewModal(false)}
       >
         <Pressable
-          style={styles.modalOverlay}
-          onPress={() => setShowReviewModal(false)}
-        >
-          <Pressable
-            style={[
-              styles.modalContent,
-              { backgroundColor: colors.background },
-            ]}
-            onPress={(e) => e.stopPropagation()}
-          >
-            <View style={styles.modalHandle} />
 
-            <Text style={[styles.modalTitle, { color: colors.slate[650] }]}>
+          onPress={() => setShowReviewModal(false)}
+         className="flex-1 bg-[rgba(0, 0, 0, 0.5)] justify-end">
+          <Pressable
+
+            onPress={(e) => e.stopPropagation()}
+           className="px-[20px] pb-[32px] max-h-[85%px] border-top-left-radius-[24px] border-top-right-radius-[24px]">
+            <View   className="w-[40px] h-[4px] bg-[#ccc] rounded-[2px] my-[12px] self-center"/>
+
+            <Text  className="text-[20px] font-bold text-center mb-[8px]">
               Give review
             </Text>
-            <Text style={[styles.modalSubtitle, { color: colors.slate[500] }]}>
+            <Text  className="text-[13px] text-center leading-[18px] mb-[24px]">
               Please provide feedback about your experience and rate the person
               who listed this property.
             </Text>
@@ -1011,19 +934,12 @@ const ChatPage = () => {
             {renderStars(rating)}
 
             {/* Comment Input */}
-            <View style={styles.commentSection}>
-              <Text style={[styles.commentLabel, { color: colors.slate[650] }]}>
+            <View  className="mb-[24px]">
+              <Text  className="text-[14px] font-medium mb-[8px]">
                 Add Comment
               </Text>
               <TextInput
-                style={[
-                  styles.commentInput,
-                  {
-                    backgroundColor: colors.slate[150],
-                    borderColor: colors.slate[300],
-                    color: colors.slate[650],
-                  },
-                ]}
+
                 placeholder="Give your feedback..."
                 placeholderTextColor={colors.slate[450]}
                 multiline
@@ -1031,7 +947,7 @@ const ChatPage = () => {
                 textAlignVertical="top"
                 value={reviewComment}
                 onChangeText={setReviewComment}
-              />
+               className="rounded-[12px] p-[16px] border-[1px] text-[15px] min-h-[120px]"/>
             </View>
 
             <AppButton title="Submit" onPress={handleSubmitReview} />
@@ -1047,26 +963,23 @@ const ChatPage = () => {
         onRequestClose={() => setShowReportModal(false)}
       >
         <Pressable
-          style={styles.modalOverlay}
-          onPress={() => setShowReportModal(false)}
-        >
-          <Pressable
-            style={[
-              styles.modalContent,
-              { backgroundColor: colors.background },
-            ]}
-            onPress={(e) => e.stopPropagation()}
-          >
-            <View style={styles.modalHandle} />
 
-            <Text style={[styles.modalTitle, { color: colors.slate[650] }]}>
+          onPress={() => setShowReportModal(false)}
+         className="flex-1 bg-[rgba(0, 0, 0, 0.5)] justify-end">
+          <Pressable
+
+            onPress={(e) => e.stopPropagation()}
+           className="px-[20px] pb-[32px] max-h-[85%px] border-top-left-radius-[24px] border-top-right-radius-[24px]">
+            <View   className="w-[40px] h-[4px] bg-[#ccc] rounded-[2px] my-[12px] self-center"/>
+
+            <Text  className="text-[20px] font-bold text-center mb-[8px]">
               Report the {recipientLabel}
             </Text>
-            <Text style={[styles.modalSubtitle, { color: colors.slate[500] }]}>
+            <Text  className="text-[13px] text-center leading-[18px] mb-[24px]">
               Let us know what the case is with this {recipientLabel}.
             </Text>
 
-            <View style={styles.reportList}>
+            <View  className="gap-[12px] mb-[24px]">
               {reportReasons.map((reason, index) => (
                 <SimpleSelector
                   title={reason}
@@ -1098,423 +1011,96 @@ const ChatPage = () => {
 };
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
-  header: {
-    flexDirection: "row",
-    alignItems: "center",
-    paddingVertical: 12,
-    borderBottomWidth: 1,
-  },
-  backButton: {
-    paddingRight: 12,
-  },
-  backIcon: {
-    fontSize: 24,
-    fontWeight: "600",
-  },
-  contactInfo: {
-    flex: 1,
-    flexDirection: "row",
-    alignItems: "center",
-  },
-  contactAvatar: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    marginRight: 12,
-  },
-  contactDetails: {
-    flex: 1,
-  },
-  contactNameContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-  },
-  contactName: {
-    fontSize: 16,
-    fontWeight: "600",
-    marginRight: 6,
-  },
-  verifiedBadge: {
-    borderRadius: 8,
-    width: 16,
-    height: 16,
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  verifiedIcon: {
-    color: "white",
-    fontSize: 10,
-    fontWeight: "bold",
-  },
-  contactStatus: {
-    fontSize: 12,
-    marginTop: 2,
-  },
-  headerActions: {
-    flexDirection: "row",
-    gap: 8,
-    alignItems: "center",
-  },
-  headerButton: {
-    padding: 8,
-  },
-  headerButtonIcon: {
-    fontSize: 20,
-  },
-  messagesList: {
-    flex: 1,
-  },
-  messagesContent: {
-    paddingVertical: 16,
-  },
-  systemMessageContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-    paddingHorizontal: 16,
-    marginVertical: 16,
-  },
-  presenceRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 6,
-  },
-  presenceDot: {
-    width: 8,
-    height: 8,
-    borderRadius: 4,
-  },
-  systemMessageLine: {
-    flex: 1,
-    height: 1,
-  },
-  systemMessagePill: {
-    borderRadius: 12,
-    paddingHorizontal: 12,
-    paddingVertical: 5,
-    marginHorizontal: 10,
-  },
-  systemMessageText: {
-    fontSize: 12,
-    fontWeight: "500",
-  },
-  propertyMessageContainer: {
-    alignItems: "flex-start",
-    width: "100%",
-    marginVertical: 8,
-  },
-  propertyContainer: {
-    width: "100%",
-    borderRadius: 16,
-    paddingRight: 4,
-    overflow: "hidden",
-    maxWidth: "100%",
-    borderWidth: 1,
-    borderColor: "rgba(0,0,0,0.05)",
-  },
-  propertyImage: {
-    width: 65,
-    height: 70,
-    borderRadius: 10,
-    resizeMode: "cover",
-    marginRight: 5,
-  },
-  propertyContent: {
-    paddingLeft: 6,
-    display: "flex",
-    flexDirection: "row",
-    paddingBlock: 5,
-    borderRadius: 6,
-  },
-  propertyDetails: {
-    flex: 1,
-    minWidth: 0,
-    paddingRight: 8,
-  },
-  propertyTitle: {
-    fontSize: 14,
-    fontWeight: "600",
-    marginBottom: 6,
-    lineHeight: 20,
-  },
-  propertyPrice: {
-    fontSize: 16,
-    fontWeight: "700",
-    marginBottom: 8,
-  },
-  propertyPriceUnit: {
-    fontSize: 14,
-    fontWeight: "400",
-  },
-  propertyLocation: {
-    fontSize: 11,
-    marginBottom: 4,
-    lineHeight: 16,
-  },
-  propertyActions: {
-    flexDirection: "row",
-    paddingHorizontal: 16,
-    paddingBottom: 16,
-    gap: 8,
-  },
-  propertyButton: {
-    flex: 1,
-    paddingVertical: 10,
-    paddingHorizontal: 12,
-    borderRadius: 20,
-    alignItems: "center",
-  },
-  viewDetailsButton: {
-    borderWidth: 1,
-  },
+  container: {},
+  header: {},
+  backButton: {},
+  backIcon: {},
+  contactInfo: {},
+  contactAvatar: {},
+  contactDetails: {},
+  contactNameContainer: {},
+  contactName: {},
+  verifiedBadge: {},
+  verifiedIcon: {},
+  contactStatus: {},
+  headerActions: {},
+  headerButton: {},
+  headerButtonIcon: {},
+  messagesList: {},
+  messagesContent: {},
+  systemMessageContainer: {},
+  presenceRow: {},
+  presenceDot: {},
+  systemMessageLine: {},
+  systemMessagePill: {},
+  systemMessageText: {},
+  propertyMessageContainer: {},
+  propertyContainer: {},
+  propertyImage: {},
+  propertyContent: {},
+  propertyDetails: {},
+  propertyTitle: {},
+  propertyPrice: {},
+  propertyPriceUnit: {},
+  propertyLocation: {},
+  propertyActions: {},
+  propertyButton: {},
+  viewDetailsButton: {},
   rentButton: {},
-  propertyButtonText: {
-    fontSize: 13,
-    fontWeight: "500",
-  },
-  propertyMessageTime: {
-    fontSize: 11,
-    marginTop: 4,
-    marginLeft: 8,
-  },
-  messageContainer: {
-    marginVertical: 3,
-  },
-  userMessageContainer: {
-    alignItems: "flex-end",
-  },
-  otherMessageContainer: {
-    alignItems: "flex-start",
-  },
+  propertyButtonText: {},
+  propertyMessageTime: {},
+  messageContainer: {},
+  userMessageContainer: {},
+  otherMessageContainer: {},
   messageBubbleContainer: {
     maxWidth: screenWidth * 0.75,
   },
-  messageBubble: {
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    borderRadius: 18,
-  },
-  userMessageBubble: {
-    borderBottomRightRadius: 4,
-  },
-  otherMessageBubble: {
-    borderBottomLeftRadius: 4,
-  },
-  messageText: {
-    fontSize: 15,
-    lineHeight: 20,
-  },
-  messageTime: {
-    fontSize: 11,
-  },
-  messageMeta: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 4,
-    marginTop: 4,
-  },
-  userMessageMeta: {
-    justifyContent: "flex-end",
-  },
-  replyContainer: {
-    borderLeftWidth: 3,
-    paddingLeft: 12,
-    paddingVertical: 6,
-    marginBottom: 4,
-    borderTopLeftRadius: 8,
-    borderTopRightRadius: 8,
-  },
-  replyText: {
-    fontSize: 13,
-    fontStyle: "italic",
-  },
-  replyPreviewContainer: {
-    paddingHorizontal: 16,
-    paddingVertical: 8,
-    borderTopWidth: 1,
-    flexDirection: "row",
-    alignItems: "center",
-  },
-  replyPreviewContent: {
-    flex: 1,
-  },
-  replyPreviewLabel: {
-    fontSize: 12,
-    fontWeight: "500",
-    marginBottom: 2,
-  },
-  replyPreviewText: {
-    fontSize: 13,
-  },
-  cancelReplyButton: {
-    padding: 8,
-  },
-  cancelReplyText: {
-    fontSize: 16,
-    fontWeight: "bold",
-  },
-  inputContainer: {
-    paddingVertical: 12,
-    borderTopWidth: 1,
-  },
-  inputRow: {
-    flexDirection: "row",
-    alignItems: "flex-end",
-    borderRadius: 24,
-    paddingHorizontal: 16,
-    paddingVertical: 8,
-  },
-  textInput: {
-    flex: 1,
-    fontSize: 16,
-    maxHeight: 120,
-    paddingVertical: 8,
-  },
-  sendButton: {
-    width: 32,
-    height: 32,
-    borderRadius: 16,
-    justifyContent: "center",
-    alignItems: "center",
-    marginLeft: 8,
-  },
-  sendIcon: {
-    color: "white",
-    fontSize: 16,
-    fontWeight: "600",
-  },
+  messageBubble: {},
+  userMessageBubble: {},
+  otherMessageBubble: {},
+  messageText: {},
+  messageTime: {},
+  messageMeta: {},
+  userMessageMeta: {},
+  replyContainer: {},
+  replyText: {},
+  replyPreviewContainer: {},
+  replyPreviewContent: {},
+  replyPreviewLabel: {},
+  replyPreviewText: {},
+  cancelReplyButton: {},
+  cancelReplyText: {},
+  inputContainer: {},
+  inputRow: {},
+  textInput: {},
+  sendButton: {},
+  sendIcon: {},
   // Menu Styles
-  menuOverlay: {
-    flex: 1,
-    backgroundColor: "rgba(0, 0, 0, 0.5)",
-    justifyContent: "flex-start",
-    alignItems: "flex-end",
-  },
-  menuContainer: {
-    marginTop: 60,
-    marginRight: 16,
-    borderRadius: 12,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.25,
-    shadowRadius: 8,
-    elevation: 5,
-    minWidth: 200,
-  },
-  menuItem: {
-    flexDirection: "row",
-    alignItems: "center",
-    paddingVertical: 14,
-    paddingHorizontal: 16,
-    gap: 12,
-  },
-  menuIcon: {
-    width: 20,
-    height: 20,
-  },
-  menuText: {
-    fontSize: 15,
-    fontWeight: "500",
-  },
+  menuOverlay: {},
+  menuContainer: {shadowOffset: { width: 0, height: 2 }},
+  menuItem: {},
+  menuIcon: {},
+  menuText: {},
   // Modal Styles
-  modalOverlay: {
-    flex: 1,
-    backgroundColor: "rgba(0, 0, 0, 0.5)",
-    justifyContent: "flex-end",
-  },
-  modalContent: {
-    borderTopLeftRadius: 24,
-    borderTopRightRadius: 24,
-    paddingHorizontal: 20,
-    paddingBottom: 32,
-    maxHeight: "85%",
-  },
-  modalHandle: {
-    width: 40,
-    height: 4,
-    backgroundColor: "#ccc",
-    borderRadius: 2,
-    alignSelf: "center",
-    marginVertical: 12,
-  },
-  modalTitle: {
-    fontSize: 20,
-    fontWeight: "700",
-    textAlign: "center",
-    marginBottom: 8,
-  },
-  modalSubtitle: {
-    fontSize: 13,
-    textAlign: "center",
-    lineHeight: 18,
-    marginBottom: 24,
-  },
+  modalOverlay: {},
+  modalContent: {},
+  modalHandle: {},
+  modalTitle: {},
+  modalSubtitle: {},
   // Review Modal
-  starsContainer: {
-    flexDirection: "row",
-    justifyContent: "center",
-    gap: 8,
-    marginBottom: 24,
-  },
-  starIcon: {
-    fontSize: 32,
-  },
-  commentSection: {
-    marginBottom: 24,
-  },
-  commentLabel: {
-    fontSize: 14,
-    fontWeight: "500",
-    marginBottom: 8,
-  },
-  commentInput: {
-    borderRadius: 12,
-    padding: 16,
-    borderWidth: 1,
-    fontSize: 15,
-    minHeight: 120,
-  },
-  submitButton: {
-    paddingVertical: 16,
-    borderRadius: 12,
-    alignItems: "center",
-  },
-  submitButtonText: {
-    fontSize: 16,
-    fontWeight: "600",
-  },
+  starsContainer: {},
+  starIcon: {},
+  commentSection: {},
+  commentLabel: {},
+  commentInput: {},
+  submitButton: {},
+  submitButtonText: {},
   // Report Modal
-  reportList: {
-    gap: 12,
-    marginBottom: 24,
-  },
-  reportItem: {
-    flexDirection: "row",
-    alignItems: "center",
-    padding: 16,
-    borderRadius: 12,
-    borderWidth: 1,
-    gap: 12,
-  },
-  radioButton: {
-    width: 20,
-    height: 20,
-    borderRadius: 10,
-    borderWidth: 2,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  radioButtonInner: {
-    width: 10,
-    height: 10,
-    borderRadius: 5,
-  },
-  reportText: {
-    flex: 1,
-    fontSize: 14,
-  },
+  reportList: {},
+  reportItem: {},
+  radioButton: {},
+  radioButtonInner: {},
+  reportText: {},
 });
 
 export default ChatPage;

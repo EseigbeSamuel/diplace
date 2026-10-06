@@ -139,15 +139,15 @@ const SelfieVerificationStep = ({ onNext, handleBack }: SelfieProps) => {
   if (!hasPermission) {
     return (
       <SafeAreaViewContainer>
-        <View style={Styles.permissionContainer}>
-          <View style={Styles.contentContainer}>
+        <View style={Styles.permissionContainer} className="flex-1 justify-between">
+          <View style={Styles.contentContainer} className="flex-1 items-center justify-center">
             <Image
               source={require("@/assets/icons/Camera - Iconly Pro.png")}
               style={Styles.permissionIcon}
               resizeMode="contain"
             />
-            <Text style={Styles.headText}>Camera Access Required</Text>
-            <Text style={Styles.descriptionText}>
+            <Text style={Styles.headText} className="font-semibold text-center">Camera Access Required</Text>
+            <Text style={Styles.descriptionText} className="text-center">
               Please allow camera access so we can take your verification
               selfie.
             </Text>
@@ -168,31 +168,31 @@ const SelfieVerificationStep = ({ onNext, handleBack }: SelfieProps) => {
 
   if (capturedPhoto) {
     return (
-      <View style={Styles.container}>
-        <View style={Styles.previewContainer}>
+      <View style={Styles.container} className="flex-1 justify-between">
+        <View  className="flex-1 relative">
           <Image
             source={{ uri: capturedPhoto }}
-            style={Styles.previewImage}
+
             resizeMode="cover"
-          />
-          <View style={Styles.previewOverlay}>
-            <Text style={Styles.previewText}>
+           className="h-[100%px] w-[100%px]"/>
+          <View style={Styles.previewOverlay} className="bg-[rgba(0, 0, 0, 0.6)] bottom-[0px] left-[0px] absolute right-[0px]">
+            <Text style={Styles.previewText} className="text-[#FFFFFF] font-semibold text-center">
               Perfect! Let&apos;s use this selfie.
             </Text>
           </View>
         </View>
 
         <View style={Styles.buttonContainer}>
-          <View style={Styles.buttonRow}>
+          <View style={Styles.buttonRow} className="items-center flex-row">
             <TouchableOpacity
               style={Styles.retakeButton}
               onPress={retakePhoto}
               disabled={initiateVerificationPending || isUploading}
             >
-              <Text style={Styles.retakeText}>Retake</Text>
+              <Text style={Styles.retakeText} className="font-medium">Retake</Text>
             </TouchableOpacity>
 
-            <View style={Styles.continueButtonWrapper}>
+            <View  className="flex-1">
               <AppButton
                 title="Continue"
                 onPress={handleContinue}
@@ -202,9 +202,9 @@ const SelfieVerificationStep = ({ onNext, handleBack }: SelfieProps) => {
             </View>
           </View>
           {(initiateVerificationPending || isUploading) && (
-            <View style={Styles.pendingOverlay}>
+            <View style={Styles.pendingOverlay} className="items-center bg-[rgba(0, 0, 0, 0.4)] bottom-[0px] justify-center left-[0px] absolute right-[0px] top-[0px]">
               <ActivityIndicator color="#FFFFFF" />
-              <Text style={Styles.pendingText}>
+              <Text style={Styles.pendingText} className="text-[#FFFFFF] font-semibold">
                 {isUploading ? "Uploading selfie..." : "Starting verification..."}
               </Text>
             </View>
@@ -215,39 +215,39 @@ const SelfieVerificationStep = ({ onNext, handleBack }: SelfieProps) => {
   }
 
   return (
-    <View style={Styles.cameraContainer}>
+    <View style={Styles.cameraContainer} className="bottom-[0px] left-[0px] absolute right-[0px]">
       <CameraView
         ref={cameraRef}
-        style={Styles.camera}
+
         facing="front"
         mode="picture"
         mirror
         onCameraReady={() => setCameraReady(true)}
-      >
-        <View style={Styles.cameraOverlay}>
-          <View style={Styles.header}>
+       className="flex-1">
+        <View  className="bg-[transparent] flex-1 justify-between">
+          <View style={Styles.header} className="items-center flex-row justify-between z-[2]">
             <TouchableOpacity
               onPress={handleBack}
               style={Styles.backButton}
               disabled={isCapturing}
-            >
+             className="items-center bg-[rgba(255, 255, 255, 0.25)] justify-center">
               <Image
                 source={require("@/assets/icons/arrow-left-dark.png")}
                 style={Styles.backIcon}
-              />
+               className="tint-[#FFFFFF]"/>
             </TouchableOpacity>
-            <Text style={Styles.headerTitle}>Take a selfie</Text>
+            <Text style={Styles.headerTitle} className="text-[#FFFFFF] font-bold">Take a selfie</Text>
             <View style={Styles.headerSpacer} />
           </View>
 
-          <View style={Styles.faceGuideContainer}>
-            <View style={[Styles.faceOval, isCapturing && Styles.faceOvalReady]}>
-              <Text style={Styles.countdownText}>
+          <View  className="items-center flex-1 justify-center">
+            <View style={[Styles.faceOval, isCapturing && Styles.faceOvalReady]} className="items-center border-[#FFFFFF] border-[3px] justify-center opacity-[0.9] border-style-[dashed]">
+              <Text style={Styles.countdownText} className="text-[#FFFFFF] font-[800] text-shadow-color-[rgba(0,_0,_0,_0.45)]">
                 {isCapturing ? "" : countdown}
               </Text>
             </View>
-            <View style={Styles.statusChip}>
-              <Text style={Styles.statusText}>
+            <View style={Styles.statusChip} className="bg-[rgba(0, 0, 0, 0.55)] self-center">
+              <Text style={Styles.statusText} className="text-[#FFFFFF] font-semibold text-center">
                 {isCapturing
                   ? "Capturing..."
                   : cameraReady
@@ -257,19 +257,19 @@ const SelfieVerificationStep = ({ onNext, handleBack }: SelfieProps) => {
             </View>
           </View>
 
-          <View style={Styles.bottomControls}>
+          <View style={Styles.bottomControls} className="items-center">
             <TouchableOpacity
               style={Styles.captureButton}
               onPress={takePicture}
               disabled={!cameraReady || isCapturing}
-            >
+             className="items-center bg-[rgba(255, 255, 255, 0.3)] border-[#FFFFFF] border-[4px] justify-center">
               {isCapturing ? (
                 <ActivityIndicator color="#111827" />
               ) : (
-                <View style={Styles.captureButtonInner} />
+                <View style={Styles.captureButtonInner}  className="bg-[#FFFFFF]"/>
               )}
             </TouchableOpacity>
-            <Text style={Styles.manualText}>Tap button if auto-capture misses</Text>
+            <Text style={Styles.manualText} className="text-[#FFFFFF] font-medium">Tap button if auto-capture misses</Text>
           </View>
         </View>
       </CameraView>
@@ -281,211 +281,74 @@ export default SelfieVerificationStep;
 
 const styles = (colors: ColorScheme) =>
   StyleSheet.create({
-    container: {
-      flex: 1,
-      justifyContent: "space-between",
-      paddingBottom: RFValue(20),
-    },
-    permissionContainer: {
-      flex: 1,
-      justifyContent: "space-between",
-      paddingBottom: RFValue(20),
-    },
-    contentContainer: {
-      flex: 1,
-      alignItems: "center",
-      justifyContent: "center",
-      gap: RFValue(16),
-      paddingHorizontal: RFValue(20),
-    },
+    container: {paddingBottom: RFValue(20)},
+    permissionContainer: {paddingBottom: RFValue(20)},
+    contentContainer: {gap: RFValue(16),
+paddingHorizontal: RFValue(20)},
     permissionIcon: {
       height: RFValue(76),
       tintColor: colors.slate[650],
       width: RFValue(76),
     },
-    headText: {
-      color: colors.slate[650],
-      fontSize: RFValue(24),
-      fontWeight: "600",
-      lineHeight: RFValue(32),
-      textAlign: "center",
-    },
-    descriptionText: {
-      color: colors.slate[600],
-      fontSize: RFValue(14),
-      lineHeight: RFValue(22),
-      textAlign: "center",
-    },
+    headText: {color: colors.slate[650],
+fontSize: RFValue(24),
+lineHeight: RFValue(32)},
+    descriptionText: {color: colors.slate[600],
+fontSize: RFValue(14),
+lineHeight: RFValue(22)},
     buttonContainer: {
       paddingHorizontal: RFValue(20),
       marginTop: RFValue(20),
     },
-    buttonRow: {
-      alignItems: "center",
-      flexDirection: "row",
-      gap: RFValue(12),
-    },
+    buttonRow: {gap: RFValue(12)},
     retakeButton: {
       paddingHorizontal: RFValue(24),
       paddingVertical: RFValue(14),
     },
-    retakeText: {
-      color: colors.slate[600],
-      fontSize: RFValue(16),
-      fontWeight: "500",
-    },
-    continueButtonWrapper: {
-      flex: 1,
-    },
-    cameraContainer: {
-      bottom: 0,
-      left: 0,
-      position: "absolute",
-      right: 0,
-      top: -50,
-    },
-    camera: {
-      flex: 1,
-    },
-    cameraOverlay: {
-      backgroundColor: "transparent",
-      flex: 1,
-      justifyContent: "space-between",
-    },
-    header: {
-      alignItems: "center",
-      flexDirection: "row",
-      justifyContent: "space-between",
-      paddingHorizontal: RFValue(16),
-      paddingTop: RFValue(90),
-      zIndex: 2,
-    },
-    backButton: {
-      alignItems: "center",
-      backgroundColor: "rgba(255, 255, 255, 0.25)",
-      borderRadius: RFValue(25),
-      height: RFValue(50),
-      justifyContent: "center",
-      width: RFValue(50),
-    },
-    backIcon: {
-      height: RFValue(24),
-      tintColor: "#FFFFFF",
-      width: RFValue(24),
-    },
-    headerTitle: {
-      color: "#FFFFFF",
-      fontSize: RFValue(18),
-      fontWeight: "700",
-    },
+    retakeText: {color: colors.slate[600],
+fontSize: RFValue(16)},
+    continueButtonWrapper: {},
+    cameraContainer: {top: -50},
+    camera: {},
+    cameraOverlay: {},
+    header: {paddingHorizontal: RFValue(16),
+paddingTop: RFValue(90)},
+    backButton: {borderRadius: RFValue(25),
+height: RFValue(50),
+width: RFValue(50)},
+    backIcon: {height: RFValue(24),
+width: RFValue(24)},
+    headerTitle: {fontSize: RFValue(18)},
     headerSpacer: {
       width: RFValue(50),
     },
-    faceGuideContainer: {
-      alignItems: "center",
-      flex: 1,
-      justifyContent: "center",
-    },
-    faceOval: {
-      alignItems: "center",
-      borderColor: "#FFFFFF",
-      borderRadius: RFValue(125),
-      borderStyle: "dashed",
-      borderWidth: 3,
-      height: RFValue(320),
-      justifyContent: "center",
-      opacity: 0.9,
-      width: RFValue(250),
-    },
-    faceOvalReady: {
-      borderColor: "#22c55e",
-      opacity: 1,
-    },
-    countdownText: {
-      color: "#FFFFFF",
-      fontSize: RFValue(54),
-      fontWeight: "800",
-      textShadowColor: "rgba(0, 0, 0, 0.45)",
-      textShadowOffset: { width: 0, height: 2 },
-      textShadowRadius: RFValue(8),
-    },
-    statusChip: {
-      alignSelf: "center",
-      backgroundColor: "rgba(0, 0, 0, 0.55)",
-      borderRadius: RFValue(18),
-      marginTop: RFValue(16),
-      paddingHorizontal: RFValue(16),
-      paddingVertical: RFValue(8),
-    },
-    statusText: {
-      color: "#FFFFFF",
-      fontSize: RFValue(12),
-      fontWeight: "600",
-      textAlign: "center",
-    },
-    bottomControls: {
-      alignItems: "center",
-      gap: RFValue(10),
-      paddingBottom: RFValue(44),
-    },
-    captureButton: {
-      alignItems: "center",
-      backgroundColor: "rgba(255, 255, 255, 0.3)",
-      borderColor: "#FFFFFF",
-      borderRadius: RFValue(40),
-      borderWidth: 4,
-      height: RFValue(80),
-      justifyContent: "center",
-      width: RFValue(80),
-    },
-    captureButtonInner: {
-      backgroundColor: "#FFFFFF",
-      borderRadius: RFValue(32.5),
-      height: RFValue(65),
-      width: RFValue(65),
-    },
-    manualText: {
-      color: "#FFFFFF",
-      fontSize: RFValue(12),
-      fontWeight: "500",
-    },
-    previewContainer: {
-      flex: 1,
-      position: "relative",
-    },
-    previewImage: {
-      height: "100%",
-      width: "100%",
-    },
-    previewOverlay: {
-      backgroundColor: "rgba(0, 0, 0, 0.6)",
-      bottom: 0,
-      left: 0,
-      paddingHorizontal: RFValue(20),
-      paddingVertical: RFValue(20),
-      position: "absolute",
-      right: 0,
-    },
-    previewText: {
-      color: "#FFFFFF",
-      fontSize: RFValue(16),
-      fontWeight: "600",
-      textAlign: "center",
-    },
-    pendingOverlay: {
-      alignItems: "center",
-      backgroundColor: "rgba(0, 0, 0, 0.4)",
-      bottom: 0,
-      gap: RFValue(8),
-      justifyContent: "center",
-      left: 0,
-      position: "absolute",
-      right: 0,
-      top: 0,
-    },
-    pendingText: {
-      color: "#FFFFFF",
-      fontSize: RFValue(14),
-      fontWeight: "600",
-    },
+    faceGuideContainer: {},
+    faceOval: {borderRadius: RFValue(125),
+height: RFValue(320),
+width: RFValue(250)},
+    faceOvalReady: {},
+    countdownText: {fontSize: RFValue(54),
+textShadowOffset: { width: 0, height: 2 },
+textShadowRadius: RFValue(8)},
+    statusChip: {borderRadius: RFValue(18),
+marginTop: RFValue(16),
+paddingHorizontal: RFValue(16),
+paddingVertical: RFValue(8)},
+    statusText: {fontSize: RFValue(12)},
+    bottomControls: {gap: RFValue(10),
+paddingBottom: RFValue(44)},
+    captureButton: {borderRadius: RFValue(40),
+height: RFValue(80),
+width: RFValue(80)},
+    captureButtonInner: {borderRadius: RFValue(32.5),
+height: RFValue(65),
+width: RFValue(65)},
+    manualText: {fontSize: RFValue(12)},
+    previewContainer: {},
+    previewImage: {},
+    previewOverlay: {paddingHorizontal: RFValue(20),
+paddingVertical: RFValue(20)},
+    previewText: {fontSize: RFValue(16)},
+    pendingOverlay: {gap: RFValue(8)},
+    pendingText: {fontSize: RFValue(14)},
   });

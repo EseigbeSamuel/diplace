@@ -31,7 +31,7 @@ interface ChatItemProps {
 
 // Verified Badge Component
 const VerifiedBadge = () => (
-  <View style={styles.verifiedBadge}>
+  <View style={styles.verifiedBadge} className="justify-center items-center rounded-[8px] w-[16px] h-[16px]">
     <Image source={require("@/assets/icons/badge-check-green.png")} />
   </View>
 );
@@ -74,10 +74,10 @@ const ChatItem: React.FC<ChatItemProps> = ({ item, colors, currentUserId }) => {
           },
         })
       }
-    >
-      <View style={styles.avatarContainer}>
+     className="flex-row items-center py-[12px]">
+      <View style={styles.avatarContainer} className="relative mr-[12px]">
         {avatarUri ? (
-          <Image source={{ uri: avatarUri }} style={styles.avatar} />
+          <Image source={{ uri: avatarUri }} style={styles.avatar}  className="w-[48px] h-[48px] rounded-[24px]"/>
         ) : (
           <View
             style={[
@@ -88,7 +88,7 @@ const ChatItem: React.FC<ChatItemProps> = ({ item, colors, currentUserId }) => {
                 alignItems: "center",
               },
             ]}
-          >
+           className="w-[48px] h-[48px] rounded-[24px]">
             <Text
               style={{
                 color: colors.slate[650],
@@ -110,27 +110,27 @@ const ChatItem: React.FC<ChatItemProps> = ({ item, colors, currentUserId }) => {
                 borderColor: colors.background,
               },
             ]}
-          />
+           className="absolute bottom-[0px] right-[0px] w-[14px] h-[14px] rounded-[7px] border-[2px]"/>
         ) : null}
       </View>
 
-      <View style={styles.chatContent}>
-        <View style={styles.chatHeader}>
-          <View style={styles.nameContainer}>
+      <View style={styles.chatContent} className="flex-1">
+        <View style={styles.chatHeader} className="flex-row justify-between items-center mb-[4px]">
+          <View style={styles.nameContainer} className="flex-row items-center flex-1 mr-[10px]">
             <Text
               style={[styles.chatName, { color: colors.slate[650] }]}
               numberOfLines={1}
-            >
+             className="font-semibold mr-[6px]">
               {displayName}
             </Text>
             {isVerified && <VerifiedBadge />}
           </View>
-          <Text style={[styles.chatTime, { color: colors.slate[500] }]}>
+          <Text style={[styles.chatTime, { color: colors.slate[500] }]} className="font-normal">
             {formattedTime}
           </Text>
         </View>
 
-        <View style={styles.messageContainer}>
+        <View className="flex-row justify-between items-center">
           <Text
             style={[
               styles.chatMessage,
@@ -141,7 +141,7 @@ const ChatItem: React.FC<ChatItemProps> = ({ item, colors, currentUserId }) => {
               },
             ]}
             numberOfLines={1}
-          >
+           className="flex-1 mr-[10px] leading-[18px]">
             {item.last_message_preview || "No messages yet"}
           </Text>
           {item.unread_count > 0 && (
@@ -150,8 +150,8 @@ const ChatItem: React.FC<ChatItemProps> = ({ item, colors, currentUserId }) => {
                 styles.unreadBadge,
                 { backgroundColor: colors.error[200] },
               ]}
-            >
-              <Text style={styles.unreadText}>{item.unread_count}</Text>
+             className="items-center rounded-[10px] px-[7px] py-[3px] min-w-[20px]">
+              <Text style={styles.unreadText} className="text-[white] font-semibold">{item.unread_count}</Text>
             </View>
           )}
         </View>
@@ -255,7 +255,7 @@ const ChatsPage: React.FC = () => {
         { borderColor: colors.slate[400] },
       ]}
       onPress={() => setActiveFilter(tab)}
-    >
+     className="flex-row items-center px-[16px] py-[8px] rounded-[20px] border-[1px]">
       <Text
         style={[
           styles.filterText,
@@ -263,15 +263,15 @@ const ChatsPage: React.FC = () => {
             color: activeFilter === tab ? colors.slate[650] : colors.slate[500],
           },
         ]}
-      >
+       className="font-medium">
         {tab}
       </Text>
       {tab === "Unread" &&
         agentConversations.some((c) => c.unread_count > 0) && (
           <View
             style={[styles.filterBadge, { backgroundColor: colors.error[200] }]}
-          >
-            <Text style={styles.filterBadgeText}>
+           className="items-center rounded-[8px] ml-[6px] px-[6px] py-[2px] min-w-[18px]">
+            <Text style={styles.filterBadgeText} className="text-[white] font-semibold">
               {agentConversations.filter((c) => c.unread_count > 0).length}
             </Text>
           </View>
@@ -292,14 +292,14 @@ const ChatsPage: React.FC = () => {
         />
       </View>
 
-      <View style={styles.filterContainer}>
+      <View style={styles.filterContainer} className="flex-row mb-[15px] gap-[10px]">
         {filterTabs.map(renderFilterTab)}
       </View>
 
       {/* Chat List */}
       {isConversationsLoading && !isRefreshing ? (
         <View
-          style={{ flex: 1, justifyContent: "center", alignItems: "center" }}
+          className="flex-1 justify-center items-center"
         >
           <ActivityIndicator size="large" color={colors.slate[650]} />
         </View>
@@ -319,13 +319,13 @@ const ChatsPage: React.FC = () => {
             />
           }
           ListEmptyComponent={
-            <View style={{ alignItems: "center", marginTop: 60 }}>
+            <View className="items-center mt-[60px]">
               <Text style={{ color: colors.slate[500], fontSize: RFValue(14) }}>
                 No conversations yet.
               </Text>
             </View>
           }
-        />
+         className="flex-1"/>
       )}
     </SafeAreaViewContainer>
   );
@@ -333,220 +333,198 @@ const ChatsPage: React.FC = () => {
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
+
   },
   header: {
     // paddingHorizontal: 20,
-    paddingTop: 10,
-    paddingBottom: 15,
+
+
   },
   headerContent: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
+
+
+
   },
-  headerTitle: {
-    fontSize: RFValue(27),
-    fontWeight: "700",
-    letterSpacing: -0.5,
-  },
+  headerTitle: {fontSize: RFValue(27)},
   headerIcons: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 15,
+
+
+
   },
   iconButton: {
-    position: "relative",
-    padding: 8,
+
+
   },
   bellIcon: {
-    width: 24,
-    height: 24,
-    borderRadius: "100%",
-    justifyContent: "center",
-    alignItems: "center",
-    padding: 17,
+
+
+
+
+
+
   },
   notificationDot: {
-    position: "absolute",
-    top: 1,
-    right: 6,
-    height: 18,
-    width: 18,
-    padding: 1,
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-    textAlign: "center",
-    borderRadius: "100%",
+
+
+
+
+
+
+
+
+
+
+
   },
   profileButton: {
-    position: "relative",
+
   },
   profileAvatar: {
-    width: 36,
-    height: 36,
-    borderRadius: 18,
+
+
+
   },
   searchContainer: {
-    marginHorizontal: 20,
-    marginBottom: 20,
-    borderRadius: 40,
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    flexDirection: "row",
-    alignItems: "center",
+
+
+
+
+
+
+
   },
   searchIcon: {
-    width: 40,
-    height: 40,
-    borderRadius: 10,
-    justifyContent: "center",
-    alignItems: "center",
-    marginRight: 12,
+
+
+
+
+
+
   },
   searchInput: {
     fontSize: RFValue(16),
-    flex: 1,
+
   },
   filterContainer: {
-    flexDirection: "row",
+
     // paddingHorizontal: 20,
-    marginBottom: 15,
-    gap: 10,
+
+
   },
   filterTab: {
-    paddingHorizontal: 16,
-    paddingVertical: 8,
-    borderRadius: 20,
-    borderWidth: 1,
-    flexDirection: "row",
-    alignItems: "center",
+
+
+
+
+
+
   },
   activeFilterTab: {
     // Styles applied in renderFilterTab
   },
   filterText: {
     fontSize: RFValue(14),
-    fontWeight: "500",
+
   },
   filterBadge: {
-    borderRadius: 8,
-    marginLeft: 6,
-    paddingHorizontal: 6,
-    paddingVertical: 2,
-    minWidth: 18,
-    alignItems: "center",
+
+
+
+
+
+
   },
   filterBadgeText: {
-    color: "white",
+
     fontSize: RFValue(11),
-    fontWeight: "600",
+
   },
   chatList: {
-    flex: 1,
+
   },
   chatListContent: {
-    paddingBottom: 100,
+
   },
   chatItem: {
-    flexDirection: "row",
+
     // paddingHorizontal: 20,
-    paddingVertical: 12,
-    alignItems: "center",
+
+
   },
   avatarContainer: {
-    position: "relative",
-    marginRight: 12,
+
+
   },
   avatar: {
-    width: 48,
-    height: 48,
-    borderRadius: 24,
+
+
+
   },
   onlineIndicator: {
-    position: "absolute",
-    bottom: 0,
-    right: 0,
-    width: 14,
-    height: 14,
-    borderRadius: 7,
-    borderWidth: 2,
+
+
+
+
+
+
+
   },
   chatContent: {
-    flex: 1,
+
   },
   chatHeader: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    marginBottom: 4,
+
+
+
+
   },
   nameContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-    flex: 1,
-    marginRight: 10,
+
+
+
+
   },
   chatName: {
     fontSize: RFValue(16),
-    fontWeight: "600",
-    marginRight: 6,
+
+
   },
   verifiedBadge: {
-    borderRadius: 8,
-    width: 16,
-    height: 16,
-    justifyContent: "center",
-    alignItems: "center",
+
+
+
+
+
   },
   chatTime: {
     fontSize: RFValue(12),
-    fontWeight: "400",
+
   },
   messageContainer: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
+
+
+
   },
   chatMessage: {
     fontSize: RFValue(14),
-    flex: 1,
-    marginRight: 10,
-    lineHeight: 18,
+
+
+
   },
   unreadBadge: {
-    borderRadius: 10,
-    paddingHorizontal: 7,
-    paddingVertical: 3,
-    minWidth: 20,
-    alignItems: "center",
+
+
+
+
+
   },
   unreadText: {
-    color: "white",
+
     fontSize: RFValue(11),
-    fontWeight: "600",
+
   },
-  fab: {
-    position: "absolute",
-    bottom: 30,
-    right: 20,
-    width: 56,
-    height: 56,
-    borderRadius: 28,
-    justifyContent: "center",
-    alignItems: "center",
-    elevation: 8,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.3,
-    shadowRadius: 6,
-  },
-  fabIcon: {
-    color: "white",
-    fontSize: RFValue(24),
-    fontWeight: "300",
-  },
+  fab: {shadowOffset: { width: 0, height: 4 }},
+  fabIcon: {fontSize: RFValue(24)},
 });
 
 export default ChatsPage;

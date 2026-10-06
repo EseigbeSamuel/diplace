@@ -153,7 +153,7 @@ const SpacePreviewScreen: React.FC<SpacePreviewScreenProps> = ({
         contentContainerStyle={styles.scrollContent}
       >
         {/* Preview Title */}
-        <Text style={styles.previewTitle}>Preview</Text>
+        <Text style={styles.previewTitle} className="font-bold">Preview</Text>
 
         {/* Main Image */}
         <View style={styles.imageContainer}>
@@ -162,20 +162,20 @@ const SpacePreviewScreen: React.FC<SpacePreviewScreenProps> = ({
               source={{ uri: spaceForm.value.media[0]?.uri }}
               style={styles.mainImage}
               resizeMode="cover"
-            />
+             className="w-[90%px] h-[100%px]"/>
           ) : (
             <Image
               source={spaceData.gallery[0]}
               style={styles.mainImage}
               resizeMode="cover"
-            />
+             className="w-[90%px] h-[100%px]"/>
           )}
         </View>
 
         {/* Property Info Card */}
         <View style={styles.propertyCard}>
-          <View style={styles.propertyHeader}>
-            <View style={styles.typeContainer}>
+          <View style={styles.propertyHeader} className="flex-row items-center">
+            <View style={styles.typeContainer} className="flex-row items-center">
               <Image
                 source={
                   spaceForm.type === "event"
@@ -184,42 +184,42 @@ const SpacePreviewScreen: React.FC<SpacePreviewScreenProps> = ({
                 }
                 resizeMode="contain"
               />
-              <Text style={styles.typeText}>{formatType(spaceForm.type)}</Text>
+              <Text style={styles.typeText} className="font-medium">{formatType(spaceForm.type)}</Text>
             </View>
-            <View style={styles.availableBadge}>
-              <Text style={styles.availableText}>
+            <View style={styles.availableBadge} className="bg-[#D1FAE5]">
+              <Text style={styles.availableText} className="font-medium text-[#16A34A]">
                 {spaceForm.value.units || 1} unit available
               </Text>
             </View>
           </View>
 
-          <Text style={styles.propertyTitle}>
+          <Text style={styles.propertyTitle} className="font-bold">
             {spaceForm.value.description?.title ||
               "2 Bedroom in-suite apartment"}
           </Text>
 
-          <View style={styles.locationRow}>
+          <View style={styles.locationRow} className="flex-row items-center">
             <Image
               source={require("@/assets/icons/location-1.png")}
               style={styles.locationIcon}
               resizeMode="contain"
             />
-            <Text style={styles.addressText}>
+            <Text style={styles.addressText} className="flex-1">
               {spaceForm.value?.location?.address ||
                 "Road 2, Tony Estate, Rumuewhere, Port Harcourt"}
             </Text>
           </View>
 
-          <Text style={styles.priceText}>
+          <Text style={styles.priceText} className="font-bold">
             {formatCurrency(spaceForm.value.rentalCost?.rentalCost)}
-            <Text style={styles.priceUnit}>
+            <Text style={styles.priceUnit} className="font-normal">
               /{spaceForm.value.rentalCost?.rentDuration}
             </Text>
           </Text>
 
           {/* Property Features */}
-          <View style={styles.featuresRow}>
-            <View style={styles.featureItem}>
+          <View style={styles.featuresRow} className="flex-row justify-content-[space-around] border-t">
+            <View style={styles.featureItem} className="items-center">
               <Image
                 source={
                   spaceForm.type === "event"
@@ -229,7 +229,7 @@ const SpacePreviewScreen: React.FC<SpacePreviewScreenProps> = ({
                 style={styles.featureIcon}
                 resizeMode="contain"
               />
-              <Text style={styles.featureText}>
+              <Text style={styles.featureText} className="font-medium">
                 {spaceForm.type === "event"
                   ? toProperCase(spaceForm.value.eventSpace)
                   : spaceForm.value.capacity?.rooms}{" "}
@@ -237,7 +237,7 @@ const SpacePreviewScreen: React.FC<SpacePreviewScreenProps> = ({
               </Text>
             </View>
 
-            <View style={styles.featureItem}>
+            <View style={styles.featureItem} className="items-center">
               <Image
                 source={
                   spaceForm.type === "event"
@@ -247,20 +247,20 @@ const SpacePreviewScreen: React.FC<SpacePreviewScreenProps> = ({
                 style={styles.featureIcon}
                 resizeMode="contain"
               />
-              <Text style={styles.featureText}>
+              <Text style={styles.featureText} className="font-medium">
                 {spaceForm.type === "event"
                   ? "Generator"
                   : `${spaceForm.value.capacity?.bathrooms} Baths`}
               </Text>
             </View>
 
-            <View style={styles.featureItem}>
+            <View style={styles.featureItem} className="items-center">
               <Image
                 source={require("@/assets/icons/size.png")}
                 style={styles.featureIcon}
                 resizeMode="contain"
               />
-              <Text style={styles.featureText}>
+              <Text style={styles.featureText} className="font-medium">
                 {spaceForm.type === "event"
                   ? spaceForm.value.capacity?.caps
                   : spaceForm.value.capacity?.roomSize}
@@ -270,8 +270,8 @@ const SpacePreviewScreen: React.FC<SpacePreviewScreenProps> = ({
         </View>
 
         {/* About Section */}
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>About this space</Text>
+        <View style={styles.section} className="border-t">
+          <Text style={styles.sectionTitle} className="font-semibold">About this space</Text>
           <Text style={styles.aboutText}>
             {spaceForm.value.description?.description}
           </Text>
@@ -279,27 +279,27 @@ const SpacePreviewScreen: React.FC<SpacePreviewScreenProps> = ({
 
         {/* Amenities Section */}
         <View>
-          <Text style={styles.sectionTitle}>Amenities</Text>
+          <Text style={styles.sectionTitle} className="font-semibold">Amenities</Text>
           {spaceForm.value.amenities?.map((amenity, index) => (
-            <View key={index} style={styles.amenityRow}>
+            <View key={index} style={styles.amenityRow} className="flex-row items-start">
               <Text style={styles.bullet}>•</Text>
-              <Text style={styles.amenityText}>{amenity}</Text>
+              <Text style={styles.amenityText} className="flex-1">{amenity}</Text>
             </View>
           ))}
         </View>
 
         {/* Location Section */}
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Location</Text>
+        <View style={styles.section} className="border-t">
+          <Text style={styles.sectionTitle} className="font-semibold">Location</Text>
           <Text style={styles.locationAddress}>
             {spaceData.location.address}
           </Text>
 
           {/* Map Placeholder */}
-          <View style={styles.mapContainer}>
+          <View style={styles.mapContainer} className="w-[100%px] overflow-hidden relative">
             {HAS_GOOGLE_MAPS_API_KEY ? (
               <MapView
-                style={{ flex: 1 }}
+                className="flex-1"
                 initialRegion={{
                   latitude: spaceForm.value.location?.latitude ?? 4.8156,
                   longitude: spaceForm.value.location?.longitude ?? 7.0498,
@@ -315,8 +315,8 @@ const SpacePreviewScreen: React.FC<SpacePreviewScreenProps> = ({
                 />
               </MapView>
             ) : (
-              <View style={styles.mapFallback}>
-                <Text style={styles.mapFallbackText}>
+              <View style={styles.mapFallback} className="flex-1 items-center justify-center">
+                <Text style={styles.mapFallbackText} className="text-center">
                   Map disabled. Add Google API key to enable.
                 </Text>
               </View>
@@ -334,13 +334,13 @@ const SpacePreviewScreen: React.FC<SpacePreviewScreenProps> = ({
                   },
                 })
               }
-            >
+             className="absolute flex-row items-center">
               <Image
                 source={require("@/assets/icons/Streetview-solid.png")}
                 style={styles.streetViewIcon}
                 resizeMode="contain"
-              />
-              <Text style={styles.streetViewText}>Street view</Text>
+               className="tint-[#FFFFFF]"/>
+              <Text style={styles.streetViewText} className="font-medium text-[#FFFFFF]">Street view</Text>
             </TouchableOpacity>
 
             {/* Fullscreen button */}
@@ -350,7 +350,7 @@ const SpacePreviewScreen: React.FC<SpacePreviewScreenProps> = ({
                 setEnlargeMapVisible(true);
                 setShowLocationSheet(true);
               }}
-            >
+             className="absolute">
               <Image
                 source={require("@/assets/icons/expand.png")}
                 style={styles.expandViewIcon}
@@ -361,22 +361,22 @@ const SpacePreviewScreen: React.FC<SpacePreviewScreenProps> = ({
         </View>
 
         {/* Gallery Section */}
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Gallery</Text>
+        <View style={styles.section} className="border-t">
+          <Text style={styles.sectionTitle} className="font-semibold">Gallery</Text>
           <ScrollView
             horizontal
             showsHorizontalScrollIndicator={false}
             contentContainerStyle={styles.galleryGrid}
           >
             {spaceForm.value.media && (
-              <View style={styles.galleryGrid}>
+              <View style={styles.galleryGrid} className="flex-row">
                 {spaceForm.value.media.map((image, index) => (
                   <View key={index} style={styles.galleryItem}>
                     <Image
                       source={{ uri: image.uri }}
                       style={styles.galleryImage}
                       resizeMode="cover"
-                    />
+                     className="w-[100%px] h-[100%px]"/>
                   </View>
                 ))}
               </View>
@@ -384,36 +384,36 @@ const SpacePreviewScreen: React.FC<SpacePreviewScreenProps> = ({
           </ScrollView>
 
           {/* Virtual Tour */}
-          <View style={styles.virtualTourRow}>
-            <View style={styles.virtualTourInfo}>
-              <Text style={styles.virtualTourLabel}>Virtual Tour</Text>
+          <View style={styles.virtualTourRow} className="flex-row items-center justify-between">
+            <View  className="flex-1">
+              <Text style={styles.virtualTourLabel} className="font-semibold">Virtual Tour</Text>
               <Text style={styles.uploadStatus}>
                 {spaceForm.value.tour && spaceForm.value.tour.length > 0
                   ? "Uploaded"
                   : "Not uploaded"}
               </Text>
             </View>
-            <TouchableOpacity style={styles.previewButton}>
+            <TouchableOpacity style={styles.previewButton} className="flex-row items-center">
               <Image
                 source={require("@/assets/icons/play-outline.png")}
                 style={styles.playIcon}
                 resizeMode="contain"
               />
-              <Text style={styles.previewButtonText}>Preview</Text>
+              <Text style={styles.previewButtonText} className="font-medium">Preview</Text>
             </TouchableOpacity>
           </View>
         </View>
 
         {/* Landlord's Details Section */}
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>
+        <View style={styles.section} className="border-t">
+          <Text style={styles.sectionTitle} className="font-semibold">
             {spaceForm.type === "event" ? "Owner's" : "Landlord's"} Details
           </Text>
 
           <View style={styles.landlordInfo}>
-            <Text style={styles.landlordName}>{previewContact.name}</Text>
+            <Text style={styles.landlordName} className="font-semibold">{previewContact.name}</Text>
 
-            <TouchableOpacity style={styles.landlordRow}>
+            <TouchableOpacity style={styles.landlordRow} className="flex-row items-center">
               <Image
                 source={require("@/assets/icons/calling.png")}
                 style={styles.landlordIcon}
@@ -422,7 +422,7 @@ const SpacePreviewScreen: React.FC<SpacePreviewScreenProps> = ({
               <Text style={styles.landlordText}>{previewContact.phone}</Text>
             </TouchableOpacity>
 
-            <TouchableOpacity style={styles.landlordRow}>
+            <TouchableOpacity style={styles.landlordRow} className="flex-row items-center">
               <Image
                 source={require("@/assets/icons/bank-light.png")}
                 style={styles.landlordIcon}
@@ -437,10 +437,10 @@ const SpacePreviewScreen: React.FC<SpacePreviewScreenProps> = ({
           </View>
 
           {/* Tenancy Agreement */}
-          <View style={styles.agreementRow}>
-            <View style={styles.agreementInfo}>
-              <Text style={styles.agreementLabel}>Tenancy Agreement</Text>
-              <View style={styles.agreementStatus}>
+          <View style={styles.agreementRow} className="flex-row items-center justify-between">
+            <View  className="flex-1">
+              <Text style={styles.agreementLabel} className="font-semibold">Tenancy Agreement</Text>
+              <View style={styles.agreementStatus} className="flex-row items-center">
                 <Image
                   source={require("@/assets/icons/paper.png")}
                   style={styles.fileIconSmall}
@@ -451,8 +451,8 @@ const SpacePreviewScreen: React.FC<SpacePreviewScreenProps> = ({
                 </Text>
               </View>
             </View>
-            <TouchableOpacity style={styles.agreementPreviewButton}>
-              <Text style={styles.agreementPreviewText}>Preview</Text>
+            <TouchableOpacity style={styles.agreementPreviewButton} className="flex-row items-center">
+              <Text style={styles.agreementPreviewText} className="font-medium">Preview</Text>
               <Image
                 source={require("@/assets/icons/arrow-right-up-outline-dark.png")}
                 style={styles.arrowUpIcon}
@@ -464,19 +464,19 @@ const SpacePreviewScreen: React.FC<SpacePreviewScreenProps> = ({
 
         {/* Inspection Schedule Section */}
         {spaceForm.type !== "event" && (
-          <View style={styles.section}>
-            <Text style={styles.sectionTitle}>Inspection Schedule</Text>
+          <View style={styles.section} className="border-t">
+            <Text style={styles.sectionTitle} className="font-semibold">Inspection Schedule</Text>
 
             <View style={styles.inspectionContainer}>
-              <View style={styles.inspectionFeeContainer}>
+              <View style={styles.inspectionFeeContainer} className="border-b">
                 <Text style={styles.inspectionFeeLabel}>Inspection fee:</Text>
-                <View style={styles.inspectionFeeRow}>
+                <View style={styles.inspectionFeeRow} className="flex-row items-center">
                   <Image
                     source={require("@/assets/icons/money-bag.png")}
                     style={styles.coinEmoji}
                     resizeMode="contain"
                   />
-                  <Text style={styles.inspectionFeeAmount}>
+                  <Text style={styles.inspectionFeeAmount} className="font-bold">
                     {formatCurrency(spaceForm.value.inspectionFee || 0)}
                   </Text>
                 </View>
@@ -487,14 +487,14 @@ const SpacePreviewScreen: React.FC<SpacePreviewScreenProps> = ({
                   Inspection times:
                 </Text>
                 {spaceForm.value.inspectionTimeSlots?.map((time, index) => (
-                  <View key={index} style={styles.inspectionTimeRow}>
+                  <View key={index} style={styles.inspectionTimeRow} className="flex-row items-center">
                     <Image
                       source={require("@/assets/icons/Time.png")}
                       style={styles.clockIcon}
                       resizeMode="contain"
                     />
-                    <Text style={styles.inspectionSlot}>{time.label}</Text>
-                    <Text style={styles.inspectionTime}>
+                    <Text style={styles.inspectionSlot} className="flex-1">{time.label}</Text>
+                    <Text style={styles.inspectionTime} className="font-semibold">
                       {time.startTime} - {time.endTime}
                     </Text>
                   </View>
@@ -505,22 +505,22 @@ const SpacePreviewScreen: React.FC<SpacePreviewScreenProps> = ({
         )}
 
         {/* Cost Breakdown Section */}
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Cost Breakdown</Text>
+        <View style={styles.section} className="border-t">
+          <Text style={styles.sectionTitle} className="font-semibold">Cost Breakdown</Text>
 
           <View style={styles.costBreakdownContainer}>
             {costBreakdown.map((item, index) => (
-              <View key={index} style={styles.costRow}>
+              <View key={index} style={styles.costRow} className="flex-row justify-between items-center">
                 <Text style={styles.costLabel}>{item.title}</Text>
-                <Text style={styles.costAmount}>
+                <Text style={styles.costAmount} className="font-semibold">
                   {formatCurrency(item.value)}
                 </Text>
               </View>
             ))}
 
-            <View style={styles.totalRow}>
-              <Text style={styles.totalLabel}>Total Payable</Text>
-              <Text style={styles.totalAmount}>
+            <View style={styles.totalRow} className="flex-row justify-between items-center border-t">
+              <Text style={styles.totalLabel} className="font-semibold">Total Payable</Text>
+              <Text style={styles.totalAmount} className="font-bold">
                 {formatCurrency(totalPackage)}
               </Text>
             </View>
@@ -549,11 +549,11 @@ const SpacePreviewScreen: React.FC<SpacePreviewScreenProps> = ({
           setEnlargeMapVisible(false);
         }}
       >
-        <View style={styles.fullMapContainer}>
+        <View  className="w-[100%px] h-[100%px] overflow-hidden relative">
           {/* The Map */}
           {HAS_GOOGLE_MAPS_API_KEY ? (
             <MapView
-              style={{ flex: 1 }}
+              className="flex-1"
               initialRegion={{
                 latitude: spaceForm.value.location?.latitude ?? 4.8156,
                 longitude: spaceForm.value.location?.longitude ?? 7.0498,
@@ -569,8 +569,8 @@ const SpacePreviewScreen: React.FC<SpacePreviewScreenProps> = ({
               />
             </MapView>
           ) : (
-            <View style={styles.mapFallback}>
-              <Text style={styles.mapFallbackText}>
+            <View style={styles.mapFallback} className="flex-1 items-center justify-center">
+              <Text style={styles.mapFallbackText} className="text-center">
                 Map disabled. Add Google API key to enable.
               </Text>
             </View>
@@ -588,12 +588,12 @@ const SpacePreviewScreen: React.FC<SpacePreviewScreenProps> = ({
                 },
               })
             }
-          >
+           className="absolute flex-row items-center">
             <Image
               source={require("@/assets/icons/Streetview-solid.png")}
               style={styles.streetViewIcon}
-            />
-            <Text style={styles.streetViewText}>Street view</Text>
+             className="tint-[#FFFFFF]"/>
+            <Text style={styles.streetViewText} className="font-medium text-[#FFFFFF]">Street view</Text>
           </TouchableOpacity>
 
           {/* Collapse button */}
@@ -603,7 +603,7 @@ const SpacePreviewScreen: React.FC<SpacePreviewScreenProps> = ({
               setShowLocationSheet(false);
               setEnlargeMapVisible(false);
             }}
-          >
+           className="absolute">
             <Image
               source={require("@/assets/icons/collapse.png")}
               style={styles.expandViewIcon}
@@ -613,13 +613,13 @@ const SpacePreviewScreen: React.FC<SpacePreviewScreenProps> = ({
           {/* Custom Bottom Sheet Inside Modal */}
           {showLocationSheet && (
             <Pressable
-              style={styles.bottomSheetOverlay}
+
               onPress={() => setShowLocationSheet(false)}
-            >
-              <Pressable style={styles.bottomSheetContainer}>
-                <View style={styles.bottomSheetHandle} />
+             className="absolute bottom-[0px] left-[0px] right-[0px] justify-end">
+              <Pressable style={styles.bottomSheetContainer} className="bg-[#FFFFFF] min-h-[15%px] shadow-color-[#000] shadow-opacity-[0.1px] shadow-radius-[8px] elevation-[10px]">
+                <View style={styles.bottomSheetHandle}  className="self-center"/>
                 <View style={styles.bottomSheetContent}>
-                  <Text style={styles.bottomSheetTitle}>Location</Text>
+                  <Text style={styles.bottomSheetTitle} className="font-semibold">Location</Text>
                   <Text style={styles.bottomSheetAddress}>
                     {spaceForm.value?.location?.address ||
                       "Road 2, Tony Estate, Rumuewhere, Port Harcourt"}
@@ -639,291 +639,156 @@ const createStyles = (colors: ColorScheme) =>
     scrollContent: {
       paddingVertical: RFValue(20),
     },
-    previewTitle: {
-      fontSize: RFValue(24),
-      fontWeight: "700",
-      color: colors.slate[650],
-      marginBottom: RFValue(24),
-    },
+    previewTitle: {fontSize: RFValue(24),
+color: colors.slate[650],
+marginBottom: RFValue(24)},
     imageContainer: {
       width: width,
       height: RFValue(220),
       marginBottom: RFValue(20),
     },
-    mainImage: {
-      width: "90%",
-      height: "100%",
-      borderRadius: RFValue(12),
-    },
+    mainImage: {borderRadius: RFValue(12)},
     propertyCard: {
       marginBottom: RFValue(24),
     },
-    propertyHeader: {
-      flexDirection: "row",
-      alignItems: "center",
-      gap: RFValue(10),
-      marginBottom: RFValue(12),
-    },
-    typeContainer: {
-      flexDirection: "row",
-      alignItems: "center",
-      gap: RFValue(6),
-      paddingVertical: RFValue(4),
-      backgroundColor: colors.slate[200],
-      paddingHorizontal: RFValue(8),
-      borderRadius: RFValue(12),
-    },
+    propertyHeader: {gap: RFValue(10),
+marginBottom: RFValue(12)},
+    typeContainer: {gap: RFValue(6),
+paddingVertical: RFValue(4),
+backgroundColor: colors.slate[200],
+paddingHorizontal: RFValue(8),
+borderRadius: RFValue(12)},
     homeIcon: {
       width: RFValue(14),
       height: RFValue(14),
       tintColor: colors.slate[650],
     },
-    typeText: {
-      fontSize: RFValue(14),
-      fontWeight: "500",
-      color: colors.slate[650],
-    },
-    availableBadge: {
-      backgroundColor: "#D1FAE5",
-      paddingHorizontal: RFValue(10),
-      paddingVertical: RFValue(4),
-      borderRadius: RFValue(12),
-    },
-    availableText: {
-      fontSize: RFValue(12),
-      fontWeight: "500",
-      color: "#16A34A",
-    },
-    propertyTitle: {
-      fontSize: RFValue(20),
-      fontWeight: "700",
-      color: colors.slate[650],
-      marginBottom: RFValue(8),
-    },
-    locationRow: {
-      flexDirection: "row",
-      alignItems: "center",
-      gap: RFValue(6),
-      marginBottom: RFValue(16),
-    },
+    typeText: {fontSize: RFValue(14),
+color: colors.slate[650]},
+    availableBadge: {paddingHorizontal: RFValue(10),
+paddingVertical: RFValue(4),
+borderRadius: RFValue(12)},
+    availableText: {fontSize: RFValue(12)},
+    propertyTitle: {fontSize: RFValue(20),
+color: colors.slate[650],
+marginBottom: RFValue(8)},
+    locationRow: {gap: RFValue(6),
+marginBottom: RFValue(16)},
     locationIcon: {
       width: RFValue(24),
       height: RFValue(24),
       tintColor: colors.slate[600],
     },
-    addressText: {
-      fontSize: RFValue(14),
-      color: colors.slate[600],
-      flex: 1,
-    },
-    priceText: {
-      fontSize: RFValue(22),
-      fontWeight: "700",
-      color: colors.slate[650],
-      marginBottom: RFValue(20),
-    },
-    priceUnit: {
-      fontSize: RFValue(16),
-      fontWeight: "400",
-      color: colors.slate[600],
-    },
-    featuresRow: {
-      flexDirection: "row",
-      justifyContent: "space-around",
-      paddingTop: RFValue(20),
-      borderTopWidth: 1,
-      borderTopColor: colors.slate[350],
-    },
-    featureItem: {
-      alignItems: "center",
-      gap: RFValue(8),
-    },
+    addressText: {fontSize: RFValue(14),
+color: colors.slate[600]},
+    priceText: {fontSize: RFValue(22),
+color: colors.slate[650],
+marginBottom: RFValue(20)},
+    priceUnit: {fontSize: RFValue(16),
+color: colors.slate[600]},
+    featuresRow: {paddingTop: RFValue(20),
+borderTopColor: colors.slate[350]},
+    featureItem: {gap: RFValue(8)},
     featureIcon: {
       width: RFValue(24),
       height: RFValue(24),
       tintColor: colors.slate[600],
     },
-    featureText: {
-      fontSize: RFValue(13),
-      color: colors.slate[600],
-      fontWeight: "500",
-    },
-    section: {
-      paddingVertical: RFValue(16),
-      borderTopColor: colors.slate[350],
-      borderTopWidth: 1,
-    },
-    sectionTitle: {
-      fontSize: RFValue(18),
-      fontWeight: "600",
-      color: colors.slate[650],
-      marginBottom: RFValue(16),
-    },
+    featureText: {fontSize: RFValue(13),
+color: colors.slate[600]},
+    section: {paddingVertical: RFValue(16),
+borderTopColor: colors.slate[350]},
+    sectionTitle: {fontSize: RFValue(18),
+color: colors.slate[650],
+marginBottom: RFValue(16)},
     aboutText: {
       fontSize: RFValue(14),
       color: colors.slate[600],
       lineHeight: RFValue(22),
     },
-    amenityRow: {
-      flexDirection: "row",
-      alignItems: "flex-start",
-      marginBottom: RFValue(8),
-    },
+    amenityRow: {marginBottom: RFValue(8)},
     bullet: {
       fontSize: RFValue(14),
       color: colors.slate[650],
       marginRight: RFValue(8),
       marginTop: RFValue(2),
     },
-    amenityText: {
-      fontSize: RFValue(14),
-      color: colors.slate[650],
-      flex: 1,
-    },
+    amenityText: {fontSize: RFValue(14),
+color: colors.slate[650]},
     locationAddress: {
       fontSize: RFValue(14),
       color: colors.slate[650],
       marginBottom: RFValue(16),
     },
-    mapContainer: {
-      width: "100%",
-      height: RFValue(250),
-      borderRadius: RFValue(12),
-      overflow: "hidden",
-      position: "relative",
-    },
-    mapFallback: {
-      flex: 1,
-      alignItems: "center",
-      justifyContent: "center",
-      backgroundColor: colors.slate[150],
-      paddingHorizontal: RFValue(16),
-    },
-    mapFallbackText: {
-      fontSize: RFValue(14),
-      color: colors.slate[600],
-      textAlign: "center",
-    },
-    fullMapContainer: {
-      width: "100%",
-      height: "100%",
-      overflow: "hidden",
-      position: "relative",
-    },
-    mapImage: {
-      width: "100%",
-      height: "100%",
-    },
-    streetViewButton: {
-      position: "absolute",
-      bottom: RFValue(12),
-      right: RFValue(12),
-      flexDirection: "row",
-      alignItems: "center",
-      backgroundColor: colors.slate[550],
-      paddingHorizontal: RFValue(12),
-      paddingVertical: RFValue(8),
-      borderRadius: RFValue(20),
-      gap: RFValue(6),
-    },
-    fullStreetViewButton: {
-      position: "absolute",
-      bottom: RFValue(150),
-      right: RFValue(12),
-      flexDirection: "row",
-      alignItems: "center",
-      backgroundColor: colors.slate[550],
-      paddingHorizontal: RFValue(12),
-      paddingVertical: RFValue(8),
-      borderRadius: RFValue(20),
-      gap: RFValue(6),
-    },
-    fullscreenButton: {
-      position: "absolute",
-      top: RFValue(12),
-      right: RFValue(12),
-      backgroundColor: colors.slate[100],
-      paddingHorizontal: RFValue(12),
-      paddingVertical: RFValue(12),
-      borderRadius: RFValue(30),
-    },
+    mapContainer: {height: RFValue(250),
+borderRadius: RFValue(12)},
+    mapFallback: {backgroundColor: colors.slate[150],
+paddingHorizontal: RFValue(16)},
+    mapFallbackText: {fontSize: RFValue(14),
+color: colors.slate[600]},
+    fullMapContainer: {},
+    mapImage: {},
+    streetViewButton: {bottom: RFValue(12),
+right: RFValue(12),
+backgroundColor: colors.slate[550],
+paddingHorizontal: RFValue(12),
+paddingVertical: RFValue(8),
+borderRadius: RFValue(20),
+gap: RFValue(6)},
+    fullStreetViewButton: {bottom: RFValue(150),
+right: RFValue(12),
+backgroundColor: colors.slate[550],
+paddingHorizontal: RFValue(12),
+paddingVertical: RFValue(8),
+borderRadius: RFValue(20),
+gap: RFValue(6)},
+    fullscreenButton: {top: RFValue(12),
+right: RFValue(12),
+backgroundColor: colors.slate[100],
+paddingHorizontal: RFValue(12),
+paddingVertical: RFValue(12),
+borderRadius: RFValue(30)},
     expandViewIcon: {
       width: RFValue(24),
       height: RFValue(24),
       tintColor: colors.slate[650],
     },
-    streetViewIcon: {
-      width: RFValue(14),
-      height: RFValue(14),
-      tintColor: "#FFFFFF",
-    },
-    streetViewText: {
-      fontSize: RFValue(12),
-      fontWeight: "500",
-      color: "#FFFFFF",
-    },
-    galleryGrid: {
-      flexDirection: "row",
-      gap: RFValue(12),
-      marginBottom: RFValue(16),
-    },
-    bottomModalContainer: {
-      zIndex: 20,
-      flex: 1,
-    },
-    infoButton: {
-      position: "absolute",
-      top: RFValue(12),
-      left: RFValue(12),
-      backgroundColor: colors.slate[100],
-      paddingHorizontal: RFValue(12),
-      paddingVertical: RFValue(12),
-      borderRadius: RFValue(30),
-    },
+    streetViewIcon: {width: RFValue(14),
+height: RFValue(14)},
+    streetViewText: {fontSize: RFValue(12)},
+    galleryGrid: {gap: RFValue(12),
+marginBottom: RFValue(16)},
+    bottomModalContainer: {},
+    infoButton: {top: RFValue(12),
+left: RFValue(12),
+backgroundColor: colors.slate[100],
+paddingHorizontal: RFValue(12),
+paddingVertical: RFValue(12),
+borderRadius: RFValue(30)},
     infoIcon: {
       width: RFValue(24),
       height: RFValue(24),
       tintColor: colors.slate[650],
     },
-    bottomSheetOverlay: {
-      position: "absolute",
-      bottom: 0,
-      left: 0,
-      right: 0,
-      justifyContent: "flex-end",
-    },
-    bottomSheetContainer: {
-      backgroundColor: "#FFFFFF",
-      borderTopLeftRadius: RFValue(20),
-      borderTopRightRadius: RFValue(20),
-      minHeight: "15%",
-      shadowColor: "#000",
-      shadowOffset: {
+    bottomSheetOverlay: {},
+    bottomSheetContainer: {borderTopLeftRadius: RFValue(20),
+borderTopRightRadius: RFValue(20),
+shadowOffset: {
         width: 0,
         height: -4,
-      },
-      shadowOpacity: 0.1,
-      shadowRadius: 8,
-      elevation: 10,
-    },
-    bottomSheetHandle: {
-      width: RFValue(40),
-      height: RFValue(4),
-      backgroundColor: colors.slate[300],
-      borderRadius: RFValue(2),
-      alignSelf: "center",
-      marginTop: RFValue(12),
-    },
+      }},
+    bottomSheetHandle: {width: RFValue(40),
+height: RFValue(4),
+backgroundColor: colors.slate[300],
+borderRadius: RFValue(2),
+marginTop: RFValue(12)},
     bottomSheetContent: {
       paddingHorizontal: RFValue(20),
       paddingVertical: RFValue(16),
     },
-    bottomSheetTitle: {
-      fontSize: RFValue(18),
-      fontWeight: "600",
-      color: colors.slate[650],
-      marginBottom: RFValue(12),
-    },
+    bottomSheetTitle: {fontSize: RFValue(18),
+color: colors.slate[650],
+marginBottom: RFValue(12)},
     bottomSheetAddress: {
       fontSize: RFValue(14),
       color: colors.slate[600],
@@ -934,66 +799,38 @@ const createStyles = (colors: ColorScheme) =>
       borderRadius: RFValue(25),
       width: RFValue(80),
     },
-    galleryImage: {
-      width: "100%",
-      borderRadius: RFValue(12),
-      height: "100%",
-    },
-    virtualTourRow: {
-      flexDirection: "row",
-      alignItems: "center",
-      justifyContent: "space-between",
-      paddingVertical: RFValue(16),
-      paddingHorizontal: RFValue(16),
-      backgroundColor: colors.slate[200],
-      borderRadius: RFValue(12),
-    },
-    virtualTourInfo: {
-      flex: 1,
-    },
-    virtualTourLabel: {
-      fontSize: RFValue(15),
-      fontWeight: "600",
-      color: colors.slate[650],
-      marginBottom: RFValue(4),
-    },
+    galleryImage: {borderRadius: RFValue(12)},
+    virtualTourRow: {paddingVertical: RFValue(16),
+paddingHorizontal: RFValue(16),
+backgroundColor: colors.slate[200],
+borderRadius: RFValue(12)},
+    virtualTourInfo: {},
+    virtualTourLabel: {fontSize: RFValue(15),
+color: colors.slate[650],
+marginBottom: RFValue(4)},
     uploadStatus: {
       fontSize: RFValue(13),
       color: colors.slate[500],
     },
-    previewButton: {
-      flexDirection: "row",
-      alignItems: "center",
-      gap: RFValue(6),
-      paddingHorizontal: RFValue(12),
-      paddingVertical: RFValue(8),
-    },
+    previewButton: {gap: RFValue(6),
+paddingHorizontal: RFValue(12),
+paddingVertical: RFValue(8)},
     playIcon: {
       width: RFValue(14),
       height: RFValue(14),
       tintColor: colors.slate[650],
     },
-    previewButtonText: {
-      fontSize: RFValue(14),
-      fontWeight: "500",
-      color: colors.slate[650],
-    },
+    previewButtonText: {fontSize: RFValue(14),
+color: colors.slate[650]},
     landlordInfo: {
       marginBottom: RFValue(8),
       paddingHorizontal: RFValue(8),
     },
-    landlordName: {
-      fontSize: RFValue(16),
-      fontWeight: "600",
-      color: colors.slate[650],
-      marginBottom: RFValue(12),
-    },
-    landlordRow: {
-      flexDirection: "row",
-      alignItems: "center",
-      gap: RFValue(8),
-      marginBottom: RFValue(12),
-    },
+    landlordName: {fontSize: RFValue(16),
+color: colors.slate[650],
+marginBottom: RFValue(12)},
+    landlordRow: {gap: RFValue(8),
+marginBottom: RFValue(12)},
     landlordIcon: {
       width: RFValue(16),
       height: RFValue(16),
@@ -1003,29 +840,15 @@ const createStyles = (colors: ColorScheme) =>
       fontSize: RFValue(14),
       color: colors.slate[600],
     },
-    agreementRow: {
-      flexDirection: "row",
-      alignItems: "center",
-      justifyContent: "space-between",
-      paddingVertical: RFValue(16),
-      paddingHorizontal: RFValue(16),
-      backgroundColor: colors.slate[200],
-      borderRadius: RFValue(12),
-    },
-    agreementInfo: {
-      flex: 1,
-    },
-    agreementLabel: {
-      fontSize: RFValue(15),
-      fontWeight: "600",
-      color: colors.slate[650],
-      marginBottom: RFValue(6),
-    },
-    agreementStatus: {
-      flexDirection: "row",
-      alignItems: "center",
-      gap: RFValue(6),
-    },
+    agreementRow: {paddingVertical: RFValue(16),
+paddingHorizontal: RFValue(16),
+backgroundColor: colors.slate[200],
+borderRadius: RFValue(12)},
+    agreementInfo: {},
+    agreementLabel: {fontSize: RFValue(15),
+color: colors.slate[650],
+marginBottom: RFValue(6)},
+    agreementStatus: {gap: RFValue(6)},
     fileIconSmall: {
       width: RFValue(12),
       height: RFValue(12),
@@ -1035,30 +858,20 @@ const createStyles = (colors: ColorScheme) =>
       fontSize: RFValue(13),
       color: colors.slate[500],
     },
-    agreementPreviewButton: {
-      flexDirection: "row",
-      alignItems: "center",
-      gap: RFValue(6),
-      paddingHorizontal: RFValue(12),
-      paddingVertical: RFValue(8),
-    },
-    agreementPreviewText: {
-      fontSize: RFValue(14),
-      fontWeight: "500",
-      color: colors.slate[650],
-    },
+    agreementPreviewButton: {gap: RFValue(6),
+paddingHorizontal: RFValue(12),
+paddingVertical: RFValue(8)},
+    agreementPreviewText: {fontSize: RFValue(14),
+color: colors.slate[650]},
     arrowUpIcon: {
       width: RFValue(14),
       height: RFValue(14),
       tintColor: colors.slate[650],
     },
-    inspectionFeeContainer: {
-      borderRadius: RFValue(12),
-      borderBottomColor: colors.slate[300],
-      borderBottomWidth: 1,
-      paddingBottom: RFValue(16),
-      marginBottom: RFValue(16),
-    },
+    inspectionFeeContainer: {borderRadius: RFValue(12),
+borderBottomColor: colors.slate[300],
+paddingBottom: RFValue(16),
+marginBottom: RFValue(16)},
     inspectionContainer: {
       backgroundColor: colors.slate[200],
       paddingHorizontal: RFValue(8),
@@ -1069,20 +882,13 @@ const createStyles = (colors: ColorScheme) =>
       color: colors.slate[600],
       marginBottom: RFValue(8),
     },
-    inspectionFeeRow: {
-      flexDirection: "row",
-      alignItems: "center",
-      gap: RFValue(8),
-    },
+    inspectionFeeRow: {gap: RFValue(8)},
     coinEmoji: {
       height: RFValue(24),
       width: RFValue(24),
     },
-    inspectionFeeAmount: {
-      fontSize: RFValue(18),
-      fontWeight: "700",
-      color: colors.slate[650],
-    },
+    inspectionFeeAmount: {fontSize: RFValue(18),
+color: colors.slate[650]},
     inspectionTimesContainer: {
       backgroundColor: colors.slate[200],
       borderRadius: RFValue(12),
@@ -1092,65 +898,35 @@ const createStyles = (colors: ColorScheme) =>
       color: colors.slate[600],
       marginBottom: RFValue(16),
     },
-    inspectionTimeRow: {
-      flexDirection: "row",
-      alignItems: "center",
-      marginBottom: RFValue(12),
-      gap: RFValue(8),
-    },
+    inspectionTimeRow: {marginBottom: RFValue(12),
+gap: RFValue(8)},
     clockIcon: {
       width: RFValue(16),
       height: RFValue(16),
       tintColor: colors.slate[600],
     },
-    inspectionSlot: {
-      fontSize: RFValue(14),
-      color: colors.slate[650],
-      flex: 1,
-    },
-    inspectionTime: {
-      fontSize: RFValue(14),
-      fontWeight: "600",
-      color: colors.slate[650],
-    },
+    inspectionSlot: {fontSize: RFValue(14),
+color: colors.slate[650]},
+    inspectionTime: {fontSize: RFValue(14),
+color: colors.slate[650]},
     costBreakdownContainer: {
       backgroundColor: colors.slate[100],
       paddingVertical: RFValue(16),
       borderRadius: RFValue(12),
     },
-    costRow: {
-      flexDirection: "row",
-      justifyContent: "space-between",
-      alignItems: "center",
-      marginBottom: RFValue(16),
-    },
+    costRow: {marginBottom: RFValue(16)},
     costLabel: {
       fontSize: RFValue(14),
       color: colors.slate[600],
     },
-    costAmount: {
-      fontSize: RFValue(14),
-      fontWeight: "600",
-      color: colors.slate[650],
-    },
-    totalRow: {
-      flexDirection: "row",
-      justifyContent: "space-between",
-      alignItems: "center",
-      paddingTop: RFValue(16),
-      borderTopWidth: 1,
-      borderTopColor: colors.slate[300],
-    },
-    totalLabel: {
-      fontSize: RFValue(16),
-      fontWeight: "600",
-      color: colors.slate[650],
-    },
-    totalAmount: {
-      fontSize: RFValue(18),
-      fontWeight: "700",
-      color: colors.slate[650],
-    },
+    costAmount: {fontSize: RFValue(14),
+color: colors.slate[650]},
+    totalRow: {paddingTop: RFValue(16),
+borderTopColor: colors.slate[300]},
+    totalLabel: {fontSize: RFValue(16),
+color: colors.slate[650]},
+    totalAmount: {fontSize: RFValue(18),
+color: colors.slate[650]},
     completeButtonContainer: {
       marginTop: RFValue(8),
     },

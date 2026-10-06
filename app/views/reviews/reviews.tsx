@@ -155,7 +155,7 @@ const ReviewsScreen = () => {
   };
 
   const renderStars = (count: number, size = 14) => (
-    <View style={styles.starsContainer}>
+    <View style={styles.starsContainer} className="flex-row">
       {[1, 2, 3, 4, 5].map((s) => (
         <Text key={s} style={{ fontSize: size }}>{s <= count ? "⭐" : "☆"}</Text>
       ))}
@@ -163,7 +163,7 @@ const ReviewsScreen = () => {
   );
 
   const renderInteractiveStars = (current: number) => (
-    <View style={styles.ratingStarsContainer}>
+    <View style={styles.ratingStarsContainer} className="flex-row justify-center">
       {[1, 2, 3, 4, 5].map((s) => (
         <TouchableOpacity key={s} onPress={() => setRating(s)}>
           <Text style={{ fontSize: RFValue(32) }}>{s <= current ? "⭐" : "☆"}</Text>
@@ -175,15 +175,15 @@ const ReviewsScreen = () => {
   return (
     <SafeAreaViewContainer>
       {/* Header */}
-      <View style={styles.header}>
-        <View style={styles.headerLeft}>
+      <View style={styles.header} className="flex-row items-center justify-between">
+        <View style={styles.headerLeft} className="flex-row items-center flex-1">
           <Pressable onPress={() => router.back()}>
             <Image source={require("@/assets/icons/arrow-left-light.png")} style={styles.backIcon} />
           </Pressable>
-          <View style={styles.headerCenter}>
-            <Text style={styles.headerTitle}>{isAgentReviewsLoading ? "Loading..." : agentName}</Text>
-            <View style={styles.headerRating}>
-              <Text style={styles.headerRatingText}>⭐ {avgRating || "–"}</Text>
+          <View  className="flex-1 items-start">
+            <Text style={styles.headerTitle} className="font-semibold">{isAgentReviewsLoading ? "Loading..." : agentName}</Text>
+            <View style={styles.headerRating} className="flex-row items-center">
+              <Text style={styles.headerRatingText} className="font-medium">⭐ {avgRating || "–"}</Text>
               <Text style={styles.headerReviewCount}>({agentReviewsTotal} {agentReviewsTotal === 1 ? "review" : "reviews"})</Text>
             </View>
           </View>
@@ -194,10 +194,10 @@ const ReviewsScreen = () => {
       </View>
 
       {/* Tabs */}
-      <View style={styles.tabsContainer}>
+      <View style={styles.tabsContainer} className="flex-row">
         {(["Listings", "Reviews"] as TabType[]).map((tab) => (
-          <Pressable key={tab} style={[styles.tab, selectedTab === tab && styles.tabActive]} onPress={() => setSelectedTab(tab)}>
-            <Text style={[styles.tabText, selectedTab === tab && styles.tabTextActive]}>{tab}</Text>
+          <Pressable key={tab} style={[styles.tab, selectedTab === tab && styles.tabActive]} onPress={() => setSelectedTab(tab)} className="flex-1 items-center border-bottom-[2px] border-bottom-color-[transparent]">
+            <Text style={[styles.tabText, selectedTab === tab && styles.tabTextActive]} className="font-medium">{tab}</Text>
           </Pressable>
         ))}
       </View>
@@ -208,22 +208,22 @@ const ReviewsScreen = () => {
           <View style={styles.reviewsContainer}>
             {/* Ratings Summary */}
             <View style={styles.ratingsSection}>
-              <Text style={styles.ratingsTitle}>Ratings</Text>
+              <Text style={styles.ratingsTitle} className="font-semibold">Ratings</Text>
               <Text style={styles.ratingsSubtitle}>Verified ratings from people who have transacted with this agent.</Text>
-              <View style={styles.ratingsSummary}>
-                <View style={styles.ratingScore}>
-                  <Text style={styles.ratingScoreNumber}>{avgRating || "–"}</Text>
+              <View style={styles.ratingsSummary} className="flex-row">
+                <View style={styles.ratingScore} className="items-center">
+                  <Text style={styles.ratingScoreNumber} className="font-bold">{avgRating || "–"}</Text>
                   {renderStars(Math.round(avgRating), 16)}
                 </View>
-                <View style={styles.ratingBars}>
+                <View style={styles.ratingBars} className="flex-1">
                   {[5, 4, 3, 2, 1].map((star) => (
-                    <View key={star} style={styles.ratingBarRow}>
+                    <View key={star} style={styles.ratingBarRow} className="flex-row items-center">
                       <Text style={styles.ratingBarLabel}>{star}</Text>
-                      <Image source={require("@/assets/icons/star.png")} style={styles.ratingBarStar} />
-                      <View style={styles.ratingBarContainer}>
-                        <View style={[styles.ratingBarFill, { width: `${agentReviewsTotal > 0 ? Math.round(((ratingCounts[star] ?? 0) / maxRatingCount) * 100) : 0}%` }]} />
+                      <Image source={require("@/assets/icons/star.png")} style={styles.ratingBarStar}  className="tint-[#FFA500]"/>
+                      <View style={styles.ratingBarContainer} className="flex-1 overflow-hidden">
+                        <View style={[styles.ratingBarFill, { width: `${agentReviewsTotal > 0 ? Math.round(((ratingCounts[star] ?? 0) / maxRatingCount) * 100) : 0}%` }]}  className="h-[100%px]"/>
                       </View>
-                      <Text style={styles.ratingBarCount}>{ratingCounts[star] ?? 0}</Text>
+                      <Text style={styles.ratingBarCount} className="text-right">{ratingCounts[star] ?? 0}</Text>
                     </View>
                   ))}
                 </View>
@@ -232,14 +232,14 @@ const ReviewsScreen = () => {
 
             {/* Reviews List */}
             <View style={styles.reviewsListSection}>
-              <View style={styles.reviewsListHeader}>
-                <Text style={styles.reviewsListTitle}>Reviews ({agentReviewsTotal})</Text>
+              <View  className="flex-row justify-between items-center">
+                <Text style={styles.reviewsListTitle} className="font-semibold">Reviews ({agentReviewsTotal})</Text>
                 {isAgentReviewsLoading && <ActivityIndicator size="small" color={colors.slate[500]} />}
               </View>
               {isAgentReviewsLoading ? (
-                <View style={styles.loadingContainer}><ActivityIndicator size="large" color={colors.slate[500]} /></View>
+                <View style={styles.loadingContainer} className="items-center"><ActivityIndicator size="large" color={colors.slate[500]} /></View>
               ) : agentReviews.length === 0 ? (
-                <View style={styles.emptyContainer}><Text style={styles.emptyText}>No reviews yet. Be the first!</Text></View>
+                <View style={styles.emptyContainer} className="items-center"><Text style={styles.emptyText}>No reviews yet. Be the first!</Text></View>
               ) : (
                 <View style={styles.reviewsList}>
                   {agentReviews.map((review) => {
@@ -248,23 +248,23 @@ const ReviewsScreen = () => {
                     const isMyReview = review.reviewer?.user_id === currentUser?.public_id;
                     const avatarUri = (u as any)?.profile_picture ?? undefined;
                     return (
-                      <View key={review.public_id} style={styles.reviewCard}>
-                        <View style={styles.reviewHeader}>
-                          <View style={styles.reviewerAvatarWrapper}>
-                            <Image source={imageSourceFilter(avatarUri)} style={styles.reviewerAvatarImage} resizeMode="cover" />
+                      <View key={review.public_id} style={styles.reviewCard} className="border-b">
+                        <View style={styles.reviewHeader} className="flex-row items-start">
+                          <View style={styles.reviewerAvatarWrapper} className="overflow-hidden">
+                            <Image source={imageSourceFilter(avatarUri)}  resizeMode="cover"  className="w-[100%px] h-[100%px]"/>
                           </View>
-                          <View style={styles.reviewerInfo}>
-                            <Text style={styles.reviewerName}>{reviewerName}</Text>
+                          <View style={styles.reviewerInfo} className="flex-1">
+                            <Text style={styles.reviewerName} className="font-semibold">{reviewerName}</Text>
                             {renderStars(review.rating, 12)}
                             <Text style={styles.reviewDate}>{postedAtLabel(review.date_created)}</Text>
                           </View>
                           {isMyReview && (
-                            <View style={styles.myReviewActions}>
+                            <View style={styles.myReviewActions} className="flex-row">
                               <TouchableOpacity onPress={() => openEditReview(review)} style={styles.reviewActionBtn}>
-                                <Text style={styles.reviewActionEdit}>Edit</Text>
+                                <Text style={styles.reviewActionEdit} className="font-semibold">Edit</Text>
                               </TouchableOpacity>
                               <TouchableOpacity onPress={() => handleDeleteReview(review.public_id)} disabled={isDeleteAgentReviewPending} style={styles.reviewActionBtn}>
-                                <Text style={styles.reviewActionDelete}>Delete</Text>
+                                <Text style={styles.reviewActionDelete} className="font-semibold">Delete</Text>
                               </TouchableOpacity>
                             </View>
                           )}
@@ -282,11 +282,11 @@ const ReviewsScreen = () => {
         {/* ── LISTINGS TAB ── */}
         {selectedTab === "Listings" && (
           <View style={styles.listingsContainer}>
-            <Text style={styles.listingsTitle}>{agentName}'s Listings</Text>
+            <Text style={styles.listingsTitle} className="font-semibold">{agentName}'s Listings</Text>
             {isListingsLoading ? (
-              <View style={styles.loadingContainer}><ActivityIndicator size="large" color={colors.slate[500]} /></View>
+              <View style={styles.loadingContainer} className="items-center"><ActivityIndicator size="large" color={colors.slate[500]} /></View>
             ) : agentListings.length === 0 ? (
-              <View style={styles.emptyContainer}><Text style={styles.emptyText}>No listings found.</Text></View>
+              <View style={styles.emptyContainer} className="items-center"><Text style={styles.emptyText}>No listings found.</Text></View>
             ) : (
               <View style={styles.listingsList}>
                 {agentListings.map((listing) => {
@@ -295,18 +295,18 @@ const ReviewsScreen = () => {
                   const price = `₦${new Intl.NumberFormat("en-NG").format(listing.price || 0)}`;
                   const period = listing.cost_frequency.replace(/^per_/, "").replace(/_/g, " ");
                   return (
-                    <Pressable key={listing.public_id} style={styles.listingCard} onPress={() => router.push({ pathname: "/views/place-details/[id]", params: { id: listing.public_id } })}>
-                      <Image source={imageSourceFilter(imgUri)} style={styles.listingImage} resizeMode="cover" />
+                    <Pressable key={listing.public_id} style={styles.listingCard} onPress={() => router.push({ pathname: "/views/place-details/[id]", params: { id: listing.public_id } })} className="border-[1px] overflow-hidden">
+                      <Image source={imageSourceFilter(imgUri)} style={styles.listingImage} resizeMode="cover"  className="w-[100%px]"/>
                       <View style={styles.listingInfo}>
-                        <Text style={styles.listingTitle} numberOfLines={1}>{listing.title}</Text>
-                        <View style={styles.listingLocationRow}>
+                        <Text style={styles.listingTitle} numberOfLines={1} className="font-semibold">{listing.title}</Text>
+                        <View style={styles.listingLocationRow} className="flex-row items-center">
                           <Image source={require("@/assets/icons/location-1.png")} style={styles.listingLocationIcon} />
-                          <Text style={styles.listingLocation} numberOfLines={1}>{addr || "Unknown location"}</Text>
+                          <Text style={styles.listingLocation} numberOfLines={1} className="flex-1">{addr || "Unknown location"}</Text>
                         </View>
-                        <View style={styles.listingFooter}>
-                          <Text style={styles.listingPrice}>{price}<Text style={styles.listingPeriod}>/{period}</Text></Text>
+                        <View  className="flex-row justify-between items-center">
+                          <Text style={styles.listingPrice} className="font-bold">{price}<Text style={styles.listingPeriod} className="font-normal">/{period}</Text></Text>
                           <View style={styles.availablePill}>
-                            <Text style={styles.availablePillText}>{listing.status.charAt(0).toUpperCase() + listing.status.slice(1)}</Text>
+                            <Text style={styles.availablePillText} className="font-semibold">{listing.status.charAt(0).toUpperCase() + listing.status.slice(1)}</Text>
                           </View>
                         </View>
                       </View>
@@ -330,16 +330,16 @@ const ReviewsScreen = () => {
 
       {/* ── Options Menu ── */}
       <Modal visible={showOptionsMenu} transparent animationType="fade" onRequestClose={() => setShowOptionsMenu(false)}>
-        <Pressable style={styles.optionsOverlay} onPress={() => setShowOptionsMenu(false)}>
-          <Pressable style={styles.optionsContainer} onPress={(e) => e.stopPropagation()}>
-            <TouchableOpacity style={styles.optionsItem} onPress={() => { setShowOptionsMenu(false); if (agentPhone) Linking.openURL(`tel:${agentPhone}`); }}>
+        <Pressable style={styles.optionsOverlay} onPress={() => setShowOptionsMenu(false)} className="flex-1 bg-[rgba(0,0,0,0.4)] justify-start items-end">
+          <Pressable style={styles.optionsContainer} onPress={(e) => e.stopPropagation()} className="overflow-hidden shadow-color-[#000] shadow-opacity-[0.15px] shadow-radius-[8px] elevation-[8px]">
+            <TouchableOpacity style={styles.optionsItem} onPress={() => { setShowOptionsMenu(false); if (agentPhone) Linking.openURL(`tel:${agentPhone}`); }} className="flex-row items-center">
               <Image source={require("@/assets/icons/calling.png")} style={[styles.optionsIcon, { tintColor: colors.slate[650] }]} />
-              <Text style={styles.optionsText}>Call who listed</Text>
+              <Text style={styles.optionsText} className="font-medium">Call who listed</Text>
             </TouchableOpacity>
-            <View style={styles.optionsDivider} />
-            <TouchableOpacity style={styles.optionsItem} onPress={() => { setShowOptionsMenu(false); setShowReportModal(true); }}>
+            <View style={styles.optionsDivider}  className="h-[1px]"/>
+            <TouchableOpacity style={styles.optionsItem} onPress={() => { setShowOptionsMenu(false); setShowReportModal(true); }} className="flex-row items-center">
               <Image source={require("@/assets/icons/flag-red.png")} style={styles.optionsIcon} />
-              <Text style={[styles.optionsText, { color: colors.error[200] }]}>Report this lister</Text>
+              <Text style={[styles.optionsText, { color: colors.error[200] }]} className="font-medium">Report this lister</Text>
             </TouchableOpacity>
           </Pressable>
         </Pressable>
@@ -347,12 +347,12 @@ const ReviewsScreen = () => {
 
       {/* ── Report Lister Modal ── */}
       <Modal visible={showReportModal} transparent animationType="slide" onRequestClose={() => setShowReportModal(false)}>
-        <Pressable style={styles.reportOverlay} onPress={() => setShowReportModal(false)}>
-          <Pressable style={styles.reportSheet} onPress={(e) => e.stopPropagation()}>
-            <View style={styles.modalHandle} />
+        <Pressable  onPress={() => setShowReportModal(false)} className="flex-1 bg-[rgba(0,0,0,0.5)] justify-end">
+          <Pressable style={styles.reportSheet} onPress={(e) => e.stopPropagation()} className="max-h-[80%px]">
+            <View style={styles.modalHandle}  className="self-center"/>
             <ScrollView showsVerticalScrollIndicator={false}>
               <View style={styles.reportBody}>
-                <Text style={styles.reportTitle}>Report this lister</Text>
+                <Text style={styles.reportTitle} className="font-bold">Report this lister</Text>
                 <Text style={styles.reportSubtitle}>Select a reason that best describes the issue.</Text>
                 {isLoadingReasons ? (
                   <ActivityIndicator size="small" color={colors.slate[500]} style={{ marginVertical: RFValue(16) }} />
@@ -361,24 +361,24 @@ const ReviewsScreen = () => {
                     {reportReasons.filter((r) => r.applies_to_agent).map((reason) => {
                       const isSelected = selectedReasonId === reason.public_id;
                       return (
-                        <TouchableOpacity key={reason.public_id} style={[styles.reportReasonRow, isSelected && styles.reportReasonRowSelected]} onPress={() => setSelectedReasonId(reason.public_id)}>
-                          <View style={[styles.radioCircle, isSelected && styles.radioCircleSelected]}>
+                        <TouchableOpacity key={reason.public_id} style={[styles.reportReasonRow, isSelected && styles.reportReasonRowSelected]} onPress={() => setSelectedReasonId(reason.public_id)} className="flex-row items-center border-[1px]">
+                          <View style={[styles.radioCircle, isSelected && styles.radioCircleSelected]} className="border-[2px] items-center justify-center">
                             {isSelected && <View style={styles.radioInner} />}
                           </View>
-                          <Text style={styles.reportReasonText}>{reason.label}</Text>
+                          <Text style={styles.reportReasonText} className="flex-1">{reason.label}</Text>
                         </TouchableOpacity>
                       );
                     })}
                   </View>
                 )}
-                <Text style={styles.commentLabel}>Additional details (optional)</Text>
+                <Text style={styles.commentLabel} className="font-medium">Additional details (optional)</Text>
                 <TextInput
                   style={styles.commentInput}
                   placeholder="Describe the issue..."
                   placeholderTextColor={colors.slate[450]}
                   multiline numberOfLines={4} textAlignVertical="top"
                   value={reportDetails} onChangeText={setReportDetails}
-                />
+                 className="border-[1px]"/>
                 <View style={{ marginTop: RFValue(16) }}>
                   <AppButton title={isReportAgentPending ? "Submitting..." : "Submit"} disabled={isReportAgentPending || !selectedReasonId} fullwidth onPress={handleSubmitReport} />
                 </View>
@@ -390,21 +390,21 @@ const ReviewsScreen = () => {
 
       {/* ── Give/Edit Review Modal ── */}
       <Modal visible={showGiveReviewModal} transparent animationType="slide" onRequestClose={() => setShowGiveReviewModal(false)}>
-        <Pressable style={styles.giveReviewOverlay} onPress={() => setShowGiveReviewModal(false)}>
+        <Pressable  onPress={() => setShowGiveReviewModal(false)} className="flex-1 bg-[rgba(0, 0, 0, 0.5)] justify-end">
           <Pressable style={styles.giveReviewSheet} onPress={(e) => e.stopPropagation()}>
-            <View style={styles.modalHandle} />
-            <Text style={styles.giveReviewTitle}>{editingReview ? "Edit Review" : "Give Review"}</Text>
-            <Text style={styles.giveReviewSubtitle}>Please provide feedback about your experience with this agent.</Text>
+            <View style={styles.modalHandle}  className="self-center"/>
+            <Text style={styles.giveReviewTitle} className="font-bold text-center">{editingReview ? "Edit Review" : "Give Review"}</Text>
+            <Text style={styles.giveReviewSubtitle} className="text-center">Please provide feedback about your experience with this agent.</Text>
             {renderInteractiveStars(rating)}
             <View style={styles.commentSection}>
-              <Text style={styles.commentLabel}>Add Comment</Text>
+              <Text style={styles.commentLabel} className="font-medium">Add Comment</Text>
               <TextInput
                 style={styles.commentInput}
                 placeholder="Give your feedback..."
                 placeholderTextColor={colors.slate[450]}
                 multiline numberOfLines={6} textAlignVertical="top"
                 value={reviewComment} onChangeText={setReviewComment}
-              />
+               className="border-[1px]"/>
             </View>
             <AppButton
               title={isSubmittingReview ? "Submitting..." : editingReview ? "Update Review" : "Submit"}
@@ -422,99 +422,168 @@ export default ReviewsScreen;
 
 const getStyles = (colors: ColorScheme) =>
   StyleSheet.create({
-    header: { flexDirection: "row", alignItems: "center", justifyContent: "space-between", paddingVertical: RFValue(16) },
-    headerLeft: { flexDirection: "row", alignItems: "center", gap: RFValue(12), flex: 1 },
+    header: {paddingVertical: RFValue(16)},
+    headerLeft: {gap: RFValue(12)},
     backIcon: { width: RFValue(20), height: RFValue(20), tintColor: colors.slate[650] },
-    headerCenter: { flex: 1, alignItems: "flex-start" },
-    headerTitle: { fontSize: RFValue(16), fontWeight: "600", color: colors.slate[650] },
-    headerRating: { flexDirection: "row", alignItems: "center", gap: RFValue(4), marginTop: RFValue(2) },
-    headerRatingText: { fontSize: RFValue(13), fontWeight: "500", color: colors.slate[650] },
+    headerCenter: {},
+    headerTitle: {fontSize: RFValue(16),
+color: colors.slate[650]},
+    headerRating: {gap: RFValue(4),
+marginTop: RFValue(2)},
+    headerRatingText: {fontSize: RFValue(13),
+color: colors.slate[650]},
     headerReviewCount: { fontSize: RFValue(13), color: colors.info[200] },
     headerIcon: { width: RFValue(20), height: RFValue(20), tintColor: colors.slate[650] },
-    tabsContainer: { flexDirection: "row", paddingVertical: RFValue(12), gap: RFValue(8), width: RFValue(150) },
-    tab: { flex: 1, paddingVertical: RFValue(8), alignItems: "center", borderBottomWidth: 2, borderBottomColor: "transparent" },
+    tabsContainer: {paddingVertical: RFValue(12),
+gap: RFValue(8),
+width: RFValue(150)},
+    tab: {paddingVertical: RFValue(8)},
     tabActive: { borderBottomColor: colors.slate[650] },
-    tabText: { fontSize: RFValue(15), fontWeight: "500", color: colors.slate[500] },
-    tabTextActive: { color: colors.slate[650], fontWeight: "600" },
+    tabText: {fontSize: RFValue(15),
+color: colors.slate[500]},
+    tabTextActive: {color: colors.slate[650]},
     scrollContent: { paddingVertical: RFValue(20), paddingBottom: RFValue(80) },
     reviewsContainer: { gap: RFValue(24) },
     ratingsSection: { gap: RFValue(12) },
-    ratingsTitle: { fontSize: RFValue(16), fontWeight: "600", color: colors.slate[650] },
+    ratingsTitle: {fontSize: RFValue(16),
+color: colors.slate[650]},
     ratingsSubtitle: { fontSize: RFValue(13), color: colors.slate[500], lineHeight: RFValue(18) },
-    ratingsSummary: { flexDirection: "row", gap: RFValue(20), marginTop: RFValue(12) },
-    ratingScore: { alignItems: "center", gap: RFValue(8) },
-    ratingScoreNumber: { fontSize: RFValue(36), fontWeight: "700", color: colors.slate[650] },
-    starsContainer: { flexDirection: "row", gap: RFValue(2) },
-    ratingBars: { flex: 1, gap: RFValue(6) },
-    ratingBarRow: { flexDirection: "row", alignItems: "center", gap: RFValue(6) },
+    ratingsSummary: {gap: RFValue(20),
+marginTop: RFValue(12)},
+    ratingScore: {gap: RFValue(8)},
+    ratingScoreNumber: {fontSize: RFValue(36),
+color: colors.slate[650]},
+    starsContainer: {gap: RFValue(2)},
+    ratingBars: {gap: RFValue(6)},
+    ratingBarRow: {gap: RFValue(6)},
     ratingBarLabel: { fontSize: RFValue(13), color: colors.slate[600], width: RFValue(8) },
-    ratingBarStar: { width: RFValue(12), height: RFValue(12), tintColor: "#FFA500" },
-    ratingBarContainer: { flex: 1, height: RFValue(6), backgroundColor: colors.slate[250], borderRadius: RFValue(3), overflow: "hidden" },
-    ratingBarFill: { height: "100%", backgroundColor: colors.slate[650] },
-    ratingBarCount: { fontSize: RFValue(11), color: colors.slate[500], width: RFValue(16), textAlign: "right" },
+    ratingBarStar: {width: RFValue(12),
+height: RFValue(12)},
+    ratingBarContainer: {height: RFValue(6),
+backgroundColor: colors.slate[250],
+borderRadius: RFValue(3)},
+    ratingBarFill: {backgroundColor: colors.slate[650]},
+    ratingBarCount: {fontSize: RFValue(11),
+color: colors.slate[500],
+width: RFValue(16)},
     reviewsListSection: { gap: RFValue(16) },
-    reviewsListHeader: { flexDirection: "row", justifyContent: "space-between", alignItems: "center" },
-    reviewsListTitle: { fontSize: RFValue(16), fontWeight: "600", color: colors.slate[650] },
+    reviewsListHeader: {},
+    reviewsListTitle: {fontSize: RFValue(16),
+color: colors.slate[650]},
     reviewsList: { gap: RFValue(20) },
-    reviewCard: { gap: RFValue(10), paddingBottom: RFValue(16), borderBottomWidth: 1, borderBottomColor: colors.slate[250] },
-    reviewHeader: { flexDirection: "row", gap: RFValue(12), alignItems: "flex-start" },
-    reviewerAvatarWrapper: { width: RFValue(40), height: RFValue(40), borderRadius: RFValue(20), backgroundColor: colors.slate[300], overflow: "hidden" },
-    reviewerAvatarImage: { width: "100%", height: "100%" },
-    reviewerInfo: { flex: 1, gap: RFValue(3) },
-    reviewerName: { fontSize: RFValue(15), fontWeight: "600", color: colors.slate[650] },
+    reviewCard: {gap: RFValue(10),
+paddingBottom: RFValue(16),
+borderBottomColor: colors.slate[250]},
+    reviewHeader: {gap: RFValue(12)},
+    reviewerAvatarWrapper: {width: RFValue(40),
+height: RFValue(40),
+borderRadius: RFValue(20),
+backgroundColor: colors.slate[300]},
+    reviewerAvatarImage: {},
+    reviewerInfo: {gap: RFValue(3)},
+    reviewerName: {fontSize: RFValue(15),
+color: colors.slate[650]},
     reviewDate: { fontSize: RFValue(12), color: colors.slate[500] },
     reviewComment: { fontSize: RFValue(14), color: colors.slate[600], lineHeight: RFValue(20) },
-    myReviewActions: { flexDirection: "row", gap: RFValue(8) },
+    myReviewActions: {gap: RFValue(8)},
     reviewActionBtn: { paddingHorizontal: RFValue(8), paddingVertical: RFValue(4) },
-    reviewActionEdit: { fontSize: RFValue(12), color: colors.info[200], fontWeight: "600" },
-    reviewActionDelete: { fontSize: RFValue(12), color: colors.error[200], fontWeight: "600" },
-    loadingContainer: { paddingVertical: RFValue(32), alignItems: "center" },
-    emptyContainer: { paddingVertical: RFValue(32), alignItems: "center" },
+    reviewActionEdit: {fontSize: RFValue(12),
+color: colors.info[200]},
+    reviewActionDelete: {fontSize: RFValue(12),
+color: colors.error[200]},
+    loadingContainer: {paddingVertical: RFValue(32)},
+    emptyContainer: {paddingVertical: RFValue(32)},
     emptyText: { fontSize: RFValue(14), color: colors.slate[500] },
     listingsContainer: { gap: RFValue(16) },
-    listingsTitle: { fontSize: RFValue(18), fontWeight: "600", color: colors.slate[650] },
+    listingsTitle: {fontSize: RFValue(18),
+color: colors.slate[650]},
     listingsList: { gap: RFValue(16) },
-    listingCard: { borderRadius: RFValue(12), borderWidth: 1, borderColor: colors.slate[300], overflow: "hidden" },
-    listingImage: { width: "100%", height: RFValue(180) },
+    listingCard: {borderRadius: RFValue(12),
+borderColor: colors.slate[300]},
+    listingImage: {height: RFValue(180)},
     listingInfo: { padding: RFValue(12), gap: RFValue(6) },
-    listingTitle: { fontSize: RFValue(15), fontWeight: "600", color: colors.slate[650] },
-    listingLocationRow: { flexDirection: "row", alignItems: "center", gap: RFValue(4) },
+    listingTitle: {fontSize: RFValue(15),
+color: colors.slate[650]},
+    listingLocationRow: {gap: RFValue(4)},
     listingLocationIcon: { width: RFValue(14), height: RFValue(14), tintColor: colors.slate[500] },
-    listingLocation: { fontSize: RFValue(13), color: colors.slate[500], flex: 1 },
-    listingFooter: { flexDirection: "row", justifyContent: "space-between", alignItems: "center" },
-    listingPrice: { fontSize: RFValue(16), fontWeight: "700", color: colors.slate[650] },
-    listingPeriod: { fontSize: RFValue(13), fontWeight: "400", color: colors.slate[500] },
+    listingLocation: {fontSize: RFValue(13),
+color: colors.slate[500]},
+    listingFooter: {},
+    listingPrice: {fontSize: RFValue(16),
+color: colors.slate[650]},
+    listingPeriod: {fontSize: RFValue(13),
+color: colors.slate[500]},
     availablePill: { backgroundColor: colors.success[100], paddingHorizontal: RFValue(8), paddingVertical: RFValue(4), borderRadius: RFValue(6) },
-    availablePillText: { fontSize: RFValue(11), fontWeight: "600", color: colors.success[300] },
+    availablePillText: {fontSize: RFValue(11),
+color: colors.success[300]},
     button: { paddingVertical: RFValue(12) },
     // Options menu
-    optionsOverlay: { flex: 1, backgroundColor: "rgba(0,0,0,0.4)", justifyContent: "flex-start", alignItems: "flex-end", paddingTop: RFValue(60), paddingRight: RFValue(16) },
-    optionsContainer: { backgroundColor: colors.background, borderRadius: RFValue(12), minWidth: RFValue(200), shadowColor: "#000", shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.15, shadowRadius: 8, elevation: 8, overflow: "hidden" },
-    optionsItem: { flexDirection: "row", alignItems: "center", gap: RFValue(12), paddingHorizontal: RFValue(16), paddingVertical: RFValue(14) },
+    optionsOverlay: {paddingTop: RFValue(60),
+paddingRight: RFValue(16)},
+    optionsContainer: {backgroundColor: colors.background,
+borderRadius: RFValue(12),
+minWidth: RFValue(200),
+shadowOffset: { width: 0, height: 4 }},
+    optionsItem: {gap: RFValue(12),
+paddingHorizontal: RFValue(16),
+paddingVertical: RFValue(14)},
     optionsIcon: { width: RFValue(18), height: RFValue(18) },
-    optionsText: { fontSize: RFValue(14), color: colors.slate[650], fontWeight: "500" },
-    optionsDivider: { height: 1, backgroundColor: colors.slate[250], marginHorizontal: RFValue(12) },
+    optionsText: {fontSize: RFValue(14),
+color: colors.slate[650]},
+    optionsDivider: {backgroundColor: colors.slate[250],
+marginHorizontal: RFValue(12)},
     // Report modal
-    reportOverlay: { flex: 1, backgroundColor: "rgba(0,0,0,0.5)", justifyContent: "flex-end" },
-    reportSheet: { backgroundColor: colors.background, borderTopLeftRadius: RFValue(24), borderTopRightRadius: RFValue(24), maxHeight: "80%" },
+    reportOverlay: {},
+    reportSheet: {backgroundColor: colors.background,
+borderTopLeftRadius: RFValue(24),
+borderTopRightRadius: RFValue(24)},
     reportBody: { paddingHorizontal: RFValue(20), paddingBottom: RFValue(32) },
-    reportTitle: { fontSize: RFValue(20), fontWeight: "700", color: colors.slate[650], marginBottom: RFValue(8) },
+    reportTitle: {fontSize: RFValue(20),
+color: colors.slate[650],
+marginBottom: RFValue(8)},
     reportSubtitle: { fontSize: RFValue(13), color: colors.slate[500], lineHeight: RFValue(18), marginBottom: RFValue(20) },
     reportReasonsList: { gap: RFValue(10), marginBottom: RFValue(20) },
-    reportReasonRow: { flexDirection: "row", alignItems: "center", gap: RFValue(12), paddingVertical: RFValue(12), paddingHorizontal: RFValue(14), borderRadius: RFValue(10), borderWidth: 1, borderColor: colors.slate[300], backgroundColor: colors.slate[100] },
+    reportReasonRow: {gap: RFValue(12),
+paddingVertical: RFValue(12),
+paddingHorizontal: RFValue(14),
+borderRadius: RFValue(10),
+borderColor: colors.slate[300],
+backgroundColor: colors.slate[100]},
     reportReasonRowSelected: { borderColor: colors.slate[650], backgroundColor: colors.slate[150] },
-    radioCircle: { width: RFValue(18), height: RFValue(18), borderRadius: RFValue(9), borderWidth: 2, borderColor: colors.slate[400], alignItems: "center", justifyContent: "center" },
+    radioCircle: {width: RFValue(18),
+height: RFValue(18),
+borderRadius: RFValue(9),
+borderColor: colors.slate[400]},
     radioCircleSelected: { borderColor: colors.slate[650] },
     radioInner: { width: RFValue(8), height: RFValue(8), borderRadius: RFValue(4), backgroundColor: colors.slate[650] },
-    reportReasonText: { fontSize: RFValue(14), color: colors.slate[650], flex: 1 },
+    reportReasonText: {fontSize: RFValue(14),
+color: colors.slate[650]},
     // Give review modal
-    giveReviewOverlay: { flex: 1, backgroundColor: "rgba(0, 0, 0, 0.5)", justifyContent: "flex-end" },
+    giveReviewOverlay: {},
     giveReviewSheet: { backgroundColor: colors.background, borderTopLeftRadius: RFValue(24), borderTopRightRadius: RFValue(24), paddingHorizontal: RFValue(20), paddingBottom: RFValue(32) },
-    modalHandle: { width: RFValue(40), height: RFValue(4), backgroundColor: colors.slate[300], borderRadius: RFValue(2), alignSelf: "center", marginVertical: RFValue(12) },
-    giveReviewTitle: { fontSize: RFValue(20), fontWeight: "700", color: colors.slate[650], textAlign: "center", marginBottom: RFValue(8) },
-    giveReviewSubtitle: { fontSize: RFValue(13), color: colors.slate[500], textAlign: "center", lineHeight: RFValue(18), marginBottom: RFValue(24) },
-    ratingStarsContainer: { flexDirection: "row", justifyContent: "center", gap: RFValue(8), marginBottom: RFValue(24) },
+    modalHandle: {width: RFValue(40),
+height: RFValue(4),
+backgroundColor: colors.slate[300],
+borderRadius: RFValue(2),
+marginVertical: RFValue(12)},
+    giveReviewTitle: {fontSize: RFValue(20),
+color: colors.slate[650],
+marginBottom: RFValue(8)},
+    giveReviewSubtitle: {fontSize: RFValue(13),
+color: colors.slate[500],
+lineHeight: RFValue(18),
+marginBottom: RFValue(24)},
+    ratingStarsContainer: {gap: RFValue(8),
+marginBottom: RFValue(24)},
     commentSection: { marginBottom: RFValue(24) },
-    commentLabel: { fontSize: RFValue(14), fontWeight: "500", color: colors.slate[650], marginBottom: RFValue(8) },
-    commentInput: { backgroundColor: colors.slate[150], borderRadius: RFValue(12), padding: RFValue(16), borderWidth: 1, borderColor: colors.slate[300], fontSize: RFValue(15), color: colors.slate[650], minHeight: RFValue(120) },
+    commentLabel: {fontSize: RFValue(14),
+color: colors.slate[650],
+marginBottom: RFValue(8)},
+    commentInput: {backgroundColor: colors.slate[150],
+borderRadius: RFValue(12),
+padding: RFValue(16),
+borderColor: colors.slate[300],
+fontSize: RFValue(15),
+color: colors.slate[650],
+minHeight: RFValue(120)},
   });

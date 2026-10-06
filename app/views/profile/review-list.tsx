@@ -48,7 +48,7 @@ const ReviewsList = () => {
       <SectionHeader title="Reviews" />
       <ScrollView showsVerticalScrollIndicator={false}>
         <View style={reviewsListStyles.container}>
-          <Text style={reviewsListStyles.reviewCount}>
+          <Text style={reviewsListStyles.reviewCount} className="font-semibold">
             Reviews ({reviewsTotal})
           </Text>
 
@@ -67,8 +67,8 @@ const ReviewsList = () => {
                   .join(" ") || "User";
 
               return (
-                <View key={review.public_id} style={reviewsListStyles.reviewCard}>
-                  <View style={reviewsListStyles.reviewHeader}>
+                <View key={review.public_id} style={reviewsListStyles.reviewCard} className="border-b">
+                  <View style={reviewsListStyles.reviewHeader} className="flex-row">
                     <Image
                       source={
                         reviewer.profile_picture
@@ -77,9 +77,9 @@ const ReviewsList = () => {
                       }
                       style={reviewsListStyles.avatar}
                     />
-                    <View style={reviewsListStyles.reviewerInfo}>
-                      <View style={reviewsListStyles.reviewerNameRow}>
-                        <Text style={reviewsListStyles.reviewerName}>
+                    <View style={reviewsListStyles.reviewerInfo} className="flex-1 justify-center">
+                      <View style={reviewsListStyles.reviewerNameRow} className="flex-row items-center">
+                        <Text style={reviewsListStyles.reviewerName} className="font-semibold">
                           {reviewerName}
                         </Text>
                         {review.status === "verified" && (
@@ -119,17 +119,14 @@ const styles = (colors: ColorScheme) =>
     },
     reviewCount: {
       fontSize: RFValue(18),
-      fontWeight: "600",
+
       color: colors.slate[650],
       marginBottom: RFValue(16),
     },
-    reviewCard: {
-      paddingVertical: RFValue(16),
-      borderBottomWidth: 1,
-      borderBottomColor: colors.slate[300],
-    },
+    reviewCard: {paddingVertical: RFValue(16),
+borderBottomColor: colors.slate[300]},
     reviewHeader: {
-      flexDirection: "row",
+
       marginBottom: RFValue(12),
     },
     avatar: {
@@ -140,18 +137,18 @@ const styles = (colors: ColorScheme) =>
       backgroundColor: colors.slate[300],
     },
     reviewerInfo: {
-      flex: 1,
-      justifyContent: "center",
+
+
     },
     reviewerNameRow: {
-      flexDirection: "row",
-      alignItems: "center",
+
+
       gap: RFValue(6),
       marginBottom: RFValue(2),
     },
     reviewerName: {
       fontSize: RFValue(15),
-      fontWeight: "600",
+
       color: colors.slate[650],
     },
     verifiedBadge: {

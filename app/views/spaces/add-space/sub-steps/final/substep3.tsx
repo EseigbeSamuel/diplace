@@ -97,7 +97,7 @@ const RentalCostSubstep: React.FC<RentalCostSubstepProps> = ({
     spaceForm.value.rentalCost?.maxRentPayout;
 
   return (
-    <View style={styles.container}>
+    <View style={styles.container} className="flex-1">
       <KeyboardAwareScrollView
         enableOnAndroid={true}
         extraScrollHeight={20}
@@ -106,14 +106,14 @@ const RentalCostSubstep: React.FC<RentalCostSubstepProps> = ({
         contentContainerStyle={styles.scrollContent}
       >
         {/* Title */}
-        <Text style={styles.title}>
+        <Text style={styles.title} className="font-semibold">
           What is the cost of renting this space?
         </Text>
 
         {/* Cost Input */}
-        <View style={styles.costInputContainer}>
-          <View style={styles.inputWrapper}>
-            <Text style={styles.currencySymbol}>₦</Text>
+        <View style={styles.costInputContainer} className="items-center">
+          <View style={styles.inputWrapper} className="flex-row items-center justify-center border-bottom-[2px]">
+            <Text style={styles.currencySymbol} className="font-bold">₦</Text>
             <TextInput
               style={styles.input}
               placeholder="0"
@@ -124,11 +124,11 @@ const RentalCostSubstep: React.FC<RentalCostSubstepProps> = ({
               onChangeText={handleCostChange}
               keyboardType="numeric"
               maxLength={12}
-            />
+             className="font-bold text-center p-[0px]"/>
           </View>
 
           {/* Warning Text */}
-          <View style={styles.warningContainer}>
+          <View style={styles.warningContainer} className="flex-row items-center">
             <Text style={styles.warningIcon}>⚠️</Text>
             <Text style={styles.warningText}>
               This should exclude other charges
@@ -137,14 +137,14 @@ const RentalCostSubstep: React.FC<RentalCostSubstepProps> = ({
         </View>
 
         {/* Rent Duration Selector */}
-        <View style={styles.durationContainer}>
+        <View style={styles.durationContainer} className="border-t border-b">
           <TouchableOpacity
-            style={styles.durationSelector}
+
             onPress={() => setShowDurationModal(true)}
-          >
-            <Text style={styles.durationLabel}>Rent duration</Text>
-            <View style={styles.durationValueContainer}>
-              <Text style={styles.durationValue}>{getDurationLabel()}</Text>
+           className="flex-row items-center justify-between">
+            <Text style={styles.durationLabel} className="font-medium">Rent duration</Text>
+            <View style={styles.durationValueContainer} className="flex-row items-center">
+              <Text style={styles.durationValue} className="font-medium">{getDurationLabel()}</Text>
               <Image
                 source={require("@/assets/icons/chevron-right.png")}
                 style={styles.arrowIcon}
@@ -153,17 +153,17 @@ const RentalCostSubstep: React.FC<RentalCostSubstepProps> = ({
             </View>
           </TouchableOpacity>
           {spaceForm.value.rentalCost?.rentDuration && (
-            <View style={styles.payoutContainer}>
-              <Text style={styles.payoutLabel}>Maximum rent pay out</Text>
-              <View style={styles.payoutInputWrapper}>
+            <View style={styles.payoutContainer} className="flex-row items-center justify-between">
+              <Text style={styles.payoutLabel} className="font-medium">Maximum rent pay out</Text>
+              <View style={styles.payoutInputWrapper} className="flex-row items-center border-bottom-[2px]">
                 <TextInput
                   style={styles.payoutInput}
                   value={spaceForm.value.rentalCost?.maxRentPayout}
                   onChangeText={handleMaxPayoutChange}
                   keyboardType="numeric"
                   maxLength={3}
-                />
-                <Text style={styles.payoutUnit}>{getPayoutUnit()}</Text>
+                 className="font-semibold text-center"/>
+                <Text style={styles.payoutUnit} className="font-medium">{getPayoutUnit()}</Text>
               </View>
             </View>
           )}
@@ -189,12 +189,12 @@ const RentalCostSubstep: React.FC<RentalCostSubstepProps> = ({
         onClose={() => setShowDurationModal(false)}
         snapPoints={useMemo(() => ["50%"], [])}
       >
-        <Text style={styles.modalTitle}>Rent duration</Text>
+        <Text style={styles.modalTitle} className="font-semibold">Rent duration</Text>
         <Text style={styles.modalDescription}>
           Select the rent duration of this property.
         </Text>
 
-        <View style={styles.durationOptions}>
+        <View style={styles.durationOptions} className="w-[100%px]">
           {rentDurations.map((duration) => (
             <SimpleSelector
               title={duration}
@@ -211,55 +211,28 @@ const RentalCostSubstep: React.FC<RentalCostSubstepProps> = ({
 
 const createStyles = (colors: ColorScheme) =>
   StyleSheet.create({
-    container: {
-      flex: 1,
-      backgroundColor: colors.background,
-    },
+    container: {backgroundColor: colors.background},
     scrollContent: {
       paddingTop: RFValue(32),
       paddingBottom: RFValue(20),
     },
-    title: {
-      fontSize: RFValue(20),
-      fontWeight: "600",
-      color: colors.slate[650],
-      lineHeight: RFValue(28),
-      marginBottom: RFValue(48),
-    },
-    costInputContainer: {
-      alignItems: "center",
-      marginBottom: RFValue(40),
-    },
-    inputWrapper: {
-      flexDirection: "row",
-      alignItems: "center",
-      justifyContent: "center",
-      marginBottom: RFValue(12),
-      backgroundColor: colors.slate[200],
-      paddingVertical: RFValue(8),
-      paddingHorizontal: RFValue(16),
-      borderBottomColor: colors.slate[650],
-      borderBottomWidth: 2,
-    },
-    currencySymbol: {
-      fontSize: RFValue(32),
-      fontWeight: "700",
-      color: colors.slate[650],
-      marginRight: RFValue(8),
-    },
-    input: {
-      fontSize: RFValue(32),
-      fontWeight: "700",
-      color: colors.slate[650],
-      minWidth: RFValue(120),
-      textAlign: "center",
-      padding: 0,
-    },
-    warningContainer: {
-      flexDirection: "row",
-      alignItems: "center",
-      gap: RFValue(6),
-    },
+    title: {fontSize: RFValue(20),
+color: colors.slate[650],
+lineHeight: RFValue(28),
+marginBottom: RFValue(48)},
+    costInputContainer: {marginBottom: RFValue(40)},
+    inputWrapper: {marginBottom: RFValue(12),
+backgroundColor: colors.slate[200],
+paddingVertical: RFValue(8),
+paddingHorizontal: RFValue(16),
+borderBottomColor: colors.slate[650]},
+    currencySymbol: {fontSize: RFValue(32),
+color: colors.slate[650],
+marginRight: RFValue(8)},
+    input: {fontSize: RFValue(32),
+color: colors.slate[650],
+minWidth: RFValue(120)},
+    warningContainer: {gap: RFValue(6)},
     warningIcon: {
       fontSize: RFValue(14),
     },
@@ -267,138 +240,73 @@ const createStyles = (colors: ColorScheme) =>
       fontSize: RFValue(13),
       color: colors.slate[500],
     },
-    durationSelector: {
-      flexDirection: "row",
-      alignItems: "center",
-      justifyContent: "space-between",
-    },
-    durationContainer: {
-      paddingVertical: RFValue(16),
-      paddingHorizontal: RFValue(16),
-      backgroundColor: colors.background,
-      borderRadius: RFValue(12),
-      borderTopWidth: 1,
-      borderBottomWidth: 1,
-      borderColor: colors.slate[300],
-      marginBottom: RFValue(16),
-    },
-    durationLabel: {
-      fontSize: RFValue(15),
-      fontWeight: "500",
-      color: colors.slate[650],
-    },
-    durationValueContainer: {
-      flexDirection: "row",
-      alignItems: "center",
-      gap: RFValue(8),
-    },
-    durationValue: {
-      fontSize: RFValue(15),
-      fontWeight: "500",
-      color: colors.slate[600],
-    },
+    durationSelector: {},
+    durationContainer: {paddingVertical: RFValue(16),
+paddingHorizontal: RFValue(16),
+backgroundColor: colors.background,
+borderRadius: RFValue(12),
+borderColor: colors.slate[300],
+marginBottom: RFValue(16)},
+    durationLabel: {fontSize: RFValue(15),
+color: colors.slate[650]},
+    durationValueContainer: {gap: RFValue(8)},
+    durationValue: {fontSize: RFValue(15),
+color: colors.slate[600]},
     arrowIcon: {
       height: RFValue(10),
       tintColor: colors.slate[600],
     },
-    payoutContainer: {
-      flexDirection: "row",
-      alignItems: "center",
-      justifyContent: "space-between",
-      paddingVertical: RFValue(12),
-    },
-    payoutLabel: {
-      fontSize: RFValue(15),
-      fontWeight: "500",
-      color: colors.slate[650],
-    },
-    payoutInputWrapper: {
-      flexDirection: "row",
-      alignItems: "center",
-      gap: RFValue(12),
-      minWidth: RFValue(40),
-      paddingVertical: RFValue(4),
-      paddingHorizontal: RFValue(8),
-      borderBottomWidth: 2,
-      backgroundColor: colors.slate[200],
-      borderBottomColor: colors.slate[650],
-    },
-    payoutInput: {
-      fontSize: RFValue(15),
-      fontWeight: "600",
-      color: colors.slate[650],
-      textAlign: "center",
-      width: RFValue(20),
-    },
-    payoutUnit: {
-      fontSize: RFValue(15),
-      fontWeight: "500",
-      color: colors.slate[600],
-    },
+    payoutContainer: {paddingVertical: RFValue(12)},
+    payoutLabel: {fontSize: RFValue(15),
+color: colors.slate[650]},
+    payoutInputWrapper: {gap: RFValue(12),
+minWidth: RFValue(40),
+paddingVertical: RFValue(4),
+paddingHorizontal: RFValue(8),
+backgroundColor: colors.slate[200],
+borderBottomColor: colors.slate[650]},
+    payoutInput: {fontSize: RFValue(15),
+color: colors.slate[650],
+width: RFValue(20)},
+    payoutUnit: {fontSize: RFValue(15),
+color: colors.slate[600]},
     buttonContainer: {
       paddingVertical: RFValue(16),
       backgroundColor: colors.background,
     },
-    modalOverlay: {
-      flex: 1,
-      backgroundColor: "rgba(0, 0, 0, 0.5)",
-      justifyContent: "flex-end",
-    },
-    modalContent: {
-      backgroundColor: colors.background,
-      borderTopLeftRadius: RFValue(24),
-      borderTopRightRadius: RFValue(24),
-      paddingTop: RFValue(12),
-      paddingBottom: RFValue(32),
-      paddingHorizontal: RFValue(16),
-      textAlign: "center",
-      alignItems: "center",
-    },
-    modalHandle: {
-      width: RFValue(40),
-      height: RFValue(4),
-      backgroundColor: colors.slate[300],
-      borderRadius: RFValue(2),
-      alignSelf: "center",
-      marginBottom: RFValue(20),
-    },
-    modalTitle: {
-      fontSize: RFValue(18),
-      fontWeight: "600",
-      color: colors.slate[650],
-      marginBottom: RFValue(8),
-    },
+    modalOverlay: {},
+    modalContent: {backgroundColor: colors.background,
+borderTopLeftRadius: RFValue(24),
+borderTopRightRadius: RFValue(24),
+paddingTop: RFValue(12),
+paddingBottom: RFValue(32),
+paddingHorizontal: RFValue(16)},
+    modalHandle: {width: RFValue(40),
+height: RFValue(4),
+backgroundColor: colors.slate[300],
+borderRadius: RFValue(2),
+marginBottom: RFValue(20)},
+    modalTitle: {fontSize: RFValue(18),
+color: colors.slate[650],
+marginBottom: RFValue(8)},
     modalDescription: {
       fontSize: RFValue(14),
       color: colors.slate[600],
       marginBottom: RFValue(24),
     },
-    durationOptions: {
-      gap: RFValue(16),
-      width: "100%",
-    },
-    durationOption: {
-      flexDirection: "row",
-      alignItems: "center",
-      paddingVertical: RFValue(16),
-      paddingHorizontal: RFValue(16),
-      backgroundColor: colors.background,
-      borderRadius: RFValue(12),
-      borderWidth: 1,
-      borderColor: colors.slate[300],
-    },
+    durationOptions: {gap: RFValue(16)},
+    durationOption: {paddingVertical: RFValue(16),
+paddingHorizontal: RFValue(16),
+backgroundColor: colors.background,
+borderRadius: RFValue(12),
+borderColor: colors.slate[300]},
     radioContainer: {
       marginRight: RFValue(12),
     },
-    radioOuter: {
-      width: RFValue(20),
-      height: RFValue(20),
-      borderRadius: RFValue(10),
-      borderWidth: 2,
-      borderColor: colors.slate[400],
-      alignItems: "center",
-      justifyContent: "center",
-    },
+    radioOuter: {width: RFValue(20),
+height: RFValue(20),
+borderRadius: RFValue(10),
+borderColor: colors.slate[400]},
     radioOuterSelected: {
       borderColor: colors.slate[650],
     },
@@ -408,11 +316,8 @@ const createStyles = (colors: ColorScheme) =>
       borderRadius: RFValue(5),
       backgroundColor: colors.slate[650],
     },
-    durationOptionText: {
-      fontSize: RFValue(15),
-      fontWeight: "500",
-      color: colors.slate[650],
-    },
+    durationOptionText: {fontSize: RFValue(15),
+color: colors.slate[650]},
   });
 
 export default RentalCostSubstep;

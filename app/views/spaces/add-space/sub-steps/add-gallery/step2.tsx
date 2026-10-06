@@ -34,10 +34,11 @@ const MAX_RECORD_SECONDS = 60;
 
 interface VideoPreviewProps {
   uri: string;
-  style: object;
+  style?: object;
+  className?: string;
 }
 
-const VideoPreview: React.FC<VideoPreviewProps> = ({ uri, style }) => {
+const VideoPreview: React.FC<VideoPreviewProps> = ({ uri, style, className }) => {
   const player = useVideoPlayer(uri, (videoPlayer) => {
     videoPlayer.loop = true;
   });
@@ -46,6 +47,7 @@ const VideoPreview: React.FC<VideoPreviewProps> = ({ uri, style }) => {
     <VideoView
       player={player}
       style={style}
+      className={className}
       nativeControls
       contentFit="cover"
     />
@@ -347,13 +349,13 @@ const VirtualTourSubstep: React.FC<VirtualTourSubstepProps> = ({
   const hasTour = (spaceForm.value.tour ?? []).length > 0;
 
   return (
-    <View style={styles.container}>
+    <View style={styles.container} className="flex-1">
       {showInstructions && (
-        <View style={styles.instructionsContainer}>
-          <Text style={styles.title}>
+        <View style={styles.instructionsContainer} className="flex-1">
+          <Text style={styles.title} className="font-semibold">
             Please follow the instructions to take a 360 view.
           </Text>
-          <View style={styles.instructionsList}>
+          <View style={styles.instructionsList} className="flex-1">
             <Text style={styles.instructionItem}>
               1. Keep the space clean, bright, and clear.
             </Text>
@@ -376,8 +378,8 @@ const VirtualTourSubstep: React.FC<VirtualTourSubstepProps> = ({
               fullwidth={true}
               afterIcon={require("@/assets/icons/Video - Iconly Pro.png")}
             />
-            <Pressable style={styles.skipButton} onPress={onNext}>
-              <Text style={styles.skipText}>Skip</Text>
+            <Pressable style={styles.skipButton} onPress={onNext} className="items-center">
+              <Text style={styles.skipText} className="font-medium">Skip</Text>
             </Pressable>
           </View>
         </View>
@@ -388,71 +390,71 @@ const VirtualTourSubstep: React.FC<VirtualTourSubstepProps> = ({
         !showCamera &&
         !showFinishModal &&
         !showRoomNameModal && (
-          <View style={styles.uploadContainer}>
-            <Text style={styles.uploadTitle}>Virtual tour ready</Text>
+          <View style={styles.uploadContainer} className="flex-1">
+            <Text style={styles.uploadTitle} className="font-semibold">Virtual tour ready</Text>
             <Text style={styles.uploadDescription}>
               {(spaceForm.value.tour ?? []).length} room clip(s) added.
             </Text>
 
             <View style={styles.uploadStatusContainer}>
-              <View style={styles.uploadStatusRow}>
+              <View style={styles.uploadStatusRow} className="flex-row items-center">
                 <Image
                   source={require("@/assets/icons/Video - Iconly Pro.png")}
                   style={styles.previewIcon}
                 />
-                <Text style={styles.uploadText}>Uploaded locally</Text>
+                <Text style={styles.uploadText} className="font-medium">Uploaded locally</Text>
               </View>
             </View>
 
             <View style={styles.bottomButtons}>
               <AppButton title="Next" onPress={onNext} size="large" fullwidth />
-              <Pressable style={styles.retakeButton} onPress={handleRetakeAll}>
+              <Pressable style={styles.retakeButton} onPress={handleRetakeAll} className="flex-row items-center justify-center">
                 <Image
                   source={require("@/assets/icons/return.png")}
                   style={styles.retakeIcon}
                 />
-                <Text style={styles.retakeText}>Retake All</Text>
+                <Text style={styles.retakeText} className="font-medium">Retake All</Text>
               </Pressable>
             </View>
           </View>
         )}
 
       <Modal visible={showCamera} animationType="fade">
-        <View style={styles.cameraContainer}>
+        <View  className="flex-1 bg-[#000000]">
           <CameraView
             ref={cameraRef}
-            style={styles.camera}
+
             facing="back"
             mode="video"
             videoQuality="1080p"
             onCameraReady={handleCameraReady}
-          />
-          <Pressable style={styles.exitButton} onPress={handleExitTour}>
+           className="flex-1 w-[100%px] h-[100%px]"/>
+          <Pressable style={styles.exitButton} onPress={handleExitTour} className="absolute flex-row items-center bg-[rgba(0, 0, 0, 0.5)]">
             <Image
               source={require("@/assets/icons/close-contained.png")}
               style={styles.exitIcon}
-            />
-            <Text style={styles.exitText}>Exit tour</Text>
+             className="tint-[#FFFFFF]"/>
+            <Text style={styles.exitText} className="text-[#FFFFFF] font-medium">Exit tour</Text>
           </Pressable>
 
-          <View style={styles.cameraOverlay} pointerEvents="none">
-            <Text style={styles.cameraInstruction}>
+          <View style={styles.cameraOverlay} pointerEvents="none" className="absolute left-[0px] right-[0px] items-center">
+            <Text style={styles.cameraInstruction} className="text-[#FFFFFF] text-center">
               Rotate slowly and keep your phone steady.
             </Text>
-            <View style={styles.timerContainer}>
-              <View style={styles.recordingDot} />
-              <Text style={styles.timerText}>{formatTime(recordingTime)}</Text>
+            <View style={styles.timerContainer} className="flex-row items-center bg-[rgba(0,0,0,0.6)]">
+              <View style={styles.recordingDot}  className="bg-[#EF4444]"/>
+              <Text style={styles.timerText} className="text-[#FFFFFF] font-semibold">{formatTime(recordingTime)}</Text>
             </View>
           </View>
 
           {isPreparingCamera && (
-            <View style={styles.preparingOverlay} pointerEvents="none">
+            <View style={styles.preparingOverlay} pointerEvents="none" className="absolute top-[45%px] items-center self-center">
               <ActivityIndicator color="#FFFFFF" />
-              <Text style={styles.preparingText}>Preparing camera...</Text>
+              <Text style={styles.preparingText} className="text-[#FFFFFF]">Preparing camera...</Text>
             </View>
           )}
 
-          <View style={styles.cameraBottomButtons}>
+          <View style={styles.cameraBottomButtons} className="absolute">
             <AppButton
               title="Next Room"
               onPress={() => handleStopRecording("next")}
@@ -471,33 +473,33 @@ const VirtualTourSubstep: React.FC<VirtualTourSubstepProps> = ({
       </Modal>
 
       <Modal visible={showRoomNameModal} transparent animationType="fade">
-        <View style={styles.modalOverlay}>
-          <View style={styles.cameraPreview}>
+        <View  className="flex-1 bg-[rgba(0,0,0,0.85)]">
+          <View  className="flex-1">
             {currentVideoUri ? (
-              <VideoPreview uri={currentVideoUri} style={styles.previewImage} />
+              <VideoPreview uri={currentVideoUri} className="w-full h-full" />
             ) : (
-              <View style={styles.noClipContainer}>
-                <Text style={styles.noClipText}>No clip captured.</Text>
+              <View  className="flex-1 items-center justify-center">
+                <Text style={styles.noClipText} className="text-[#FFFFFF]">No clip captured.</Text>
               </View>
             )}
 
-            <View style={styles.roomNameCard}>
-              <Text style={styles.roomNameTitle}>What room is this?</Text>
+            <View style={styles.roomNameCard} className="absolute">
+              <Text style={styles.roomNameTitle} className="font-bold">What room is this?</Text>
               <TextInput
                 style={styles.roomNameInput}
                 placeholder="Room Name"
                 placeholderTextColor={colors.slate[500]}
                 value={roomName}
                 onChangeText={setRoomName}
-              />
+               className="border-[1px]"/>
               <AppButton
                 title="Proceed to Next Room"
                 onPress={handleProceedToNextRoom}
                 size="large"
                 fullwidth
               />
-              <Pressable style={styles.retakeLink} onPress={handleRetakeCurrent}>
-                <Text style={styles.retakeLinkText}>Retake This Clip</Text>
+              <Pressable style={styles.retakeLink} onPress={handleRetakeCurrent} className="items-center">
+                <Text style={styles.retakeLinkText} className="font-medium">Retake This Clip</Text>
               </Pressable>
             </View>
           </View>
@@ -505,18 +507,18 @@ const VirtualTourSubstep: React.FC<VirtualTourSubstepProps> = ({
       </Modal>
 
       <Modal visible={showFinishModal} transparent animationType="fade">
-        <View style={styles.modalOverlay}>
-          <View style={styles.cameraPreview}>
+        <View  className="flex-1 bg-[rgba(0,0,0,0.85)]">
+          <View  className="flex-1">
             {currentVideoUri ? (
-              <VideoPreview uri={currentVideoUri} style={styles.previewImage} />
+              <VideoPreview uri={currentVideoUri} className="w-full h-full" />
             ) : (
-              <View style={styles.noClipContainer}>
-                <Text style={styles.noClipText}>No clip captured.</Text>
+              <View  className="flex-1 items-center justify-center">
+                <Text style={styles.noClipText} className="text-[#FFFFFF]">No clip captured.</Text>
               </View>
             )}
 
-            <View style={styles.roomNameCard}>
-              <Text style={styles.roomNameTitle}>Finish Tour</Text>
+            <View style={styles.roomNameCard} className="absolute">
+              <Text style={styles.roomNameTitle} className="font-bold">Finish Tour</Text>
               <Text style={styles.roomNameDescription}>
                 Name this last room before finishing.
               </Text>
@@ -526,15 +528,15 @@ const VirtualTourSubstep: React.FC<VirtualTourSubstepProps> = ({
                 placeholderTextColor={colors.slate[500]}
                 value={roomName}
                 onChangeText={setRoomName}
-              />
+               className="border-[1px]"/>
               <AppButton
                 title="Save and Finish"
                 onPress={handleUploadTour}
                 size="large"
                 fullwidth
               />
-              <Pressable style={styles.retakeLink} onPress={handleRetakeCurrent}>
-                <Text style={styles.retakeLinkText}>Retake This Clip</Text>
+              <Pressable style={styles.retakeLink} onPress={handleRetakeCurrent} className="items-center">
+                <Text style={styles.retakeLinkText} className="font-medium">Retake This Clip</Text>
               </Pressable>
             </View>
           </View>
@@ -546,24 +548,12 @@ const VirtualTourSubstep: React.FC<VirtualTourSubstepProps> = ({
 
 const createStyles = (colors: ColorScheme) =>
   StyleSheet.create({
-    container: {
-      flex: 1,
-      backgroundColor: colors.background,
-    },
-    instructionsContainer: {
-      flex: 1,
-      paddingTop: RFValue(32),
-    },
-    title: {
-      fontSize: RFValue(20),
-      fontWeight: "600",
-      color: colors.slate[650],
-      marginBottom: RFValue(24),
-    },
-    instructionsList: {
-      gap: RFValue(16),
-      flex: 1,
-    },
+    container: {backgroundColor: colors.background},
+    instructionsContainer: {paddingTop: RFValue(32)},
+    title: {fontSize: RFValue(20),
+color: colors.slate[650],
+marginBottom: RFValue(24)},
+    instructionsList: {gap: RFValue(16)},
     instructionItem: {
       fontSize: RFValue(14),
       color: colors.slate[600],
@@ -573,25 +563,13 @@ const createStyles = (colors: ColorScheme) =>
       gap: RFValue(12),
       paddingVertical: RFValue(16),
     },
-    skipButton: {
-      alignItems: "center",
-      paddingVertical: RFValue(12),
-    },
-    skipText: {
-      fontSize: RFValue(15),
-      color: colors.slate[600],
-      fontWeight: "500",
-    },
-    uploadContainer: {
-      flex: 1,
-      paddingTop: RFValue(32),
-    },
-    uploadTitle: {
-      fontSize: RFValue(20),
-      fontWeight: "600",
-      color: colors.slate[650],
-      marginBottom: RFValue(12),
-    },
+    skipButton: {paddingVertical: RFValue(12)},
+    skipText: {fontSize: RFValue(15),
+color: colors.slate[600]},
+    uploadContainer: {paddingTop: RFValue(32)},
+    uploadTitle: {fontSize: RFValue(20),
+color: colors.slate[650],
+marginBottom: RFValue(12)},
     uploadDescription: {
       fontSize: RFValue(14),
       color: colors.slate[600],
@@ -602,176 +580,77 @@ const createStyles = (colors: ColorScheme) =>
       backgroundColor: colors.slate[200],
       borderRadius: RFValue(12),
     },
-    uploadStatusRow: {
-      flexDirection: "row",
-      alignItems: "center",
-      gap: RFValue(8),
-    },
-    uploadText: {
-      fontSize: RFValue(14),
-      color: colors.slate[650],
-      fontWeight: "500",
-    },
-    cameraContainer: {
-      flex: 1,
-      backgroundColor: "#000000",
-    },
-    camera: {
-      flex: 1,
-      width: "100%",
-      height: "100%",
-    },
-    exitButton: {
-      position: "absolute",
-      top: RFValue(50),
-      right: RFValue(16),
-      flexDirection: "row",
-      alignItems: "center",
-      backgroundColor: "rgba(0, 0, 0, 0.5)",
-      paddingHorizontal: RFValue(12),
-      paddingVertical: RFValue(8),
-      borderRadius: RFValue(20),
-      gap: RFValue(6),
-    },
-    exitIcon: {
-      width: RFValue(16),
-      height: RFValue(16),
-      tintColor: "#FFFFFF",
-    },
-    exitText: {
-      fontSize: RFValue(13),
-      color: "#FFFFFF",
-      fontWeight: "500",
-    },
-    cameraOverlay: {
-      position: "absolute",
-      top: RFValue(120),
-      left: 0,
-      right: 0,
-      alignItems: "center",
-      gap: RFValue(16),
-      paddingHorizontal: RFValue(20),
-    },
-    cameraInstruction: {
-      fontSize: RFValue(14),
-      color: "#FFFFFF",
-      textAlign: "center",
-    },
-    timerContainer: {
-      flexDirection: "row",
-      alignItems: "center",
-      backgroundColor: "rgba(0,0,0,0.6)",
-      paddingHorizontal: RFValue(12),
-      paddingVertical: RFValue(6),
-      borderRadius: RFValue(20),
-      gap: RFValue(8),
-    },
-    recordingDot: {
-      width: RFValue(10),
-      height: RFValue(10),
-      borderRadius: RFValue(6),
-      backgroundColor: "#EF4444",
-    },
-    timerText: {
-      fontSize: RFValue(15),
-      color: "#FFFFFF",
-      fontWeight: "600",
-    },
-    preparingOverlay: {
-      position: "absolute",
-      alignSelf: "center",
-      top: "45%",
-      alignItems: "center",
-      gap: RFValue(8),
-    },
-    preparingText: {
-      color: "#FFFFFF",
-      fontSize: RFValue(13),
-    },
-    cameraBottomButtons: {
-      position: "absolute",
-      bottom: RFValue(32),
-      left: RFValue(20),
-      right: RFValue(20),
-      gap: RFValue(10),
-    },
-    modalOverlay: {
-      flex: 1,
-      backgroundColor: "rgba(0,0,0,0.85)",
-    },
-    cameraPreview: {
-      flex: 1,
-    },
-    previewImage: {
-      width: "100%",
-      height: "100%",
-    },
-    noClipContainer: {
-      flex: 1,
-      alignItems: "center",
-      justifyContent: "center",
-    },
-    noClipText: {
-      color: "#FFFFFF",
-      fontSize: RFValue(14),
-    },
-    roomNameCard: {
-      position: "absolute",
-      bottom: RFValue(48),
-      left: RFValue(20),
-      right: RFValue(20),
-      backgroundColor: colors.background,
-      borderRadius: RFValue(16),
-      padding: RFValue(16),
-      gap: RFValue(12),
-    },
-    roomNameTitle: {
-      fontSize: RFValue(19),
-      fontWeight: "700",
-      color: colors.slate[650],
-    },
+    uploadStatusRow: {gap: RFValue(8)},
+    uploadText: {fontSize: RFValue(14),
+color: colors.slate[650]},
+    cameraContainer: {},
+    camera: {},
+    exitButton: {top: RFValue(50),
+right: RFValue(16),
+paddingHorizontal: RFValue(12),
+paddingVertical: RFValue(8),
+borderRadius: RFValue(20),
+gap: RFValue(6)},
+    exitIcon: {width: RFValue(16),
+height: RFValue(16)},
+    exitText: {fontSize: RFValue(13)},
+    cameraOverlay: {top: RFValue(120),
+gap: RFValue(16),
+paddingHorizontal: RFValue(20)},
+    cameraInstruction: {fontSize: RFValue(14)},
+    timerContainer: {paddingHorizontal: RFValue(12),
+paddingVertical: RFValue(6),
+borderRadius: RFValue(20),
+gap: RFValue(8)},
+    recordingDot: {width: RFValue(10),
+height: RFValue(10),
+borderRadius: RFValue(6)},
+    timerText: {fontSize: RFValue(15)},
+    preparingOverlay: {gap: RFValue(8)},
+    preparingText: {fontSize: RFValue(13)},
+    cameraBottomButtons: {bottom: RFValue(32),
+left: RFValue(20),
+right: RFValue(20),
+gap: RFValue(10)},
+    modalOverlay: {},
+    cameraPreview: {},
+    previewImage: {},
+    noClipContainer: {},
+    noClipText: {fontSize: RFValue(14)},
+    roomNameCard: {bottom: RFValue(48),
+left: RFValue(20),
+right: RFValue(20),
+backgroundColor: colors.background,
+borderRadius: RFValue(16),
+padding: RFValue(16),
+gap: RFValue(12)},
+    roomNameTitle: {fontSize: RFValue(19),
+color: colors.slate[650]},
     roomNameDescription: {
       fontSize: RFValue(13),
       color: colors.slate[600],
     },
-    roomNameInput: {
-      borderWidth: 1,
-      borderColor: colors.slate[300],
-      borderRadius: RFValue(10),
-      paddingHorizontal: RFValue(12),
-      paddingVertical: RFValue(12),
-      color: colors.slate[650],
-    },
-    retakeLink: {
-      alignItems: "center",
-      paddingVertical: RFValue(4),
-    },
-    retakeLinkText: {
-      fontSize: RFValue(14),
-      color: colors.slate[600],
-      fontWeight: "500",
-    },
+    roomNameInput: {borderColor: colors.slate[300],
+borderRadius: RFValue(10),
+paddingHorizontal: RFValue(12),
+paddingVertical: RFValue(12),
+color: colors.slate[650]},
+    retakeLink: {paddingVertical: RFValue(4)},
+    retakeLinkText: {fontSize: RFValue(14),
+color: colors.slate[600]},
     bottomButtons: {
       marginTop: RFValue(20),
       gap: RFValue(12),
     },
-    retakeButton: {
-      flexDirection: "row",
-      alignItems: "center",
-      justifyContent: "center",
-      gap: RFValue(8),
-      paddingVertical: RFValue(10),
-    },
+    retakeButton: {gap: RFValue(8),
+paddingVertical: RFValue(10)},
     retakeIcon: {
       width: RFValue(16),
       height: RFValue(16),
       tintColor: colors.slate[600],
     },
-    retakeText: {
-      fontSize: RFValue(14),
-      color: colors.slate[600],
-      fontWeight: "500",
-    },
+    retakeText: {fontSize: RFValue(14),
+color: colors.slate[600]},
     previewIcon: {
       width: RFValue(16),
       height: RFValue(16),

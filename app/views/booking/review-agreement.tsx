@@ -50,25 +50,25 @@ const ReviewAgreement = () => {
   return (
     <SafeAreaViewContainer>
       {/* Header */}
-      <View style={styles.header}>
+      <View style={styles.header} className="flex-row items-center justify-between">
         <Pressable onPress={() => router.back()}>
           <Image
             source={require("@/assets/icons/arrow-left-light.png")}
             style={styles.backIcon}
           />
         </Pressable>
-        <Text style={styles.headerTitle}>Review agreement</Text>
-        <Text style={styles.stepIndicator}>3/4</Text>
+        <Text style={styles.headerTitle} className="font-semibold flex-1 text-center">Review agreement</Text>
+        <Text style={styles.stepIndicator} className="font-medium">3/4</Text>
       </View>
 
       <ScrollView
         showsVerticalScrollIndicator={false}
         contentContainerStyle={styles.scrollContent}
       >
-        <View style={styles.container}>
+        <View  className="flex-1">
           {/* Title Section */}
           <View style={styles.titleSection}>
-            <Text style={styles.title}>Review Agreement</Text>
+            <Text style={styles.title} className="font-bold">Review Agreement</Text>
             <Text style={styles.subtitle}>
               Before completing your booking, kindly take a moment to read
               through the agreement provided below for event space rental.
@@ -78,23 +78,23 @@ const ReviewAgreement = () => {
           </View>
 
           {/* Download Button */}
-          <Pressable style={styles.downloadButton} onPress={handleDownload}>
+          <Pressable style={styles.downloadButton} onPress={handleDownload} className="flex-row items-center justify-center border-[1px]">
             <Image
               source={require("@/assets/icons/Download - Iconly Pro-1.png")}
               style={styles.downloadIcon}
             />
-            <Text style={styles.downloadText}>Download copy</Text>
+            <Text style={styles.downloadText} className="font-semibold">Download copy</Text>
           </Pressable>
 
           {/* Agreement Document */}
-          <View style={styles.agreementContainer}>
-            <View style={styles.agreementHeader}>
+          <View style={styles.agreementContainer} className="overflow-hidden">
+            <View style={styles.agreementHeader} className="flex-row items-center">
               <Image
                 source={require("@/assets/icons/paper.png")}
                 style={styles.documentIcon}
               />
-              <View style={styles.agreementHeaderText}>
-                <Text style={styles.agreementTitle}>Tenancy Agreement</Text>
+              <View  className="flex-1">
+                <Text style={styles.agreementTitle} className="font-semibold">Tenancy Agreement</Text>
                 <Text style={styles.agreementSize}>2861 kb</Text>
               </View>
               <Pressable onPress={handleShare}>
@@ -106,7 +106,7 @@ const ReviewAgreement = () => {
             </View>
 
             <View style={styles.agreementContent}>
-              <Text style={styles.agreementContentTitle}>
+              <Text style={styles.agreementContentTitle} className="font-bold">
                 Tenancy Agreement
               </Text>
               <Text style={styles.agreementText}>
@@ -115,7 +115,7 @@ const ReviewAgreement = () => {
                 2-Bedroom Apartment, No. 12 Unity street, Lekki, Lagos{"\n"}•
                 Duration: 12 Months, starting from: July 15, 2025 to July 15,
                 2026{"\n"}• Rent Amount: ₦600,000 (Payable upfront){"\n\n"}
-                <Text style={styles.agreementSectionTitle}>
+                <Text style={styles.agreementSectionTitle} className="font-semibold">
                   1. Terms & Conditions
                 </Text>
                 {"\n"}• The property shall be used strictly for residential
@@ -124,13 +124,13 @@ const ReviewAgreement = () => {
                 and is responsible for structural repairs; the tenant is
                 responsible for minor maintenance.{"\n"}• Rent is non-refundable
                 once tenancy begins.{"\n\n"}
-                <Text style={styles.agreementSectionTitle}>
+                <Text style={styles.agreementSectionTitle} className="font-semibold">
                   2. Payment Terms
                 </Text>
                 {"\n"}• Rent must be paid in full before move-in.{"\n"}• Late
                 payment is payment in escrow, and disburse it to the landlord
                 only after successful inspection and confirmation.{"\n\n"}
-                <Text style={styles.agreementSectionTitle}>3. Termination</Text>
+                <Text style={styles.agreementSectionTitle} className="font-semibold">3. Termination</Text>
                 {"\n"}• Either party must give at least 1-month notice before
                 termination.{"\n"}• Early termination by the tenant may result
                 in forfeiture of the deposit.{"\n"}• Non-payment of rent may
@@ -144,8 +144,8 @@ const ReviewAgreement = () => {
           <Pressable
             style={styles.checkboxContainer}
             onPress={() => setIsAgreed(!isAgreed)}
-          >
-            <View style={[styles.checkbox, isAgreed && styles.checkboxChecked]}>
+           className="flex-row items-start">
+            <View style={[styles.checkbox, isAgreed && styles.checkboxChecked]} className="border-[2px] items-center justify-center">
               {isAgreed && (
                 <Image
                   source={require("@/assets/icons/Checkbox-circle-intermediate.png")}
@@ -153,7 +153,7 @@ const ReviewAgreement = () => {
                 />
               )}
             </View>
-            <Text style={styles.checkboxText}>
+            <Text style={styles.checkboxText} className="flex-1">
               I have read and agree to the terms of the tenancy/ event space
               agreement.
             </Text>
@@ -176,100 +176,57 @@ export default ReviewAgreement;
 
 const getStyles = (colors: ColorScheme) =>
   StyleSheet.create({
-    header: {
-      flexDirection: "row",
-      alignItems: "center",
-      justifyContent: "space-between",
-      paddingVertical: RFValue(16),
-    },
+    header: {paddingVertical: RFValue(16)},
     backIcon: {
       width: RFValue(20),
       height: RFValue(20),
       tintColor: colors.slate[650],
     },
-    headerTitle: {
-      fontSize: RFValue(16),
-      fontWeight: "600",
-      color: colors.slate[650],
-      flex: 1,
-      textAlign: "center",
-    },
-    stepIndicator: {
-      fontSize: RFValue(14),
-      color: colors.slate[500],
-      fontWeight: "500",
-    },
-    scrollContent: {
-      flexGrow: 1,
-      paddingBottom: RFValue(20),
-    },
-    container: {
-      flex: 1,
-    },
+    headerTitle: {fontSize: RFValue(16),
+color: colors.slate[650]},
+    stepIndicator: {fontSize: RFValue(14),
+color: colors.slate[500]},
+    scrollContent: {paddingBottom: RFValue(20)},
+    container: {},
     titleSection: {
       marginTop: RFValue(24),
       marginBottom: RFValue(24),
     },
-    title: {
-      fontSize: RFValue(22),
-      fontWeight: "700",
-      color: colors.slate[650],
-      marginBottom: RFValue(8),
-    },
+    title: {fontSize: RFValue(22),
+color: colors.slate[650],
+marginBottom: RFValue(8)},
     subtitle: {
       fontSize: RFValue(14),
       color: colors.slate[500],
       lineHeight: RFValue(20),
     },
-    downloadButton: {
-      flexDirection: "row",
-      alignItems: "center",
-      justifyContent: "center",
-      backgroundColor: colors.slate[150],
-      borderRadius: RFValue(12),
-      paddingVertical: RFValue(14),
-      marginBottom: RFValue(24),
-      borderWidth: 1,
-      borderColor: colors.slate[300],
-    },
+    downloadButton: {backgroundColor: colors.slate[150],
+borderRadius: RFValue(12),
+paddingVertical: RFValue(14),
+marginBottom: RFValue(24),
+borderColor: colors.slate[300]},
     downloadIcon: {
       width: RFValue(18),
       height: RFValue(18),
       tintColor: colors.slate[650],
       marginRight: RFValue(8),
     },
-    downloadText: {
-      fontSize: RFValue(15),
-      fontWeight: "600",
-      color: colors.slate[650],
-    },
-    agreementContainer: {
-      backgroundColor: colors.slate[150],
-
-      borderColor: colors.slate[300],
-      marginBottom: RFValue(24),
-      overflow: "hidden",
-    },
-    agreementHeader: {
-      flexDirection: "row",
-      alignItems: "center",
-      padding: RFValue(16),
-    },
+    downloadText: {fontSize: RFValue(15),
+color: colors.slate[650]},
+    agreementContainer: {backgroundColor: colors.slate[150],
+borderColor: colors.slate[300],
+marginBottom: RFValue(24)},
+    agreementHeader: {padding: RFValue(16)},
     documentIcon: {
       width: RFValue(22),
       height: RFValue(22),
       tintColor: colors.slate[500],
       marginRight: RFValue(12),
     },
-    agreementHeaderText: {
-      flex: 1,
-    },
-    agreementTitle: {
-      fontSize: RFValue(15),
-      fontWeight: "600",
-      color: colors.slate[650],
-      marginBottom: RFValue(2),
-    },
+    agreementHeaderText: {},
+    agreementTitle: {fontSize: RFValue(15),
+color: colors.slate[650],
+marginBottom: RFValue(2)},
     agreementSize: {
       fontSize: RFValue(12),
       color: colors.slate[500],
@@ -282,37 +239,22 @@ const getStyles = (colors: ColorScheme) =>
     agreementContent: {
       padding: RFValue(20),
     },
-    agreementContentTitle: {
-      fontSize: RFValue(18),
-      fontWeight: "700",
-      color: colors.slate[650],
-      marginBottom: RFValue(16),
-    },
+    agreementContentTitle: {fontSize: RFValue(18),
+color: colors.slate[650],
+marginBottom: RFValue(16)},
     agreementText: {
       fontSize: RFValue(13),
       color: colors.slate[600],
       lineHeight: RFValue(20),
     },
-    agreementSectionTitle: {
-      fontWeight: "600",
-      color: colors.slate[650],
-    },
-    checkboxContainer: {
-      flexDirection: "row",
-      alignItems: "flex-start",
-      marginBottom: RFValue(24),
-    },
-    checkbox: {
-      width: RFValue(20),
-      height: RFValue(20),
-      borderRadius: RFValue(4),
-      borderWidth: 2,
-      borderColor: colors.slate[400],
-      marginRight: RFValue(12),
-      alignItems: "center",
-      justifyContent: "center",
-      marginTop: RFValue(2),
-    },
+    agreementSectionTitle: {color: colors.slate[650]},
+    checkboxContainer: {marginBottom: RFValue(24)},
+    checkbox: {width: RFValue(20),
+height: RFValue(20),
+borderRadius: RFValue(4),
+borderColor: colors.slate[400],
+marginRight: RFValue(12),
+marginTop: RFValue(2)},
     checkboxChecked: {
       backgroundColor: colors.slate[650],
       borderColor: colors.slate[650],
@@ -321,30 +263,16 @@ const getStyles = (colors: ColorScheme) =>
       width: RFValue(2),
       height: RFValue(2),
     },
-    checkboxText: {
-      flex: 1,
-      fontSize: RFValue(14),
-      color: colors.slate[600],
-      lineHeight: RFValue(20),
-    },
-    footer: {
-      position: "absolute",
-      bottom: 0,
-      left: 0,
-      right: 0,
-      paddingHorizontal: RFValue(20),
-      paddingVertical: RFValue(16),
-      backgroundColor: colors.background,
-      borderTopWidth: 1,
-      borderTopColor: colors.slate[300],
-    },
-    continueButton: {
-      backgroundColor: colors.slate[650],
-      borderRadius: RFValue(12),
-      paddingVertical: RFValue(16),
-      alignItems: "center",
-      justifyContent: "center",
-    },
+    checkboxText: {fontSize: RFValue(14),
+color: colors.slate[600],
+lineHeight: RFValue(20)},
+    footer: {paddingHorizontal: RFValue(20),
+paddingVertical: RFValue(16),
+backgroundColor: colors.background,
+borderTopColor: colors.slate[300]},
+    continueButton: {backgroundColor: colors.slate[650],
+borderRadius: RFValue(12),
+paddingVertical: RFValue(16)},
     continueButtonDisabled: {
       backgroundColor: colors.slate[300],
     },

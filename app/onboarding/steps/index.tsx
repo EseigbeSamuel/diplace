@@ -127,8 +127,8 @@ const Renter = () => {
 
   if (current === 3) {
     return (
-      <View style={{ position: "relative", flex: 1 }}>
-        <View style={{ flex: 1 }}>{renderStep()}</View>
+      <View className="relative flex-1">
+        <View className="flex-1">{renderStep()}</View>
       </View>
     );
   }
@@ -158,7 +158,7 @@ const Renter = () => {
           </Text>
         </View>
       )}
-      <View style={{ flex: 1 }}>{renderStep()}</View>
+      <View className="flex-1">{renderStep()}</View>
     </SafeAreaViewContainer>
   );
 };
